@@ -179,11 +179,11 @@ namespace GGemCo.Scripts.Characters.Player
                 yield return null;
             }
 
-            player.isStartFade = false;
+            player.SetIsStartFade(false);
         }
         public override void PlayDeadAnimation()
         {
-            PlayAnimation(deadAnim, false);
+            PlayAnimation(deadAnim);
         }
     }
 }

@@ -32,7 +32,7 @@ namespace GGemCo.Scripts.Characters.Npc
                 yield return null;
             }
 
-            npc.isStartFade = false;
+            npc.SetIsStartFade(false);
         }
     }
 }

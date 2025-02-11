@@ -44,7 +44,7 @@ namespace GGemCo.Scripts.Characters
 
         private bool isPossibleFlip = true;
         private ICharacter characterImplementation;
-        public bool isStartFade;
+        private bool isStartFade;
         
 #if GGEMCO_USE_SPINE
         private SkeletonAnimation skeletonAnimation;

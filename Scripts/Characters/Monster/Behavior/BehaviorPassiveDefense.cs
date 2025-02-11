@@ -223,7 +223,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
                 yield return null;
             }
 
-            monster.isStartFade = false;
+            monster.SetIsStartFade(false);
         }
 
         #endregion
