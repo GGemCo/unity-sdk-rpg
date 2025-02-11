@@ -35,8 +35,8 @@ namespace GGemCo.Scripts.Characters
         public bool PossibleAttack { get; set; }
         public string MyTag { get; set; }
         public string TargetTag { get; set; }
-        
-        public bool Flip { get; set; }
+
+        public bool flip;
         
         private Renderer characterRenderer;
 
@@ -44,7 +44,7 @@ namespace GGemCo.Scripts.Characters
 
         private bool isPossibleFlip = true;
         private ICharacter characterImplementation;
-        public bool isStartFade;
+        private bool isStartFade;
         
 #if GGEMCO_USE_SPINE
         private SkeletonAnimation skeletonAnimation;
@@ -121,7 +121,7 @@ namespace GGemCo.Scripts.Characters
             if (IsPossibleFlip() != true) return;
 
             transform.localScale = flip ? new Vector3(OriginalScaleX * -1f, transform.localScale.y, transform.localScale.z) : new Vector3(OriginalScaleX, transform.localScale.y, transform.localScale.z);
-            Flip = flip;
+            this.flip = flip;
         }
         /// <summary>
         /// 타겟 오브젝트가 있을경우 방향 셋팅하기
@@ -276,6 +276,11 @@ namespace GGemCo.Scripts.Characters
         public void TakeDamage(int damage)
         {
             throw new System.NotImplementedException();
+        }
+
+        public void SetIsStartFade(bool value)
+        {
+            isStartFade = value;
         }
     }
 }

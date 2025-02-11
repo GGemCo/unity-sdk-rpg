@@ -89,7 +89,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                 {
                     var monster = child.gameObject.GetComponent<Monster>();
                     if (monster == null) continue;
-                    saveMonsterList.monsterDataList.Add(new MonsterData(monster.Uid, child.position, monster.Flip, mapUid, true));
+                    saveMonsterList.monsterDataList.Add(new MonsterData(monster.Uid, child.position, monster.flip, mapUid, true));
                 }
             }
 

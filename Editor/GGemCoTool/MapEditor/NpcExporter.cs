@@ -88,7 +88,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                 {
                     var npc = child.gameObject.GetComponent<Npc>();
                     if (npc == null) continue;
-                    saveNpcList.npcDataList.Add(new NpcData(npc.Uid, child.position, npc.Flip, mapUid, true));
+                    saveNpcList.npcDataList.Add(new NpcData(npc.Uid, child.position, npc.flip, mapUid, true));
                 }
             }
 
@@ -153,7 +153,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                     // 추가적인 속성 설정을 여기에서 수행할 수 있습니다.
                     myNpcScript.SetScale(info.Scale);
                     // SetScale 다음에 처리해야 함
-                    myNpcScript.Flip = npcData.Flip;
+                    myNpcScript.flip = npcData.Flip;
                     myNpcScript.SetFlip(npcData.Flip);
                 }
             }

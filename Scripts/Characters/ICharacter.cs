@@ -95,7 +95,6 @@ namespace GGemCo.Scripts.Characters
         bool PossibleAttack { get; set; }
         float OriginalScaleX { get; set; }
         bool IsAttacking { get; set; }
-        bool Flip { get; set; }
         string MyTag { get; set; }
         
         void Move(Vector3 direction);

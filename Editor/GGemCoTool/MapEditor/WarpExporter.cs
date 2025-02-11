@@ -104,7 +104,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                 return;
             }
 
-            GameObject warpPrefab = Resources.Load<GameObject>("Prefabs/Map/ObjectWarp");
+            GameObject warpPrefab = Resources.Load<GameObject>(MapConstants.PathPrefabWarp);
             if (warpPrefab == null)
             {
                 GcLogger.LogError("워프 프리팹이 없습니다. ");
@@ -112,17 +112,17 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             }
             foreach (WarpData warpData in warpDatas)
             {
-                int toMapUid = warpData.ToMapUid;
-                if (toMapUid <= 0) continue;
+                // int toMapUid = warpData.ToMapUid;
+                // if (toMapUid <= 0) continue;
                 GameObject warp = Object.Instantiate(warpPrefab, _defaultMap.gameObject.transform);
                 
                 // NPC의 속성을 설정하는 스크립트가 있을 경우 적용
-                ObjectWarp npcScript = warp.GetComponent<ObjectWarp>();
-                if (npcScript != null)
+                ObjectWarp objectWarp = warp.GetComponent<ObjectWarp>();
+                if (objectWarp != null)
                 {
                     // MapManager.cs:164 도 수정
-                    npcScript.WarpData = warpData;
-                    npcScript.Initialize();
+                    objectWarp.WarpData = warpData;
+                    objectWarp.Initialize();
                 }
             }
 
