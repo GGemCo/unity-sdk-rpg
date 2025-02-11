@@ -135,7 +135,7 @@ namespace GGemCo.Scripts.Characters.Player
                     Monster.Monster monster = hit.GetComponent<Monster.Monster>();
                     if (monster != null)
                     {
-                        // FgLogger.Log("Player attacked the monster after animation!");
+                        // GcLogger.Log("Player attacked the monster after animation!");
                         targetMonster = monster.gameObject;
                         return true;
                     }

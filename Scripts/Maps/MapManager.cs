@@ -89,12 +89,12 @@ namespace GGemCo.Scripts.Maps
         {
             if (IsPossibleLoad() != true)
             {
-                // FgLogger.LogError($"map state: {currentState}");
+                // GcLogger.LogError($"map state: {currentState}");
                 return;
             }
 
             if (mapUid <= 0) return;
-            // FgLogger.Log("LoadMap start");
+            // GcLogger.Log("LoadMap start");
             Reset();
             currentState = MapConstants.State.FadeIn;
             currentMapUid = mapUid;
@@ -248,7 +248,7 @@ namespace GGemCo.Scripts.Maps
             // 필요시 가비지 컬렉션을 강제로 실행
             GC.Collect();
 
-            // FgLogger.Log("이전 스테이지의 몬스터 프리팹이 메모리에서 해제되었습니다.");
+            // GcLogger.Log("이전 스테이지의 몬스터 프리팹이 메모리에서 해제되었습니다.");
         }
 
         private void DestroyOthers()

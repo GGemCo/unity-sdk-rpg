@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace GGemCo.Scripts.Characters
 {
@@ -9,13 +10,13 @@ namespace GGemCo.Scripts.Characters
         {
             None,
             Player,
-            NPC,
+            Npc,
             Monster
         }
         
         public DefaultCharacter CreateCharacter(CharacterType type, CharacterData data)
         {
-            DefaultCharacter newCharacter = null;
+            DefaultCharacter newCharacter;
             switch (type)
             {
                 case CharacterType.Player:
@@ -32,23 +33,27 @@ namespace GGemCo.Scripts.Characters
 
             return newCharacter;
         }
-        // 플레이어 캐릭터 생성
+        /// <summary>
+        /// 플레이어 캐릭터 생성
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         private GGemCo.Scripts.Characters.Player.Player CreatePlayerCharacter(CharacterData data)
         {
             // 플레이어 캐릭터 프리팹을 스폰합니다. (여기서는 프리팹 로드를 가정)
-            GameObject playerPrefab = Resources.Load<GameObject>("Prefabs/Characters/player");
-            if (playerPrefab == null)
+            GameObject playerPrefab = Resources.Load<GameObject>("Characters/Player/Player");
+            if (playerPrefab ==null)
             {
-                // FgLogger.LogError("플레이어 프리팹이 없습니다.");
+                // GcLogger.LogError("플레이어 프리팹이 없습니다.");
                 return null;
             }
-            GameObject playerObject = GameObject.Instantiate(playerPrefab);
+            GameObject playerObject = Object.Instantiate(playerPrefab);
         
             // PlayerCharacter 설정
             GGemCo.Scripts.Characters.Player.Player player = playerObject.GetComponent<GGemCo.Scripts.Characters.Player.Player>();
             if (player == null)
             {
-                // FgLogger.LogError("플레이어 스크립트가 프리팹에 없습니다.");
+                // GcLogger.LogError("플레이어 스크립트가 프리팹에 없습니다.");
                 return null;
             }
 

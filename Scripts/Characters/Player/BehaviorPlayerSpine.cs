@@ -104,7 +104,7 @@ namespace GGemCo.Scripts.Characters.Player
 
         protected override void OnSpineEventAttack(Event @event) 
         {
-            // FgLogger.Log(@event);
+            // GcLogger.Log(@event);
             long totalDamage = SceneGame.Instance.calculateManager.GetPlayerTotalAtk();
         
             // 캡슐 콜라이더 2D와 충돌 중인 모든 콜라이더를 검색
@@ -123,7 +123,7 @@ namespace GGemCo.Scripts.Characters.Player
                     Monster.Monster monster = hit.GetComponent<Monster.Monster>();
                     if (monster != null)
                     {
-                        // FgLogger.Log("Player attacked the monster after animation!");
+                        // GcLogger.Log("Player attacked the monster after animation!");
                         // 몬스터와 마주보고 있으면 공격 
                         if (player.IsFlipped() != monster.IsFlipped())
                         {

@@ -125,7 +125,7 @@ namespace GGemCo.Scripts.Popup
             {
                 if (gaugeBarAutoClose == null)
                 {
-                    // FgLogger.LogError("dont exist gauge image.");
+                    // GcLogger.LogError("dont exist gauge image.");
                 }
                 else
                 {
