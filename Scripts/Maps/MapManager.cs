@@ -92,6 +92,8 @@ namespace GGemCo.Scripts.Maps
                 // FgLogger.LogError($"map state: {currentState}");
                 return;
             }
+
+            if (mapUid <= 0) return;
             // FgLogger.Log("LoadMap start");
             Reset();
             currentState = MapConstants.State.FadeIn;
@@ -100,43 +102,57 @@ namespace GGemCo.Scripts.Maps
             StartCoroutine(UpdateState());
         }
 
-        IEnumerator UpdateState()
+        private IEnumerator UpdateState()
         {
-            while (currentState != MapConstants.State.Complete)
+            while (currentState != MapConstants.State.Complete && currentState != MapConstants.State.Failed)
             {
                 switch (currentState)
                 {
                     case MapConstants.State.FadeIn:
-                        yield return StartCoroutine(FadeIn());
+                        yield return StartCoroutineSafe(FadeIn());
+                        if (currentState == MapConstants.State.Failed) yield break;
                         currentState = MapConstants.State.UnloadPreviousStage;
                         break;
+
                     case MapConstants.State.UnloadPreviousStage:
-                        yield return StartCoroutine(UnloadPreviousStage());
+                        yield return StartCoroutineSafe(UnloadPreviousStage());
+                        if (currentState == MapConstants.State.Failed) yield break;
                         currentState = MapConstants.State.LoadTilemapPrefab;
                         break;
+
                     case MapConstants.State.LoadTilemapPrefab:
-                        yield return StartCoroutine(LoadTilemap());
+                        yield return StartCoroutineSafe(LoadTilemap());
+                        if (currentState == MapConstants.State.Failed) yield break;
                         currentState = MapConstants.State.LoadPlayerPrefabs;
                         break;
-                    // 플레이어를 먼저 로드해야 카메라 위치가 정해지고 캐릭터 culling 이 자연스럽게 된다 
+
                     case MapConstants.State.LoadPlayerPrefabs:
-                        yield return StartCoroutine(LoadPlayer());
+                        yield return StartCoroutineSafe(LoadPlayer());
+                        if (currentState == MapConstants.State.Failed) yield break;
                         currentState = MapConstants.State.LoadMonsterPrefabs;
                         break;
+
                     case MapConstants.State.LoadMonsterPrefabs:
-                        yield return StartCoroutine(LoadMonsters());
+                        yield return StartCoroutineSafe(LoadMonsters());
+                        if (currentState == MapConstants.State.Failed) yield break;
                         currentState = MapConstants.State.LoadNpcPrefabs;
                         break;
+
                     case MapConstants.State.LoadNpcPrefabs:
-                        yield return StartCoroutine(LoadNpcs());
+                        yield return StartCoroutineSafe(LoadNpcs());
+                        if (currentState == MapConstants.State.Failed) yield break;
                         currentState = MapConstants.State.LoadWarpPrefabs;
                         break;
+
                     case MapConstants.State.LoadWarpPrefabs:
-                        yield return StartCoroutine(LoadWarps());
+                        yield return StartCoroutineSafe(LoadWarps());
+                        if (currentState == MapConstants.State.Failed) yield break;
                         currentState = MapConstants.State.FadeOut;
                         break;
+
                     case MapConstants.State.FadeOut:
-                        yield return StartCoroutine(FadeOut());
+                        yield return StartCoroutineSafe(FadeOut());
+                        if (currentState == MapConstants.State.Failed) yield break;
                         currentState = MapConstants.State.Complete;
                         break;
                 }
@@ -144,9 +160,36 @@ namespace GGemCo.Scripts.Maps
                 yield return null;
             }
 
-            OnMapLoadComplete();
+            if (currentState == MapConstants.State.Complete)
+            {
+                OnMapLoadComplete();
+            }
+            else
+            {
+                Debug.LogError("맵 로드 실패");
+            }
         }
+        /// <summary>
+        /// 실패 시 즉시 종료되는 안전한 코루틴 실행 함수
+        /// </summary>
+        private IEnumerator StartCoroutineSafe(IEnumerator routine)
+        {
+            yield return StartCoroutine(routine);
 
+            if (currentState == MapConstants.State.Failed)
+            {
+                yield break;
+            }
+        }
+        /// <summary>
+        /// 실패 시 currentState를 Failed로 설정하고 코루틴 종료
+        /// </summary>
+        private void SetLoadFailed(string errorMessage)
+        {
+            Debug.LogError($"맵 로드 실패: {errorMessage}");
+            StartCoroutine(FadeOut());
+            currentState = MapConstants.State.Failed;
+        }
         IEnumerator FadeIn()
         {
             if (bgBlackForMapLoading == null)
@@ -221,6 +264,7 @@ namespace GGemCo.Scripts.Maps
         {
             if (gridTileMap == null)
             {
+                SetLoadFailed($"dont exist grid tile map");
                 GcLogger.Log($"dont exist grid tile map");
                 yield break;
             }
@@ -230,11 +274,24 @@ namespace GGemCo.Scripts.Maps
             {
                 currentMapUid = saveDataManager.CurrentChapter;
             }
+            if (TableLoaderManager.instance.TableMap.GetCount() <= 0)
+            {
+                SetLoadFailed($"dont exist map table.");
+                GcLogger.Log($"dont exist map table.");
+                yield break;
+            }
             resultChapterData = TableLoaderManager.instance.TableMap.GetMapData(currentMapUid);
+            if (resultChapterData == null)
+            {
+                SetLoadFailed($"dont exist map data. Uid: " + currentMapUid);
+                GcLogger.Log($"dont exist map data. Uid: " + currentMapUid);
+                yield break;
+            }
             string path = GetFilePath(MapConstants.FileNameTilemap);
             GameObject prefab = Resources.Load<GameObject>(path);
             if (prefab == null)
             {
+                SetLoadFailed($"dont exist prefab path. path: {path} / currentMapUid: {currentMapUid}");
                 GcLogger.Log($"dont exist prefab path. path: {path} / currentMapUid: {currentMapUid}");
                 yield break;
             }

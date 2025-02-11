@@ -82,5 +82,10 @@ namespace GGemCo.Scripts.TableLoader
         {
             return value == "Y";
         }
+
+        public int GetCount()
+        {
+            return table.Count;
+        }
     }
 }

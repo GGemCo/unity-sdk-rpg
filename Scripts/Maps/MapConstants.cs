@@ -28,7 +28,8 @@
             LoadWarpPrefabs,      // 맵에 배치되는 warp 프리팹 불러오기
             LoadPlayerPrefabs,    // 맵에 배치되는 플레이어 프리팹 불러오기
             FadeOut,              // 검정색 스프라이트 페이드 아웃
-            Complete              // 완료
+            Complete,             // 완료
+            Failed                // 실패
         }
         
         public const string ResourceMapPath = "Maps/";
