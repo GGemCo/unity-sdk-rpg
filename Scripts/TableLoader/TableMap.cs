@@ -1,0 +1,70 @@
+﻿using System.Collections.Generic;
+using GGemCo.Scripts.Core;
+using GGemCo.Scripts.Maps;
+using GGemCo.Scripts.Utils;
+using UnityEngine;
+
+namespace GGemCo.Scripts.TableLoader
+{
+    public class StruckTableMap
+    {
+        public int Uid;
+        public string Name;
+        public MapConstants.Type Type;
+        public MapConstants.SubType Subtype;
+        public string FolderName;
+        public Vector2 PlayerSpawnPosition;
+        public int BgmUid;
+    }
+    public class TableMap : DefaultTable
+    {
+        private static readonly Dictionary<string, MapConstants.Type> MapType;
+        private static readonly Dictionary<string, MapConstants.SubType> MapSubType;
+
+        static TableMap()
+        {
+            MapType = new Dictionary<string, MapConstants.Type>
+            {
+                { "Common", MapConstants.Type.Common },
+            };
+            MapSubType = new Dictionary<string, MapConstants.SubType>
+            {
+            };
+        }
+        private static MapConstants.Type ConvertType(string type) => MapType.GetValueOrDefault(type, MapConstants.Type.None);
+        private static MapConstants.SubType ConvertTypeSub(string type) => MapSubType.GetValueOrDefault(type, MapConstants.SubType.None);
+
+        
+        public StruckTableMap GetMapData(int uid)
+        {
+            if (uid <= 0)
+            {
+                GcLogger.LogError("uid is 0.");
+                return new StruckTableMap();
+            }
+            var data = GetData(uid);
+            return new StruckTableMap
+            {
+                Uid = int.Parse(data["Uid"]),
+                Name = data["Name"],
+                Type = ConvertType(data["Type"]),
+                Subtype = ConvertTypeSub(data["Subtype"]),
+                FolderName = data["FolderName"],
+                PlayerSpawnPosition = ConvertPlayerSpawnPosition(data["PlayerSpawnPosition"]),
+                BgmUid = int.Parse(data["BgmUid"]),
+            };
+        }
+
+        private Vector2 ConvertPlayerSpawnPosition(string position)
+        {
+            Vector2 playerSpawnPosition = new Vector2(0, 0);
+            if (position != "")
+            {
+                var result2 = position.Split(",");
+                playerSpawnPosition.x = float.Parse(result2[0]);
+                playerSpawnPosition.y = float.Parse(result2[1]);
+            }
+            return playerSpawnPosition;
+        }
+    }
+}
