@@ -54,8 +54,8 @@ namespace GGemCo.Scripts.TableLoader
                 StatAtk = float.Parse(data["StatAtk"]),
                 StatMoveSpeed = float.Parse(data["StatMoveSpeed"]),
                 StatAttackSpeed = float.Parse(data["StatAttackSpeed"]),
-                RewardExp = int.Parse(data["RewardExp"]),
-                RewardGold = int.Parse(data["RewardGold"]),
+                RewardExp = 0,
+                RewardGold = 0,
             };
         }
         

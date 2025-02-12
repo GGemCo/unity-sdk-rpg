@@ -51,7 +51,7 @@ namespace GGemCo.Scripts.TableLoader
                 Subtype = ConvertTypeSub(data["Subtype"]),
                 FolderName = data["FolderName"],
                 PlayerSpawnPosition = ConvertPlayerSpawnPosition(data["PlayerSpawnPosition"]),
-                BgmUid = int.Parse(data["BgmUid"]),
+                BgmUid = 0,
             };
         }
 
