@@ -63,6 +63,8 @@ namespace GGemCo.Scripts.Characters
             CurrentStatus = ICharacter.CharacterStatus.None;
             
             SetScale(1f);
+            characterRenderer = GetComponent<Renderer>();
+            characterRenderer.sortingLayerName = ConfigSortingLayer.Character;
 #if GGEMCO_USE_SPINE
             skeletonAnimation = GetComponent<SkeletonAnimation>();
 #else
@@ -72,8 +74,6 @@ namespace GGemCo.Scripts.Characters
 
         protected virtual void Start()
         {
-            characterRenderer = GetComponent<Renderer>();
-            
             // statatk 값들은 table 에서 불러올 수 있기 때문에 Start 에서 처리한다.
             CurrentAtk = (long)StatAtk;
             CurrentHp = (long)StatHp;
