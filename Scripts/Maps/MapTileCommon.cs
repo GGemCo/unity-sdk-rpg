@@ -41,7 +41,7 @@ namespace GGemCo.Scripts.Maps
         {
             base.Initialize(uid, chapterName, type, subType);
             var size = GetMapSize();
-            gameObject.transform.position = new Vector3(gameObject.transform.position.x, size.height, 0);
+            gameObject.transform.position = new Vector3(0, 0, 0);
         }
 
         void LateUpdate()
