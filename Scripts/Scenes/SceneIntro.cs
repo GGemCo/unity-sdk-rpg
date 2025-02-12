@@ -1,12 +1,27 @@
-﻿using UnityEngine;
+﻿using GGemCo.Scripts.Configs;
+using GGemCo.Scripts.Core;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace GGemCo.Scripts.Scenes
 {
     public class SceneIntro : MonoBehaviour
     {
-        public void OnClickGameStart()
+        public Button buttonGameStart;
+
+        void Awake()
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("Loading");
+            InitButtons();
+        }
+
+        void InitButtons()
+        {
+            if (buttonGameStart == null) return;
+            buttonGameStart.onClick.AddListener(OnClickGameStart);
+        }
+        void OnClickGameStart()
+        {
+            SceneManager.ChangeScene(ConfigDefine.SceneNameLoading);
         }
     }
 }

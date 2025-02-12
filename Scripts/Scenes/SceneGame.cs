@@ -66,9 +66,9 @@ namespace GGemCo.Scripts.Scenes
 
         private void CacheReferences()
         {
-            mainCamera = GameObject.FindWithTag(ConfigTags.MainCamera)?.GetComponent<Camera>();
-            canvasUI = GameObject.FindWithTag(ConfigTags.CanvasUI)?.GetComponent<Canvas>();
-            cameraManager = GameObject.FindWithTag(ConfigTags.MainCamera)?.GetComponent<CameraManager>();
+            mainCamera = GameObject.FindWithTag(ConfigTags.GetMainCamera())?.GetComponent<Camera>();
+            canvasUI = GameObject.FindWithTag(ConfigTags.GetCanvasUI())?.GetComponent<Canvas>();
+            cameraManager = GameObject.FindWithTag(ConfigTags.GetMainCamera())?.GetComponent<CameraManager>();
         }
 
         private void InitializeManagers()

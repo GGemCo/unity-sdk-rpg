@@ -70,12 +70,12 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             _tableMap = TableLoaderManager.LoadMapTable();
             
             // 타일맵을 추가할 grid
-            _gridTileMap = GameObject.Find(ConfigTags.GridTileMap);
+            _gridTileMap = GameObject.Find(ConfigTags.GetGridTileMap());
             if (_gridTileMap == null)
             {
-                _gridTileMap = new GameObject(ConfigTags.GridTileMap)
+                _gridTileMap = new GameObject(ConfigTags.GetGridTileMap())
                 {
-                    tag = ConfigTags.GridTileMap
+                    tag = ConfigTags.GetGridTileMap()
                 };
                 Grid grid = _gridTileMap.gameObject.AddComponent<Grid>();
                 grid.cellSize = new Vector3(GRID_CELL_SIZE, GRID_CELL_SIZE, 0);
@@ -103,7 +103,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                 DestroyImmediate(obj);
             }
 
-            obj = GameObject.FindWithTag(ConfigTags.GridTileMap);
+            obj = GameObject.FindWithTag(ConfigTags.GetGridTileMap());
             if (obj)
             {
                 DestroyImmediate(obj);
@@ -165,7 +165,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
         private void ExportDataToJson()
         {
             // 태그가 'Map'인 오브젝트를 찾습니다.
-            GameObject mapObject = GameObject.FindGameObjectWithTag(ConfigTags.Map);
+            GameObject mapObject = GameObject.FindGameObjectWithTag(ConfigTags.GetMap());
         
             if (mapObject == null)
             {
@@ -218,7 +218,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
 
             if (_gridTileMap == null)
             {
-                _gridTileMap = GameObject.Find(ConfigTags.GridTileMap);
+                _gridTileMap = GameObject.Find(ConfigTags.GetGridTileMap());
             }
             currentJsonFolderPath = jsonFolderPath + mapData.FolderName + "/";
             GameObject currentMap = Instantiate(prefab, _gridTileMap.transform);

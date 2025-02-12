@@ -35,7 +35,7 @@ namespace GGemCo.Scripts.Core
         {
             GameObject gameObjectCanvas = new GameObject("CanvasTextDamage")
             {
-                tag = ConfigTags.CanvasUIByWorld
+                tag = ConfigTags.GetCanvasUIByWorld()
             };
             Canvas canvas = gameObjectCanvas.gameObject.AddComponent<Canvas>();
             gameObjectCanvas.gameObject.AddComponent<CanvasScaler>();

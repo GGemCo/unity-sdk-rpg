@@ -249,7 +249,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
 
         private void OnTriggerExit2D(Collider2D collision)
         {
-            if (collision.CompareTag(ConfigTags.Player))
+            if (collision.CompareTag(ConfigTags.GetPlayer()))
             {
                 IsAttacking = false;
                 StopAttackCoroutine();
@@ -273,7 +273,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
             for (int i = 0; i < hitCount; i++)
             {
                 Collider2D hit = monster.hits[i];
-                if (hit.CompareTag(ConfigTags.Player))
+                if (hit.CompareTag(ConfigTags.GetPlayer()))
                 {
                     Player.Player player = hit.GetComponent<Player.Player>();
                     if (player != null)

@@ -38,7 +38,7 @@ namespace GGemCo.Scripts.Characters.Player
         public override void InitTagSortingLayer()
         {
             base.InitTagSortingLayer();
-            tag = ConfigTags.Player;
+            tag = ConfigTags.GetPlayer();
         }
         /// <summary>
         /// 캐릭터에 필요한 컴포넌트 추가하기
@@ -152,7 +152,7 @@ namespace GGemCo.Scripts.Characters.Player
             for (int i = 0; i < hitCount; i++)
             {
                 Collider2D hit = hits[i];
-                if (hit.CompareTag(ConfigTags.Monster))
+                if (hit.CompareTag(ConfigTags.GetMonster()))
                 {
                     Monster.Monster monster = hit.GetComponent<Monster.Monster>();
                     if (monster != null)
@@ -168,7 +168,7 @@ namespace GGemCo.Scripts.Characters.Player
         }
         protected void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.gameObject.CompareTag(ConfigTags.Monster))
+            if (collision.gameObject.CompareTag(ConfigTags.GetMonster()))
             {
                 IsAttacking = true;
                 Monster.Monster monster = collision.gameObject.GetComponent<Monster.Monster>();
@@ -182,11 +182,11 @@ namespace GGemCo.Scripts.Characters.Player
                     Attack();
                 }
             }
-            else if (collision.gameObject.CompareTag(ConfigTags.Npc))
+            else if (collision.gameObject.CompareTag(ConfigTags.GetNpc()))
             {
                 IsNpcNearby = true;
             }
-            else if (collision.gameObject.CompareTag(ConfigTags.MapObjectWarp))
+            else if (collision.gameObject.CompareTag(ConfigTags.GetMapObjectWarp()))
             {
                 ObjectWarp objectWarp = collision.gameObject.GetComponent<ObjectWarp>();
                 if (objectWarp != null && objectWarp.toMapUid > 0)
@@ -198,11 +198,11 @@ namespace GGemCo.Scripts.Characters.Player
         }
         protected void OnTriggerExit2D(Collider2D collision)
         {
-            if (collision.gameObject.CompareTag(ConfigTags.Monster))
+            if (collision.gameObject.CompareTag(ConfigTags.GetMonster()))
             {
                 IsAttacking = false;
             }
-            else if (collision.gameObject.CompareTag(ConfigTags.Npc))
+            else if (collision.gameObject.CompareTag(ConfigTags.GetNpc()))
             {
                 IsNpcNearby = false;
             }

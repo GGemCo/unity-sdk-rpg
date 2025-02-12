@@ -54,12 +54,12 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
 
         public void ExportWarpDataToJson(string filePath, string fileName, int mapUid)
         {
-            GameObject mapObject = GameObject.FindGameObjectWithTag(ConfigTags.Map);
+            GameObject mapObject = GameObject.FindGameObjectWithTag(ConfigTags.GetMap());
             WarpDataList warpDataList = new WarpDataList();
 
             foreach (Transform child in mapObject.transform)
             {
-                if (child.CompareTag(ConfigTags.MapObjectWarp))
+                if (child.CompareTag(ConfigTags.GetMapObjectWarp()))
                 {
                     var objectWarp = child.gameObject.GetComponent<ObjectWarp>();
                     if (objectWarp == null) continue;

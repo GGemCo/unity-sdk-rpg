@@ -137,7 +137,7 @@ namespace GGemCo.Scripts.Characters.Player
             for (int i = 0; i < hitCount; i++)
             {
                 Collider2D hit = player.hits[i];
-                if (hit.CompareTag(ConfigTags.Monster))
+                if (hit.CompareTag(ConfigTags.GetMonster()))
                 {
                     Monster.Monster monster = hit.GetComponent<Monster.Monster>();
                     if (monster != null)

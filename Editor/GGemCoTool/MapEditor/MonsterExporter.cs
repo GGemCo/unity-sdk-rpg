@@ -80,12 +80,12 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
 
         public void ExportMonsterDataToJson(string filePath, string fileName, int mapUid)
         {
-            GameObject mapObject = GameObject.FindGameObjectWithTag(ConfigTags.Map);
+            GameObject mapObject = GameObject.FindGameObjectWithTag(ConfigTags.GetMap());
             MonsterDataList saveMonsterList = new MonsterDataList();
 
             foreach (Transform child in mapObject.transform)
             {
-                if (child.CompareTag(ConfigTags.Monster))
+                if (child.CompareTag(ConfigTags.GetMonster()))
                 {
                     var monster = child.gameObject.GetComponent<Monster>();
                     if (monster == null) continue;

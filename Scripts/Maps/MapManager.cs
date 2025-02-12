@@ -60,8 +60,8 @@ namespace GGemCo.Scripts.Maps
         /// </summary>
         private void CreateGrid()
         {
-            gridTileMap = new GameObject(ConfigTags.GridTileMap);
-            gridTileMap.tag = ConfigTags.GridTileMap;
+            gridTileMap = new GameObject(ConfigTags.GetGridTileMap());
+            gridTileMap.tag = ConfigTags.GetGridTileMap();
             Grid grid = gridTileMap.gameObject.AddComponent<Grid>();
             grid.cellSize = new Vector3(gridCellSize, gridCellSize, 0);
             grid.cellLayout = GridLayout.CellLayout.Rectangle;
@@ -71,7 +71,7 @@ namespace GGemCo.Scripts.Maps
         /// </summary>
         void InitializeCanvasBlockInteraction()
         {
-            GameObject gameObjectCanvasBlockInteraction = GameObject.FindWithTag(ConfigTags.CanvasBlockInteraction);
+            GameObject gameObjectCanvasBlockInteraction = GameObject.FindWithTag(ConfigTags.GetCanvasBlockInteraction());
             bgBlackForMapLoading = gameObjectCanvasBlockInteraction.transform.GetChild(0).gameObject;
         }
         protected void Start()
@@ -235,8 +235,8 @@ namespace GGemCo.Scripts.Maps
         IEnumerator UnloadPreviousStage()
         {
             // 현재 씬에 있는 모든 몬스터 오브젝트를 삭제
-            DestroyByTag(ConfigTags.Monster);
-            DestroyByTag(ConfigTags.Npc);
+            DestroyByTag(ConfigTags.GetMonster());
+            DestroyByTag(ConfigTags.GetNpc());
 
             DestroyOthers();
             // 잠시 대기하여 오브젝트가 완전히 삭제되도록 보장
@@ -253,8 +253,8 @@ namespace GGemCo.Scripts.Maps
 
         private void DestroyOthers()
         {
-            DestroyByTag(ConfigTags.Map);
-            DestroyByTag(ConfigTags.ButtonNpcQuest);
+            DestroyByTag(ConfigTags.GetMap());
+            DestroyByTag(ConfigTags.GetButtonNpcQuest());
         }
 
         /// <summary>

@@ -14,7 +14,7 @@ namespace GGemCo.Scripts.Maps.Objects
         protected override void InitTagSortingLayer()
         {
             base.InitTagSortingLayer();
-            tag = ConfigTags.MapObjectWarp;
+            tag = ConfigTags.GetMapObjectWarp();
             GetComponent<SpriteRenderer>().sortingLayerName = ConfigSortingLayer.MapObject;
         }
         protected override void InitComponents()

@@ -9,8 +9,6 @@ namespace GGemCo.Editor.GGemCoTool.DefaultSetting
     {
         private readonly string title = "태그 추가하기";
         
-        private readonly string[] tagsToAdd = { ConfigTags.MainCamera, ConfigTags.Player, ConfigTags.Monster, ConfigTags.Npc, ConfigTags.Map, ConfigTags.ButtonNpcQuest, ConfigTags.MapObjectWarp, ConfigTags.GridTileMap, ConfigTags.CanvasBlockInteraction, ConfigTags.CanvasUIByWorld, ConfigTags.CanvasUI };
-
         public void OnGUI()
         {
             Common.OnGUITitle(title);
@@ -28,8 +26,9 @@ namespace GGemCo.Editor.GGemCoTool.DefaultSetting
             SerializedProperty tagsProp = tagManager.FindProperty("tags");
 
             // 원하는 태그 목록
-            foreach (string tag in tagsToAdd)
+            foreach (var tags in ConfigTags.Tags)
             {
+                string tag = tags.Value;
                 if (!TagExists(tagsProp, tag))
                 {
                     tagsProp.InsertArrayElementAtIndex(tagsProp.arraySize);

@@ -56,7 +56,7 @@ namespace GGemCo.Scripts.Characters.Monster
         public override void InitTagSortingLayer()
         {
             base.InitTagSortingLayer();
-            tag = ConfigTags.Monster;
+            tag = ConfigTags.GetMonster();
         }
         /// <summary>
         /// 캐릭터에 필요한 컴포넌트 추가하기
@@ -169,7 +169,7 @@ namespace GGemCo.Scripts.Characters.Monster
         /// <param name="collision"></param>
         void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.gameObject.CompareTag(ConfigTags.Player))
+            if (collision.gameObject.CompareTag(ConfigTags.GetPlayer()))
             {
                 CurrentStatus = ICharacter.CharacterStatus.Idle;
                 // 선공
