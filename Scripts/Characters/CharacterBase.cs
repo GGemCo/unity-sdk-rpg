@@ -8,8 +8,7 @@ namespace GGemCo.Scripts.Characters
         public float health;
         public float moveSpeed;
 
-        protected Animator animator;
-        protected Rigidbody2D rb;
+        protected Animator Animator;
 
         public abstract void Move(Vector2 direction);
         public abstract void Attack();

@@ -173,7 +173,7 @@ namespace GGemCo.Scripts.Spine2d
         /// 캐릭터 width 값 구하기
         /// </summary>
         /// <returns></returns>
-        public override float GetCharacterWidth()
+        protected override float GetCharacterWidth()
         {
             // Skeleton에서 바운딩 박스 계산
             float[] vertexBuffer = new float[8];

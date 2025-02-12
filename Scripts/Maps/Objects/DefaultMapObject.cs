@@ -13,11 +13,11 @@ namespace GGemCo.Scripts.Maps.Objects
             InitTagSortingLayer();
         }
 
-        public virtual void InitComponents()
+        protected virtual void InitComponents()
         {
             
         }
-        public virtual void InitTagSortingLayer()
+        protected virtual void InitTagSortingLayer()
         {
             tag = ConfigTags.MapObject;
             if (GetComponent<TilemapRenderer>() != null)

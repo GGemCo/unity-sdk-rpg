@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Core;
 using GGemCo.Scripts.Maps;
 using GGemCo.Scripts.Maps.Objects;
 using GGemCo.Scripts.Utils;
@@ -15,20 +14,20 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
     public class WarpExporter
     {
         private List<WarpData> warpDatas;
-        private DefaultMap _defaultMap;
+        private DefaultMap defaultMap;
 
-        public void Initialize(DefaultMap defaultMap)
+        public void Initialize(DefaultMap pDefaultMap)
         {
-            _defaultMap = defaultMap;
+            defaultMap = pDefaultMap;
         }
 
-        public void SetDefaultMap(DefaultMap defaultMap)
+        public void SetDefaultMap(DefaultMap pDefaultMap)
         {
-            _defaultMap = defaultMap;
+            defaultMap = pDefaultMap;
         }
         public void AddWarpToMap()
         {
-            if (_defaultMap == null)
+            if (defaultMap == null)
             {
                 Debug.LogError("_defaultMap 이 없습니다.");
                 return;
@@ -41,7 +40,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                 return;
             }
 
-            GameObject warp = Object.Instantiate(warpPrefab, Vector3.zero, Quaternion.identity, _defaultMap.transform);
+            GameObject warp = Object.Instantiate(warpPrefab, Vector3.zero, Quaternion.identity, defaultMap.transform);
 
             var objectWarp = warp.GetComponent<ObjectWarp>();
             if (objectWarp == null)
@@ -64,7 +63,14 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                 {
                     var objectWarp = child.gameObject.GetComponent<ObjectWarp>();
                     if (objectWarp == null) continue;
-                    warpDataList.warpDataList.Add(new WarpData(mapUid,child.position,objectWarp.toMapUid,objectWarp.toMapPlayerSpawnPosition,child.transform.eulerAngles,child.GetComponent<BoxCollider2D>().size));
+                    WarpData warpData = new WarpData(
+                        mapUid,child.position,
+                        objectWarp.toMapUid,
+                        objectWarp.toMapPlayerSpawnPosition,
+                        child.transform.eulerAngles,
+                        child.GetComponent<BoxCollider2D>().size,
+                        child.GetComponent<BoxCollider2D>().offset);
+                    warpDataList.warpDataList.Add(warpData);
                 }
             }
 
@@ -98,7 +104,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
         }
         private void SpawnWarps()
         {
-            if (_defaultMap == null)
+            if (defaultMap == null)
             {
                 Debug.LogError("_defaultMap 이 없습니다.");
                 return;
@@ -114,7 +120,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             {
                 // int toMapUid = warpData.ToMapUid;
                 // if (toMapUid <= 0) continue;
-                GameObject warp = Object.Instantiate(warpPrefab, _defaultMap.gameObject.transform);
+                GameObject warp = Object.Instantiate(warpPrefab, defaultMap.gameObject.transform);
                 
                 // NPC의 속성을 설정하는 스크립트가 있을 경우 적용
                 ObjectWarp objectWarp = warp.GetComponent<ObjectWarp>();
@@ -122,9 +128,6 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                 {
                     // MapManager.cs:164 도 수정
                     objectWarp.WarpData = warpData;
-                    objectWarp.InitComponents();
-                    objectWarp.InitTagSortingLayer();
-                    objectWarp.InitializeByWarpData();
                 }
             }
 

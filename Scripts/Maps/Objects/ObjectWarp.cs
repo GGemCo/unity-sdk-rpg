@@ -11,13 +11,13 @@ namespace GGemCo.Scripts.Maps.Objects
         public Vector3 toMapPlayerSpawnPosition; // 워프될 곳에 플레이어가 스폰될 위치
         private BoxCollider2D boxCollider2D;
 
-        public override void InitTagSortingLayer()
+        protected override void InitTagSortingLayer()
         {
             base.InitTagSortingLayer();
             tag = ConfigTags.MapObjectWarp;
             GetComponent<SpriteRenderer>().sortingLayerName = ConfigSortingLayer.MapObject;
         }
-        public override void InitComponents()
+        protected override void InitComponents()
         {
             base.InitComponents();
             boxCollider2D = ComponentController.AddBoxCollider2D(gameObject, false,Vector2.zero, Vector2.zero);
@@ -28,7 +28,7 @@ namespace GGemCo.Scripts.Maps.Objects
             InitializeByWarpData();
         }
 
-        public void InitializeByWarpData()
+        private void InitializeByWarpData()
         {
             if (WarpData == null) return;
             toMapUid = WarpData.ToMapUid;
@@ -36,6 +36,7 @@ namespace GGemCo.Scripts.Maps.Objects
             transform.position = new Vector3(WarpData.x, WarpData.y, WarpData.z);
             transform.eulerAngles = new Vector3(WarpData.RotationX, WarpData.RotationY, WarpData.RotationZ);
             boxCollider2D.size = new Vector2(WarpData.BoxColliderSizeX, WarpData.BoxColliderSizeY);
+            boxCollider2D.offset = new Vector2(WarpData.BoxColliderOffsetX, WarpData.BoxColliderOffsetY);
         }
     }
 }

@@ -20,15 +20,15 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
         private TableAnimation tableAnimation;
         private DefaultMap defaultMap;
         
-        public void Initialize(TableMonster tableMonster, TableAnimation tableAnimation, DefaultMap defaultMap)
+        public void Initialize(TableMonster pTableMonster, TableAnimation pTableAnimation, DefaultMap pDefaultMap)
         {
-            this.tableMonster = tableMonster;
-            this.tableAnimation = tableAnimation;
-            this.defaultMap = defaultMap;
+            tableMonster = pTableMonster;
+            tableAnimation = pTableAnimation;
+            defaultMap = pDefaultMap;
         }
-        public void SetDefaultMap(DefaultMap defaultMap)
+        public void SetDefaultMap(DefaultMap pDefaultMap)
         {
-            this.defaultMap = defaultMap;
+            defaultMap = pDefaultMap;
         }
 
         public void AddMonsterToMap(int selectedMonsterIndex)

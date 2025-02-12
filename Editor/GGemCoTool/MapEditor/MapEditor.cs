@@ -26,34 +26,36 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
         private static TableMonster _tableMonster;
         private static TableAnimation _tableAnimation;
 
-        private string jsonFolderPath = Application.dataPath+"/Resources/Maps/";
+        private readonly string jsonFolderPath = Application.dataPath+"/Resources/Maps/";
         private string currentJsonFolderPath = "";
-        private string resourcesFolderPath = "Maps/";
+        private const string RESOURCES_FOLDER_PATH = "Maps/";
+
         // private string fileName = "regen_npc.json";
         // private string fileNameWarp = "warp.json";
         private string loadMapUid = "101";
         private const string NameTempTableLoaderManager = "TempTableLoaderManager";
 
-        private static string _fileNameTilemap = MapConstants.FileNameTilemap;
-        private static string _fileNameRegenNpc = MapConstants.FileNameRegenNpc;
-        private static string _fileNameRegenMonster = MapConstants.FileNameRegenMonster;
-        private static string _fileNameWarp = MapConstants.FileNameWarp;
-        private static string _fileExt = MapConstants.FileExt;
-        private string jsonFileNameTilemap = _fileNameTilemap+_fileExt;
-        private string jsonFileNameRegenNpc = _fileNameRegenNpc+_fileExt;
-        private string jsonFileNameRegenMonster = _fileNameRegenMonster+_fileExt;
-        private string jsonFileNameWarp = _fileNameWarp+_fileExt;
+        private const string FILE_NAME_TILEMAP = MapConstants.FileNameTilemap;
+        private const string FILE_NAME_REGEN_NPC = MapConstants.FileNameRegenNpc;
+        private const string FILE_NAME_REGEN_MONSTER = MapConstants.FileNameRegenMonster;
+        private const string FILE_NAME_WARP = MapConstants.FileNameWarp;
+        private const string FILE_EXT = MapConstants.FileExt;
+
+        // private string jsonFileNameTilemap = _fileNameTilemap+_fileExt;
+        private readonly string jsonFileNameRegenNpc = FILE_NAME_REGEN_NPC+FILE_EXT;
+        private readonly string jsonFileNameRegenMonster = FILE_NAME_REGEN_MONSTER+FILE_EXT;
+        private readonly string jsonFileNameWarp = FILE_NAME_WARP+FILE_EXT;
         
-        private NpcExporter _npcExporter = new NpcExporter();
-        private MonsterExporter _monsterExporter = new MonsterExporter();
-        private WarpExporter _warpExporter = new WarpExporter();
+        private readonly NpcExporter npcExporter = new NpcExporter();
+        private readonly MonsterExporter monsterExporter = new MonsterExporter();
+        private readonly WarpExporter warpExporter = new WarpExporter();
         
         private static List<string> _npcNames; // NPC 이름 목록
         private static List<string> _monsterNames; // 몬스터 이름 목록
         
-        private int selectedNpcIndex = 0;
-        private int selectedMonsterIndex = 0;
-        private float gridCellSize = 64;
+        private int selectedNpcIndex;
+        private int selectedMonsterIndex;
+        private const float GRID_CELL_SIZE = 64;
 
         [MenuItem("GGemCoTool/Map 배치툴")]
         public static void ShowWindow()
@@ -63,16 +65,20 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
 
         private void OnEnable()
         {
+            selectedNpcIndex = 0;
+            selectedMonsterIndex = 0;
             _tableMap = TableLoaderManager.LoadMapTable();
             
             // 타일맵을 추가할 grid
             _gridTileMap = GameObject.Find(ConfigTags.GridTileMap);
             if (_gridTileMap == null)
             {
-                _gridTileMap = new GameObject(ConfigTags.GridTileMap);
-                _gridTileMap.tag = ConfigTags.GridTileMap;
+                _gridTileMap = new GameObject(ConfigTags.GridTileMap)
+                {
+                    tag = ConfigTags.GridTileMap
+                };
                 Grid grid = _gridTileMap.gameObject.AddComponent<Grid>();
-                grid.cellSize = new Vector3(gridCellSize, gridCellSize, 0);
+                grid.cellSize = new Vector3(GRID_CELL_SIZE, GRID_CELL_SIZE, 0);
                 grid.cellLayout = GridLayout.CellLayout.Rectangle;
             }
 
@@ -82,9 +88,9 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             var tableMonster = TableLoaderManager.LoadMonsterTable();
             var tableSpine = TableLoaderManager.LoadSpineTable();
 
-            _npcExporter.Initialize(tableNpc, tableSpine, defaultMap);
-            _monsterExporter.Initialize(tableMonster, tableSpine, defaultMap);
-            _warpExporter.Initialize(defaultMap);
+            npcExporter.Initialize(tableNpc, tableSpine, defaultMap);
+            monsterExporter.Initialize(tableMonster, tableSpine, defaultMap);
+            warpExporter.Initialize(defaultMap);
              LoadNpcInfoData();
              LoadMonsterInfoData();
         }
@@ -123,7 +129,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             // NPC 추가 버튼
             if (GUILayout.Button("NPC 추가"))
             {
-                _npcExporter.AddNpcToMap(selectedNpcIndex);
+                npcExporter.AddNpcToMap(selectedNpcIndex);
             }
             
             GUILayout.Space(20);
@@ -134,7 +140,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             // 몬스터 추가 버튼
             if (GUILayout.Button("몬스터 추가"))
             {
-                _monsterExporter.AddMonsterToMap(selectedMonsterIndex);
+                monsterExporter.AddMonsterToMap(selectedMonsterIndex);
             }
             
             GUILayout.Space(20);
@@ -143,7 +149,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             // 워프 추가 버튼
             if (GUILayout.Button("워프 추가"))
             {
-                _warpExporter.AddWarpToMap();
+                warpExporter.AddWarpToMap();
             }
             
             GUILayout.Space(20);
@@ -168,10 +174,9 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             }
             
             int mapUid = int.Parse(loadMapUid);
-            var mapData = _tableMap.GetMapData(mapUid);
-            _npcExporter.ExportNpcDataToJson(currentJsonFolderPath, jsonFileNameRegenNpc, mapUid);
-            _monsterExporter.ExportMonsterDataToJson(currentJsonFolderPath, jsonFileNameRegenMonster, mapUid);
-            _warpExporter.ExportWarpDataToJson(currentJsonFolderPath, jsonFileNameWarp, mapUid);
+            npcExporter.ExportNpcDataToJson(currentJsonFolderPath, jsonFileNameRegenNpc, mapUid);
+            monsterExporter.ExportMonsterDataToJson(currentJsonFolderPath, jsonFileNameRegenMonster, mapUid);
+            warpExporter.ExportWarpDataToJson(currentJsonFolderPath, jsonFileNameWarp, mapUid);
             AssetDatabase.Refresh();
         }
 
@@ -181,9 +186,9 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             var mapData = _tableMap.GetMapData(mapUid);
             
             LoadTileData();
-            _npcExporter.LoadNpcData(resourcesFolderPath + mapData.FolderName + "/" + _fileNameRegenNpc);
-            _monsterExporter.LoadMonsterData(resourcesFolderPath + mapData.FolderName + "/" + _fileNameRegenMonster);
-            _warpExporter.LoadWarpData(resourcesFolderPath + mapData.FolderName + "/" + _fileNameWarp);
+            npcExporter.LoadNpcData(RESOURCES_FOLDER_PATH + mapData.FolderName + "/" + FILE_NAME_REGEN_NPC);
+            monsterExporter.LoadMonsterData(RESOURCES_FOLDER_PATH + mapData.FolderName + "/" + FILE_NAME_REGEN_MONSTER);
+            warpExporter.LoadWarpData(RESOURCES_FOLDER_PATH + mapData.FolderName + "/" + FILE_NAME_WARP);
         }
         /// <summary>
         /// MapManager.cs:25
@@ -203,7 +208,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                 DestroyImmediate(_defaultMap.gameObject);
             }
 
-            string tilemapPath = resourcesFolderPath + mapData.FolderName + "/" + _fileNameTilemap;
+            string tilemapPath = RESOURCES_FOLDER_PATH + mapData.FolderName + "/" + FILE_NAME_TILEMAP;
             GameObject prefab = Resources.Load<GameObject>(tilemapPath);
             if (prefab == null)
             {
@@ -221,9 +226,9 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             _defaultMap.InitComponents();
             _defaultMap.InitTagSortingLayer();
             _defaultMap.Initialize(mapData.Uid, mapData.Name, mapData.Type, mapData.Subtype);
-            _npcExporter.SetDefaultMap(_defaultMap);
-            _monsterExporter.SetDefaultMap(_defaultMap);
-            _warpExporter.SetDefaultMap(_defaultMap);
+            npcExporter.SetDefaultMap(_defaultMap);
+            monsterExporter.SetDefaultMap(_defaultMap);
+            warpExporter.SetDefaultMap(_defaultMap);
         }
         /// <summary>
         /// npc 정보 불러오기

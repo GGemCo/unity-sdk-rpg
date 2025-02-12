@@ -1,6 +1,6 @@
 ﻿namespace GGemCo.Scripts.Characters
 {
-    public class CharacterData
+    public abstract class CharacterData
     {
         public long Uid;
     }

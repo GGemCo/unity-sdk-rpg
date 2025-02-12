@@ -31,11 +31,13 @@ namespace GGemCo.Scripts.Characters
         {
             return 0;
         }
-        public virtual float GetCharacterWidth()
+
+        protected virtual float GetCharacterWidth()
         {
             return 0;
         }
-        public virtual Vector2 GetCharacterSize()
+
+        protected virtual Vector2 GetCharacterSize()
         {
             return new Vector2(GetCharacterWidth(), GetCharacterHeight());
         }

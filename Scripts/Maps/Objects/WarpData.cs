@@ -10,8 +10,9 @@ namespace GGemCo.Scripts.Maps.Objects
         public float RotationX, RotationY, RotationZ;
         public float ToX, ToY, ToZ; // 이동했을때 플레이어 스폰되는 위치
         public float BoxColliderSizeX, BoxColliderSizeY;
+        public float BoxColliderOffsetX, BoxColliderOffsetY;
 
-        public WarpData(int mapUid, Vector3 position, int toMapUid, Vector3 toSpawnPosition, Vector3 rotation, Vector2 boxColliderSize)
+        public WarpData(int mapUid, Vector3 position, int toMapUid, Vector3 toSpawnPosition, Vector3 rotation, Vector2 boxColliderSize, Vector2 boxColliderOffset)
         {
             MapUid = mapUid;
             ToMapUid = toMapUid;
@@ -26,6 +27,8 @@ namespace GGemCo.Scripts.Maps.Objects
             RotationZ = rotation.z;
             BoxColliderSizeX = boxColliderSize.x;
             BoxColliderSizeY = boxColliderSize.y;
+            BoxColliderOffsetX = boxColliderOffset.x;
+            BoxColliderOffsetY = boxColliderOffset.y;
         }
     }
 }
