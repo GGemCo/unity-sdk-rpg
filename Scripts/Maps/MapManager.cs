@@ -620,5 +620,13 @@ namespace GGemCo.Scripts.Maps
                 characterVid++;
             }
         }
+        /// <summary>
+        /// 현재 맵 사이즈 가져오기
+        /// </summary>
+        /// <returns></returns>
+        public (float width, float height) GetCurrentMapSize()
+        {
+            return mapTileCommon.GetMapSize();
+        }
     }
 }

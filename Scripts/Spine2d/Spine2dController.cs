@@ -169,6 +169,17 @@ namespace GGemCo.Scripts.Spine2d
             SkeletonAnimation.Skeleton.GetBounds(out float x, out float y, out float width, out float height, ref vertexBuffer);
             return height;
         }
+        /// <summary>
+        /// 캐릭터 width 값 구하기
+        /// </summary>
+        /// <returns></returns>
+        public override float GetCharacterWidth()
+        {
+            // Skeleton에서 바운딩 박스 계산
+            float[] vertexBuffer = new float[8];
+            SkeletonAnimation.Skeleton.GetBounds(out float x, out float y, out float width, out float height, ref vertexBuffer);
+            return width;
+        }
     }
 }
 #endif

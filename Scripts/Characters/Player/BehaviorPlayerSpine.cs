@@ -1,4 +1,5 @@
 ﻿#if GGEMCO_USE_SPINE
+using System;
 using System.Collections;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
@@ -14,10 +15,20 @@ namespace GGemCo.Scripts.Characters.Player
         private Transform attackerTransform;
         private Player player;
 
+        private Vector2 minBounds, maxBounds; // 타일맵의 최소/최대 경계
+        private (float width, float height) mapSize;
         protected override void Awake()
         {
             base.Awake();
             player = GetComponent<Player>();
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+            // 타일맵의 경계를 가져오는 코드 (직접 설정 가능)
+            minBounds = new Vector2(0f, 0f); // 좌측 하단 경계
+            mapSize = SceneGame.Instance.mapManager.GetCurrentMapSize();
         }
         private void HandleInput()
         {
@@ -86,7 +97,6 @@ namespace GGemCo.Scripts.Characters.Player
                 DirectionPrev = Direction;
             }
         }
-
         private void Update()
         {
             if (IsAttacking) return; // 공격 중이면 움직임 차단
@@ -94,7 +104,16 @@ namespace GGemCo.Scripts.Characters.Player
             HandleInput();
             HandleAttack();
             UpdateDirectionAnimation();
-            player.transform.Translate(Direction * (player.CurrentMoveStep * player.CurrentMoveSpeed * Time.deltaTime));
+
+            UpdateCheckMaxBounds();
+            // 이동 처리
+            Vector3 nextPosition = player.transform.position + Direction * (player.CurrentMoveStep * player.CurrentMoveSpeed * Time.deltaTime);
+
+            // 경계 체크 (타일맵 범위를 벗어나지 않도록 제한)
+            nextPosition.x = Mathf.Clamp(nextPosition.x, minBounds.x, maxBounds.x);
+            nextPosition.y = Mathf.Clamp(nextPosition.y, minBounds.y, maxBounds.y);
+
+            player.transform.position = nextPosition;
         }
 
         protected override void OnSpineEventShake(Event @event) 
@@ -184,6 +203,14 @@ namespace GGemCo.Scripts.Characters.Player
         public override void PlayDeadAnimation()
         {
             PlayAnimation(deadAnim);
+        }
+        private void UpdateCheckMaxBounds()
+        {
+            var characterSize = GetCharacterSize();
+            characterSize.x *= Math.Abs(player.transform.localScale.x);
+            characterSize.y *= player.transform.localScale.y;
+            minBounds.x = characterSize.x / 2;
+            maxBounds = new Vector2(mapSize.width - (characterSize.x/2), mapSize.height - characterSize.y);   // 우측 상단 경계
         }
     }
 }

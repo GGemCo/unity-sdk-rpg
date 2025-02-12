@@ -31,6 +31,14 @@ namespace GGemCo.Scripts.Characters
         {
             return 0;
         }
+        public virtual float GetCharacterWidth()
+        {
+            return 0;
+        }
+        public virtual Vector2 GetCharacterSize()
+        {
+            return new Vector2(GetCharacterWidth(), GetCharacterHeight());
+        }
 
         public virtual IEnumerator FadeEffect(float duration, bool fadeIn)
         {

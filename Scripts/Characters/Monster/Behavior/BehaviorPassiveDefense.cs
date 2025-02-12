@@ -1,4 +1,5 @@
 ﻿#if GGEMCO_USE_SPINE
+using System;
 using System.Collections;
 using GGemCo.Scripts.Spine2d;
 using GGemCo.Scripts.Configs;
@@ -21,6 +22,8 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         private Coroutine coroutineAttack;
 
         private const float DelayAttack = 0f;
+        private Vector2 minBounds, maxBounds; // 타일맵의 최소/최대 경계
+        private (float width, float height) mapSize;
 
         protected override void Awake()
         {
@@ -29,6 +32,13 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
             capsuleCollider = monster.GetComponent<CapsuleCollider2D>();
             hits = monster.hits;
             SkeletonAnimation.state.Complete += OnAttackComplete;
+        }
+        protected override void Start()
+        {
+            base.Start();
+            // 타일맵의 경계를 가져오는 코드 (직접 설정 가능)
+            minBounds = new Vector2(0f, 0f); // 좌측 하단 경계
+            mapSize = SceneGame.Instance.mapManager.GetCurrentMapSize();
         }
 
         private void Update()
@@ -188,7 +198,16 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
                 : walkForwardAnim;
 
             PlayAnimation(moveAnim);
-            monster.transform.Translate(Direction * (monster.CurrentMoveStep * monster.CurrentMoveSpeed * Time.deltaTime));
+            
+            UpdateCheckMaxBounds();
+            // 이동 처리
+            Vector3 nextPosition = monster.transform.position + Direction * (monster.CurrentMoveStep * monster.CurrentMoveSpeed * Time.deltaTime);
+
+            // 경계 체크 (타일맵 범위를 벗어나지 않도록 제한)
+            nextPosition.x = Mathf.Clamp(nextPosition.x, minBounds.x, maxBounds.x);
+            nextPosition.y = Mathf.Clamp(nextPosition.y, minBounds.y, maxBounds.y);
+
+            monster.transform.position = nextPosition;
         }
 
         /// <summary>
@@ -274,6 +293,14 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
             StopCoroutine(coroutineAttack);
             coroutineAttack = null;
             SkeletonAnimation.AnimationState.SetAnimation(0, deadAnim, false);
+        }
+        private void UpdateCheckMaxBounds()
+        {
+            var characterSize = GetCharacterSize();
+            characterSize.x *= Math.Abs(monster.transform.localScale.x);
+            characterSize.y *= monster.transform.localScale.y;
+            minBounds.x = characterSize.x / 2;
+            maxBounds = new Vector2(mapSize.width - (characterSize.x/2), mapSize.height - characterSize.y);   // 우측 상단 경계
         }
     }
 }
