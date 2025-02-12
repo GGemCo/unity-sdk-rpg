@@ -2,6 +2,7 @@ using GGemCo.Scripts.Characters.Monster.Behavior;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
+using GGemCo.Scripts.Utils;
 using UnityEngine;
 
 namespace GGemCo.Scripts.Characters.Monster
@@ -34,7 +35,6 @@ namespace GGemCo.Scripts.Characters.Monster
         protected override void Awake()
         {
             base.Awake();
-            tag = ConfigTags.Monster;
             currentAttackSpeed = 1f;
             isAggro = false;
             MonsterData = null;
@@ -50,10 +50,23 @@ namespace GGemCo.Scripts.Characters.Monster
             DefaultCharacterBehavior = gameObject.AddComponent<BehaviorMonsterSprite>();
 #endif
         }
-        protected override void Start()
+        /// <summary>
+        /// tag, sorting layer, layer 셋팅하기
+        /// </summary>
+        public override void InitTagSortingLayer()
         {
-            base.Start();
-            gameObject.tag = ConfigTags.Monster;
+            base.InitTagSortingLayer();
+            tag = ConfigTags.Monster;
+        }
+        /// <summary>
+        /// 캐릭터에 필요한 컴포넌트 추가하기
+        /// </summary>
+        protected override void InitComponents()
+        {
+            base.InitComponents();
+            Vector2 offset = Vector2.zero;
+            Vector2 size = new Vector2(340,170);
+            ComponentController.AddCapsuleCollider2D(gameObject,false, offset, size);
         }
         /// <summary>
         /// regen_data 의 정보 셋팅

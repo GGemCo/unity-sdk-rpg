@@ -15,15 +15,27 @@ namespace GGemCo.Scripts.Characters.Npc
         protected override void Awake()
         {
             base.Awake();
-            tag = ConfigTags.Npc;
             NpcData = null;
-            gameObject.tag = ConfigTags.Npc;
             
 #if GGEMCO_USE_SPINE
             DefaultCharacterBehavior = gameObject.AddComponent<BehaviorNpcSpine>();
 #else
             DefaultCharacterBehavior = gameObject.AddComponent<BehaviorNpcSprite>();
 #endif
+        }
+        /// <summary>
+        /// tag, sorting layer, layer 셋팅하기
+        /// </summary>
+        public override void InitTagSortingLayer()
+        {
+            base.InitTagSortingLayer();
+            tag = ConfigTags.Npc;
+        }
+        /// <summary>
+        /// 캐릭터에 필요한 컴포넌트 추가하기
+        /// </summary>
+        protected override void InitComponents()
+        {
         }
         /// <summary>
         /// 테이블에서 가져온 npc 정보 셋팅

@@ -155,6 +155,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                     myMonsterScript.SetScale(info.Scale);
                     // SetScale 다음에 처리해야 함
                     myMonsterScript.SetFlip(monsterData.IsFlip);
+                    myMonsterScript.InitTagSortingLayer();
                 }
             }
 

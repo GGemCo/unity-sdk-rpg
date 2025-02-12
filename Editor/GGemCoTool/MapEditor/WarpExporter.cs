@@ -122,7 +122,9 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                 {
                     // MapManager.cs:164 도 수정
                     objectWarp.WarpData = warpData;
-                    objectWarp.Initialize();
+                    objectWarp.InitComponents();
+                    objectWarp.InitTagSortingLayer();
+                    objectWarp.InitializeByWarpData();
                 }
             }
 

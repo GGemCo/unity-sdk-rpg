@@ -1,4 +1,5 @@
 ﻿using GGemCo.Scripts.Configs;
+using GGemCo.Scripts.Utils;
 using UnityEngine;
 
 namespace GGemCo.Scripts.Maps.Objects
@@ -10,26 +11,26 @@ namespace GGemCo.Scripts.Maps.Objects
         public Vector3 toMapPlayerSpawnPosition; // 워프될 곳에 플레이어가 스폰될 위치
         private BoxCollider2D boxCollider2D;
 
-        protected override void Awake()
+        public override void InitTagSortingLayer()
         {
-            base.Awake();
+            base.InitTagSortingLayer();
             tag = ConfigTags.MapObjectWarp;
-            boxCollider2D = GetComponent<BoxCollider2D>();
             GetComponent<SpriteRenderer>().sortingLayerName = ConfigSortingLayer.MapObject;
+        }
+        public override void InitComponents()
+        {
+            base.InitComponents();
+            boxCollider2D = ComponentController.AddBoxCollider2D(gameObject, false,Vector2.zero, Vector2.zero);
         }
 
         private void Start()
         {
-            Initialize();
+            InitializeByWarpData();
         }
 
-        public void Initialize()
+        public void InitializeByWarpData()
         {
             if (WarpData == null) return;
-            if (boxCollider2D == null)
-            {
-                boxCollider2D = GetComponent<BoxCollider2D>();
-            }
             toMapUid = WarpData.ToMapUid;
             toMapPlayerSpawnPosition = new Vector3(WarpData.ToX, WarpData.ToY, WarpData.ToZ);
             transform.position = new Vector3(WarpData.x, WarpData.y, WarpData.z);

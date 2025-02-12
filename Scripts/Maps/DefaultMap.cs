@@ -15,8 +15,20 @@ namespace GGemCo.Scripts.Maps
 
         protected virtual void Awake()
         {
-            tag = ConfigTags.Map;
             tilemap = GetComponent<Tilemap>();
+            
+            InitComponents();
+            InitTagSortingLayer();
+        }
+
+        public virtual void InitComponents()
+        {
+            
+        }
+
+        public virtual void InitTagSortingLayer()
+        {
+            tag = ConfigTags.Map;
             GetComponent<TilemapRenderer>().sortingLayerName = ConfigSortingLayer.MapTerrain;
         }
 

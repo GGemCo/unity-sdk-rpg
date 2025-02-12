@@ -27,13 +27,13 @@ namespace GGemCo.Scripts.Maps
             tilemapRenderer = GetComponent<TilemapRenderer>();
         }
 
-        void Start()
+        private void Start()
         {
-            if (mainCamera == null)
+            if (mainCamera == null && SceneGame.Instance != null)
             {
                 mainCamera = SceneGame.Instance.mainCamera;
+                mainCameraZ = mainCamera.transform.position.z;
             }
-            mainCameraZ = mainCamera.transform.position.z;
             CalculateCullingBounds();
         }
 

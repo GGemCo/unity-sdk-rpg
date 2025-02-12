@@ -2,6 +2,7 @@ using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Maps.Objects;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
+using GGemCo.Scripts.Utils;
 using UnityEngine;
 
 namespace GGemCo.Scripts.Characters.Player
@@ -24,7 +25,6 @@ namespace GGemCo.Scripts.Characters.Player
         protected override void Awake()
         {
             base.Awake();
-            tag = ConfigTags.Player;
             IsNpcNearby = false;
 #if GGEMCO_USE_SPINE
             DefaultCharacterBehavior = gameObject.AddComponent<BehaviorPlayerSpine>();
@@ -32,7 +32,28 @@ namespace GGemCo.Scripts.Characters.Player
             DefaultCharacterBehavior = gameObject.AddComponent<BehaviorPlayerSprite>();
 #endif
         }
-
+        /// <summary>
+        /// tag, sorting layer, layer 셋팅하기
+        /// </summary>
+        public override void InitTagSortingLayer()
+        {
+            base.InitTagSortingLayer();
+            tag = ConfigTags.Player;
+        }
+        /// <summary>
+        /// 캐릭터에 필요한 컴포넌트 추가하기
+        /// </summary>
+        protected override void InitComponents()
+        {
+            base.InitComponents();
+            ComponentController.AddRigidbody2D(gameObject);
+            Vector2 offset = Vector2.zero;
+            Vector2 size = new Vector2(500, 250);
+            ComponentController.AddCapsuleCollider2D(gameObject, true, offset, size);
+            offset = Vector2.zero;
+            size = new Vector2(264,132);
+            ComponentController.AddCapsuleCollider2D(gameObject, false, offset, size, LayerMask.GetMask(ConfigLayer.TileMapWall), ~ (1 <<  LayerMask.NameToLayer(ConfigLayer.TileMapWall)));
+        }
         protected override void Start()
         {
             base.Start();

@@ -155,6 +155,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                     // SetScale 다음에 처리해야 함
                     myNpcScript.flip = npcData.Flip;
                     myNpcScript.SetFlip(npcData.Flip);
+                    myNpcScript.InitTagSortingLayer();
                 }
             }
 

@@ -218,6 +218,8 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             currentJsonFolderPath = jsonFolderPath + mapData.FolderName + "/";
             GameObject currentMap = Instantiate(prefab, _gridTileMap.transform);
             _defaultMap = currentMap.GetComponent<MapTileCommon>();
+            _defaultMap.InitComponents();
+            _defaultMap.InitTagSortingLayer();
             _defaultMap.Initialize(mapData.Uid, mapData.Name, mapData.Type, mapData.Subtype);
             _npcExporter.SetDefaultMap(_defaultMap);
             _monsterExporter.SetDefaultMap(_defaultMap);

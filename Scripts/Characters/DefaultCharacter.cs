@@ -64,14 +64,32 @@ namespace GGemCo.Scripts.Characters
             
             SetScale(1f);
             characterRenderer = GetComponent<Renderer>();
-            characterRenderer.sortingLayerName = ConfigSortingLayer.Character;
 #if GGEMCO_USE_SPINE
             skeletonAnimation = GetComponent<SkeletonAnimation>();
 #else
             spriteRenderer = GetComponent<SpriteRenderer>();
 #endif
+            InitComponents();
+            InitTagSortingLayer();
         }
-
+        /// <summary>
+        /// tag, sorting layer, layer 셋팅하기
+        /// </summary>
+        public virtual void InitTagSortingLayer()
+        {
+            if (characterRenderer == null)
+            {
+                characterRenderer = GetComponent<Renderer>();
+            }
+            characterRenderer.sortingLayerName = ConfigSortingLayer.Character;
+        }
+        /// <summary>
+        /// 캐릭터에 필요한 컴포넌트 추가하기
+        /// </summary>
+        protected virtual void InitComponents()
+        {
+            
+        }
         protected virtual void Start()
         {
             // statatk 값들은 table 에서 불러올 수 있기 때문에 Start 에서 처리한다.
