@@ -34,11 +34,11 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
         private string loadMapUid = "101";
         private const string NameTempTableLoaderManager = "TempTableLoaderManager";
 
-        private static string _fileNameTilemap = "tilemap";
-        private static string _fileNameRegenNpc = "regen_npc";
-        private static string _fileNameRegenMonster = "regen_monster";
-        private static string _fileNameWarp = "warp";
-        private static string _fileExt = ".json";
+        private static string _fileNameTilemap = MapConstants.FileNameTilemap;
+        private static string _fileNameRegenNpc = MapConstants.FileNameRegenNpc;
+        private static string _fileNameRegenMonster = MapConstants.FileNameRegenMonster;
+        private static string _fileNameWarp = MapConstants.FileNameWarp;
+        private static string _fileExt = MapConstants.FileExt;
         private string jsonFileNameTilemap = _fileNameTilemap+_fileExt;
         private string jsonFileNameRegenNpc = _fileNameRegenNpc+_fileExt;
         private string jsonFileNameRegenMonster = _fileNameRegenMonster+_fileExt;

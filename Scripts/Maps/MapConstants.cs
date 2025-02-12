@@ -33,12 +33,12 @@
         }
         
         public const string ResourceMapPath = "Maps/";
-        public const string ResourceMapCommonPath = ResourceMapPath + "common/";
+        public const string ResourceMapCommonPath = ResourceMapPath + "Common/";
         public const string FileNameTilemap = "tilemap";
         public const string FileNameRegenNpc = "regen_npc";
         public const string FileNameRegenMonster = "regen_monster";
         public const string FileNameWarp = "warp";
-        private const string PrefabNameWarp = "objectWarp";
+        private const string PrefabNameWarp = "ObjectWarp";
         public const string FileExt = ".json";
         
         public const float FadeDuration = 0.7f;
