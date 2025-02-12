@@ -34,6 +34,7 @@ namespace GGemCo.Scripts.Characters.Monster
         protected override void Awake()
         {
             base.Awake();
+            tag = ConfigTags.Monster;
             currentAttackSpeed = 1f;
             isAggro = false;
             MonsterData = null;

@@ -1,4 +1,5 @@
 using System.Collections;
+using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -23,6 +24,7 @@ namespace GGemCo.Scripts.Core
 
         private void Awake()
         {
+            tag = ConfigTags.MainCamera;
             originCameraPosition = Vector3.zero;
         }
 

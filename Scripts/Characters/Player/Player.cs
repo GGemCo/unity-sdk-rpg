@@ -24,6 +24,7 @@ namespace GGemCo.Scripts.Characters.Player
         protected override void Awake()
         {
             base.Awake();
+            tag = ConfigTags.Player;
             IsNpcNearby = false;
 #if GGEMCO_USE_SPINE
             DefaultCharacterBehavior = gameObject.AddComponent<BehaviorPlayerSpine>();

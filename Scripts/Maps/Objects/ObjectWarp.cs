@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEngine.Serialization;
+﻿using GGemCo.Scripts.Configs;
+using UnityEngine;
 
 namespace GGemCo.Scripts.Maps.Objects
 {
@@ -12,6 +12,7 @@ namespace GGemCo.Scripts.Maps.Objects
 
         private void Awake()
         {
+            tag = ConfigTags.MapObjectWarp;
             boxCollider2D = GetComponent<BoxCollider2D>();
         }
 

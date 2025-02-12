@@ -15,6 +15,7 @@ namespace GGemCo.Scripts.Characters.Npc
         protected override void Awake()
         {
             base.Awake();
+            tag = ConfigTags.Npc;
             NpcData = null;
             gameObject.tag = ConfigTags.Npc;
             

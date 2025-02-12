@@ -1,4 +1,5 @@
 using GGemCo.Scripts.Characters.Npc;
+using GGemCo.Scripts.Configs;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -14,6 +15,7 @@ namespace GGemCo.Scripts.Maps
 
         protected virtual void Awake()
         {
+            tag = ConfigTags.Map;
             tilemap = GetComponent<Tilemap>();
         }
 
