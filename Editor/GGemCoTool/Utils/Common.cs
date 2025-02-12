@@ -1,9 +1,9 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace GGemCo.Editor.GGemCoTool
+namespace GGemCo.Editor.GGemCoTool.Utils
 {
-    public static class Common
+    public abstract class Common
     {
         public static void OnGUITitle(string title)
         {

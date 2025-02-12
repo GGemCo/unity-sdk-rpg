@@ -6,7 +6,7 @@ namespace GGemCo.Editor.GGemCoTool
 {
     public class PlayerPrefsEditor : EditorWindow
     {
-        [MenuItem("GGemCoTool/PlayerPrefs Editor")]
+        [MenuItem("GGemCoTool/PlayerPrefs Editor", true)]
         public static void ShowWindow()
         {
             GetWindow<PlayerPrefsEditor>("PlayerPrefs Editor");

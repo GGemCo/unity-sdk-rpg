@@ -57,7 +57,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
         private int selectedMonsterIndex;
         private const float GRID_CELL_SIZE = 64;
 
-        [MenuItem("GGemCoTool/Map 배치툴")]
+        [MenuItem("GGemCoTool/Map 배치툴", false, 3)]
         public static void ShowWindow()
         {
             GetWindow<MapExporter>("Map 배치툴");

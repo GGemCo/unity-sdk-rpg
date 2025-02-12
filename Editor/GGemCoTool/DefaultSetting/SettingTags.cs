@@ -1,4 +1,5 @@
-﻿using GGemCo.Scripts.Configs;
+﻿using GGemCo.Editor.GGemCoTool.Utils;
+using GGemCo.Scripts.Configs;
 using UnityEditor;
 using UnityEngine;
 

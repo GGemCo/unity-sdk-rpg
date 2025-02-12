@@ -2,10 +2,10 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace GGemCo.Editor.GGemCoTool
+namespace GGemCo.Editor.GGemCoTool.DefaultSetting
 {
     [CustomEditor(typeof(GGemCoSettings))]
-    public class GGemCoSettingsInspector : UnityEditor.Editor
+    public class SettingGGemCoInspector : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
