@@ -16,6 +16,7 @@ namespace GGemCo.Scripts.Configs
         [Header("Map")]
         // 맵
         public const string Map = "GGemCo_Map";
+        public const string MapObject = "GGemCo_MapObject";
         // 맵에 배치되는 워프
         public const string MapObjectWarp = "GGemCo_MapObjectWarp";
         // 타일 맵이 들어가는 부모 grid object

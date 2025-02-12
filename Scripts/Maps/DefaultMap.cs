@@ -17,6 +17,7 @@ namespace GGemCo.Scripts.Maps
         {
             tag = ConfigTags.Map;
             tilemap = GetComponent<Tilemap>();
+            GetComponent<TilemapRenderer>().sortingLayerName = ConfigSortingLayer.MapTerrain;
         }
 
         public virtual void Initialize(int uid, string name, MapConstants.Type type, MapConstants.SubType subType)
