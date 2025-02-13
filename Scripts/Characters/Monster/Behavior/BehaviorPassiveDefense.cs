@@ -30,7 +30,6 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
             base.Awake();
             monster = GetComponent<Monster>();
             capsuleCollider = monster.GetComponent<CapsuleCollider2D>();
-            hits = monster.hits;
             SkeletonAnimation.state.Complete += OnAttackComplete;
         }
         protected override void Start()
@@ -43,7 +42,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
 
         private void Update()
         {
-            if (AttackerTransform == null || IsAttackAnimationing() || monster.IsStatusDead()) return;
+            if (IsAttackAnimationing() || monster.IsStatusDead()) return;
 
             HandleInput();
 
@@ -73,6 +72,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         /// </summary>
         private void HandleInput()
         {
+            if (AttackerTransform == null) return;
             Direction = (AttackerTransform.position - monster.transform.position).normalized;
         }
 
@@ -92,7 +92,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         /// <summary>
         /// 공격 애니메이션 완료 이벤트
         /// </summary>
-        private void OnAttackComplete(Spine.TrackEntry trackEntry)
+        private void OnAttackComplete(TrackEntry trackEntry)
         {
             if (trackEntry.Animation.Name != attackAnim) return;
 
@@ -109,12 +109,13 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         /// </summary>
         private bool SearchAttackerTarget()
         {
+            if (AttackerTransform == null) return false;
             Vector2 size = new Vector2(capsuleCollider.size.x * Mathf.Abs(transform.localScale.x), capsuleCollider.size.y * transform.localScale.y);
-            int hitCount = Physics2D.OverlapCapsuleNonAlloc(transform.position, size, capsuleCollider.direction, 0f, hits);
+            Collider2D[] collider2Ds = Physics2D.OverlapCapsuleAll(transform.position, size, capsuleCollider.direction, 0f);
 
-            for (int i = 0; i < hitCount; i++)
+            foreach (var hit in collider2Ds)
             {
-                if (hits[i].CompareTag(AttackerTransform.tag) && hits[i].GetComponent<Player.Player>() != null)
+                if (hit.CompareTag(AttackerTransform.tag) && hit.GetComponent<Player.Player>() != null)
                 {
                     return true;
                 }
@@ -268,11 +269,10 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
             CapsuleCollider2D capsuleCollider2D = GetComponent<CapsuleCollider2D>();
             Vector2 size = new Vector2(capsuleCollider2D.size.x * Mathf.Abs(transform.localScale.x), capsuleCollider2D.size.y * transform.localScale.y);
             Vector2 point = (Vector2)transform.position + capsuleCollider2D.offset * transform.localScale;
-            int hitCount = Physics2D.OverlapCapsuleNonAlloc(point, size, capsuleCollider2D.direction, 0f, monster.hits);
+            Collider2D[] collider2Ds = Physics2D.OverlapCapsuleAll(point, size, capsuleCollider2D.direction, 0f);
 
-            for (int i = 0; i < hitCount; i++)
+            foreach (var hit in collider2Ds)
             {
-                Collider2D hit = monster.hits[i];
                 if (hit.CompareTag(ConfigTags.GetPlayer()))
                 {
                     Player.Player player = hit.GetComponent<Player.Player>();

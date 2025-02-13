@@ -14,6 +14,7 @@ namespace GGemCo.Scripts.Characters.Npc
         {
             base.Awake();
             npc = GetComponent<Npc>();
+            PlayAnimation(waitForwardAnim, true);
         }
         
         public override IEnumerator FadeEffect(float duration, bool fadeIn)
