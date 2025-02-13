@@ -58,7 +58,6 @@ namespace GGemCo.Scripts.Scenes
             }
             
             InitializeManagers();
-            CacheReferences();
 
             isStateDirty = false;
             SetState(GameState.Begin);
@@ -94,6 +93,7 @@ namespace GGemCo.Scripts.Scenes
         private void Start()
         {
             if (TableLoaderManager.instance == null) return;
+            CacheReferences();
             mapManager.LoadMap(TableLoaderManager.instance.TableConfig.GetStartMapUid());
             StartCoroutine(UpdateStateRoutine());
         }
