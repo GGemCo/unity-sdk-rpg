@@ -73,6 +73,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             {
                 monsterScript.Uid = monsterData.Uid;
                 monsterScript.SetScale(monsterData.Scale);
+                monsterScript.InitTagSortingLayer();
             }
 
             Debug.Log($"{monsterData.Name} 몬스터가 맵에 추가되었습니다.");

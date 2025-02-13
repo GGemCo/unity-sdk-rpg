@@ -72,6 +72,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             {
                 npcScript.Uid = npcData.Uid;
                 npcScript.SetScale(npcData.Scale);
+                npcScript.InitTagSortingLayer();
             }
 
             Debug.Log($"{npcData.Name} NPC가 맵에 추가되었습니다.");
