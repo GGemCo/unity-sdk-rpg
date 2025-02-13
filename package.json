@@ -1,0 +1,23 @@
+{
+  "name": "com.ggemco.unity-sdk-rpg",
+  "version": "1.0.0",
+  "displayName": "GGemCo-Unity Sdk Rpg",
+  "description": "",
+  "unity": "2022.3",
+  "documentationUrl": "https://sturdy-coat-0d2.notion.site/fb36d91845834d13a565dcbd987e192c?pvs=4",
+  "licensesUrl": "https://github.com/GGemCo/unity-sdk-rpg?tab=MIT-1-ov-file",
+  "dependencies": {
+    "com.unity.addressables": "1.21.21"    
+ },
+ "keywords": [
+    "keyword1",
+    "keyword2",
+    "keyword3"
+  ],
+  "author": {
+    "name": "GGemCo",
+    "email": "ggemco.master@gmail.com",
+    "url": "https://www.youtube.com/@ggemco/community"
+  }
+}
+
