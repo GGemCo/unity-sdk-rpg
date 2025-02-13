@@ -17,12 +17,10 @@ namespace GGemCo.Scripts.Characters.Monster
     /// </summary>
     public class Monster : DefaultCharacter, IMonster
     {
-        // 몬스터가 공격했을때 범위에 있는 플레이어 관리를 위한 변수
-        [HideInInspector] public Collider2D[] hits;
         // 어그로
         [HideInInspector] public bool isAggro;
         // 몬스터 데이터
-        [HideInInspector] public MonsterData MonsterData;
+        public MonsterData MonsterData;
         
         // 선공/후공
         private AttackType attackType;
@@ -39,7 +37,6 @@ namespace GGemCo.Scripts.Characters.Monster
             isAggro = false;
             MonsterData = null;
             PossibleAttack = true;
-            hits = new Collider2D[TableLoaderManager.instance.TableConfig.GetMaxEnemyValue()];
 
             attackType = AttackType.PassiveDefense;
             delayDestroy = TableLoaderManager.instance.TableConfig.GetDelayDestroyMonster();

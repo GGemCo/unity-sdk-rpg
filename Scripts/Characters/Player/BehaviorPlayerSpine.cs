@@ -130,13 +130,12 @@ namespace GGemCo.Scripts.Characters.Player
             CapsuleCollider2D capsuleCollider = GetComponent<CapsuleCollider2D>();
             Vector2 size = new Vector2(capsuleCollider.size.x * Mathf.Abs(transform.localScale.x), capsuleCollider.size.y * transform.localScale.y);
             Vector2 point = (Vector2)transform.position + capsuleCollider.offset * transform.localScale;
-            int hitCount = Physics2D.OverlapCapsuleNonAlloc(point, size, capsuleCollider.direction, 0f, player.hits);
+            Collider2D[] hitsCollider2D = Physics2D.OverlapCapsuleAll(point, size, capsuleCollider.direction, 0f);
 
             int countDamageMonster = 0;
             int maxDamageMonster = 10;
-            for (int i = 0; i < hitCount; i++)
+            foreach (var hit in hitsCollider2D)
             {
-                Collider2D hit = player.hits[i];
                 if (hit.CompareTag(ConfigTags.GetMonster()))
                 {
                     Monster.Monster monster = hit.GetComponent<Monster.Monster>();

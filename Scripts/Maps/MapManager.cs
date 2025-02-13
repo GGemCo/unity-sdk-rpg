@@ -526,8 +526,6 @@ namespace GGemCo.Scripts.Maps
             }
             foreach (WarpData warpData in warpDatas)
             {
-                int toMapUid = warpData.ToMapUid;
-                if (toMapUid <= 0) continue;
                 GameObject warp = Instantiate(warpPrefab, new Vector3(warpData.x, warpData.y, warpData.z), Quaternion.identity, mapTileCommon.gameObject.transform);
             
                 // 워프의 이름과 기타 속성 설정
@@ -627,6 +625,26 @@ namespace GGemCo.Scripts.Maps
         public (float width, float height) GetCurrentMapSize()
         {
             return mapTileCommon.GetMapSize();
+        }
+        /// <summary>
+        /// 워프로 맵 이동하기
+        /// </summary>
+        /// <param name="objectWarp"></param>
+        public void LoadMapByWarp(ObjectWarp objectWarp)
+        {
+            if (objectWarp == null)
+            {
+                GcLogger.LogError("ObjectWarp.cs 가 없습니다.");
+                return;
+            }
+
+            if (objectWarp.toMapUid <= 0)
+            {
+                GcLogger.LogError("이동할 워프 정보가 없습니다.");
+                return;
+            }
+            SetPlaySpawnPosition(objectWarp.toMapPlayerSpawnPosition);
+            LoadMap(objectWarp.toMapUid);
         }
     }
 }

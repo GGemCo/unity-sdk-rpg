@@ -14,8 +14,6 @@ namespace GGemCo.Scripts.Characters.Player
     {
         // 공격할 몬스터 
         private GameObject targetMonster;
-        // 플레이어 주변에 얼마나 많은 몬스터에게 데미지를 입힐 것인지
-        [HideInInspector] public Collider2D[] hits;
         // 주변에 npc 가 있는지 체크 
         protected bool IsNpcNearby;
         
@@ -54,12 +52,6 @@ namespace GGemCo.Scripts.Characters.Player
             size = new Vector2(264,132);
             ComponentController.AddCapsuleCollider2D(gameObject, false, offset, size, LayerMask.GetMask(ConfigLayer.TileMapWall), ~ (1 <<  LayerMask.NameToLayer(ConfigLayer.TileMapWall)));
         }
-        protected override void Start()
-        {
-            base.Start();
-            hits = new Collider2D[TableLoaderManager.instance.TableConfig.GetMaxEnemyValue()];
-        }
-
         /// <summary>
         /// 테이블에서 가져온 몬스터 정보 셋팅
         /// </summary>
@@ -85,7 +77,7 @@ namespace GGemCo.Scripts.Characters.Player
         /// <summary>
         /// 공격 버튼 눌렀을때 처리 
         /// </summary>
-        public bool Attack()
+        private bool Attack()
         {
             if (!IsPossibleAttack()) return false;
             if (!SearchAndAttackMonsters()) return false;
@@ -148,10 +140,9 @@ namespace GGemCo.Scripts.Characters.Player
             CapsuleCollider2D capsuleCollider = GetComponent<CapsuleCollider2D>();
             Vector2 size = new Vector2(capsuleCollider.size.x * Mathf.Abs(transform.localScale.x), capsuleCollider.size.y * transform.localScale.y);
             Vector2 point = transform.position;
-            int hitCount = Physics2D.OverlapCapsuleNonAlloc(point, size, capsuleCollider.direction, 0f, hits);
-            for (int i = 0; i < hitCount; i++)
+            Collider2D[] collider2Ds = Physics2D.OverlapCapsuleAll(point, size, capsuleCollider.direction, 0f);
+            foreach (var hit in collider2Ds)
             {
-                Collider2D hit = hits[i];
                 if (hit.CompareTag(ConfigTags.GetMonster()))
                 {
                     Monster.Monster monster = hit.GetComponent<Monster.Monster>();
@@ -189,11 +180,7 @@ namespace GGemCo.Scripts.Characters.Player
             else if (collision.gameObject.CompareTag(ConfigTags.GetMapObjectWarp()))
             {
                 ObjectWarp objectWarp = collision.gameObject.GetComponent<ObjectWarp>();
-                if (objectWarp != null && objectWarp.toMapUid > 0)
-                {
-                    SceneGame.Instance.mapManager.SetPlaySpawnPosition(objectWarp.toMapPlayerSpawnPosition);
-                    SceneGame.Instance.mapManager.LoadMap(objectWarp.toMapUid);
-                }
+                SceneGame.Instance.mapManager.LoadMapByWarp(objectWarp);
             }
         }
         protected void OnTriggerExit2D(Collider2D collision)
