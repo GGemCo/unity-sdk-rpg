@@ -624,6 +624,7 @@ namespace GGemCo.Scripts.Maps
         /// <returns></returns>
         public (float width, float height) GetCurrentMapSize()
         {
+            if (mapTileCommon == null) return (0, 0);
             return mapTileCommon.GetMapSize();
         }
         /// <summary>

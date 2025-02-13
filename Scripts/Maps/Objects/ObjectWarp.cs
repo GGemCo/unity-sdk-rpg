@@ -20,7 +20,11 @@ namespace GGemCo.Scripts.Maps.Objects
         protected override void InitComponents()
         {
             base.InitComponents();
-            boxCollider2D = ComponentController.AddBoxCollider2D(gameObject, false,Vector2.zero, Vector2.zero);
+            boxCollider2D = GetComponent<BoxCollider2D>();
+            if (boxCollider2D == null)
+            {
+                boxCollider2D = ComponentController.AddBoxCollider2D(gameObject, false, Vector2.zero, Vector2.zero);
+            }
         }
 
         private void Start()

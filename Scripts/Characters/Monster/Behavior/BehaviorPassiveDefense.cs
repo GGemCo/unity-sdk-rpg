@@ -18,7 +18,6 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
     {
         private Monster monster;
         private CapsuleCollider2D capsuleCollider;
-        private Collider2D[] hits;
         private Coroutine coroutineAttack;
 
         private const float DelayAttack = 0f;

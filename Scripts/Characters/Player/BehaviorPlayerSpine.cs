@@ -28,7 +28,6 @@ namespace GGemCo.Scripts.Characters.Player
             base.Start();
             // 타일맵의 경계를 가져오는 코드 (직접 설정 가능)
             minBounds = new Vector2(0f, 0f); // 좌측 하단 경계
-            mapSize = SceneGame.Instance.mapManager.GetCurrentMapSize();
         }
         private void HandleInput()
         {
@@ -208,6 +207,7 @@ namespace GGemCo.Scripts.Characters.Player
             var characterSize = GetCharacterSize();
             characterSize.x *= Math.Abs(player.transform.localScale.x);
             characterSize.y *= player.transform.localScale.y;
+            mapSize = SceneGame.Instance.mapManager.GetCurrentMapSize();
             minBounds.x = characterSize.x / 2;
             maxBounds = new Vector2(mapSize.width - (characterSize.x/2), mapSize.height - characterSize.y);   // 우측 상단 경계
         }
