@@ -79,6 +79,7 @@ namespace GGemCo.Editor.GGemCoTool.DefaultSetting
             // 설정 저장
             settings.SetDirty(AddressableAssetSettings.ModificationEvent.EntryMoved, null, true);
             AssetDatabase.SaveAssets();
+            EditorUtility.DisplayDialog(Title, "Addressable 설정 완료", "OK");
         }
 
         /// <summary>
