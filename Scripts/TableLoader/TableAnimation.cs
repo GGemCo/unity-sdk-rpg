@@ -11,6 +11,7 @@ namespace GGemCo.Scripts.TableLoader
         public string PrefabPath;
         public GameObject Prefab;
         public float MoveStep;
+        public Vector2 ColliderSize;
     }
     public class TableAnimation : DefaultTable
     {
@@ -31,6 +32,7 @@ namespace GGemCo.Scripts.TableLoader
                 PrefabPath = data["PrefabPath"],
                 Prefab = LoadPrefab(data["PrefabPath"]),
                 MoveStep = float.Parse(data["MoveStep"]),
+                ColliderSize = ConvertVector2(data["ColliderSize"]),
             };
         }
         public GameObject GetPrefab(int uid) {

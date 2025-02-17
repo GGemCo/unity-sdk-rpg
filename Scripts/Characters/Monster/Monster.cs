@@ -62,7 +62,7 @@ namespace GGemCo.Scripts.Characters.Monster
         {
             base.InitComponents();
             Vector2 offset = Vector2.zero;
-            Vector2 size = new Vector2(340,170);
+            Vector2 size = new Vector2(0,0);
             ComponentController.AddCapsuleCollider2D(gameObject,false, offset, size);
         }
         /// <summary>
@@ -101,6 +101,11 @@ namespace GGemCo.Scripts.Characters.Monster
             if (struckTableAnimation is { Uid: > 0 })
             {
                 CurrentMoveStep = struckTableAnimation.MoveStep;
+                CapsuleCollider2D capsule = GetComponent<CapsuleCollider2D>();
+                if (capsule != null)
+                {
+                    capsule.size = struckTableAnimation.ColliderSize;
+                }
             }
         }
         /// <summary>
