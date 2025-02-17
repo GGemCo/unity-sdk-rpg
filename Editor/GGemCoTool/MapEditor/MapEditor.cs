@@ -26,6 +26,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
         private static TableMonster _tableMonster;
         private static TableAnimation _tableAnimation;
 
+        private const string Title = "Map 배치툴";
         private readonly string jsonFolderPath = Application.dataPath+"/Resources/Maps/";
         private string currentJsonFolderPath = "";
         private const string RESOURCES_FOLDER_PATH = "Maps/";
@@ -60,7 +61,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
         [MenuItem("GGemCoTool/Map 배치툴", false, 3)]
         public static void ShowWindow()
         {
-            GetWindow<MapExporter>("Map 배치툴");
+            GetWindow<MapExporter>(Title);
         }
 
         private void OnEnable()
@@ -178,6 +179,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             monsterExporter.ExportMonsterDataToJson(currentJsonFolderPath, jsonFileNameRegenMonster, mapUid);
             warpExporter.ExportWarpDataToJson(currentJsonFolderPath, jsonFileNameWarp, mapUid);
             AssetDatabase.Refresh();
+            EditorUtility.DisplayDialog(Title, "Json 저장하기 완료", "OK");
         }
 
         private void LoadJsonData()
