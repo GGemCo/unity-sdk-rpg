@@ -47,6 +47,8 @@ namespace GGemCo.Scripts.Maps
         
         private MapTileCommon mapTileCommon;
         private UnityEvent onLoadTileMap;
+
+        private Coroutine coroutineRegenMonster;
         protected void Awake()
         {
             isLoadComplete = false;
@@ -84,6 +86,10 @@ namespace GGemCo.Scripts.Maps
         protected void Reset()
         {
             isLoadComplete = false;
+            if (coroutineRegenMonster != null)
+            {
+                StopCoroutine(coroutineRegenMonster);
+            }
         }
         public void LoadMap(int mapUid = 0)
         {
@@ -581,7 +587,7 @@ namespace GGemCo.Scripts.Maps
             MonsterData monsterData = mapTileCommon.GetMonsterDataByVid(vid);
             if (monsterData == null) return;
             
-            StartCoroutine(RegenMonster(monsterData));
+            coroutineRegenMonster = StartCoroutine(RegenMonster(monsterData));
         }
         /// <summary>
         /// 몬스터 리젠하기 
@@ -592,6 +598,8 @@ namespace GGemCo.Scripts.Maps
             yield return new WaitForSeconds(defaultMonsterRegenTimeSec);
             if (monsterData == null) yield break;
             int uid = monsterData.Uid;
+            int mapUid = monsterData.MapUid;
+            if (mapUid != currentMapUid) yield break;
             if (uid <= 0) yield break;
             TableMonster myTableMonster = TableLoaderManager.instance.TableMonster;
             TableAnimation tableAnimation = TableLoaderManager.instance.TableAnimation;
