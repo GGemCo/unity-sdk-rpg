@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Core;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -10,10 +9,20 @@ namespace GGemCo.Scripts.Addressable
 {
     public class AddressableSettingsLoader : MonoBehaviour
     {
+        public static AddressableSettingsLoader Instance { get; private set; }
         private static GGemCoSettings _settings;
 
         private async void Awake()
         {
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
             _settings = await LoadSettings();
             if (_settings != null)
             {
@@ -39,6 +48,10 @@ namespace GGemCo.Scripts.Addressable
         public bool GetUseSpine2d()
         {
             return _settings.useSpine2d;
+        }
+        public Vector2 GetTilemapGridSize()
+        {
+            return _settings.tilemapGridCellSize;
         }
     }
 }

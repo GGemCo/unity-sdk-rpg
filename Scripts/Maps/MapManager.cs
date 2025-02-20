@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Characters.Monster;
 using GGemCo.Scripts.Characters.Npc;
 using GGemCo.Scripts.Characters.Player;
@@ -25,7 +26,6 @@ namespace GGemCo.Scripts.Maps
         public GameObject gridTileMap;
         public GameObject bgBlackForMapLoading;  // 페이드 인에 사용할 검정색 스프라이트 오브젝트
         public float fadeDuration = 0.3f;  // 페이드 인 지속 시간
-        public float gridCellSize = 64;
         
         private MapConstants.State currentState = MapConstants.State.None;
         private bool isLoadComplete;
@@ -65,7 +65,8 @@ namespace GGemCo.Scripts.Maps
             gridTileMap = new GameObject(ConfigTags.GetGridTileMap());
             gridTileMap.tag = ConfigTags.GetGridTileMap();
             Grid grid = gridTileMap.gameObject.AddComponent<Grid>();
-            grid.cellSize = new Vector3(gridCellSize, gridCellSize, 0);
+            Vector2 tilemapGridSize = AddressableSettingsLoader.Instance.GetTilemapGridSize();
+            grid.cellSize = new Vector3(tilemapGridSize.x, tilemapGridSize.y, 0);
             grid.cellLayout = GridLayout.CellLayout.Rectangle;
         }
         /// <summary>

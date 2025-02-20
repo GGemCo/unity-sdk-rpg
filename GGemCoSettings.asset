@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: GGemCoSettings
   m_EditorClassIdentifier: 
   useSpine2d: 1
+  tilemapGridCellSize: {x: 64, y: 64}

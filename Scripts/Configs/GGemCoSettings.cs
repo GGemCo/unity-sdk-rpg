@@ -8,6 +8,9 @@ namespace GGemCo.Scripts.Configs
         [Header("기본 설정")] [Tooltip("스파인2D 사용 여부. 사용할 경우 #define GGEMCO_USE_SPINE 이 추가됩니다. 스파인2D 패키지를 추가해주세요.")]
         public bool useSpine2d;
 
+        [Header("맵 설정")] [Tooltip("타일맵에 사용되는 Grid 오브젝트의 Cell Size")]
+        public Vector2 tilemapGridCellSize;
+
         // [Header("기본 설정")]
         // [Tooltip("이 설정은 첫 번째 기능의 기본 값을 정의합니다.")]
         // public string setting1 = "Default Value";
