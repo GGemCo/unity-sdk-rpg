@@ -106,7 +106,7 @@ namespace GGemCo.Scripts.Characters
         /// </summary>
         protected virtual void InitializeByTable()
         {
-            if (TableLoaderManager.instance == null) return;
+            if (TableLoaderManager.Instance == null) return;
             if (Uid <= 0) return;
         }
         /// <summary>

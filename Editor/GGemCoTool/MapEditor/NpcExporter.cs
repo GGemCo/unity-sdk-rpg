@@ -46,7 +46,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             {
                 if (index == selectedNpcIndex)
                 {
-                    npcData = tableNpc.GetNpcData(outerPair.Key);
+                    npcData = tableNpc.GetDataByUid(outerPair.Key);
                     break;
                 }
                 index++;
@@ -134,7 +134,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             {
                 int uid = npcData.Uid;
                 if (uid <= 0) continue;
-                var info = tableNpc.GetNpcData(uid);
+                var info = tableNpc.GetDataByUid(uid);
                 if (info.Uid <= 0 || info.SpineUid <= 0) continue;
                 GameObject npcPrefab = tableAnimation.GetPrefab(info.SpineUid);
                 if (npcPrefab == null)

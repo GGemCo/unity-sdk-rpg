@@ -39,7 +39,7 @@ namespace GGemCo.Scripts.Characters.Monster
             PossibleAttack = true;
 
             attackType = AttackType.PassiveDefense;
-            delayDestroy = TableLoaderManager.instance.TableConfig.GetDelayDestroyMonster();
+            delayDestroy = TableLoaderManager.Instance.TableConfig.GetDelayDestroyMonster();
             
 #if GGEMCO_USE_SPINE
             DefaultCharacterBehavior = gameObject.AddComponent<BehaviorPassiveDefense>();
@@ -80,10 +80,10 @@ namespace GGemCo.Scripts.Characters.Monster
         protected override void InitializeByTable()
         {
             base.InitializeByTable();
-            if (TableLoaderManager.instance == null) return;
+            if (TableLoaderManager.Instance == null) return;
             if (Uid <= 0) return;
-            TableLoaderManager tableLoaderManager = TableLoaderManager.instance;
-            var info = tableLoaderManager.TableMonster.GetMonsterData(Uid);
+            TableLoaderManager tableLoaderManager = TableLoaderManager.Instance;
+            var info = tableLoaderManager.TableMonster.GetDataByUid(Uid);
             // FG_Logger.Log("InitializationStat uid: "+uid+" / info.uid: "+info.uid+" / StatMoveSpeed: "+info.statMoveSpeed);
             if (info.Uid <= 0) return;
             StatAtk = info.StatAtk;
@@ -97,7 +97,7 @@ namespace GGemCo.Scripts.Characters.Monster
             float scale = info.Scale;
             SetScale(scale);
 
-            StruckTableAnimation struckTableAnimation = tableLoaderManager.TableAnimation.GetSpineData(info.SpineUid);
+            StruckTableAnimation struckTableAnimation = tableLoaderManager.TableAnimation.GetDataByUid(info.SpineUid);
             if (struckTableAnimation is { Uid: > 0 })
             {
                 CurrentMoveStep = struckTableAnimation.MoveStep;

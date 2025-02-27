@@ -9,7 +9,7 @@ namespace GGemCo.Scripts.TableLoader
 {
     public class TableLoaderManager : MonoBehaviour
     {
-        public static TableLoaderManager instance;
+        public static TableLoaderManager Instance;
 
         private static string[] _dataFiles;
         
@@ -22,11 +22,11 @@ namespace GGemCo.Scripts.TableLoader
         private float loadProgress;
         private SceneLoading mySceneLoading;
 
-        protected virtual void Awake()
+        protected void Awake()
         {
-            if (instance == null)
+            if (Instance == null)
             {
-                instance = this;
+                Instance = this;
                 DontDestroyOnLoad(gameObject);
             }
             else
@@ -56,7 +56,8 @@ namespace GGemCo.Scripts.TableLoader
 
             OnEndLoad();
         }
-        protected virtual void LoadDataFile(string fileName)
+
+        private void LoadDataFile(string fileName)
         {
             try
             {

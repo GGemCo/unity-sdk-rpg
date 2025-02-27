@@ -22,19 +22,20 @@ namespace GGemCo.Scripts.TableLoader
     }
     public class TableMonster : DefaultTable
     {
-        private static readonly Dictionary<string, ICharacter.Grade> mapGrade;
+        private static readonly Dictionary<string, ICharacter.Grade> MapGrade;
 
         static TableMonster()
         {
-            mapGrade = new Dictionary<string, ICharacter.Grade>
+            MapGrade = new Dictionary<string, ICharacter.Grade>
             {
                 { "Common", ICharacter.Grade.Common },
                 { "Boss", ICharacter.Grade.Boss },
             };
         }
-        public ICharacter.Grade ConvertGrade(string grade) => mapGrade.GetValueOrDefault(grade, ICharacter.Grade.None);
 
-        public StruckTableMonster GetMonsterData(int uid)
+        private ICharacter.Grade ConvertGrade(string grade) => MapGrade.GetValueOrDefault(grade, ICharacter.Grade.None);
+
+        public StruckTableMonster GetDataByUid(int uid)
         {
             if (uid <= 0)
             {
@@ -60,10 +61,10 @@ namespace GGemCo.Scripts.TableLoader
         }
         
         public GameObject GetPrefab(int uid) {
-            var info = GetMonsterData(uid);
+            var info = GetDataByUid(uid);
             if (info.SpineUid == 0) return null;
         
-            string prefabPath = TableLoaderManager.instance.TableAnimation.GetPrefabPath(info.SpineUid);
+            string prefabPath = TableLoaderManager.Instance.TableAnimation.GetPrefabPath(info.SpineUid);
             if (prefabPath == "") {
                 GcLogger.Log("prefabPath is ''. shape: "+info.SpineUid);
                 return null;
@@ -77,8 +78,8 @@ namespace GGemCo.Scripts.TableLoader
         }
         public string GetShapePath(int uid)
         {
-            var info = GetMonsterData(uid);
-            return info.SpineUid <= 0 ? "" : TableLoaderManager.instance.TableAnimation.GetPrefabPath(info.SpineUid);
+            var info = GetDataByUid(uid);
+            return info.SpineUid <= 0 ? "" : TableLoaderManager.Instance.TableAnimation.GetPrefabPath(info.SpineUid);
         }
     }
 }

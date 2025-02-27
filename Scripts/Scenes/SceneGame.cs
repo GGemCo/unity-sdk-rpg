@@ -39,7 +39,7 @@ namespace GGemCo.Scripts.Scenes
 
         private void Awake()
         {
-            if (TableLoaderManager.instance == null)
+            if (TableLoaderManager.Instance == null)
             {
                 UnityEngine.SceneManagement.SceneManager.LoadScene("Intro");
                 return;
@@ -90,9 +90,9 @@ namespace GGemCo.Scripts.Scenes
 
         private void Start()
         {
-            if (TableLoaderManager.instance == null) return;
+            if (TableLoaderManager.Instance == null) return;
             CacheReferences();
-            mapManager.LoadMap(TableLoaderManager.instance.TableConfig.GetStartMapUid());
+            mapManager.LoadMap(TableLoaderManager.Instance.TableConfig.GetStartMapUid());
             StartCoroutine(UpdateStateRoutine());
         }
 

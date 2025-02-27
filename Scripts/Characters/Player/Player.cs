@@ -57,13 +57,13 @@ namespace GGemCo.Scripts.Characters.Player
         /// </summary>
         protected override void InitializeByTable() 
         {
-            if (TableLoaderManager.instance != null)
+            if (TableLoaderManager.Instance != null)
             {
-                StatAtk = (long)TableLoaderManager.instance.TableConfig.GetPolyPlayerStatAtk();
+                StatAtk = (long)TableLoaderManager.Instance.TableConfig.GetPolyPlayerStatAtk();
                 CurrentAtk = (long)StatAtk;
                 CurrentHp = (long)StatHp;
-                StatMoveStep = TableLoaderManager.instance.TableConfig.GetPolyPlayerStatMoveStep();
-                StatMoveSpeed = TableLoaderManager.instance.TableConfig.GetPolyPlayerStatMoveSpeed();
+                StatMoveStep = TableLoaderManager.Instance.TableConfig.GetPolyPlayerStatMoveStep();
+                StatMoveSpeed = TableLoaderManager.Instance.TableConfig.GetPolyPlayerStatMoveSpeed();
                 CurrentMoveSpeed = StatMoveSpeed;
                 CurrentMoveStep = StatMoveStep;
                 OriginalScaleX = transform.localScale.x;

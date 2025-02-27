@@ -185,7 +185,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
         private void LoadJsonData()
         {
             int mapUid = int.Parse(loadMapUid);
-            var mapData = _tableMap.GetMapData(mapUid);
+            var mapData = _tableMap.GetDataByUid(mapUid);
             
             LoadTileData();
             npcExporter.LoadNpcData(RESOURCES_FOLDER_PATH + mapData.FolderName + "/" + FILE_NAME_REGEN_NPC);
@@ -198,7 +198,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
         private void LoadTileData()
         {
             int mapUid = int.Parse(loadMapUid);
-            var mapData = _tableMap.GetMapData(mapUid);
+            var mapData = _tableMap.GetDataByUid(mapUid);
             if (mapData.Uid <= 0)
             {
                 GcLogger.LogError("맵 데이터가 없거나 리젠 파일명이 없습니다.");
@@ -245,7 +245,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             // foreach 문을 사용하여 딕셔너리 내용을 출력
             foreach (KeyValuePair<int, Dictionary<string, string>> outerPair in npcDictionary)
             {
-                var info = _tableNpc.GetNpcData(outerPair.Key);
+                var info = _tableNpc.GetDataByUid(outerPair.Key);
                 if (info.Uid <= 0) continue;
                 _npcNames.Add($"{info.Uid} - {info.Name}");
             }
@@ -263,7 +263,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             // foreach 문을 사용하여 딕셔너리 내용을 출력
             foreach (KeyValuePair<int, Dictionary<string, string>> outerPair in monsterDictionary)
             {
-                var info = _tableMonster.GetMonsterData(outerPair.Key);
+                var info = _tableMonster.GetDataByUid(outerPair.Key);
                 if (info.Uid <= 0) continue;
                 _monsterNames.Add($"{info.Uid} - {info.Name}");
             }

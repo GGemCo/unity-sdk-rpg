@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.Core;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
 
@@ -7,7 +6,7 @@ namespace GGemCo.Scripts.TableLoader
 {
     public class DefaultTable
     {
-        protected Dictionary<int, Dictionary<string, string>> table = new Dictionary<int, Dictionary<string, string>>();
+        private readonly Dictionary<int, Dictionary<string, string>> table = new Dictionary<int, Dictionary<string, string>>();
 
         public virtual void LoadData(string content)
         {
@@ -36,7 +35,8 @@ namespace GGemCo.Scripts.TableLoader
         {
             
         }
-        protected string CheckNone(string value)
+
+        private string CheckNone(string value)
         {
             return value == "None" ? "" : value;
         }
