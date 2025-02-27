@@ -13,6 +13,7 @@
         {
             None,
             Weapon, // 무기
+            Armor, // 방어구
             Potion, // 물약
         }
 
@@ -20,6 +21,7 @@
         {
             None,
             Sword, // 칼
+            Top, // 상의
             RecoverHp, // hp 물약
             RecoverMp, // mp 물약
         }

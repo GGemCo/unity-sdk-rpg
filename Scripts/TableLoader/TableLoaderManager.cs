@@ -19,6 +19,8 @@ namespace GGemCo.Scripts.TableLoader
         public TableMonster TableMonster { get; private set; } = new TableMonster();
         public TableAnimation TableAnimation { get; private set; } = new TableAnimation();
         public TableItem TableItem { get; private set; } = new TableItem();
+        public TableMonsterDropRate TableMonsterDropRate { get; private set; } = new TableMonsterDropRate();
+        public TableItemDropGroup TableItemDropGroup { get; private set; } = new TableItemDropGroup();
 
         private float loadProgress;
         private SceneLoading mySceneLoading;
@@ -34,7 +36,7 @@ namespace GGemCo.Scripts.TableLoader
             {
                 Destroy(gameObject);
             }
-            _dataFiles = new[] { ConfigTableFileName.Config, ConfigTableFileName.Map, ConfigTableFileName.Monster, ConfigTableFileName.Npc, ConfigTableFileName.Animation, ConfigTableFileName.Item };
+            _dataFiles = new[] { ConfigTableFileName.Config, ConfigTableFileName.Map, ConfigTableFileName.Monster, ConfigTableFileName.Npc, ConfigTableFileName.Animation, ConfigTableFileName.Item, ConfigTableFileName.MonsterDropRate, ConfigTableFileName.ItemDropGroup };
             mySceneLoading = GameObject.Find("SceneLoading").GetComponent<SceneLoading>();
             loadProgress = 0f;
         }
@@ -87,6 +89,12 @@ namespace GGemCo.Scripts.TableLoader
                                 break;
                             case ConfigTableFileName.Item:
                                 TableItem.LoadData(content);
+                                break;
+                            case ConfigTableFileName.MonsterDropRate:
+                                TableMonsterDropRate.LoadData(content);
+                                break;
+                            case ConfigTableFileName.ItemDropGroup:
+                                TableItemDropGroup.LoadData(content);
                                 break;
                         }
                     }

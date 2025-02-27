@@ -34,11 +34,13 @@ namespace GGemCo.Scripts.TableLoader
             MapCategory = new Dictionary<string, ItemConstants.Category>
             {
                 { "Weapon", ItemConstants.Category.Weapon },
+                { "Armor", ItemConstants.Category.Armor },
                 { "Potion", ItemConstants.Category.Potion },
             };
             MapSubCategory = new Dictionary<string, ItemConstants.SubCategory>
             {
                 { "Sword", ItemConstants.SubCategory.Sword },
+                { "Top", ItemConstants.SubCategory.Top },
                 { "RecoverHp", ItemConstants.SubCategory.RecoverHp },
                 { "RecoverMp", ItemConstants.SubCategory.RecoverMp },
             };
@@ -49,6 +51,7 @@ namespace GGemCo.Scripts.TableLoader
             MapAttributesType = new Dictionary<string, AttributesConstants.Type>
             {
                 { "Atk", AttributesConstants.Type.Atk },
+                { "Def", AttributesConstants.Type.Def },
             };
         }
         private static ItemConstants.Type ConvertType(string type) => MapType.GetValueOrDefault(type, ItemConstants.Type.None);
@@ -56,6 +59,33 @@ namespace GGemCo.Scripts.TableLoader
         private static ItemConstants.SubCategory ConvertSubCategory(string type) => MapSubCategory.GetValueOrDefault(type, ItemConstants.SubCategory.None);
         private static ItemConstants.Class ConvertClass(string type) => MapClass.GetValueOrDefault(type, ItemConstants.Class.None);
         private static AttributesConstants.Type ConvertAttributesType(string type) => MapAttributesType.GetValueOrDefault(type, AttributesConstants.Type.None);
+        
+        public readonly Dictionary<ItemConstants.Category, List<StruckTableItem>> DictionaryByCategory = new Dictionary<ItemConstants.Category, List<StruckTableItem>>();
+        public readonly Dictionary<ItemConstants.SubCategory, List<StruckTableItem>> DictionaryBySubCategory = new Dictionary<ItemConstants.SubCategory, List<StruckTableItem>>();
+        protected override void OnLoadedData(Dictionary<string, string> data)
+        {
+            int uid = int.Parse(data["Uid"]);
+            ItemConstants.Category category = ConvertCategory(data["Category"]);
+            ItemConstants.SubCategory subCategory = ConvertSubCategory(data["SubCategory"]);
+            
+            StruckTableItem struckTableItemDropGroup = GetDataByUid(uid);
+            {
+                if (!DictionaryByCategory.ContainsKey(category))
+                {
+                    DictionaryByCategory[category] = new List<StruckTableItem>();
+                }
+
+                DictionaryByCategory[category].Add(struckTableItemDropGroup);
+            }
+            {
+                if (!DictionaryBySubCategory.ContainsKey(subCategory))
+                {
+                    DictionaryBySubCategory[subCategory] = new List<StruckTableItem>();
+                }
+
+                DictionaryBySubCategory[subCategory].Add(struckTableItemDropGroup);
+            }
+        }
         
         public StruckTableItem GetDataByUid(int uid)
         {

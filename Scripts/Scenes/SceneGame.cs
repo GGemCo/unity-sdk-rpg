@@ -1,7 +1,7 @@
 ﻿using System.Collections;
-using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Core;
+using GGemCo.Scripts.Items;
 using GGemCo.Scripts.Maps;
 using GGemCo.Scripts.Popup;
 using GGemCo.Scripts.TableLoader;
@@ -34,6 +34,7 @@ namespace GGemCo.Scripts.Scenes
         [HideInInspector] public MapManager mapManager;
         [HideInInspector] public PopupManager popupManager;
         [HideInInspector] public DamageTextManager damageTextManager;
+        [HideInInspector] public ItemManager itemManager;
 
         private Canvas canvasUI;
 
@@ -79,6 +80,7 @@ namespace GGemCo.Scripts.Scenes
             popupManager = CreateManager<PopupManager>(managerContainer);
             saveDataManager = CreateManager<SaveDataManager>(managerContainer);
             damageTextManager = CreateManager<DamageTextManager>(managerContainer);
+            itemManager = CreateManager<ItemManager>(managerContainer);
         }
 
         private T CreateManager<T>(GameObject parent) where T : Component
