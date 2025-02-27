@@ -7,5 +7,6 @@
         public const string Monster = "monster";
         public const string Npc = "npc";
         public const string Animation = "animation";
+        public const string Item = "item";
     }
 }
