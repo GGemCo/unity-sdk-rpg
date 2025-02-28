@@ -27,16 +27,16 @@ namespace GGemCo.Scripts.Spine2d
         private void HandleEvent(TrackEntry trackEntry, Event e)
         {
             // Logger.Log("effect spine event: "+e.Data.Name);
-            if (e.Data.Name == SpineEventManager.EventNameAttack)
+            if (e.Data.Name == Spine2dConstants.EventNameAttack)
             {
                 // FG_Logger.Log("hit event " + this.gameObject.name + " | json: " + e.String);
                 OnSpineEventHit(e);
             }
-            else if (e.Data.Name == SpineEventManager.EventNameSound)
+            else if (e.Data.Name == Spine2dConstants.EventNameSound)
             {
                 OnSpineEventSound(e);
             }
-            else if (e.Data.Name == SpineEventManager.EventNameShake)
+            else if (e.Data.Name == Spine2dConstants.EventNameShake)
             {
                 if (e.Float <= 0) return;
                 SceneGame.Instance.cameraManager.StartShake(e.Float, 0.1f);
