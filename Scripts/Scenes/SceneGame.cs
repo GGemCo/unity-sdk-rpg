@@ -4,6 +4,7 @@ using GGemCo.Scripts.Core;
 using GGemCo.Scripts.Items;
 using GGemCo.Scripts.Maps;
 using GGemCo.Scripts.Popup;
+using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI;
 using UnityEngine;

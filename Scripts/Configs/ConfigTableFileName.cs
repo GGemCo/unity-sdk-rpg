@@ -10,5 +10,6 @@
         public const string Item = "item";
         public const string MonsterDropRate = "monster_drop_rate";
         public const string ItemDropGroup = "item_drop_group";
+        public const string Exp = "Exp";
     }
 }

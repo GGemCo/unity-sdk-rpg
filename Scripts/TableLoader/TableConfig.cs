@@ -12,6 +12,7 @@
             DefaultMonsterRegenTimeSec = 5, // 디폴트 몬스터 리젠 시간
             MaxEnemyValue = 6, // 공격시 최대 피해 몬스터 개수
             DelayDestroyMonster = 7, // 몬스터 죽었을때 없어지기까지 시간
+            MaxLevel = 8, // 플레이어 최대 레벨
         }
 
         // 제네릭 메서드를 사용하여 공통 로직 처리
@@ -35,5 +36,6 @@
         public float GetDefaultMonsterRegenTimeSec() => GetConfigValue<float>(ColumnIndex.DefaultMonsterRegenTimeSec);
         public long GetMaxEnemyValue() => GetConfigValue<long>(ColumnIndex.MaxEnemyValue);
         public long GetDelayDestroyMonster() => GetConfigValue<long>(ColumnIndex.DelayDestroyMonster);
+        public int GetMaxLevel() => GetConfigValue<int>(ColumnIndex.MaxLevel);
     }
 }

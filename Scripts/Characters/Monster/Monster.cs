@@ -53,6 +53,7 @@ namespace GGemCo.Scripts.Characters.Monster
             DefaultCharacterBehavior = gameObject.AddComponent<BehaviorMonsterSprite>();
 #endif
             OnMonsterDead += SceneGame.Instance.itemManager.GetDroppedItems;
+            OnMonsterDead += SceneGame.Instance.saveDataManager.Player.AddExp;
         }
         /// <summary>
         /// tag, sorting layer, layer 셋팅하기

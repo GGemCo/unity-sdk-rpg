@@ -170,7 +170,7 @@ namespace GGemCo.Scripts.Items
         {
             Item item = dropItem.GetComponent<Item>();
             if (item ==null || item.itemUid <= 0) return;
-            SceneGame.Instance.saveDataManager.AddItemCount(item.itemUid, 1);
+            SceneGame.Instance.saveDataManager.Inventory.AddItem(item.itemUid, 1);
             item.gameObject.SetActive(false);
             poolDropItem.Enqueue(item);
         }

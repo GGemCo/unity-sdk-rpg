@@ -17,8 +17,8 @@ namespace GGemCo.Scripts.TableLoader
         public float StatAtk;
         public float StatMoveSpeed;
         public float StatAttackSpeed;
-        public int RewardExp;
-        public int RewardGold;
+        public long RewardExp;
+        public long RewardGold;
     }
     public class TableMonster : DefaultTable
     {
@@ -55,7 +55,7 @@ namespace GGemCo.Scripts.TableLoader
                 StatAtk = float.Parse(data["StatAtk"]),
                 StatMoveSpeed = float.Parse(data["StatMoveSpeed"]),
                 StatAttackSpeed = float.Parse(data["StatAttackSpeed"]),
-                RewardExp = 0,
+                RewardExp = long.Parse(data["RewardExp"]),
                 RewardGold = 0,
             };
         }

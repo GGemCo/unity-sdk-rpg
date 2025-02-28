@@ -6,8 +6,8 @@ using GGemCo.Scripts.Characters.Monster;
 using GGemCo.Scripts.Characters.Npc;
 using GGemCo.Scripts.Characters.Player;
 using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Core;
 using GGemCo.Scripts.Maps.Objects;
+using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.Utils;
@@ -282,7 +282,7 @@ namespace GGemCo.Scripts.Maps
 
             if (currentMapUid == 0)
             {
-                currentMapUid = saveDataManager.CurrentChapter;
+                currentMapUid = saveDataManager.Player.CurrentChapter.Value;
             }
             if (tableLoaderManager.TableMap.GetCount() <= 0)
             {
