@@ -176,7 +176,7 @@ namespace GGemCo.Scripts.Core
             // 최대 레벨 일때 처리
             if (nextLevel > maxPlayerLevel)
             {
-                GcLogger.Log("current Level is max. maxPlayerLevel :"+maxPlayerLevel);
+                // GcLogger.Log("current Level is max. maxPlayerLevel :"+maxPlayerLevel);
                 return 0;
             }
             
@@ -213,6 +213,10 @@ namespace GGemCo.Scripts.Core
             if (itemUid <= 0) return (0, 0);
             currentItemCount.TryAdd(itemUid, 0);
             currentItemCount[itemUid] += value;
+            foreach (var info in currentItemCount)
+            {
+                // GcLogger.Log("item Uid: "+info.Key+" / count: "+info.Value);
+            }
             return (itemUid, currentItemCount[itemUid]);
         }
         /// <summary>

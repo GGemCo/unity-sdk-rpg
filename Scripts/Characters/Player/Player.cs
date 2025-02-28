@@ -50,7 +50,7 @@ namespace GGemCo.Scripts.Characters.Player
             ComponentController.AddCapsuleCollider2D(gameObject, true, offset, size);
             offset = Vector2.zero;
             size = new Vector2(264,132);
-            ComponentController.AddCapsuleCollider2D(gameObject, false, offset, size, LayerMask.GetMask(ConfigLayer.TileMapWall), ~ (1 <<  LayerMask.NameToLayer(ConfigLayer.TileMapWall)));
+            ComponentController.AddCapsuleCollider2D(gameObject, false, offset, size, LayerMask.GetMask(ConfigLayer.GetTileMapWall()), ~ (1 <<  LayerMask.NameToLayer(ConfigLayer.GetTileMapWall())));
         }
         /// <summary>
         /// 테이블에서 가져온 몬스터 정보 셋팅
@@ -181,6 +181,10 @@ namespace GGemCo.Scripts.Characters.Player
             {
                 ObjectWarp objectWarp = collision.gameObject.GetComponent<ObjectWarp>();
                 SceneGame.Instance.mapManager.LoadMapByWarp(objectWarp);
+            }
+            else if (collision.gameObject.CompareTag(ConfigTags.GetDropItem()))
+            {
+                SceneGame.Instance.itemManager.PlayerTaken(collision.gameObject);
             }
         }
         protected void OnTriggerExit2D(Collider2D collision)

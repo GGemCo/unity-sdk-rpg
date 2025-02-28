@@ -1,13 +1,18 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using GGemCo.Scripts.Configs;
+using GGemCo.Scripts.TableLoader;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace GGemCo.Scripts.Items
 {
     public class Item : MonoBehaviour
     {
         private Renderer itemRenderer;
+        private SpriteRenderer spriteRenderer;
+        private CircleCollider2D circleCollider2D;
         
         public float minDistance = 40f; // 최소 드랍 거리 (픽셀)
         public float maxDistance = 80f; // 최대 드랍 거리 (픽셀)
@@ -19,7 +24,7 @@ namespace GGemCo.Scripts.Items
         public float rotationSpeed = 180f; // 회전 속도 (도/초)
 
         private static readonly List<Vector2> DroppedItemPositions = new List<Vector2>(); // 드랍된 아이템 위치 저장
-        private Vector2 startPos;
+        public Vector2 startPos;
         private Vector2 targetPos;
         private float timeElapsed;
         private Vector2 velocity;
@@ -28,20 +33,35 @@ namespace GGemCo.Scripts.Items
         private bool isBouncing; // 바운스 여부 체크
         private float bounceTime; // 바운스 지속 시간
         private float rotationDirection; // 랜덤 회전 방향
+
+        public int itemUid;
+        private bool isStart;
         
         private void Awake()
         {
             timeElapsed = 0f;
             isBouncing = false;
             bounceTime = 0.1f;
+            originalScale = transform.localScale; // 원래 크기 저장
+            
             itemRenderer = GetComponent<Renderer>();
-            itemRenderer.sortingLayerName = ConfigSortingLayer.UI;
+            spriteRenderer = GetComponent<SpriteRenderer>();
+            circleCollider2D = GetComponent<CircleCollider2D>();
+            circleCollider2D.enabled = false;
         }
 
         private void OnEnable()
         {
-            startPos = transform.position;
-            originalScale = transform.localScale; // 원래 크기 저장
+            if (itemUid <= 0) return;
+            var info = TableLoaderManager.Instance.TableItem.GetDataByUid(itemUid);
+            if (info == null || info.Uid <= 0) return;
+            
+            itemRenderer.sortingLayerName = ConfigSortingLayer.GetCharacterTop();
+            itemRenderer.sortingOrder = 1;
+            timeElapsed = 0f;
+            isBouncing = false;
+            transform.localScale = Vector3.one;
+            spriteRenderer.sprite = Resources.Load<Sprite>($"Images/Item/{info.Type.ToString()}/{info.Category.ToString()}/{info.SubCategory.ToString()}/{info.ImagePath}");
 
             // 특정 반경 내에서 랜덤한 위치 선택 (X, Y 축 모두 분산)
             int maxAttempts = 10; // 겹치지 않도록 최대 시도 횟수
@@ -87,10 +107,14 @@ namespace GGemCo.Scripts.Items
 
             // 랜덤한 회전 방향 설정
             rotationDirection = Random.Range(-1f, 1f);
+            
+            isStart = true;
         }
         
         void Update()
         {
+            if (!isStart) return;
+            
             timeElapsed += Time.deltaTime;
 
             if (!isBouncing)
@@ -145,12 +169,18 @@ namespace GGemCo.Scripts.Items
 
         private void OnEnd()
         {
+            isStart = false;
             transform.localScale = originalScale;
             isBouncing = false;
-            enabled = false;
             // 드랍된 후에는 캐릭터 layer 로 적용한다.
-            itemRenderer.sortingLayerName = ConfigSortingLayer.Character;
+            itemRenderer.sortingLayerName = ConfigSortingLayer.GetCharacter();
             itemRenderer.sortingOrder = -(int)(transform.position.y * 100);
+            circleCollider2D.enabled = true;
+        }
+
+        private void OnDisable()
+        {
+            circleCollider2D.enabled = false;
         }
     }
 }

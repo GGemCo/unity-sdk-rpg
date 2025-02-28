@@ -13,8 +13,8 @@ namespace GGemCo.Scripts.Items
 {
     public class ItemManager : MonoBehaviour
     {
-        [SerializeField] private int poolSize = 20;
-        private readonly Queue<SpriteRenderer> poolSprite = new Queue<SpriteRenderer>();
+        [SerializeField] private int poolSize = 3;
+        private readonly Queue<Item> poolDropItem = new Queue<Item>();
         
         public enum MonsterDropRateType
         {
@@ -39,7 +39,7 @@ namespace GGemCo.Scripts.Items
         private Dictionary<int, List<StruckTableMonsterDropRate>> monsterDropDictionary = new Dictionary<int, List<StruckTableMonsterDropRate>>();
         private void Awake()
         {
-            poolSprite.Clear();
+            poolDropItem.Clear();
             InitializePool();
         }
         void Start()
@@ -64,9 +64,9 @@ namespace GGemCo.Scripts.Items
                 for (int i = 0; i < poolSize; i++)
                 {
                     GameObject gameObjectText = Instantiate(handle.Result, SceneGame.Instance.itemManager.gameObject.transform);
-                    SpriteRenderer spriteRenderer = gameObjectText.GetComponent<SpriteRenderer>();
-                    spriteRenderer.gameObject.SetActive(false);
-                    poolSprite.Enqueue(spriteRenderer);
+                    Item item = gameObjectText.GetComponent<Item>();
+                    item.gameObject.SetActive(false);
+                    poolDropItem.Enqueue(item);
                 }
             }
             else
@@ -77,14 +77,14 @@ namespace GGemCo.Scripts.Items
 
         private void ShowDropItem(Vector3 worldPosition, int itemUid)
         {
-            if (poolSprite.Count == 0)
+            if (poolDropItem.Count == 0)
                 return;
             var info = TableLoaderManager.Instance.TableItem.GetDataByUid(itemUid);
             if (info == null) return;
-            SpriteRenderer spriteRenderer = poolSprite.Dequeue();
-            spriteRenderer.sprite = Resources.Load<Sprite>($"Images/Item/{info.Type.ToString()}/{info.Category.ToString()}/{info.SubCategory.ToString()}/{info.ImagePath}");
-            spriteRenderer.transform.position = worldPosition;
-            spriteRenderer.gameObject.SetActive(true);
+            Item item = poolDropItem.Dequeue();
+            item.itemUid = itemUid;
+            item.startPos= worldPosition;
+            item.gameObject.SetActive(true);
         }
 
         public void GetDroppedItems(int monsterVid, int monsterUid, GameObject monsterObject)
@@ -134,7 +134,7 @@ namespace GGemCo.Scripts.Items
                     StruckTableItem item = FindItemByGroup(group);
                     if (item is { Uid: > 0 })
                     {
-                        GcLogger.Log("item drop. uid: "+ item.Uid + " / Name: "+item.Name);
+                        // GcLogger.Log("item drop. uid: "+ item.Uid + " / Name: "+item.Name);
                         ShowDropItem(monsterObject.transform.position, item.Uid);
                         return;
                     }
@@ -162,6 +162,17 @@ namespace GGemCo.Scripts.Items
                 default:
                     return null;
             }
+        }
+        /// <summary>
+        /// 플레이어가 드랍 아이템을 먹었을때 처리 
+        /// </summary>
+        public void PlayerTaken(GameObject dropItem)
+        {
+            Item item = dropItem.GetComponent<Item>();
+            if (item ==null || item.itemUid <= 0) return;
+            SceneGame.Instance.saveDataManager.AddItemCount(item.itemUid, 1);
+            item.gameObject.SetActive(false);
+            poolDropItem.Enqueue(item);
         }
 #if UNITY_EDITOR
         public void TestDropRates(int monsterUid, int iterations)
