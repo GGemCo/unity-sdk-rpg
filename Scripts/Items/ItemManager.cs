@@ -1,13 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using GGemCo.Scripts.Configs;
+using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
+using GGemCo.Scripts.Utils;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using Random = UnityEngine.Random;
 
 namespace GGemCo.Scripts.Items
 {
     public class ItemManager : MonoBehaviour
     {
+        [SerializeField] private int poolSize = 20;
+        private readonly Queue<SpriteRenderer> poolSprite = new Queue<SpriteRenderer>();
+        
         public enum MonsterDropRateType
         {
             None,
@@ -29,7 +37,11 @@ namespace GGemCo.Scripts.Items
         private Dictionary<ItemConstants.SubCategory, List<StruckTableItem>> dictionaryBySubCategory;
         private Dictionary<int, List<StruckTableItemDropGroup>> dropGroupDictionary = new Dictionary<int, List<StruckTableItemDropGroup>>();
         private Dictionary<int, List<StruckTableMonsterDropRate>> monsterDropDictionary = new Dictionary<int, List<StruckTableMonsterDropRate>>();
-
+        private void Awake()
+        {
+            poolSprite.Clear();
+            InitializePool();
+        }
         void Start()
         {
             tableItem = TableLoaderManager.Instance.TableItem;
@@ -38,10 +50,46 @@ namespace GGemCo.Scripts.Items
             dropGroupDictionary = TableLoaderManager.Instance.TableItemDropGroup.DropGroupDictionary;
             monsterDropDictionary = TableLoaderManager.Instance.TableMonsterDropRate.MonsterDropDictionary;
         }
-
-        public StruckTableItem GetDroppedItems(int monsterUid)
+        /// <summary>
+        /// Addressable 에 등록된 damageText 를 불러와서 pool 을 만든다 
+        /// </summary>
+        private void InitializePool()
         {
-            if (!monsterDropDictionary.ContainsKey(monsterUid)) return null;
+            Addressables.LoadAssetAsync<GameObject>(ConfigAddressableKeys.SpriteDropItem).Completed += OnPrefabLoaded;
+        }
+        private void OnPrefabLoaded(AsyncOperationHandle<GameObject> handle)
+        {
+            if (handle.Status == AsyncOperationStatus.Succeeded)
+            {
+                for (int i = 0; i < poolSize; i++)
+                {
+                    GameObject gameObjectText = Instantiate(handle.Result, SceneGame.Instance.itemManager.gameObject.transform);
+                    SpriteRenderer spriteRenderer = gameObjectText.GetComponent<SpriteRenderer>();
+                    spriteRenderer.gameObject.SetActive(false);
+                    poolSprite.Enqueue(spriteRenderer);
+                }
+            }
+            else
+            {
+                Debug.LogError("Addressables에서 프리팹을 로드하지 못했습니다.");
+            }
+        }
+
+        private void ShowDropItem(Vector3 worldPosition, int itemUid)
+        {
+            if (poolSprite.Count == 0)
+                return;
+            var info = TableLoaderManager.Instance.TableItem.GetDataByUid(itemUid);
+            if (info == null) return;
+            SpriteRenderer spriteRenderer = poolSprite.Dequeue();
+            spriteRenderer.sprite = Resources.Load<Sprite>($"Images/Item/{info.Type.ToString()}/{info.Category.ToString()}/{info.SubCategory.ToString()}/{info.ImagePath}");
+            spriteRenderer.transform.position = worldPosition;
+            spriteRenderer.gameObject.SetActive(true);
+        }
+
+        public void GetDroppedItems(int monsterVid, int monsterUid, GameObject monsterObject)
+        {
+            if (!monsterDropDictionary.ContainsKey(monsterUid)) return;
 
             Dictionary<MonsterDropRateType, int> dropRates = new Dictionary<MonsterDropRateType, int>();
 
@@ -71,10 +119,10 @@ namespace GGemCo.Scripts.Items
 
             if (groupUid <= 0)
             {
-                return null;
+                return;
             }
             if (!dropGroupDictionary.ContainsKey(groupUid))
-                return null;
+                return;
             
             roll = Random.Range(0, 100);
             cumulativePercent = 0f;
@@ -86,11 +134,13 @@ namespace GGemCo.Scripts.Items
                     StruckTableItem item = FindItemByGroup(group);
                     if (item is { Uid: > 0 })
                     {
-                        return item;
+                        GcLogger.Log("item drop. uid: "+ item.Uid + " / Name: "+item.Name);
+                        ShowDropItem(monsterObject.transform.position, item.Uid);
+                        return;
                     }
                 }
             }
-            return null;
+            return;
         }
         private StruckTableItem FindItemByGroup(StruckTableItemDropGroup group)
         {
@@ -113,6 +163,7 @@ namespace GGemCo.Scripts.Items
                     return null;
             }
         }
+#if UNITY_EDITOR
         public void TestDropRates(int monsterUid, int iterations)
         {
             Dictionary<MonsterDropRateType, int> dropRateCounts = new Dictionary<MonsterDropRateType, int>();
@@ -135,28 +186,28 @@ namespace GGemCo.Scripts.Items
 
             for (int i = 0; i < iterations; i++)
             {
-                StruckTableItem item = GetDroppedItems(monsterUid);
-
-                if (item == null)
-                {
-                    dropRateCounts[MonsterDropRateType.Nothing]++;
-                }
-                else
-                {
-                    dropRateCounts[MonsterDropRateType.ItemDropGroupUid]++;
-                    // foreach (var item in droppedItems)
-                    // {
-                        if (Enum.IsDefined(typeof(ItemConstants.Category), item.Category))
-                        {
-                            categoryCounts[item.Category]++;
-                        }
-                        if (Enum.IsDefined(typeof(ItemConstants.SubCategory), item.SubCategory))
-                        {
-                            subCategoryCounts[item.SubCategory]++;
-                        }
-                        totalDrops++;
-                    // }
-                }
+                // StruckTableItem item = GetDroppedItems(monsterUid);
+                //
+                // if (item == null)
+                // {
+                //     dropRateCounts[MonsterDropRateType.Nothing]++;
+                // }
+                // else
+                // {
+                //     dropRateCounts[MonsterDropRateType.ItemDropGroupUid]++;
+                //     // foreach (var item in droppedItems)
+                //     // {
+                //         if (Enum.IsDefined(typeof(ItemConstants.Category), item.Category))
+                //         {
+                //             categoryCounts[item.Category]++;
+                //         }
+                //         if (Enum.IsDefined(typeof(ItemConstants.SubCategory), item.SubCategory))
+                //         {
+                //             subCategoryCounts[item.SubCategory]++;
+                //         }
+                //         totalDrops++;
+                //     // }
+                // }
             }
 
             Debug.Log($"Test Results for Monster UID: {monsterUid} ({iterations} iterations)");
@@ -180,5 +231,6 @@ namespace GGemCo.Scripts.Items
                 Debug.Log($"{entry.Key}: {entry.Value} times ({percentage:F2}%)");
             }
         }
+#endif
     }
 }

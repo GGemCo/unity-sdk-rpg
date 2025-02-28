@@ -13,6 +13,7 @@ namespace GGemCo.Scripts.TableLoader
         public ItemConstants.Category Category;
         public ItemConstants.SubCategory SubCategory;
         public ItemConstants.Class Class;
+        public string ImagePath;
         public AttributesConstants.Type OptionType1;
         public float OptionValue1;
     }
@@ -103,6 +104,7 @@ namespace GGemCo.Scripts.TableLoader
                 Category = ConvertCategory(data["Category"]),
                 SubCategory = ConvertSubCategory(data["SubCategory"]),
                 Class = ConvertClass(data["Class"]),
+                ImagePath = data["ImagePath"],
                 OptionType1 = ConvertAttributesType(data["OptionType1"]),
                 OptionValue1 = float.Parse(data["OptionValue1"]),
             };

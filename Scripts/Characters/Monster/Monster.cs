@@ -1,3 +1,4 @@
+using System;
 using GGemCo.Scripts.Characters.Monster.Behavior;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
@@ -29,6 +30,11 @@ namespace GGemCo.Scripts.Characters.Monster
         // 공격 속도
         [HideInInspector] public float currentAttackSpeed;
         
+        // 1. 델리게이트 선언
+        public delegate void DelegateMonsterDead(int monsterVid, int monsterUid, GameObject monsterObject);
+        // 2. 델리게이트 이벤트 정의
+        public event DelegateMonsterDead OnMonsterDead;
+        
         // Start is called before the first frame update
         protected override void Awake()
         {
@@ -46,6 +52,7 @@ namespace GGemCo.Scripts.Characters.Monster
 #else
             DefaultCharacterBehavior = gameObject.AddComponent<BehaviorMonsterSprite>();
 #endif
+            OnMonsterDead += SceneGame.Instance.itemManager.GetDroppedItems;
         }
         /// <summary>
         /// tag, sorting layer, layer 셋팅하기
@@ -121,7 +128,7 @@ namespace GGemCo.Scripts.Characters.Monster
                 return false;
             }
             if (damage <= 0) return false;
-                
+
             CurrentHp -= damage;
             // -1 이면 죽지 않는다
             if (StatHp < 0)
@@ -134,10 +141,10 @@ namespace GGemCo.Scripts.Characters.Monster
             
             if (CurrentHp <= 0)
             {
+                CurrentStatus = ICharacter.CharacterStatus.Dead;
                 SceneGame.Instance.mapManager.OnDeadMonster(Vid);
                 
                 //FG_Logger.Log("dead vid : " + this.vid);
-                CurrentStatus = ICharacter.CharacterStatus.Dead;
                 Destroy(gameObject, delayDestroy);
 
                 OnDead();
@@ -164,6 +171,7 @@ namespace GGemCo.Scripts.Characters.Monster
         private void OnDead()
         {
             DefaultCharacterBehavior.PlayDeadAnimation();
+            OnMonsterDead?.Invoke(Vid, Uid, gameObject);
         }
         /// <summary>
         /// 선공 몬스터 처리
@@ -173,6 +181,8 @@ namespace GGemCo.Scripts.Characters.Monster
         {
             if (collision.gameObject.CompareTag(ConfigTags.GetPlayer()))
             {
+                if (IsStatusDead()) return;
+                
                 CurrentStatus = ICharacter.CharacterStatus.Idle;
                 // 선공
                 if (attackType == AttackType.AggroFirst && isAggro == false)
@@ -181,6 +191,12 @@ namespace GGemCo.Scripts.Characters.Monster
                     DefaultCharacterBehavior.SetAttackerTarget(collision.gameObject.transform);
                 }
             }
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            OnMonsterDead -= SceneGame.Instance.itemManager.GetDroppedItems;
         }
     }
 }

@@ -300,5 +300,10 @@ namespace GGemCo.Scripts.Characters
         {
             isStartFade = value;
         }
+
+        protected virtual void OnDestroy()
+        {
+            
+        }
     }
 }
