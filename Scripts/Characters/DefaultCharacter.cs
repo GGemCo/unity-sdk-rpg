@@ -81,7 +81,7 @@ namespace GGemCo.Scripts.Characters
             {
                 characterRenderer = GetComponent<Renderer>();
             }
-            characterRenderer.sortingLayerName = ConfigSortingLayer.Character;
+            characterRenderer.sortingLayerName = ConfigSortingLayer.GetCharacter();
         }
         /// <summary>
         /// 캐릭터에 필요한 컴포넌트 추가하기

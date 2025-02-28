@@ -29,6 +29,8 @@ namespace GGemCo.Scripts.Configs
             CanvasUIByWorld,
             // UI가 포함될 canvas
             CanvasUI,
+            // 드랍된 아이템 
+            DropItem,
         }
 
         public static readonly Dictionary<Keys, string> Tags = new Dictionary<Keys, string>
@@ -45,9 +47,10 @@ namespace GGemCo.Scripts.Configs
             { Keys.ButtonNpcQuest, "GGemCo_ButtonNpcQuest" },
             { Keys.CanvasUIByWorld, "GGemCo_CanvasUIByWorld" },
             { Keys.CanvasUI, "GGemCo_CanvasUI" },
+            { Keys.DropItem, "GGemCo_DropItem" },
         };
 
-        static string GetTag(Keys key)
+        private static string GetTag(Keys key)
         {
             return Tags.TryGetValue(key, out string value) ? value : throw new ArgumentException($"Invalid key: {key}");
         }
@@ -99,6 +102,10 @@ namespace GGemCo.Scripts.Configs
         public static string GetCanvasUI()
         {
             return GetTag(Keys.CanvasUI);
+        }
+        public static string GetDropItem()
+        {
+            return GetTag(Keys.DropItem);
         }
     }
 }

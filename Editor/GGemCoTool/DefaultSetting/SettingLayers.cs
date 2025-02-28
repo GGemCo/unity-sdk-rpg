@@ -10,7 +10,6 @@ namespace GGemCo.Editor.GGemCoTool.DefaultSetting
         private readonly string title = "Layer 추가하기";
 
         // 추가할 Layer 목록
-        private readonly string[] layersToAdd = { ConfigLayer.TileMapWall };
 
         public void OnGUI()
         {
@@ -29,8 +28,9 @@ namespace GGemCo.Editor.GGemCoTool.DefaultSetting
 
             bool addedAnyLayer = false;
 
-            foreach (var layerName in layersToAdd)
+            foreach (var layerNames in ConfigLayer.Tags)
             {
+                string layerName = layerNames.Value;
                 if (!LayerExists(layersProp, layerName))
                 {
                     int emptySlot = FindEmptyLayerSlot(layersProp);

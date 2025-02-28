@@ -18,7 +18,7 @@ namespace GGemCo.Scripts.Maps.Objects
         protected override void InitTagSortingLayer()
         {
             base.InitTagSortingLayer();
-            gameObject.layer = LayerMask.NameToLayer(ConfigLayer.TileMapWall);
+            gameObject.layer = LayerMask.NameToLayer(ConfigLayer.GetTileMapWall());
         }
     }
 }
