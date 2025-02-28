@@ -33,13 +33,13 @@ namespace GGemCo.Scripts.Popup
             GameObject prefab = GetPopupPrefab(popupType);
             if (prefab == null)
             {
-                GcLogger.LogError("dont exist popup prefab. type: "+popupType);
+                GcLogger.LogError("팝업 prefab 이 없습니다. type: "+popupType);
                 return;
             }
             DefaultPopup newDefaultPopup = Instantiate(prefab, canvasPopup).GetComponent<DefaultPopup>();
             if (newDefaultPopup == null)
             {
-                GcLogger.LogError("dont make new popup.");
+                GcLogger.LogError("팝업을 생성할 수 없습니다.");
                 return;
             }
 
@@ -58,13 +58,13 @@ namespace GGemCo.Scripts.Popup
             GameObject prefab = GetPopupPrefab(popupType);
             if (prefab == null)
             {
-                GcLogger.LogError("dont exist popup prefab. type: "+popupType);
+                GcLogger.LogError("팝업 prefab 이 없습니다. type: "+popupType);
                 return;
             }
             DefaultPopup newDefaultPopup = Instantiate(prefab, canvasPopup).GetComponent<DefaultPopup>();
             if (newDefaultPopup == null)
             {
-                GcLogger.LogError("dont make new popup.");
+                GcLogger.LogError("팝업을 생성할 수 없습니다.");
                 return;
             }
 
@@ -83,13 +83,13 @@ namespace GGemCo.Scripts.Popup
             GameObject prefab = GetPopupPrefab(popupType);
             if (prefab == null)
             {
-                GcLogger.LogError("dont exist popup prefab. type: "+popupType);
+                GcLogger.LogError("팝업 prefab 이 없습니다. type: "+popupType);
                 return;
             }
             DefaultPopup newDefaultPopup = Instantiate(prefab, canvasPopup).GetComponent<DefaultPopup>();
             if (newDefaultPopup == null)
             {
-                GcLogger.LogError("dont make new popup.");
+                GcLogger.LogError("팝업을 생성할 수 없습니다.");
                 return;
             }
 
@@ -107,20 +107,20 @@ namespace GGemCo.Scripts.Popup
         {
             if (rewardDia == 0 && rewardGold == 0)
             {
-                GcLogger.LogError("reward dia, reward gold is zero.");
+                // GcLogger.LogWarning("reward dia, reward gold is zero.");
                 return;
             }
             PopupType popupType = PopupType.DungeonWin;
             GameObject prefab = GetPopupPrefab(popupType);
             if (prefab == null)
             {
-                GcLogger.LogError("dont exist popup prefab. type: "+popupType);
+                GcLogger.LogError("팝업 prefab 이 없습니다. type: "+popupType);
                 return;
             }
             DefaultPopup newDefaultPopup = Instantiate(prefab, canvasPopup).GetComponent<DefaultPopup>();
             if (newDefaultPopup == null)
             {
-                GcLogger.LogError("dont make new popup.");
+                GcLogger.LogError("팝업을 생성할 수 없습니다.");
                 return;
             }
 
@@ -139,20 +139,20 @@ namespace GGemCo.Scripts.Popup
         {
             if (rewardDia == 0 && rewardGold == 0)
             {
-                GcLogger.LogError("reward dia, reward gold is zero.");
+                // GcLogger.LogWarning("reward dia, reward gold is zero.");
                 return;
             }
             PopupType popupType = PopupType.BossBattleWin;
             GameObject prefab = GetPopupPrefab(popupType);
             if (prefab == null)
             {
-                GcLogger.LogError("dont exist popup prefab. type: "+popupType);
+                GcLogger.LogError("팝업 prefab 이 없습니다. type: "+popupType);
                 return;
             }
             DefaultPopup newDefaultPopup = Instantiate(prefab, canvasPopup).GetComponent<DefaultPopup>();
             if (newDefaultPopup == null)
             {
-                GcLogger.LogError("dont make new popup.");
+                GcLogger.LogError("팝업을 생성할 수 없습니다.");
                 return;
             }
 
@@ -173,13 +173,13 @@ namespace GGemCo.Scripts.Popup
             GameObject prefab = GetPopupPrefab(popupType);
             if (prefab == null)
             {
-                GcLogger.LogError("dont exist popup prefab. type: "+popupType);
+                GcLogger.LogError("팝업 prefab 이 없습니다. type: "+popupType);
                 return;
             }
             DefaultPopup newDefaultPopup = Instantiate(prefab, canvasPopup).GetComponent<DefaultPopup>();
             if (newDefaultPopup == null)
             {
-                GcLogger.LogError("dont make new popup.");
+                GcLogger.LogError("팝업을 생성할 수 없습니다.");
                 return;
             }
             message = string.Format(message, parameters);
@@ -199,13 +199,13 @@ namespace GGemCo.Scripts.Popup
             GameObject prefab = GetPopupPrefab(popupMetadata.PopupType);
             if (prefab == null)
             {
-                GcLogger.LogError("dont exist popup prefab. type: "+popupMetadata.PopupType);
+                GcLogger.LogError("팝업 prefab 이 없습니다. type: "+popupMetadata.PopupType);
                 return;
             }
             DefaultPopup newDefaultPopup = Instantiate(prefab, canvasPopup).GetComponent<DefaultPopup>();
             if (newDefaultPopup == null)
             {
-                GcLogger.LogError("dont make new popup.");
+                GcLogger.LogError("팝업을 생성할 수 없습니다.");
                 return;
             }
             newDefaultPopup.Initialize(popupMetadata);
@@ -265,13 +265,13 @@ namespace GGemCo.Scripts.Popup
             popupMetadata.PopupType = PopupType.NormalButtons;
             popupMetadata.OnConfirm = () =>
             {
-                GcLogger.Log("확인 버튼 클릭됨");
+                // GcLogger.Log("확인 버튼 클릭됨");
                 // SceneGame.Instance.uIWindowManager.CloseAll();
                 // SceneGame.Instance.uIWindowManager.ShowWindow(UIWindowManager.WindowUid.CashShop, true);
             };
             popupMetadata.OnCancel = () =>
             {
-                GcLogger.Log("취소 버튼 클릭됨");
+                // GcLogger.Log("취소 버튼 클릭됨");
             };
             ShowPopup(popupMetadata);
         }

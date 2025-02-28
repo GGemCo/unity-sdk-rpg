@@ -111,12 +111,12 @@ namespace GGemCo.Scripts.Core
                 }
                 else
                 {
-                    GcLogger.LogWarning("No available audio source in the pool for Uid: " + uid);
+                    GcLogger.LogWarning("사용 가능한 audio pool 이 없습니다. Uid: " + uid);
                 }
             }
             else
             {
-                GcLogger.LogWarning("Uid not found in the sound pool: " + uid);
+                GcLogger.LogWarning("Sfx pool 에서 찾을 수 없는 audio uid 입니다. Uid: " + uid);
             }
         }
         /// <summary>
@@ -183,7 +183,7 @@ namespace GGemCo.Scripts.Core
             }
             else
             {
-                GcLogger.LogWarning("Uid not found in the sound pool: " + uid);
+                GcLogger.LogWarning("Sfx pool 에서 찾을 수 없는 audio uid 입니다. Uid: " + uid);
             }
         }
     }

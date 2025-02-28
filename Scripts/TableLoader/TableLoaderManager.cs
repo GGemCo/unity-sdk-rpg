@@ -102,7 +102,7 @@ namespace GGemCo.Scripts.TableLoader
             }
             catch (Exception ex)
             {
-                GcLogger.LogError($"Error reading file {fileName}: {ex.Message}");
+                GcLogger.LogError($"테이블 파싱중 오류. file {fileName}: {ex.Message}");
             }
         }
 

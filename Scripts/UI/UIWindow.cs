@@ -36,7 +36,7 @@ namespace GGemCo.Scripts.UI
         {
             if (icons.Length == 0 || icons[index] == null)
             {
-                GcLogger.LogError("no icon. index: " +index);
+                GcLogger.LogError("아이콘이 없습니다. index: " +index);
                 return null;
             }
         
@@ -45,13 +45,13 @@ namespace GGemCo.Scripts.UI
         /// <summary>
         /// 아이콘 가져오기
         /// </summary>
-        /// <param name="uid"></param>
+        /// <param name="iconUid"></param>
         /// <returns></returns>
-        public GameObject GetIconByUid(int uid)
+        public GameObject GetIconByUid(int iconUid)
         {
             if (icons.Length == 0)
             {
-                GcLogger.LogError("icons.Length is zero");
+                GcLogger.LogError("아이콘이 없습니다.");
                 return null;
             }
 
@@ -60,7 +60,7 @@ namespace GGemCo.Scripts.UI
                 if (icon == null) continue;
                 UIIcon uiIcon = icon.GetComponent<UIIcon>();
                 if (uiIcon == null) continue;
-                if (uiIcon.uid == uid)
+                if (uiIcon.uid == iconUid)
                 {
                     return icon;
                 }
@@ -78,7 +78,7 @@ namespace GGemCo.Scripts.UI
             GameObject icon = icons[slotIndex];
             if (icon == null || icon.GetComponent<UIIcon>() == null)
             {
-                GcLogger.LogError("dont exist icon. slot index: " +slotIndex);
+                GcLogger.LogError("슬롯에 아이콘이 없습니다. slot index: " +slotIndex);
                 return;
             }
             icon.GetComponent<UIIcon>().ClearIconInfos();
@@ -99,7 +99,7 @@ namespace GGemCo.Scripts.UI
             GameObject slot = slots[slotIndex];
             if (slot == null)
             {
-                GcLogger.LogError("dont exist slot. slot index: " +slotIndex);
+                GcLogger.LogError("슬롯에 아이콘이 없습니다. slot index: " +slotIndex);
                 return;
             }
             icon.transform.SetParent(slot.transform);
@@ -128,7 +128,7 @@ namespace GGemCo.Scripts.UI
         /// <param name="originalIcon">드랍되는 곳에 있는 아이콘</param>
         public virtual void OnEndDragInIcon(GameObject droppedIcon, GameObject originalIcon)
         {
-            GcLogger.Log("OnEndDragInIcon");
+            // GcLogger.Log("OnEndDragInIcon");
         }
         /// <summary>
         /// 아이템 구매

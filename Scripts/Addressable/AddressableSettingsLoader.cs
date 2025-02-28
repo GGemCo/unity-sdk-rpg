@@ -26,7 +26,7 @@ namespace GGemCo.Scripts.Addressable
             _settings = await LoadSettings();
             if (_settings != null)
             {
-                GcLogger.Log("useSpine2d : " + _settings.useSpine2d);
+                GcLogger.Log("Spine2d 사용여부 : " + _settings.useSpine2d);
             }
         }
 

@@ -67,12 +67,12 @@ namespace GGemCo.Scripts.TableLoader
         }
         protected GameObject LoadPrefab(string prefabPath) {
             if (prefabPath == "") {
-                GcLogger.Log("prefabPath is "+prefabPath+"");
+                GcLogger.LogError("prefab 경로가 없습니다. prefabPath: "+prefabPath+"");
                 return null;
             }
             GameObject prefab = Resources.Load<GameObject>(prefabPath);
             if (prefab == null) {
-                GcLogger.Log("prefab is null. prefabPath: "+prefabPath);
+                GcLogger.LogError("prefab 오브젝트가 없습니다. prefabPath: "+prefabPath);
                 return null;
             }
             return prefab;

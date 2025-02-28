@@ -20,7 +20,7 @@ namespace GGemCo.Scripts.Spine2d
 
             if (SkeletonAnimation == null)
             {
-                GcLogger.LogError("SkeletonAnimation component not found!");
+                GcLogger.LogError("SkeletonAnimation component 가 없습니다.");
             }
             SkeletonAnimation.AnimationState.Event += HandleEvent;
         }
@@ -123,7 +123,7 @@ namespace GGemCo.Scripts.Spine2d
 
             if (findAnimation == null)
             {
-                GcLogger.LogWarning($"Animation '{animationName}' not found.");
+                GcLogger.LogWarning($"애니메이션 클립을 찾을 수 없습니다. AnimationName: {animationName}");
                 return 0;
             }
 

@@ -275,8 +275,7 @@ namespace GGemCo.Scripts.Maps
         {
             if (gridTileMap == null)
             {
-                SetLoadFailed($"dont exist grid tile map");
-                GcLogger.Log($"dont exist grid tile map");
+                SetLoadFailed($"Grid 오브젝트가 없습니다.");
                 yield break;
             }
             // SceneGame.Instance.player?.GetComponent<Player>().Stop();
@@ -287,23 +286,20 @@ namespace GGemCo.Scripts.Maps
             }
             if (tableLoaderManager.TableMap.GetCount() <= 0)
             {
-                SetLoadFailed($"dont exist map table.");
-                GcLogger.Log($"dont exist map table.");
+                SetLoadFailed("맵 테이블에 내용이 없습니다.");
                 yield break;
             }
             resultChapterData = tableLoaderManager.TableMap.GetDataByUid(currentMapUid);
             if (resultChapterData == null)
             {
-                SetLoadFailed($"dont exist map data. Uid: " + currentMapUid);
-                GcLogger.Log($"dont exist map data. Uid: " + currentMapUid);
+                SetLoadFailed($"맵 테이블에서 찾을 수 없습니다. Uid: {currentMapUid}");
                 yield break;
             }
             string path = GetFilePath(MapConstants.FileNameTilemap);
             GameObject prefab = Resources.Load<GameObject>(path);
             if (prefab == null)
             {
-                SetLoadFailed($"dont exist prefab path. path: {path} / currentMapUid: {currentMapUid}");
-                GcLogger.Log($"dont exist prefab path. path: {path} / currentMapUid: {currentMapUid}");
+                SetLoadFailed($"타일맵 prefab 이 없습니다. path: {path} / currentMapUid: {currentMapUid}");
                 yield break;
             }
             // bgm 플레이
@@ -348,7 +344,7 @@ namespace GGemCo.Scripts.Maps
             }
             catch (Exception ex)
             {
-                GcLogger.LogError($"Error reading file {regenFileName}: {ex.Message}");
+                GcLogger.LogError($"몬스터 regen json 파싱중 오류. file {regenFileName}: {ex.Message}");
                 yield break;
             }
 
@@ -375,7 +371,7 @@ namespace GGemCo.Scripts.Maps
             }
             catch (Exception ex)
             {
-                GcLogger.LogError($"Error reading file {rPathWarp}: {ex.Message}");
+                GcLogger.LogError($"워프 json 파싱중 오류. file {rPathWarp}: {ex.Message}");
                 yield break;
             }
             yield return null;
@@ -401,7 +397,7 @@ namespace GGemCo.Scripts.Maps
             }
             catch (Exception ex)
             {
-                GcLogger.LogError($"Error reading file {regenFileName}: {ex.Message}");
+                GcLogger.LogError($"npc json 파싱중 오류. file {regenFileName}: {ex.Message}");
                 yield break;
             }
 
