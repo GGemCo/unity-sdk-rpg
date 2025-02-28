@@ -71,7 +71,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         /// </summary>
         private void HandleInput()
         {
-            if (AttackerTransform == null) return;
+            if (AttackerTransform == null || monster.IsStatusDead()) return;
             Direction = (AttackerTransform.position - monster.transform.position).normalized;
         }
 
@@ -80,7 +80,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         /// </summary>
         private void HandleAttack()
         {
-            if (IsAttackAnimationing()) return;
+            if (IsAttackAnimationing() || monster.IsStatusDead()) return;
 
             HandleInput();
             UpdateMonsterScale(Direction);
@@ -93,7 +93,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         /// </summary>
         private void OnAttackComplete(TrackEntry trackEntry)
         {
-            if (trackEntry.Animation.Name != attackAnim) return;
+            if (trackEntry.Animation.Name != attackAnim || monster.IsStatusDead()) return;
 
             PlayIdleAnimation();
         }
@@ -108,7 +108,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         /// </summary>
         private bool SearchAttackerTarget()
         {
-            if (AttackerTransform == null) return false;
+            if (AttackerTransform == null || monster.IsStatusDead()) return false;
             Vector2 size = new Vector2(capsuleCollider.size.x * Mathf.Abs(transform.localScale.x), capsuleCollider.size.y * transform.localScale.y);
             Collider2D[] collider2Ds = Physics2D.OverlapCapsuleAll(transform.position, size, capsuleCollider.direction, 0f);
 
@@ -133,7 +133,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
 
         private void StartAttackCoroutine()
         {
-            if (coroutineAttack != null) return;
+            if (coroutineAttack != null || monster.IsStatusDead()) return;
 
             coroutineAttack = StartCoroutine(DownAttackByTime());
         }
@@ -163,6 +163,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         /// </summary>
         private void UpdateMonsterScale(Vector2 direction)
         {
+            if (monster.IsStatusDead()) return;
             monster.transform.localScale = new Vector3(monster.OriginalScaleX * GetScaleByDirection(direction), 
                                                        monster.transform.localScale.y, 
                                                        monster.transform.localScale.z);
@@ -193,6 +194,8 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         /// </summary>
         private void PlayRunAnimation()
         {
+            if (monster.IsStatusDead()) return;
+            
             string moveAnim = Direction.y != 0 
                 ? (Direction.y > 0 ? walkBackwardAnim : walkForwardAnim) 
                 : walkForwardAnim;
@@ -251,6 +254,8 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         {
             if (collision.CompareTag(ConfigTags.GetPlayer()))
             {
+                if (monster.IsStatusDead()) return;
+                
                 IsAttacking = false;
                 StopAttackCoroutine();
             }
@@ -261,6 +266,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         }
         protected override void OnSpineEventAttack(Event @event) 
         {
+            if (monster.IsStatusDead()) return;
             // GcLogger.Log(@event);
             long totalDamage = SceneGame.Instance.calculateManager.GetPlayerTotalAtk();
         
@@ -295,6 +301,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         }
         private void UpdateCheckMaxBounds()
         {
+            if (monster.IsStatusDead()) return;
             var characterSize = GetCharacterSize();
             characterSize.x *= Math.Abs(monster.transform.localScale.x);
             characterSize.y *= monster.transform.localScale.y;
