@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using GGemCo.Scripts.FgPlayerPrefs;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
 
@@ -65,7 +64,7 @@ namespace GGemCo.Scripts.Core
         private IEnumerator BgmFadeOutAndIn(AudioClip newClip)
         {
             // Fade out current audio
-            float startVolume = SoundSettings.GetBGMVolume();
+            float startVolume = 1;
             while (currentBgmAudioSource.volume > 0)
             {
                 currentBgmAudioSource.volume -= startVolume * Time.deltaTime / bgmFadeDuration;
@@ -106,7 +105,7 @@ namespace GGemCo.Scripts.Core
                     AudioSource audioSource = soundObject.GetComponent<AudioSource>();
                     soundObject.SetActive(true); // 활성화
                     audioSource.Play();
-                    audioSource.volume = SoundSettings.GetSfxVolume();
+                    audioSource.volume = 1;
                     StartCoroutine(DeactivateAfterPlay(soundObject, audioSource.clip.length));
                 }
                 else
@@ -157,7 +156,6 @@ namespace GGemCo.Scripts.Core
         {
             if (currentBgmAudioSource == null) return;
             currentBgmAudioSource.volume = value;
-            SoundSettings.SetBGMVolume(value);
         }
         public void ChangeSoundVolumeSfx(float value)
         {
@@ -165,7 +163,6 @@ namespace GGemCo.Scripts.Core
             {
                 SetSfxVolume(uid, value);
             }
-            SoundSettings.SetSfxVolume(value);
         }
         /// <summary>
         /// sfx 볼륨 조절하기
