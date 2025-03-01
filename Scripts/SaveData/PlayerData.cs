@@ -18,8 +18,8 @@ namespace GGemCo.Scripts.SaveData
         private TableMonster tableMonster;
         private TableExp tableExp;
 
-        private const string PlayerPrefsKeyLevel = "GGemCo_PlayerPrefs_Player_Level";
-        private const string PlayerPrefsKeyExp = "GGemCo_PlayerPrefs_Player_Exp";
+        public const string PlayerPrefsKeyLevel = "GGemCo_PlayerPrefs_Player_Level";
+        public const string PlayerPrefsKeyExp = "GGemCo_PlayerPrefs_Player_Exp";
         public PlayerData(TableLoaderManager loader)
         {
             tableLoaderManager = loader;
@@ -39,7 +39,7 @@ namespace GGemCo.Scripts.SaveData
         /// </summary>
         private void LoadLevel()
         {
-            int level = PlayerPrefsLoadInt(PlayerPrefsKeyLevel, 1);
+            int level = PlayerPrefsLoadInt(PlayerPrefsKeyLevel, "1");
             SetLevel(level);
             SetNeedExp(tableExp.GetNeedExp(level + 1));
         }
@@ -48,7 +48,7 @@ namespace GGemCo.Scripts.SaveData
         /// </summary>
         private void LoadExp()
         {
-            SetExp(PlayerPrefsLoadLong(PlayerPrefsKeyExp));
+            SetExp(PlayerPrefsLoadInt(PlayerPrefsKeyExp));
         }
         /// <summary>
         /// 경험치 추가하기
@@ -97,7 +97,7 @@ namespace GGemCo.Scripts.SaveData
         private void SetExp(long value)
         {
             CurrentExp.OnNext(value);
-            PlayerPrefsSaveLong(PlayerPrefsKeyExp, value);
+            PlayerPrefsSave(PlayerPrefsKeyExp, value.ToString());
         }
         /// <summary>
         /// 레벨 셋팅
@@ -107,7 +107,7 @@ namespace GGemCo.Scripts.SaveData
         private int SetLevel(int value)
         {
             CurrentLevel.OnNext(value);
-            PlayerPrefsSaveInt(PlayerPrefsKeyLevel, value);
+            PlayerPrefsSave(PlayerPrefsKeyLevel, value.ToString());
             return CurrentLevel.Value;
         }
         /// <summary>

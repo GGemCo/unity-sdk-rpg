@@ -81,7 +81,9 @@ namespace GGemCo.Scripts.Scenes
             popupManager = CreateManager<PopupManager>(managerContainer);
             saveDataManager = CreateManager<SaveDataManager>(managerContainer);
             damageTextManager = CreateManager<DamageTextManager>(managerContainer);
-            itemManager = CreateManager<ItemManager>(managerContainer);
+            
+            itemManager = new ItemManager();
+            itemManager.Initialize();
         }
 
         private T CreateManager<T>(GameObject parent) where T : Component

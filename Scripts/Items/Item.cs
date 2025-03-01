@@ -182,5 +182,13 @@ namespace GGemCo.Scripts.Items
         {
             circleCollider2D.enabled = false;
         }
+        /// <summary>
+        /// 플레이어가 아이템을 먹 후 처리
+        /// </summary>
+        public void Reset()
+        {
+            itemUid = 0;
+            gameObject.SetActive(false);
+        }
     }
 }

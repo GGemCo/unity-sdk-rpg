@@ -52,7 +52,7 @@ namespace GGemCo.Scripts.Characters.Monster
 #else
             DefaultCharacterBehavior = gameObject.AddComponent<BehaviorMonsterSprite>();
 #endif
-            OnMonsterDead += SceneGame.Instance.itemManager.GetDroppedItems;
+            OnMonsterDead += SceneGame.Instance.itemManager.OnMonsterDead;
             OnMonsterDead += SceneGame.Instance.saveDataManager.Player.AddExp;
         }
         /// <summary>
@@ -197,7 +197,7 @@ namespace GGemCo.Scripts.Characters.Monster
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            OnMonsterDead -= SceneGame.Instance.itemManager.GetDroppedItems;
+            OnMonsterDead -= SceneGame.Instance.itemManager.OnMonsterDead;
         }
     }
 }

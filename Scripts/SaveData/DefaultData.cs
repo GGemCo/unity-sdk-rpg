@@ -4,23 +4,22 @@ namespace GGemCo.Scripts.SaveData
 {
     public class DefaultData
     {
-        protected static void PlayerPrefsSaveInt(string key, int value)
+        protected static void PlayerPrefsSave(string key, string value)
         {
-            PlayerPrefs.SetInt(key, value);
+            PlayerPrefs.SetString(key, value);
             PlayerPrefs.Save();
         }
-        protected static void PlayerPrefsSaveLong(string key, long value)
+        protected int PlayerPrefsLoadInt(string key, string defaultValue = "0")
         {
-            PlayerPrefs.SetFloat(key, value);
-            PlayerPrefs.Save();
+            return int.Parse(PlayerPrefs.GetString(key, defaultValue));
         }
-        protected int PlayerPrefsLoadInt(string key, int defaultValue = 0)
+        protected float PlayerPrefsLoadFloat(string key, string defaultValue = "0")
         {
-            return PlayerPrefs.GetInt(key, defaultValue);
+            return float.Parse(PlayerPrefs.GetString(key, defaultValue));
         }
-        protected long PlayerPrefsLoadLong(string key, long defaultValue = 0)
+        protected long PlayerPrefsLoadLong(string key, string defaultValue = "0")
         {
-            return (long)PlayerPrefs.GetFloat(key, defaultValue);
+            return long.Parse(PlayerPrefs.GetString(key, defaultValue));
         }
     }
 }

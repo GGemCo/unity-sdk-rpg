@@ -57,5 +57,17 @@ namespace GGemCo.Editor.GGemCoTool.TableLoader
         {
             return LoadTable<TableAnimation>(ConfigTableFileName.Animation);
         }
+        public static TableItem LoadItemTable()
+        {
+            return LoadTable<TableItem>(ConfigTableFileName.Item);
+        }
+        public static TableItemDropGroup LoadItemDropGroupTable()
+        {
+            return LoadTable<TableItemDropGroup>(ConfigTableFileName.ItemDropGroup);
+        }
+        public static TableMonsterDropRate LoadMonsterDropRateTable()
+        {
+            return LoadTable<TableMonsterDropRate>(ConfigTableFileName.MonsterDropRate);
+        }
     }
 }
