@@ -38,19 +38,7 @@ namespace GGemCo.Scripts.TableLoader
             {
                 DropGroupDictionary[uid] = new List<StruckTableItemDropGroup>();
             }
-
-            StruckTableItemDropGroup struckTableItemDropGroup = GetDataByUid(uid);
-            DropGroupDictionary[uid].Add(struckTableItemDropGroup);
-        }
-        public StruckTableItemDropGroup GetDataByUid(int uid)
-        {
-            if (uid <= 0)
-            {
-                GcLogger.LogError("uid is 0.");
-                return new StruckTableItemDropGroup();
-            }
-            var data = GetData(uid);
-            return new StruckTableItemDropGroup
+            StruckTableItemDropGroup struckTableItemDropGroup = new StruckTableItemDropGroup
             {
                 Uid = int.Parse(data["Uid"]),
                 Memo = data["Memo"],
@@ -58,6 +46,7 @@ namespace GGemCo.Scripts.TableLoader
                 Value = data["Value"],
                 Rate = int.Parse(data["Rate"]),
             };
+            DropGroupDictionary[uid].Add(struckTableItemDropGroup);
         }
     }
 }
