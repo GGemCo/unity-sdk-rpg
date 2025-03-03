@@ -1,4 +1,5 @@
 ﻿using GGemCo.Editor.GGemCoTool.Utils;
+using GGemCo.Scripts.Configs;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
@@ -10,13 +11,6 @@ namespace GGemCo.Editor.GGemCoTool.DefaultSetting
     {
         private const string Title = "Addressable 추가하기";
         private const string DefaultGroupName = "Default Local Group"; // 기본 그룹 이름
-
-        // 추가할 파일 목록 (경로, 키 값)
-        private static readonly (string path, string key)[] AssetsToAdd =
-        {
-            ("Assets/GGemCo/GGemCoSettings.asset", "GGemCo_Settings"),
-            ("Assets/GGemCo/Prefabs/UI/TextDamage.prefab", "GGemCo_TextFloatingDamage")
-        };
 
         public void OnGUI()
         {
@@ -47,7 +41,7 @@ namespace GGemCo.Editor.GGemCoTool.DefaultSetting
                 return;
             }
 
-            foreach (var (assetPath, keyName) in AssetsToAdd)
+            foreach (var (assetPath, keyName) in ConfigAddressableKeys.AssetsToAdd)
             {
                 // 대상 파일 가져오기
                 var asset = AssetDatabase.LoadMainAssetAtPath(assetPath);

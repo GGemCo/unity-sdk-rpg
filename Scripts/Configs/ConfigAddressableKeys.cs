@@ -8,5 +8,12 @@
         public const string TextFloatingDamage = "GGemCo_TextFloatingDamage";
         // 드랍 아이템 이미지
         public const string SpriteDropItem = "GGemCo_SpriteDropItem";
+
+        public static readonly (string path, string key)[] AssetsToAdd =
+        {
+            ("Assets/GGemCo/GGemCoSettings.asset", Settings),
+            ("Assets/GGemCo/Prefabs/UI/TextDamage.prefab", TextFloatingDamage),
+            ("Assets/GGemCo/Prefabs/Item/DropItem.prefab", SpriteDropItem)
+        };
     }
 }
