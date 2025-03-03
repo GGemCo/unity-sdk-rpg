@@ -17,8 +17,8 @@ namespace GGemCo.Scripts.Characters
         public int Uid { get; set; }
         // 스폰될때 vid
         public int Vid { get; set; }
-        public float StatHp { get; set; }
-        public float StatAtk { get; set; }
+        public long StatHp { get; set; }
+        public long StatAtk { get; set; }
         public float StatMoveStep { get; set; }
         public float StatMoveSpeed { get; set; }
         

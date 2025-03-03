@@ -94,13 +94,13 @@ namespace GGemCo.Scripts.Characters.Monster
             // FG_Logger.Log("InitializationStat uid: "+uid+" / info.uid: "+info.uid+" / StatMoveSpeed: "+info.statMoveSpeed);
             if (info.Uid <= 0) return;
             StatAtk = info.StatAtk;
-            CurrentAtk = (long)StatAtk;
+            CurrentAtk = StatAtk;
             currentAttackSpeed = info.StatAttackSpeed;
             StatMoveSpeed = info.StatMoveSpeed;
             CurrentMoveSpeed = StatMoveSpeed;
             CurrentMoveStep = StatMoveStep;
             StatHp = info.StatHp;
-            CurrentHp = (long)StatHp;
+            CurrentHp = StatHp;
             float scale = info.Scale;
             SetScale(scale);
 

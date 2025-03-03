@@ -59,9 +59,10 @@ namespace GGemCo.Scripts.Characters.Player
         {
             if (TableLoaderManager.Instance != null)
             {
-                StatAtk = (long)TableLoaderManager.Instance.TableConfig.GetPolyPlayerStatAtk();
-                CurrentAtk = (long)StatAtk;
-                CurrentHp = (long)StatHp;
+                StatAtk = TableLoaderManager.Instance.TableConfig.GetPolyPlayerStatAtk();
+                CurrentAtk = StatAtk;
+                StatHp = TableLoaderManager.Instance.TableConfig.GetPolyPlayerStatHp();
+                CurrentHp = StatHp;
                 StatMoveStep = TableLoaderManager.Instance.TableConfig.GetPolyPlayerStatMoveStep();
                 StatMoveSpeed = TableLoaderManager.Instance.TableConfig.GetPolyPlayerStatMoveSpeed();
                 CurrentMoveSpeed = StatMoveSpeed;

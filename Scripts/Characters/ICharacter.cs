@@ -73,9 +73,9 @@ namespace GGemCo.Scripts.Characters
         /// <value>캐릭터 생성시 부여된 id</value>
         int Vid { get; set; }
         /// <value>캐릭터 기본 hp</value>
-        float StatHp { get; set; }
+        long StatHp { get; set; }
         /// <value>캐릭터 기본 공격력</value>
-        float StatAtk { get; set; }
+        long StatAtk { get; set; }
         /// <value>캐릭터 기본 이동거리</value>
         float StatMoveStep { get; set; }
         /// <value>캐릭터 기본 이동속도</value>

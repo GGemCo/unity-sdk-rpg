@@ -13,8 +13,8 @@ namespace GGemCo.Scripts.TableLoader
         public string DefaultSkin;
         public float Scale;
         public ICharacter.Grade Grade;
-        public float StatHp;
-        public float StatAtk;
+        public long StatHp;
+        public long StatAtk;
         public float StatMoveSpeed;
         public float StatAttackSpeed;
         public long RewardExp;
@@ -51,8 +51,8 @@ namespace GGemCo.Scripts.TableLoader
                 DefaultSkin = data["DefaultSkin"],
                 Scale = float.Parse(data["Scale"]),
                 Grade = ConvertGrade(data["Grade"]),
-                StatHp = float.Parse(data["StatHp"]),
-                StatAtk = float.Parse(data["StatAtk"]),
+                StatHp = long.Parse(data["StatHp"]),
+                StatAtk = long.Parse(data["StatAtk"]),
                 StatMoveSpeed = float.Parse(data["StatMoveSpeed"]),
                 StatAttackSpeed = float.Parse(data["StatAttackSpeed"]),
                 RewardExp = long.Parse(data["RewardExp"]),
