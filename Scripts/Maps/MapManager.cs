@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Characters.Monster;
 using GGemCo.Scripts.Characters.Npc;
 using GGemCo.Scripts.Characters.Player;
@@ -11,6 +10,7 @@ using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.Utils;
+using GGemCo.Scripts.Addressable;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Events;
@@ -407,10 +407,10 @@ namespace GGemCo.Scripts.Maps
         {
             if (SceneGame.Instance.player == null)
             {
-                GameObject prefabPlayer = Resources.Load<GameObject>(ConfigCommon.pathPlayerPrefab);
+                GameObject prefabPlayer = Resources.Load<GameObject>(ConfigCommon.PathPlayerPrefab);
                 if (prefabPlayer == null)
                 {
-                    GcLogger.LogError("플레이어 프리팹이 없습니다. path:"+ConfigCommon.pathPlayerPrefab);
+                    GcLogger.LogError("플레이어 프리팹이 없습니다. path:"+ConfigCommon.PathPlayerPrefab);
                     yield break;
                 }
                 GameObject player = Instantiate(prefabPlayer, new Vector3(0, 0, 0), Quaternion.identity);

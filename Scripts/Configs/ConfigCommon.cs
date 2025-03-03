@@ -3,6 +3,6 @@
     public static class ConfigCommon
     {
         public const float CharacterFadeSec = 0.7f;
-        public static string pathPlayerPrefab = "Characters/Player/Player";
+        public static string PathPlayerPrefab = "Characters/Player/Player";
     }
 }

@@ -1,5 +1,3 @@
-using GGemCo.Scripts.Core;
-using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;

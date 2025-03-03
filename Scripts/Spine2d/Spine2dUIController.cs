@@ -1,5 +1,4 @@
 #if GGEMCO_USE_SPINE
-using GGemCo.Scripts.Core;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.Utils;
 using Spine;

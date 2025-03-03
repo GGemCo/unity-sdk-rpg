@@ -1,4 +1,3 @@
-using System;
 using GGemCo.Scripts.Characters.Monster.Behavior;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
@@ -198,6 +197,7 @@ namespace GGemCo.Scripts.Characters.Monster
         {
             base.OnDestroy();
             OnMonsterDead -= SceneGame.Instance.itemManager.OnMonsterDead;
+            OnMonsterDead -= SceneGame.Instance.saveDataManager.Player.AddExp;
         }
     }
 }
