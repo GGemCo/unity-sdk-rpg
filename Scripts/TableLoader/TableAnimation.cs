@@ -1,5 +1,4 @@
-﻿using GGemCo.Scripts.Core;
-using GGemCo.Scripts.Utils;
+﻿using GGemCo.Scripts.Utils;
 using UnityEngine;
 
 namespace GGemCo.Scripts.TableLoader
@@ -17,7 +16,7 @@ namespace GGemCo.Scripts.TableLoader
     {
         public string GetPrefabPath(int uid) => GetDataColumn(uid, "PrefabPath");
         
-        public StruckTableAnimation GetSpineData(int uid)
+        public StruckTableAnimation GetDataByUid(int uid)
         {
             if (uid <= 0)
             {
@@ -36,7 +35,7 @@ namespace GGemCo.Scripts.TableLoader
             };
         }
         public GameObject GetPrefab(int uid) {
-            var info = GetSpineData(uid);
+            var info = GetDataByUid(uid);
             if (info.Uid == 0) return null;
             return info.Prefab;
         }

@@ -47,7 +47,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             {
                 if (index == selectedMonsterIndex)
                 {
-                    monsterData = tableMonster.GetMonsterData(outerPair.Key);
+                    monsterData = tableMonster.GetDataByUid(outerPair.Key);
                     break;
                 }
                 index++;
@@ -135,7 +135,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             {
                 int uid = monsterData.Uid;
                 if (uid <= 0) continue;
-                var info = tableMonster.GetMonsterData(uid);
+                var info = tableMonster.GetDataByUid(uid);
                 if (info.Uid <= 0 || info.SpineUid <= 0) continue;
                 GameObject monsterPrefab = tableAnimation.GetPrefab(info.SpineUid);
                 if (monsterPrefab == null)

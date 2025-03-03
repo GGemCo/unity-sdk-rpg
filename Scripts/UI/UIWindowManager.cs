@@ -1,4 +1,3 @@
-using GGemCo.Scripts.Core;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.UI;
@@ -37,7 +36,7 @@ namespace GGemCo.Scripts.UI
         {
             UIWindow uiWindow = GetUIWindowByUid<UIWindow>(uid);
             if (uiWindow == null) {
-                GcLogger.LogWarning("dont exist window. uid:"+uid);
+                GcLogger.LogError("UIWindow 컴포넌트가 없습니다. uid:"+uid);
                 return;
             }
             if (uiWindow.gameObject.activeSelf == show) return;
@@ -78,12 +77,12 @@ namespace GGemCo.Scripts.UI
 
             if (fromWindow == null || toWindow == null)
             {
-                GcLogger.LogError("dont exist fromUIWindow or toUIWindow. fromWindow: "+fromWindowUid+" / toWindow: "+toWindow);
+                GcLogger.LogError("fromUIWindow 또는 toUIWindow 컴포넌트가 없습니다. fromWindow: "+fromWindowUid+" / toWindow: "+toWindow);
                 return;
             }
             if (fromIcon == null)
             {
-                GcLogger.LogError("dont exist fromIcon. fromWindow: "+fromWindowUid+" / fromIndex: "+fromIndex);
+                GcLogger.LogError("이동할 아이콘이 없습니다. fromWindow: "+fromWindowUid+" / fromIndex: "+fromIndex);
                 return;
             }
 
@@ -112,7 +111,7 @@ namespace GGemCo.Scripts.UI
             UIWindow uiWindow = GetUIWindowByUid<UIWindow>(srcWindowUid);
             if (uiWindow == null)
             {
-                GcLogger.LogError("dont exist window. window uid: "+srcWindowUid);
+                GcLogger.LogError("UIWindow 컴포넌트가 없습니다. uid:"+srcWindowUid);
                 return null;
             }
             return uiWindow.GetIconByIndex(srcIndex);
@@ -130,14 +129,14 @@ namespace GGemCo.Scripts.UI
             GameObject srcIcon = this.GetIconByWindowUid(srcWindowUid, srcIndex);
             if(srcIcon == null) 
             {
-                GcLogger.LogError("dont exist srcIcon. window uid: "+srcWindowUid+ " / srcIndex: "+srcIndex);
+                GcLogger.LogError("원본 아이콘이 없습니다. window uid: "+srcWindowUid+ " / srcIndex: "+srcIndex);
                 return null;
             }
 
             UIIcon uiIcon = srcIcon.GetComponent<UIIcon>();
             if(uiIcon == null) 
             {
-                GcLogger.LogError("dont exist srcIcon FG_UIIcon. window uid: "+srcWindowUid+ " / srcIndex: "+srcIndex);
+                GcLogger.LogError("원본 아이콘에 UIIcon 컴포넌트가 없습니다. window uid: "+srcWindowUid+ " / srcIndex: "+srcIndex);
                 return null;
             }
             GameObject registerIcon = this.GetIconByWindowUid(toWindowUid, toIndex);
@@ -217,7 +216,7 @@ namespace GGemCo.Scripts.UI
             UIWindow uiWindow = uiWindows[(int)windowUid];
             if (uiWindow == null)
             {
-                GcLogger.LogError("dont exist window. window uid: "+windowUid);
+                GcLogger.LogError("UIWindow 컴포넌트가 없습니다. uid:"+windowUid);
                 return null;
             }
 
@@ -233,7 +232,7 @@ namespace GGemCo.Scripts.UI
             UIWindow uiWindow = GetUIWindowByUid<UIWindow>(windowUid);
             if (uiWindow == null)
             {
-                GcLogger.LogError("dont exist window. window uid: "+windowUid);
+                GcLogger.LogError("UIWindow 컴포넌트가 없습니다. uid:"+windowUid);
                 return;
             }
             uiWindow.DetachIcon(slotIndex);

@@ -13,28 +13,29 @@ namespace GGemCo.Scripts.TableLoader
         public string DefaultSkin;
         public float Scale;
         public ICharacter.Grade Grade;
-        public float StatHp;
-        public float StatAtk;
+        public long StatHp;
+        public long StatAtk;
         public float StatMoveSpeed;
         public float StatAttackSpeed;
-        public int RewardExp;
-        public int RewardGold;
+        public long RewardExp;
+        public long RewardGold;
     }
     public class TableMonster : DefaultTable
     {
-        private static readonly Dictionary<string, ICharacter.Grade> mapGrade;
+        private static readonly Dictionary<string, ICharacter.Grade> MapGrade;
 
         static TableMonster()
         {
-            mapGrade = new Dictionary<string, ICharacter.Grade>
+            MapGrade = new Dictionary<string, ICharacter.Grade>
             {
                 { "Common", ICharacter.Grade.Common },
                 { "Boss", ICharacter.Grade.Boss },
             };
         }
-        public ICharacter.Grade ConvertGrade(string grade) => mapGrade.GetValueOrDefault(grade, ICharacter.Grade.None);
 
-        public StruckTableMonster GetMonsterData(int uid)
+        private ICharacter.Grade ConvertGrade(string grade) => MapGrade.GetValueOrDefault(grade, ICharacter.Grade.None);
+
+        public StruckTableMonster GetDataByUid(int uid)
         {
             if (uid <= 0)
             {
@@ -50,35 +51,35 @@ namespace GGemCo.Scripts.TableLoader
                 DefaultSkin = data["DefaultSkin"],
                 Scale = float.Parse(data["Scale"]),
                 Grade = ConvertGrade(data["Grade"]),
-                StatHp = float.Parse(data["StatHp"]),
-                StatAtk = float.Parse(data["StatAtk"]),
+                StatHp = long.Parse(data["StatHp"]),
+                StatAtk = long.Parse(data["StatAtk"]),
                 StatMoveSpeed = float.Parse(data["StatMoveSpeed"]),
                 StatAttackSpeed = float.Parse(data["StatAttackSpeed"]),
-                RewardExp = 0,
+                RewardExp = long.Parse(data["RewardExp"]),
                 RewardGold = 0,
             };
         }
         
         public GameObject GetPrefab(int uid) {
-            var info = GetMonsterData(uid);
+            var info = GetDataByUid(uid);
             if (info.SpineUid == 0) return null;
         
-            string prefabPath = TableLoaderManager.instance.TableAnimation.GetPrefabPath(info.SpineUid);
+            string prefabPath = TableLoaderManager.Instance.TableAnimation.GetPrefabPath(info.SpineUid);
             if (prefabPath == "") {
-                GcLogger.Log("prefabPath is ''. shape: "+info.SpineUid);
+                GcLogger.LogError("prefab 경로가 없습니다. SpineUid: "+info.SpineUid);
                 return null;
             }
             GameObject prefab = Resources.Load<GameObject>(prefabPath);
             if (prefab == null) {
-                GcLogger.Log("prefab is null. prefabPath: "+prefabPath);
+                GcLogger.LogError("prefab 오브젝트가 없습니다. prefabPath: "+prefabPath);
                 return null;
             }
             return prefab;
         }
         public string GetShapePath(int uid)
         {
-            var info = GetMonsterData(uid);
-            return info.SpineUid <= 0 ? "" : TableLoaderManager.instance.TableAnimation.GetPrefabPath(info.SpineUid);
+            var info = GetDataByUid(uid);
+            return info.SpineUid <= 0 ? "" : TableLoaderManager.Instance.TableAnimation.GetPrefabPath(info.SpineUid);
         }
     }
 }

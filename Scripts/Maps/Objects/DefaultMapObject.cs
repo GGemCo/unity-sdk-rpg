@@ -22,7 +22,7 @@ namespace GGemCo.Scripts.Maps.Objects
             tag = ConfigTags.GetMapObject();
             if (GetComponent<TilemapRenderer>() != null)
             {
-                GetComponent<TilemapRenderer>().sortingLayerName = ConfigSortingLayer.MapObject;
+                GetComponent<TilemapRenderer>().sortingLayerName = ConfigSortingLayer.GetMapObject();
             }
         }
     }

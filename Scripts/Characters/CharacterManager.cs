@@ -1,4 +1,5 @@
 ﻿using System;
+using GGemCo.Scripts.Utils;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -44,7 +45,7 @@ namespace GGemCo.Scripts.Characters
             GameObject playerPrefab = Resources.Load<GameObject>("Characters/Player/Player");
             if (playerPrefab ==null)
             {
-                // GcLogger.LogError("플레이어 프리팹이 없습니다.");
+                GcLogger.LogError("플레이어 프리팹이 없습니다.");
                 return null;
             }
             GameObject playerObject = Object.Instantiate(playerPrefab);
@@ -53,7 +54,7 @@ namespace GGemCo.Scripts.Characters
             GGemCo.Scripts.Characters.Player.Player player = playerObject.GetComponent<GGemCo.Scripts.Characters.Player.Player>();
             if (player == null)
             {
-                // GcLogger.LogError("플레이어 스크립트가 프리팹에 없습니다.");
+                GcLogger.LogError("플레이어 스크립트가 프리팹에 없습니다.");
                 return null;
             }
 

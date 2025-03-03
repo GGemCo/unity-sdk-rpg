@@ -43,10 +43,10 @@ namespace GGemCo.Scripts.Characters.Npc
         protected override void InitializeByTable()
         {
             base.InitializeByTable();
-            if (TableLoaderManager.instance == null) return;
+            if (TableLoaderManager.Instance == null) return;
             if (Uid <= 0) return;
-            TableLoaderManager tableLoaderManager = TableLoaderManager.instance;
-            var info = tableLoaderManager.TableNpc.GetNpcData(Uid);
+            TableLoaderManager tableLoaderManager = TableLoaderManager.Instance;
+            var info = tableLoaderManager.TableNpc.GetDataByUid(Uid);
             // FG_Logger.Log("InitializationStat uid: "+uid+" / info.uid: "+info.uid+" / StatMoveSpeed: "+info.statMoveSpeed);
             if (info.Uid > 0)
             {
@@ -58,7 +58,7 @@ namespace GGemCo.Scripts.Characters.Npc
                 float scale = info.Scale;
                 SetScale(scale);
                 
-                StruckTableAnimation struckTableAnimation = tableLoaderManager.TableAnimation.GetSpineData(info.SpineUid);
+                StruckTableAnimation struckTableAnimation = tableLoaderManager.TableAnimation.GetDataByUid(info.SpineUid);
                 if (struckTableAnimation is { Uid: > 0 })
                 {
                     CurrentMoveStep = struckTableAnimation.MoveStep;

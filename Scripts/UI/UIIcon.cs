@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GGemCo.Scripts.Core;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -286,7 +285,7 @@ namespace GGemCo.Scripts.UI
 
                     if (newSprite == null)
                     {
-                        GcLogger.LogError("dont exist icon path. uid: "+uid+" / icon path: "+iconPath);
+                        GcLogger.LogError("icon 이미지 리소스가 없습니다. uid: "+uid+" / icon path: "+iconPath);
                         return;
                     }
                     imageIcon.sprite = newSprite;
@@ -294,12 +293,12 @@ namespace GGemCo.Scripts.UI
                 }
                 else
                 {
-                    GcLogger.LogError("no ImageSkillIcon child. uid:"+uid);
+                    GcLogger.LogError("Image 프로퍼티에 값이 없습니다. uid:"+uid);
                 }
             }
             else
             {
-                GcLogger.LogError("no icon path. uid:"+uid);
+                GcLogger.LogError("icon 이미지 경로가 없습니다. uid:"+uid);
             }
         }
         /// <summary>
@@ -356,19 +355,19 @@ namespace GGemCo.Scripts.UI
         {
             if (innerDictionary == null)
             {
-                GcLogger.LogError("dont exist dictionary.");
+                GcLogger.LogError("아이템 테이블 정보가 없습니다.");
                 return;
             }
 
             if (slotIndex < 0)
             {
-                GcLogger.LogError("slot index is minus value.");
+                GcLogger.LogError("슬롯 정보가 잘 못 되었습니다. slotIndex: "+slotIndex);
                 return;
             }
 
             if (parentWindow == null)
             {
-                GcLogger.LogError("dont parent window.");
+                GcLogger.LogError("아이콘이 들어갈 윈도우가 없습니다.");
                 return;
             }
 
@@ -403,7 +402,7 @@ namespace GGemCo.Scripts.UI
         {
             if (iconName == "")
             {
-                GcLogger.LogError("Name is blank.");
+                GcLogger.LogError("아이템 이름이 없습니다.");
                 return;
             }
         }
@@ -418,11 +417,7 @@ namespace GGemCo.Scripts.UI
 
         protected void SetLevelUpCount(int value)
         {
-            if (value == 0)
-            {
-                GcLogger.LogError("compose count is 0.");
-                return;
-            }
+            if (value == 0) return;
             this.composeCount = value;
         }
         /// <summary>
@@ -434,7 +429,7 @@ namespace GGemCo.Scripts.UI
         {
             if (valueGrade == UIIcon.Grade.None && imageGrade == null)
             {
-                GcLogger.LogError("dont exist text grade object.");
+                GcLogger.LogError("등급 이미지 오브젝트가 없습니다.");
                 return;
             }
 
@@ -460,11 +455,7 @@ namespace GGemCo.Scripts.UI
         /// <param name="value"></param>
         protected void SetComposeCount(int value)
         {
-            if (value == 0)
-            {
-                GcLogger.LogError("compose count is 0.");
-                return;
-            }
+            if (value == 0) return;
             this.composeCount = value;
         }
         /// <summary>

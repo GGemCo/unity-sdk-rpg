@@ -1,9 +1,10 @@
 ﻿using System.Collections;
-using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Core;
+using GGemCo.Scripts.Items;
 using GGemCo.Scripts.Maps;
 using GGemCo.Scripts.Popup;
+using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI;
 using UnityEngine;
@@ -34,12 +35,13 @@ namespace GGemCo.Scripts.Scenes
         [HideInInspector] public MapManager mapManager;
         [HideInInspector] public PopupManager popupManager;
         [HideInInspector] public DamageTextManager damageTextManager;
+        [HideInInspector] public ItemManager itemManager;
 
         private Canvas canvasUI;
 
         private void Awake()
         {
-            if (TableLoaderManager.instance == null)
+            if (TableLoaderManager.Instance == null)
             {
                 UnityEngine.SceneManagement.SceneManager.LoadScene("Intro");
                 return;
@@ -79,6 +81,9 @@ namespace GGemCo.Scripts.Scenes
             popupManager = CreateManager<PopupManager>(managerContainer);
             saveDataManager = CreateManager<SaveDataManager>(managerContainer);
             damageTextManager = CreateManager<DamageTextManager>(managerContainer);
+            
+            itemManager = new ItemManager();
+            itemManager.Initialize();
         }
 
         private T CreateManager<T>(GameObject parent) where T : Component
@@ -90,9 +95,9 @@ namespace GGemCo.Scripts.Scenes
 
         private void Start()
         {
-            if (TableLoaderManager.instance == null) return;
+            if (TableLoaderManager.Instance == null) return;
             CacheReferences();
-            mapManager.LoadMap(TableLoaderManager.instance.TableConfig.GetStartMapUid());
+            mapManager.LoadMap(TableLoaderManager.Instance.TableConfig.GetStartMapUid());
             StartCoroutine(UpdateStateRoutine());
         }
 

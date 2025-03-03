@@ -1,5 +1,4 @@
 using System.Collections;
-using GGemCo.Scripts.Core;
 using UnityEngine;
 
 namespace GGemCo.Scripts.Utils
@@ -14,7 +13,7 @@ namespace GGemCo.Scripts.Utils
             {
                 if (_instance == null)
                 {
-                    GcLogger.Log("CoroutineHelper 인스턴스가 생성됩니다.");
+                    // GcLogger.Log("CoroutineHelper 인스턴스가 생성됩니다.");
                     var obj = new GameObject("CoroutineHelper");
                     _instance = obj.AddComponent<CoroutineHelper>();
                     obj.hideFlags = HideFlags.HideAndDontSave;

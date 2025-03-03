@@ -26,9 +26,10 @@ namespace GGemCo.Scripts.TableLoader
                 { "Boss", ICharacter.Grade.Boss },
             };
         }
-        public ICharacter.Grade ConvertGrade(string grade) => MapGrade.GetValueOrDefault(grade, ICharacter.Grade.None);
 
-        public StruckTableNpc GetNpcData(int uid)
+        private ICharacter.Grade ConvertGrade(string grade) => MapGrade.GetValueOrDefault(grade, ICharacter.Grade.None);
+
+        public StruckTableNpc GetDataByUid(int uid)
         {
             if (uid <= 0)
             {

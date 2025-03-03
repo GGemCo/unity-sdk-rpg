@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using GGemCo.Scripts.Core;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
@@ -73,7 +72,7 @@ namespace GGemCo.Scripts.Popup
 
             if (popupMetadata.ShowConfirmButton && buttonConfirm == null)
             {
-                GcLogger.LogError("dont exist confirm button.");
+                GcLogger.LogError("Confirm 버튼이 없습니다.");
             }
             if (buttonConfirm != null)
             {
@@ -92,7 +91,7 @@ namespace GGemCo.Scripts.Popup
 
             if (popupMetadata.ShowCancelButton && buttonCancel == null)
             {
-                GcLogger.LogError("dont exist cacnel button.");
+                GcLogger.LogError("Cancel 버튼이 없습니다.");
             }
             if (buttonCancel != null)
             {

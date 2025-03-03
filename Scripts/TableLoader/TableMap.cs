@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.Core;
 using GGemCo.Scripts.Maps;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
@@ -35,7 +34,7 @@ namespace GGemCo.Scripts.TableLoader
         private static MapConstants.SubType ConvertTypeSub(string type) => MapSubType.GetValueOrDefault(type, MapConstants.SubType.None);
 
         
-        public StruckTableMap GetMapData(int uid)
+        public StruckTableMap GetDataByUid(int uid)
         {
             if (uid <= 0)
             {

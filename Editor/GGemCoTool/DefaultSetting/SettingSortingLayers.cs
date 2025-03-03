@@ -9,8 +9,6 @@ namespace GGemCo.Editor.GGemCoTool.DefaultSetting
     {
         private readonly string title = "Sorting Layer 추가하기";
 
-        private readonly string[] sortingLayersToAdd = { ConfigSortingLayer.MapTerrain, ConfigSortingLayer.MapObject, ConfigSortingLayer.Character, ConfigSortingLayer.UI };
-
         public void OnGUI()
         {
             Common.OnGUITitle(title);
@@ -30,8 +28,9 @@ namespace GGemCo.Editor.GGemCoTool.DefaultSetting
             int highestID = GetHighestSortingLayerID(sortingLayersProp); // 가장 높은 ID 찾기
 
             // Sorting Layer 추가
-            foreach (string layer in sortingLayersToAdd)
+            foreach (var layers in ConfigSortingLayer.Tags)
             {
+                string layer = layers.Value;
                 if (!SortingLayerExists(sortingLayersProp, layer))
                 {
                     sortingLayersProp.InsertArrayElementAtIndex(sortingLayersProp.arraySize);

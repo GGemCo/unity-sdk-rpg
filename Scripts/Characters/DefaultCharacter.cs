@@ -17,8 +17,8 @@ namespace GGemCo.Scripts.Characters
         public int Uid { get; set; }
         // 스폰될때 vid
         public int Vid { get; set; }
-        public float StatHp { get; set; }
-        public float StatAtk { get; set; }
+        public long StatHp { get; set; }
+        public long StatAtk { get; set; }
         public float StatMoveStep { get; set; }
         public float StatMoveSpeed { get; set; }
         
@@ -81,7 +81,7 @@ namespace GGemCo.Scripts.Characters
             {
                 characterRenderer = GetComponent<Renderer>();
             }
-            characterRenderer.sortingLayerName = ConfigSortingLayer.Character;
+            characterRenderer.sortingLayerName = ConfigSortingLayer.GetCharacter();
         }
         /// <summary>
         /// 캐릭터에 필요한 컴포넌트 추가하기
@@ -106,7 +106,7 @@ namespace GGemCo.Scripts.Characters
         /// </summary>
         protected virtual void InitializeByTable()
         {
-            if (TableLoaderManager.instance == null) return;
+            if (TableLoaderManager.Instance == null) return;
             if (Uid <= 0) return;
         }
         /// <summary>
@@ -299,6 +299,11 @@ namespace GGemCo.Scripts.Characters
         public void SetIsStartFade(bool value)
         {
             isStartFade = value;
+        }
+
+        protected virtual void OnDestroy()
+        {
+            
         }
     }
 }

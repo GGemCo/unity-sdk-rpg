@@ -20,7 +20,7 @@ namespace GGemCo.Scripts.Spine2d
 
             if (SkeletonAnimation == null)
             {
-                GcLogger.LogError("SkeletonAnimation component not found!");
+                GcLogger.LogError("SkeletonAnimation component 가 없습니다.");
             }
             SkeletonAnimation.AnimationState.Event += HandleEvent;
         }
@@ -28,16 +28,16 @@ namespace GGemCo.Scripts.Spine2d
         private void HandleEvent(TrackEntry trackEntry, Event e)
         {
             // Logger.Log("effect spine event: "+e.Data.Name);
-            if (e.Data.Name == SpineEventManager.EventNameAttack)
+            if (e.Data.Name == Spine2dConstants.EventNameAttack)
             {
                 // FG_Logger.Log("hit event " + this.gameObject.name + " | json: " + e.String);
                 OnSpineEventAttack(e);
             }
-            else if (e.Data.Name == SpineEventManager.EventNameSound)
+            else if (e.Data.Name == Spine2dConstants.EventNameSound)
             {
                 OnSpineEventSound(e);
             }
-            else if (e.Data.Name == SpineEventManager.EventNameShake)
+            else if (e.Data.Name == Spine2dConstants.EventNameShake)
             {
                 if (e.Float <= 0) return;
                 OnSpineEventShake(e);
@@ -123,7 +123,7 @@ namespace GGemCo.Scripts.Spine2d
 
             if (findAnimation == null)
             {
-                GcLogger.LogWarning($"Animation '{animationName}' not found.");
+                GcLogger.LogWarning($"애니메이션 클립을 찾을 수 없습니다. AnimationName: {animationName}");
                 return 0;
             }
 

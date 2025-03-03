@@ -1,16 +1,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Characters.Monster;
 using GGemCo.Scripts.Characters.Npc;
 using GGemCo.Scripts.Characters.Player;
 using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Core;
 using GGemCo.Scripts.Maps.Objects;
+using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.Utils;
+using GGemCo.Scripts.Addressable;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Events;
@@ -49,6 +49,7 @@ namespace GGemCo.Scripts.Maps
         private UnityEvent onLoadTileMap;
 
         private Coroutine coroutineRegenMonster;
+        private TableLoaderManager tableLoaderManager;
         protected void Awake()
         {
             isLoadComplete = false;
@@ -62,8 +63,10 @@ namespace GGemCo.Scripts.Maps
         /// </summary>
         private void CreateGrid()
         {
-            gridTileMap = new GameObject(ConfigTags.GetGridTileMap());
-            gridTileMap.tag = ConfigTags.GetGridTileMap();
+            gridTileMap = new GameObject(ConfigTags.GetGridTileMap())
+            {
+                tag = ConfigTags.GetGridTileMap()
+            };
             Grid grid = gridTileMap.gameObject.AddComponent<Grid>();
             Vector2 tilemapGridSize = AddressableSettingsLoader.Instance.GetTilemapGridSize();
             grid.cellSize = new Vector3(tilemapGridSize.x, tilemapGridSize.y, 0);
@@ -72,7 +75,7 @@ namespace GGemCo.Scripts.Maps
         /// <summary>
         /// 맵 이동시 보여줄 검정 로딩 canvas
         /// </summary>
-        void InitializeCanvasBlockInteraction()
+        private void InitializeCanvasBlockInteraction()
         {
             GameObject gameObjectCanvasBlockInteraction = GameObject.FindWithTag(ConfigTags.GetCanvasBlockInteraction());
             bgBlackForMapLoading = gameObjectCanvasBlockInteraction.transform.GetChild(0).gameObject;
@@ -81,7 +84,8 @@ namespace GGemCo.Scripts.Maps
         {
             sceneGame = SceneGame.Instance;
             saveDataManager = sceneGame.saveDataManager;
-            defaultMonsterRegenTimeSec = TableLoaderManager.instance.TableConfig.GetDefaultMonsterRegenTimeSec();
+            tableLoaderManager = TableLoaderManager.Instance;
+            defaultMonsterRegenTimeSec = tableLoaderManager.TableConfig.GetDefaultMonsterRegenTimeSec();
         }
 
         protected void Reset()
@@ -271,35 +275,31 @@ namespace GGemCo.Scripts.Maps
         {
             if (gridTileMap == null)
             {
-                SetLoadFailed($"dont exist grid tile map");
-                GcLogger.Log($"dont exist grid tile map");
+                SetLoadFailed($"Grid 오브젝트가 없습니다.");
                 yield break;
             }
             // SceneGame.Instance.player?.GetComponent<Player>().Stop();
 
             if (currentMapUid == 0)
             {
-                currentMapUid = saveDataManager.CurrentChapter;
+                currentMapUid = saveDataManager.Player.CurrentChapter.Value;
             }
-            if (TableLoaderManager.instance.TableMap.GetCount() <= 0)
+            if (tableLoaderManager.TableMap.GetCount() <= 0)
             {
-                SetLoadFailed($"dont exist map table.");
-                GcLogger.Log($"dont exist map table.");
+                SetLoadFailed("맵 테이블에 내용이 없습니다.");
                 yield break;
             }
-            resultChapterData = TableLoaderManager.instance.TableMap.GetMapData(currentMapUid);
+            resultChapterData = tableLoaderManager.TableMap.GetDataByUid(currentMapUid);
             if (resultChapterData == null)
             {
-                SetLoadFailed($"dont exist map data. Uid: " + currentMapUid);
-                GcLogger.Log($"dont exist map data. Uid: " + currentMapUid);
+                SetLoadFailed($"맵 테이블에서 찾을 수 없습니다. Uid: {currentMapUid}");
                 yield break;
             }
             string path = GetFilePath(MapConstants.FileNameTilemap);
             GameObject prefab = Resources.Load<GameObject>(path);
             if (prefab == null)
             {
-                SetLoadFailed($"dont exist prefab path. path: {path} / currentMapUid: {currentMapUid}");
-                GcLogger.Log($"dont exist prefab path. path: {path} / currentMapUid: {currentMapUid}");
+                SetLoadFailed($"타일맵 prefab 이 없습니다. path: {path} / currentMapUid: {currentMapUid}");
                 yield break;
             }
             // bgm 플레이
@@ -344,7 +344,7 @@ namespace GGemCo.Scripts.Maps
             }
             catch (Exception ex)
             {
-                GcLogger.LogError($"Error reading file {regenFileName}: {ex.Message}");
+                GcLogger.LogError($"몬스터 regen json 파싱중 오류. file {regenFileName}: {ex.Message}");
                 yield break;
             }
 
@@ -371,7 +371,7 @@ namespace GGemCo.Scripts.Maps
             }
             catch (Exception ex)
             {
-                GcLogger.LogError($"Error reading file {rPathWarp}: {ex.Message}");
+                GcLogger.LogError($"워프 json 파싱중 오류. file {rPathWarp}: {ex.Message}");
                 yield break;
             }
             yield return null;
@@ -397,7 +397,7 @@ namespace GGemCo.Scripts.Maps
             }
             catch (Exception ex)
             {
-                GcLogger.LogError($"Error reading file {regenFileName}: {ex.Message}");
+                GcLogger.LogError($"npc json 파싱중 오류. file {regenFileName}: {ex.Message}");
                 yield break;
             }
 
@@ -407,10 +407,10 @@ namespace GGemCo.Scripts.Maps
         {
             if (SceneGame.Instance.player == null)
             {
-                GameObject prefabPlayer = Resources.Load<GameObject>(ConfigCommon.pathPlayerPrefab);
+                GameObject prefabPlayer = Resources.Load<GameObject>(ConfigCommon.PathPlayerPrefab);
                 if (prefabPlayer == null)
                 {
-                    GcLogger.LogError("플레이어 프리팹이 없습니다. path:"+ConfigCommon.pathPlayerPrefab);
+                    GcLogger.LogError("플레이어 프리팹이 없습니다. path:"+ConfigCommon.PathPlayerPrefab);
                     yield break;
                 }
                 GameObject player = Instantiate(prefabPlayer, new Vector3(0, 0, 0), Quaternion.identity);
@@ -459,14 +459,14 @@ namespace GGemCo.Scripts.Maps
 
         private void SpawnNpcs()
         {
-            TableNpc tableNpc = TableLoaderManager.instance.TableNpc;
-            TableAnimation tableAnimation = TableLoaderManager.instance.TableAnimation;
+            TableNpc tableNpc = tableLoaderManager.TableNpc;
+            TableAnimation tableAnimation = tableLoaderManager.TableAnimation;
             
             foreach (NpcData npcData in npcList)
             {
                 int uid = npcData.Uid;
                 if (uid <= 0) continue;
-                var info = tableNpc.GetNpcData(uid);
+                var info = tableNpc.GetDataByUid(uid);
                 if (info.Uid <= 0 || info.SpineUid <= 0) continue;
                 GameObject npcPrefab = tableAnimation.GetPrefab(info.SpineUid);
                 if (npcPrefab == null)
@@ -492,14 +492,14 @@ namespace GGemCo.Scripts.Maps
         }
         private void SpawnMonsters()
         {
-            TableMonster myTableMonster = TableLoaderManager.instance.TableMonster;
-            TableAnimation tableAnimation = TableLoaderManager.instance.TableAnimation;
+            TableMonster myTableMonster = tableLoaderManager.TableMonster;
+            TableAnimation tableAnimation = tableLoaderManager.TableAnimation;
 
             foreach (MonsterData monsterData in monsterList)
             {
                 int uid = monsterData.Uid;
                 if (uid <= 0) continue;
-                var info = myTableMonster.GetMonsterData(uid);
+                var info = myTableMonster.GetDataByUid(uid);
                 if (info.Uid <= 0 || info.SpineUid <= 0) continue;
                 GameObject monsterPrefab = tableAnimation.GetPrefab(info.SpineUid);
                 if (monsterPrefab == null)
@@ -570,7 +570,7 @@ namespace GGemCo.Scripts.Maps
             return MapConstants.ResourceMapPath + resultChapterData.FolderName + "/" + fileName;
         }
 
-        public void SetPlaySpawnPosition(Vector3 position)
+        private void SetPlaySpawnPosition(Vector3 position)
         {
             playSpawnPosition = position;
         }
@@ -602,9 +602,9 @@ namespace GGemCo.Scripts.Maps
             int mapUid = monsterData.MapUid;
             if (mapUid != currentMapUid) yield break;
             if (uid <= 0) yield break;
-            TableMonster myTableMonster = TableLoaderManager.instance.TableMonster;
-            TableAnimation tableAnimation = TableLoaderManager.instance.TableAnimation;
-            var info = myTableMonster.GetMonsterData(uid);
+            TableMonster myTableMonster = tableLoaderManager.TableMonster;
+            TableAnimation tableAnimation = tableLoaderManager.TableAnimation;
+            var info = myTableMonster.GetDataByUid(uid);
             if (info.Uid <= 0 || info.SpineUid <= 0) yield break;
             GameObject monsterPrefab = tableAnimation.GetPrefab(info.SpineUid);
             if (monsterPrefab == null)

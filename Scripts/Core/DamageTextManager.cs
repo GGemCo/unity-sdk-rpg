@@ -41,7 +41,7 @@ namespace GGemCo.Scripts.Core
             gameObjectCanvas.gameObject.AddComponent<CanvasScaler>();
             gameObjectCanvas.gameObject.AddComponent<GraphicRaycaster>();
             
-            canvas.sortingLayerName = ConfigSortingLayer.UI;
+            canvas.sortingLayerName = ConfigSortingLayer.GetUI();
             canvas.sortingOrder = 999;
             canvas.renderMode = RenderMode.WorldSpace;
             

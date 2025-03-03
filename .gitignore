@@ -75,6 +75,10 @@ crashlytics-build.properties
 # rider
 .idea
 
-#etc
+# etc
 LICENSE.meta
 README.md.meta
+
+# ggemco setting file
+GGemCoSettings.asset
+GGemCoSettings.asset.meta

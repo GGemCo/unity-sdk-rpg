@@ -25,17 +25,17 @@ namespace GGemCo.Editor.GGemCoTool.TableLoader
                     }
                     else
                     {
-                        GcLogger.LogError($"Content is empty in file Tables/{fileName}");
+                        GcLogger.LogError($"테이블 내용이 없습니다. Tables/{fileName}");
                     }
                 }
                 else
                 {
-                    GcLogger.LogError($"File not found: Tables/{fileName}");
+                    GcLogger.LogError($"테이블 파일을 찾을 수 없습니다. Tables/{fileName}");
                 }
             }
             catch (Exception ex)
             {
-                GcLogger.LogError($"Error reading file Tables/{fileName}: {ex.Message}");
+                GcLogger.LogError($"테이블 파일을 읽는중 오류 발생. Tables/{fileName}: {ex.Message}");
             }
 
             return tableData;
@@ -56,6 +56,18 @@ namespace GGemCo.Editor.GGemCoTool.TableLoader
         public static TableAnimation LoadSpineTable()
         {
             return LoadTable<TableAnimation>(ConfigTableFileName.Animation);
+        }
+        public static TableItem LoadItemTable()
+        {
+            return LoadTable<TableItem>(ConfigTableFileName.Item);
+        }
+        public static TableItemDropGroup LoadItemDropGroupTable()
+        {
+            return LoadTable<TableItemDropGroup>(ConfigTableFileName.ItemDropGroup);
+        }
+        public static TableMonsterDropRate LoadMonsterDropRateTable()
+        {
+            return LoadTable<TableMonsterDropRate>(ConfigTableFileName.MonsterDropRate);
         }
     }
 }

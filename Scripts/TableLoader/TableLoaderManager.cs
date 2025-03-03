@@ -9,7 +9,7 @@ namespace GGemCo.Scripts.TableLoader
 {
     public class TableLoaderManager : MonoBehaviour
     {
-        public static TableLoaderManager instance;
+        public static TableLoaderManager Instance;
 
         private static string[] _dataFiles;
         
@@ -18,22 +18,26 @@ namespace GGemCo.Scripts.TableLoader
         public TableMap TableMap { get; private set; } = new TableMap();
         public TableMonster TableMonster { get; private set; } = new TableMonster();
         public TableAnimation TableAnimation { get; private set; } = new TableAnimation();
+        public TableItem TableItem { get; private set; } = new TableItem();
+        public TableMonsterDropRate TableMonsterDropRate { get; private set; } = new TableMonsterDropRate();
+        public TableItemDropGroup TableItemDropGroup { get; private set; } = new TableItemDropGroup();
+        public TableExp TableExp { get; private set; } = new TableExp();
 
         private float loadProgress;
         private SceneLoading mySceneLoading;
 
-        protected virtual void Awake()
+        protected void Awake()
         {
-            if (instance == null)
+            if (Instance == null)
             {
-                instance = this;
+                Instance = this;
                 DontDestroyOnLoad(gameObject);
             }
             else
             {
                 Destroy(gameObject);
             }
-            _dataFiles = new[] { ConfigTableFileName.Config, ConfigTableFileName.Map, ConfigTableFileName.Monster, ConfigTableFileName.Npc, ConfigTableFileName.Animation };
+            _dataFiles = new[] { ConfigTableFileName.Config, ConfigTableFileName.Map, ConfigTableFileName.Monster, ConfigTableFileName.Npc, ConfigTableFileName.Animation, ConfigTableFileName.Item, ConfigTableFileName.MonsterDropRate, ConfigTableFileName.ItemDropGroup, ConfigTableFileName.Exp };
             mySceneLoading = GameObject.Find("SceneLoading").GetComponent<SceneLoading>();
             loadProgress = 0f;
         }
@@ -56,7 +60,8 @@ namespace GGemCo.Scripts.TableLoader
 
             OnEndLoad();
         }
-        protected virtual void LoadDataFile(string fileName)
+
+        private void LoadDataFile(string fileName)
         {
             try
             {
@@ -83,13 +88,25 @@ namespace GGemCo.Scripts.TableLoader
                             case ConfigTableFileName.Map:
                                 TableMap.LoadData(content);
                                 break;
+                            case ConfigTableFileName.Item:
+                                TableItem.LoadData(content);
+                                break;
+                            case ConfigTableFileName.MonsterDropRate:
+                                TableMonsterDropRate.LoadData(content);
+                                break;
+                            case ConfigTableFileName.ItemDropGroup:
+                                TableItemDropGroup.LoadData(content);
+                                break;
+                            case ConfigTableFileName.Exp:
+                                TableExp.LoadData(content);
+                                break;
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                GcLogger.LogError($"Error reading file {fileName}: {ex.Message}");
+                GcLogger.LogError($"테이블 파싱중 오류. file {fileName}: {ex.Message}");
             }
         }
 

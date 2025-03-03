@@ -29,7 +29,7 @@ namespace GGemCo.Scripts.Maps
         public virtual void InitTagSortingLayer()
         {
             tag = ConfigTags.GetMap();
-            GetComponent<TilemapRenderer>().sortingLayerName = ConfigSortingLayer.MapTerrain;
+            GetComponent<TilemapRenderer>().sortingLayerName = ConfigSortingLayer.GetMapTerrain();
         }
 
         public virtual void Initialize(int uid, string name, MapConstants.Type type, MapConstants.SubType subType)
