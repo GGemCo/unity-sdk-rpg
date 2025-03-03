@@ -268,7 +268,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         {
             if (monster.IsStatusDead()) return;
             // GcLogger.Log(@event);
-            long totalDamage = SceneGame.Instance.calculateManager.GetPlayerTotalAtk();
+            long totalDamage = SceneGame.Instance.calculateManager.GetMonsterTotalAtk(monster.Uid);
         
             // 캡슐 콜라이더 2D와 충돌 중인 모든 콜라이더를 검색
             CapsuleCollider2D capsuleCollider2D = GetComponent<CapsuleCollider2D>();
