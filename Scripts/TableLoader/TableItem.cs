@@ -44,6 +44,8 @@ namespace GGemCo.Scripts.TableLoader
                 { "Top", ItemConstants.SubCategory.Top },
                 { "RecoverHp", ItemConstants.SubCategory.RecoverHp },
                 { "RecoverMp", ItemConstants.SubCategory.RecoverMp },
+                { "IncreaseAttackSpeed", ItemConstants.SubCategory.IncreaseAttackSpeed },
+                { "IncreaseMoveSpeed", ItemConstants.SubCategory.IncreaseMoveSpeed },
             };
             MapClass = new Dictionary<string, ItemConstants.Class>
             {

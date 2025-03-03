@@ -24,6 +24,8 @@
             Top, // 상의
             RecoverHp, // hp 물약
             RecoverMp, // mp 물약
+            IncreaseAttackSpeed, // 공격속도 증가
+            IncreaseMoveSpeed, // 이동속도 증가
         }
 
         public enum Class
