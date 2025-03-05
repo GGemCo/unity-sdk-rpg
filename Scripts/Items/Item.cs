@@ -55,7 +55,7 @@ namespace GGemCo.Scripts.Items
             var info = TableLoaderManager.Instance.TableItem.GetDataByUid(itemUid);
             if (info == null || info.Uid <= 0) return;
             
-            itemRenderer.sortingLayerName = ConfigSortingLayer.GetCharacterTop();
+            itemRenderer.sortingLayerName = ConfigSortingLayer.GetValue(ConfigSortingLayer.Keys.CharacterTop);
             itemRenderer.sortingOrder = 1;
             timeElapsed = 0f;
             isBouncing = false;
@@ -172,7 +172,7 @@ namespace GGemCo.Scripts.Items
             transform.localScale = originalScale;
             isBouncing = false;
             // 드랍된 후에는 캐릭터 layer 로 적용한다.
-            itemRenderer.sortingLayerName = ConfigSortingLayer.GetCharacter();
+            itemRenderer.sortingLayerName = ConfigSortingLayer.GetValue(ConfigSortingLayer.Keys.Character);
             itemRenderer.sortingOrder = -(int)(transform.position.y * 100);
             circleCollider2D.enabled = true;
         }

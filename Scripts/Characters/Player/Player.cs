@@ -36,7 +36,7 @@ namespace GGemCo.Scripts.Characters.Player
         public override void InitTagSortingLayer()
         {
             base.InitTagSortingLayer();
-            tag = ConfigTags.GetPlayer();
+            tag = ConfigTags.GetValue(ConfigTags.Keys.Player);
         }
         /// <summary>
         /// 캐릭터에 필요한 컴포넌트 추가하기
@@ -50,7 +50,9 @@ namespace GGemCo.Scripts.Characters.Player
             ComponentController.AddCapsuleCollider2D(gameObject, true, offset, size);
             offset = Vector2.zero;
             size = new Vector2(264,132);
-            ComponentController.AddCapsuleCollider2D(gameObject, false, offset, size, LayerMask.GetMask(ConfigLayer.GetTileMapWall()), ~ (1 <<  LayerMask.NameToLayer(ConfigLayer.GetTileMapWall())));
+            ComponentController.AddCapsuleCollider2D(gameObject, false, offset, size,
+                LayerMask.GetMask(ConfigLayer.GetValue(ConfigLayer.Keys.TileMapWall)),
+                ~ (1 << LayerMask.NameToLayer(ConfigLayer.GetValue(ConfigLayer.Keys.TileMapWall))));
         }
         /// <summary>
         /// 테이블에서 가져온 몬스터 정보 셋팅
@@ -144,7 +146,7 @@ namespace GGemCo.Scripts.Characters.Player
             Collider2D[] collider2Ds = Physics2D.OverlapCapsuleAll(point, size, capsuleCollider.direction, 0f);
             foreach (var hit in collider2Ds)
             {
-                if (hit.CompareTag(ConfigTags.GetMonster()))
+                if (hit.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Monster)))
                 {
                     Monster.Monster monster = hit.GetComponent<Monster.Monster>();
                     if (monster != null)
@@ -160,7 +162,7 @@ namespace GGemCo.Scripts.Characters.Player
         }
         protected void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.gameObject.CompareTag(ConfigTags.GetMonster()))
+            if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Monster)))
             {
                 IsAttacking = true;
                 Monster.Monster monster = collision.gameObject.GetComponent<Monster.Monster>();
@@ -174,27 +176,27 @@ namespace GGemCo.Scripts.Characters.Player
                     Attack();
                 }
             }
-            else if (collision.gameObject.CompareTag(ConfigTags.GetNpc()))
+            else if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Npc)))
             {
                 IsNpcNearby = true;
             }
-            else if (collision.gameObject.CompareTag(ConfigTags.GetMapObjectWarp()))
+            else if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.MapObjectWarp)))
             {
                 ObjectWarp objectWarp = collision.gameObject.GetComponent<ObjectWarp>();
                 SceneGame.Instance.mapManager.LoadMapByWarp(objectWarp);
             }
-            else if (collision.gameObject.CompareTag(ConfigTags.GetDropItem()))
+            else if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.DropItem)))
             {
                 SceneGame.Instance.itemManager.PlayerTaken(collision.gameObject);
             }
         }
         protected void OnTriggerExit2D(Collider2D collision)
         {
-            if (collision.gameObject.CompareTag(ConfigTags.GetMonster()))
+            if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Monster)))
             {
                 IsAttacking = false;
             }
-            else if (collision.gameObject.CompareTag(ConfigTags.GetNpc()))
+            else if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Npc)))
             {
                 IsNpcNearby = false;
             }

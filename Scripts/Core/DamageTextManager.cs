@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
 using TMPro;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
@@ -26,7 +25,7 @@ namespace GGemCo.Scripts.Core
         private void Awake()
         {
             CreateTextDamageCanvas();
-            textPool.Clear();
+            InitializePool();
         }
         /// <summary>
         /// 데미지 텍스트가 들어갈 canvas 만들기
@@ -35,41 +34,34 @@ namespace GGemCo.Scripts.Core
         {
             GameObject gameObjectCanvas = new GameObject("CanvasTextDamage")
             {
-                tag = ConfigTags.GetCanvasUIByWorld()
+                tag = ConfigTags.GetValue(ConfigTags.Keys.CanvasUIByWorld)
             };
             Canvas canvas = gameObjectCanvas.gameObject.AddComponent<Canvas>();
             gameObjectCanvas.gameObject.AddComponent<CanvasScaler>();
             gameObjectCanvas.gameObject.AddComponent<GraphicRaycaster>();
             
-            canvas.sortingLayerName = ConfigSortingLayer.GetUI();
+            canvas.sortingLayerName = ConfigSortingLayer.GetValue(ConfigSortingLayer.Keys.UI);
             canvas.sortingOrder = 999;
             canvas.renderMode = RenderMode.WorldSpace;
             
             canvasTransform = gameObjectCanvas.transform;
-            InitializePool();
         }
         /// <summary>
         /// Addressable 에 등록된 damageText 를 불러와서 pool 을 만든다 
         /// </summary>
         private void InitializePool()
         {
-            Addressables.LoadAssetAsync<GameObject>(ConfigAddressableKeys.TextFloatingDamage).Completed += OnPrefabLoaded;
-        }
-        private void OnPrefabLoaded(AsyncOperationHandle<GameObject> handle)
-        {
-            if (handle.Status == AsyncOperationStatus.Succeeded)
+            if (AddressableSettingsLoader.Instance == null) return;
+            textPool.Clear();
+            if (poolSize <= 0) return;
+            GameObject textFloatingDamage = AddressableSettingsLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyTextFloatingDamage);
+            if (textFloatingDamage == null) return;
+            for (int i = 0; i < poolSize; i++)
             {
-                for (int i = 0; i < poolSize; i++)
-                {
-                    GameObject gameObjectText = Instantiate(handle.Result, canvasTransform);
-                    TextMeshProUGUI text = gameObjectText.GetComponent<TextMeshProUGUI>();
-                    text.gameObject.SetActive(false);
-                    textPool.Enqueue(text);
-                }
-            }
-            else
-            {
-                Debug.LogError("Addressables에서 프리팹을 로드하지 못했습니다.");
+                GameObject gameObjectText = Instantiate(textFloatingDamage, canvasTransform);
+                TextMeshProUGUI text = gameObjectText.GetComponent<TextMeshProUGUI>();
+                text.gameObject.SetActive(false);
+                textPool.Enqueue(text);
             }
         }
         /// <summary>

@@ -29,7 +29,7 @@ namespace GGemCo.Scripts.Characters.Npc
         public override void InitTagSortingLayer()
         {
             base.InitTagSortingLayer();
-            tag = ConfigTags.GetNpc();
+            tag = ConfigTags.GetValue(ConfigTags.Keys.Npc);
         }
         /// <summary>
         /// 캐릭터에 필요한 컴포넌트 추가하기
@@ -76,13 +76,13 @@ namespace GGemCo.Scripts.Characters.Npc
         }
         void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.gameObject.CompareTag(ConfigTags.GetPlayer()))
+            if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Player)))
             {
             }
         }
         void OnTriggerExit2D(Collider2D collision)
         {
-            if (collision.gameObject.CompareTag(ConfigTags.GetPlayer()))
+            if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Player)))
             {
             }
         }

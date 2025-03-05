@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
@@ -71,7 +71,11 @@ namespace GGemCo.Scripts.Items
         /// </summary>
         private void InitializePool()
         {
-            Addressables.LoadAssetAsync<GameObject>(ConfigAddressableKeys.SpriteDropItem).Completed += OnPrefabLoaded;
+            if (AddressableSettingsLoader.Instance == null) return;
+            prefabDropItem = AddressableSettingsLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeySpriteDropItem);
+            if (prefabDropItem == null) return;
+            containerPoolDropItem = new GameObject("ContainerPoolDropItem");
+            ExpandPool(poolSize); // 초기 풀 생성
         }
         private void OnPrefabLoaded(AsyncOperationHandle<GameObject> handle)
         {

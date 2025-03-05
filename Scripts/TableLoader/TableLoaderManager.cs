@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
 
@@ -11,7 +9,7 @@ namespace GGemCo.Scripts.TableLoader
     {
         public static TableLoaderManager Instance;
 
-        private static string[] _dataFiles;
+        private string[] dataFiles;
         
         public TableConfig TableConfig { get; private set; } = new TableConfig();
         public TableNpc TableNpc { get; private set; } = new TableNpc();
@@ -22,9 +20,7 @@ namespace GGemCo.Scripts.TableLoader
         public TableMonsterDropRate TableMonsterDropRate { get; private set; } = new TableMonsterDropRate();
         public TableItemDropGroup TableItemDropGroup { get; private set; } = new TableItemDropGroup();
         public TableExp TableExp { get; private set; } = new TableExp();
-
-        private float loadProgress;
-        private SceneLoading mySceneLoading;
+        public TableWindow TableWindow { get; private set; } = new TableWindow();
 
         protected void Awake()
         {
@@ -37,31 +33,17 @@ namespace GGemCo.Scripts.TableLoader
             {
                 Destroy(gameObject);
             }
-            _dataFiles = new[] { ConfigTableFileName.Config, ConfigTableFileName.Map, ConfigTableFileName.Monster, ConfigTableFileName.Npc, ConfigTableFileName.Animation, ConfigTableFileName.Item, ConfigTableFileName.MonsterDropRate, ConfigTableFileName.ItemDropGroup, ConfigTableFileName.Exp };
-            mySceneLoading = GameObject.Find("SceneLoading").GetComponent<SceneLoading>();
-            loadProgress = 0f;
-        }
 
-        private void Start()
-        {
-            StartCoroutine(LoadAllDataFiles());
-        }
-
-        private IEnumerator LoadAllDataFiles()
-        {
-            int fileCount = _dataFiles.Length;
-            for (int i = 0; i < fileCount; i++)
+            dataFiles = new[]
             {
-                LoadDataFile(_dataFiles[i]);
-                loadProgress = (float)(i + 1) / fileCount * 100f;
-                mySceneLoading?.SetTextLoadingPercent(loadProgress);
-                yield return new WaitForSeconds(0.1f);
-            }
-
-            OnEndLoad();
+                ConfigTableFileName.Config, ConfigTableFileName.Map, ConfigTableFileName.Monster,
+                ConfigTableFileName.Npc, ConfigTableFileName.Animation, ConfigTableFileName.Item,
+                ConfigTableFileName.MonsterDropRate, ConfigTableFileName.ItemDropGroup, ConfigTableFileName.Exp,
+                ConfigTableFileName.Window
+            };
         }
 
-        private void LoadDataFile(string fileName)
+        public void LoadDataFile(string fileName)
         {
             try
             {
@@ -100,6 +82,9 @@ namespace GGemCo.Scripts.TableLoader
                             case ConfigTableFileName.Exp:
                                 TableExp.LoadData(content);
                                 break;
+                            case ConfigTableFileName.Window:
+                                TableWindow.LoadData(content);
+                                break;
                         }
                     }
                 }
@@ -110,10 +95,9 @@ namespace GGemCo.Scripts.TableLoader
             }
         }
 
-        private static void OnEndLoad()
+        public string[] GetDataFiles()
         {
-            // 로드 완료 후의 로직 추가
-            UnityEngine.SceneManagement.SceneManager.LoadScene("Game");
+            return dataFiles;
         }
     }
 }

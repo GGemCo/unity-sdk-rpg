@@ -26,7 +26,7 @@ namespace GGemCo.Editor.GGemCoTool.DefaultSetting
             SerializedProperty tagsProp = tagManager.FindProperty("tags");
 
             // 원하는 태그 목록
-            foreach (var tags in ConfigTags.Tags)
+            foreach (var tags in ConfigTags.GetValues())
             {
                 string tag = tags.Value;
                 if (!TagExists(tagsProp, tag))

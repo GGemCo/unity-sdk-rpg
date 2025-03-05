@@ -24,7 +24,7 @@ namespace GGemCo.Scripts.Core
 
         private void Awake()
         {
-            tag = ConfigTags.GetMainCamera();
+            tag = ConfigTags.GetValue(ConfigTags.Keys.MainCamera);
             originCameraPosition = Vector3.zero;
         }
 

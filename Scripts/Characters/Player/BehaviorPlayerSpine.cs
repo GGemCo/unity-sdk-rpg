@@ -135,7 +135,7 @@ namespace GGemCo.Scripts.Characters.Player
             int maxDamageMonster = 10;
             foreach (var hit in hitsCollider2D)
             {
-                if (hit.CompareTag(ConfigTags.GetMonster()))
+                if (hit.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Monster)))
                 {
                     Monster.Monster monster = hit.GetComponent<Monster.Monster>();
                     if (monster != null)

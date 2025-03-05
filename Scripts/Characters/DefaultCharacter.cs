@@ -81,7 +81,7 @@ namespace GGemCo.Scripts.Characters
             {
                 characterRenderer = GetComponent<Renderer>();
             }
-            characterRenderer.sortingLayerName = ConfigSortingLayer.GetCharacter();
+            characterRenderer.sortingLayerName = ConfigSortingLayer.GetValue(ConfigSortingLayer.Keys.Character);
         }
         /// <summary>
         /// 캐릭터에 필요한 컴포넌트 추가하기
@@ -93,8 +93,8 @@ namespace GGemCo.Scripts.Characters
         protected virtual void Start()
         {
             // statatk 값들은 table 에서 불러올 수 있기 때문에 Start 에서 처리한다.
-            CurrentAtk = (long)StatAtk;
-            CurrentHp = (long)StatHp;
+            CurrentAtk = StatAtk;
+            CurrentHp = StatHp;
             CurrentMoveStep = StatMoveStep;
             CurrentMoveSpeed = StatMoveSpeed;
             OriginalScaleX = transform.localScale.x;
@@ -133,13 +133,13 @@ namespace GGemCo.Scripts.Characters
         /// <summary>
         /// 캐릭터 방향 셋팅하기
         /// </summary>
-        /// <param name="flip"></param>
-        public void SetFlip(bool flip)
+        /// <param name="value"></param>
+        public void SetFlip(bool value)
         {
             if (IsPossibleFlip() != true) return;
 
-            transform.localScale = flip ? new Vector3(OriginalScaleX * -1f, transform.localScale.y, transform.localScale.z) : new Vector3(OriginalScaleX, transform.localScale.y, transform.localScale.z);
-            this.flip = flip;
+            transform.localScale = value ? new Vector3(OriginalScaleX * -1f, transform.localScale.y, transform.localScale.z) : new Vector3(OriginalScaleX, transform.localScale.y, transform.localScale.z);
+            flip = value;
         }
         /// <summary>
         /// 타겟 오브젝트가 있을경우 방향 셋팅하기

@@ -28,7 +28,7 @@ namespace GGemCo.Editor.GGemCoTool.DefaultSetting
             int highestID = GetHighestSortingLayerID(sortingLayersProp); // 가장 높은 ID 찾기
 
             // Sorting Layer 추가
-            foreach (var layers in ConfigSortingLayer.Tags)
+            foreach (var layers in ConfigSortingLayer.GetValues())
             {
                 string layer = layers.Value;
                 if (!SortingLayerExists(sortingLayersProp, layer))

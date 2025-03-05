@@ -21,5 +21,9 @@ namespace GGemCo.Scripts.SaveData
         {
             return long.Parse(PlayerPrefs.GetString(key, defaultValue));
         }
+        protected string PlayerPrefsLoad(string key)
+        {
+            return PlayerPrefs.GetString(key);
+        }
     }
 }

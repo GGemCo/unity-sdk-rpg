@@ -19,10 +19,10 @@ namespace GGemCo.Scripts.Maps.Objects
         }
         protected virtual void InitTagSortingLayer()
         {
-            tag = ConfigTags.GetMapObject();
+            tag = ConfigTags.GetValue(ConfigTags.Keys.MapObject);
             if (GetComponent<TilemapRenderer>() != null)
             {
-                GetComponent<TilemapRenderer>().sortingLayerName = ConfigSortingLayer.GetMapObject();
+                GetComponent<TilemapRenderer>().sortingLayerName = ConfigSortingLayer.GetValue(ConfigSortingLayer.Keys.MapObject);
             }
         }
     }

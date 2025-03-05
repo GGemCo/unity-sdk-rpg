@@ -80,12 +80,12 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
 
         public void ExportNpcDataToJson(string filePath, string fileName, int mapUid)
         {
-            GameObject mapObject = GameObject.FindGameObjectWithTag(ConfigTags.GetMap());
+            GameObject mapObject = GameObject.FindGameObjectWithTag(ConfigTags.GetValue(ConfigTags.Keys.Map));
             NpcDataList saveNpcList = new NpcDataList();
 
             foreach (Transform child in mapObject.transform)
             {
-                if (child.CompareTag(ConfigTags.GetNpc()))
+                if (child.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Npc)))
                 {
                     var npc = child.gameObject.GetComponent<Npc>();
                     if (npc == null) continue;

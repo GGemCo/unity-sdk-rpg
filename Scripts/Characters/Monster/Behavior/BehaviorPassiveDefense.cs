@@ -252,7 +252,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
 
         private void OnTriggerExit2D(Collider2D collision)
         {
-            if (collision.CompareTag(ConfigTags.GetPlayer()))
+            if (collision.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Player)))
             {
                 if (monster.IsStatusDead()) return;
                 
@@ -278,7 +278,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
 
             foreach (var hit in collider2Ds)
             {
-                if (hit.CompareTag(ConfigTags.GetPlayer()))
+                if (hit.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Player)))
                 {
                     Player.Player player = hit.GetComponent<Player.Player>();
                     if (player != null)

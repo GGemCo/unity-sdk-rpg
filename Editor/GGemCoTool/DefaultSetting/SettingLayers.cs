@@ -28,7 +28,7 @@ namespace GGemCo.Editor.GGemCoTool.DefaultSetting
 
             bool addedAnyLayer = false;
 
-            foreach (var layerNames in ConfigLayer.Tags)
+            foreach (var layerNames in ConfigLayer.GetValues())
             {
                 string layerName = layerNames.Value;
                 if (!LayerExists(layersProp, layerName))

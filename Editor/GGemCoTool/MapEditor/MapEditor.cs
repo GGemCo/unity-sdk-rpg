@@ -71,12 +71,12 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             _tableMap = TableLoaderManager.LoadMapTable();
             
             // 타일맵을 추가할 grid
-            _gridTileMap = GameObject.Find(ConfigTags.GetGridTileMap());
+            _gridTileMap = GameObject.Find(ConfigTags.GetValue(ConfigTags.Keys.GridTileMap));
             if (_gridTileMap == null)
             {
-                _gridTileMap = new GameObject(ConfigTags.GetGridTileMap())
+                _gridTileMap = new GameObject(ConfigTags.GetValue(ConfigTags.Keys.GridTileMap))
                 {
-                    tag = ConfigTags.GetGridTileMap()
+                    tag = ConfigTags.GetValue(ConfigTags.Keys.GridTileMap)
                 };
                 Grid grid = _gridTileMap.gameObject.AddComponent<Grid>();
                 grid.cellSize = new Vector3(GRID_CELL_SIZE, GRID_CELL_SIZE, 0);
@@ -104,7 +104,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                 DestroyImmediate(obj);
             }
 
-            obj = GameObject.FindWithTag(ConfigTags.GetGridTileMap());
+            obj = GameObject.FindWithTag(ConfigTags.GetValue(ConfigTags.Keys.GridTileMap));
             if (obj)
             {
                 DestroyImmediate(obj);
@@ -166,7 +166,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
         private void ExportDataToJson()
         {
             // 태그가 'Map'인 오브젝트를 찾습니다.
-            GameObject mapObject = GameObject.FindGameObjectWithTag(ConfigTags.GetMap());
+            GameObject mapObject = GameObject.FindGameObjectWithTag(ConfigTags.GetValue(ConfigTags.Keys.Map));
         
             if (mapObject == null)
             {
@@ -220,7 +220,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
 
             if (_gridTileMap == null)
             {
-                _gridTileMap = GameObject.Find(ConfigTags.GetGridTileMap());
+                _gridTileMap = GameObject.Find(ConfigTags.GetValue(ConfigTags.Keys.GridTileMap));
             }
             currentJsonFolderPath = jsonFolderPath + mapData.FolderName + "/";
             GameObject currentMap = Instantiate(prefab, _gridTileMap.transform);
