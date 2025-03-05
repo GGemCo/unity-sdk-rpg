@@ -6,6 +6,9 @@ using GGemCo.Scripts.SaveData;
 
 namespace GGemCo.Editor.GGemCoTool
 {
+    /// <summary>
+    /// PlayerPrefs 데이터 관리 툴
+    /// </summary>
     public class PlayerPrefsEditor : EditorWindow
     {
         private const string Title = "PlayerPrefs 데이터 관리";
@@ -52,7 +55,7 @@ namespace GGemCo.Editor.GGemCoTool
             // 테이블 형식으로 PlayerPrefs 데이터 표시
             GUILayout.BeginHorizontal(EditorStyles.helpBox);
             GUILayout.Label("Key", EditorStyles.boldLabel, GUILayout.Width(250));
-            GUILayout.Label("Value", EditorStyles.boldLabel, GUILayout.Width(150));
+            GUILayout.Label("Value", EditorStyles.boldLabel, GUILayout.ExpandWidth(true), GUILayout.MinWidth(200));
             GUILayout.Label("Type", EditorStyles.boldLabel, GUILayout.Width(100));
             GUILayout.Label("Actions", EditorStyles.boldLabel, GUILayout.Width(80));
             GUILayout.EndHorizontal();
@@ -63,12 +66,15 @@ namespace GGemCo.Editor.GGemCoTool
             {
                 GUILayout.BeginHorizontal(EditorStyles.helpBox);
                 GUILayout.Label(kvp.Key, GUILayout.Width(250));
-                GUILayout.Label(kvp.Value, GUILayout.Width(150));
+    
+                // JSON을 포함한 긴 문자열이 잘리거나 한 줄로 나오지 않도록 TextArea 사용
+                GUILayout.TextArea(kvp.Value, GUILayout.ExpandWidth(true), GUILayout.MinWidth(200), GUILayout.MaxHeight(50));
+    
                 GUILayout.Label(DetectType(kvp.Key), GUILayout.Width(100));
 
                 if (GUILayout.Button("삭제", GUILayout.Width(80)))
                 {
-                    keysToDelete.Add(kvp.Key); // 리스트에 삭제할 키 추가
+                    keysToDelete.Add(kvp.Key);
                 }
 
                 GUILayout.EndHorizontal();
@@ -93,7 +99,9 @@ namespace GGemCo.Editor.GGemCoTool
         {
             LoadPlayerPrefs();
         }
-
+        /// <summary>
+        /// 저장된 player prefs 값 불러오기
+        /// </summary>
         private void LoadPlayerPrefs()
         {
             playerPrefsData.Clear();
@@ -109,7 +117,10 @@ namespace GGemCo.Editor.GGemCoTool
                 }
             }
         }
-
+        /// <summary>
+        /// 불러올 키 값 셋팅하기
+        /// </summary>
+        /// <returns></returns>
         private string[] GetAllPossibleKeys()
         {
             // EditorPrefs를 사용하여 키 목록을 유지하는 방법 (이전에 저장된 키를 추적 가능)
@@ -124,10 +135,15 @@ namespace GGemCo.Editor.GGemCoTool
             // 여기에 미리 알고 있는 키 추가 가능 (예제)
             keys.Add(PlayerData.PlayerPrefsKeyLevel);
             keys.Add(PlayerData.PlayerPrefsKeyExp);
+            keys.Add(InventoryData.PlayerPrefsKeyInventoryItemCount);
 
             return keys.Distinct().ToArray();
         }
-
+        /// <summary>
+        /// 키 값으로 value 가져오기
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         private string GetValueAsString(string key)
         {
             if (PlayerPrefs.HasKey(key))
@@ -136,7 +152,11 @@ namespace GGemCo.Editor.GGemCoTool
             }
             return "N/A";
         }
-
+        /// <summary>
+        /// 가져올 값이 어떤 유형인지 체크하기
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         private string DetectType(string key)
         {
             if (IsInt(key)) return "int";
