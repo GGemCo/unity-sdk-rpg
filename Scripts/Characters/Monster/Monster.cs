@@ -91,7 +91,7 @@ namespace GGemCo.Scripts.Characters.Monster
             if (Uid <= 0) return;
             TableLoaderManager tableLoaderManager = TableLoaderManager.Instance;
             var info = tableLoaderManager.TableMonster.GetDataByUid(Uid);
-            // FG_Logger.Log("InitializationStat uid: "+uid+" / info.uid: "+info.uid+" / StatMoveSpeed: "+info.statMoveSpeed);
+            // GcLogger.Log("InitializationStat uid: "+uid+" / info.uid: "+info.uid+" / StatMoveSpeed: "+info.statMoveSpeed);
             if (info.Uid <= 0) return;
             StatAtk = info.StatAtk;
             CurrentAtk = StatAtk;
@@ -124,7 +124,7 @@ namespace GGemCo.Scripts.Characters.Monster
         {
             if (IsStatusDead())
             {
-                // FG_Logger.Log("monster dead");
+                // GcLogger.Log("monster dead");
                 return false;
             }
             if (damage <= 0) return false;
@@ -144,7 +144,7 @@ namespace GGemCo.Scripts.Characters.Monster
                 CurrentStatus = ICharacter.CharacterStatus.Dead;
                 SceneGame.Instance.mapManager.OnDeadMonster(Vid);
                 
-                //FG_Logger.Log("dead vid : " + this.vid);
+                //GcLogger.Log("dead vid : " + this.vid);
                 Destroy(gameObject, delayDestroy);
 
                 OnDead();

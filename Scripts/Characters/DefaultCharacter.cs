@@ -179,7 +179,7 @@ namespace GGemCo.Scripts.Characters
         ///  플레이어 움직임 멈춤 
         /// </summary>
         public void Stop() {
-            // FG_Logger.Log("player Stop");
+            // GcLogger.Log("player Stop");
             SetStatus(ICharacter.CharacterStatus.Idle);
         }
         public void SetSortingOrder(ICharacter.CharacterSortingOrder value)

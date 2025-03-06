@@ -30,7 +30,7 @@ namespace GGemCo.Scripts.Spine2d
             // Logger.Log("effect spine event: "+e.Data.Name);
             if (e.Data.Name == Spine2dConstants.EventNameAttack)
             {
-                // FG_Logger.Log("hit event " + this.gameObject.name + " | json: " + e.String);
+                // GcLogger.Log("hit event " + this.gameObject.name + " | json: " + e.String);
                 OnSpineEventAttack(e);
             }
             else if (e.Data.Name == Spine2dConstants.EventNameSound)
@@ -68,7 +68,7 @@ namespace GGemCo.Scripts.Spine2d
         protected virtual void PlayAnimation(string animationName, bool loop = false)
         {
             if (SkeletonAnimation == null) return;
-            //  FG_Logger.Log("PlayAnimation gameobject: " + this.gameObject.name + " / animationName: " + animationName + " / " + loop);
+            //  GcLogger.Log("PlayAnimation gameobject: " + this.gameObject.name + " / animationName: " + animationName + " / " + loop);
             SkeletonAnimation.AnimationState.SetAnimation(0, animationName, loop);
         }
         /// <summary>
@@ -88,7 +88,7 @@ namespace GGemCo.Scripts.Spine2d
         protected virtual void PlayAnimationOnceAndThenLoop(string animationName)
         {
             if (SkeletonAnimation == null) return;
-            // FG_Logger.Log("PlayAnimationOnceAndThenLoop gameobject: " + this.gameObject.name + " / animationName: " + animationName );
+            // GcLogger.Log("PlayAnimationOnceAndThenLoop gameobject: " + this.gameObject.name + " / animationName: " + animationName );
             // 애니메이션 실행
             SkeletonAnimation.AnimationState.SetAnimation(0, animationName, false);
 

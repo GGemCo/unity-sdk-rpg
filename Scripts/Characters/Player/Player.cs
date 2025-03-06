@@ -100,7 +100,7 @@ namespace GGemCo.Scripts.Characters.Player
             
             if (CurrentStatus == ICharacter.CharacterStatus.Dead)
             {
-                // FG_Logger.Log("monster dead");
+                // GcLogger.Log("monster dead");
                 return false;
             }
                 
@@ -168,7 +168,7 @@ namespace GGemCo.Scripts.Characters.Player
                 Monster.Monster monster = collision.gameObject.GetComponent<Monster.Monster>();
                 if (monster.gameObject.GetComponent<Monster.Monster>().IsStatusDead())
                 {
-                    // FG_Logger.Log("player / update / monster dead");
+                    // GcLogger.Log("player / update / monster dead");
                     targetMonster = null;
                 }
                 else {

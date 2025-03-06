@@ -47,7 +47,7 @@ namespace GGemCo.Scripts.Characters.Npc
             if (Uid <= 0) return;
             TableLoaderManager tableLoaderManager = TableLoaderManager.Instance;
             var info = tableLoaderManager.TableNpc.GetDataByUid(Uid);
-            // FG_Logger.Log("InitializationStat uid: "+uid+" / info.uid: "+info.uid+" / StatMoveSpeed: "+info.statMoveSpeed);
+            // GcLogger.Log("InitializationStat uid: "+uid+" / info.uid: "+info.uid+" / StatMoveSpeed: "+info.statMoveSpeed);
             if (info.Uid > 0)
             {
                 CurrentAtk = (long)StatAtk;
