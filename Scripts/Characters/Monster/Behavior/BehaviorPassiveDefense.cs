@@ -71,7 +71,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         /// </summary>
         private void HandleInput()
         {
-            if (AttackerTransform == null || monster.IsStatusDead()) return;
+            if (!monster.isAggro || AttackerTransform == null || monster.IsStatusDead()) return;
             Direction = (AttackerTransform.position - monster.transform.position).normalized;
         }
 
@@ -163,7 +163,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         /// </summary>
         private void UpdateMonsterScale(Vector2 direction)
         {
-            if (monster.IsStatusDead()) return;
+            if (!monster.isAggro || monster.IsStatusDead()) return;
             monster.transform.localScale = new Vector3(monster.OriginalScaleX * GetScaleByDirection(direction), 
                                                        monster.transform.localScale.y, 
                                                        monster.transform.localScale.z);

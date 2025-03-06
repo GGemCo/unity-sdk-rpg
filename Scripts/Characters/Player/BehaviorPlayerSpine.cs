@@ -119,6 +119,20 @@ namespace GGemCo.Scripts.Characters.Player
         {
         
         }
+        /// <summary>
+        /// 플레이어와 몬스터가 마주보고 있는지 체크 
+        /// </summary>
+        /// <param name="monster"></param>
+        /// <returns></returns>
+        private bool AreFacingEachOther(Transform monster)
+        {
+            float playerDir = Mathf.Sign(player.transform.localScale.x);  // 플레이어 방향 (오른쪽: -1, 왼쪽: 1)
+            float monsterDir = Mathf.Sign(monster.localScale.x); // 몬스터 방향 (오른쪽: -1, 왼쪽: 1)
+
+            float directionToMonster = Mathf.Sign(monster.position.x - player.transform.position.x);
+
+            return Mathf.Approximately(playerDir, -directionToMonster) && Mathf.Approximately(monsterDir, directionToMonster);
+        }
 
         protected override void OnSpineEventAttack(Event @event) 
         {
@@ -142,7 +156,7 @@ namespace GGemCo.Scripts.Characters.Player
                     {
                         // GcLogger.Log("Player attacked the monster after animation!");
                         // 몬스터와 마주보고 있으면 공격 
-                        if (player.IsFlipped() != monster.IsFlipped())
+                        if (AreFacingEachOther(monster.transform))
                         {
                             monster.OnDamage(totalDamage, gameObject);
                             ++countDamageMonster;
