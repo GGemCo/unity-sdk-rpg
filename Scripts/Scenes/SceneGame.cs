@@ -37,6 +37,9 @@ namespace GGemCo.Scripts.Scenes
         [HideInInspector] public DamageTextManager damageTextManager;
         [HideInInspector] public ItemManager itemManager;
 
+        [Tooltip("드랍 아이템의 이름 text 오브젝트가 들어갈 오브젝트 입니다.")]
+        public GameObject containerDropItemName;
+
         private Canvas canvasUI;
 
         private void Awake()

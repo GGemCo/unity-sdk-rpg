@@ -55,6 +55,9 @@ namespace GGemCo.Scripts.Items
         private Dictionary<int, List<StruckTableItemDropGroup>> dropGroupDictionary = new Dictionary<int, List<StruckTableItemDropGroup>>();
         private Dictionary<int, List<StruckTableMonsterDropRate>> monsterDropDictionary = new Dictionary<int, List<StruckTableMonsterDropRate>>();
 
+        /// <summary>
+        /// 초기화. Awake 단계에서 호출됩니다.
+        /// </summary>
         public void Initialize()
         {
             poolSize = 1;

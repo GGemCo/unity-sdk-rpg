@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
+using GGemCo.Scripts.TagName;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -10,10 +11,13 @@ namespace GGemCo.Scripts.Items
 {
     public class Item : MonoBehaviour
     {
-        private Renderer itemRenderer;
-        private SpriteRenderer spriteRenderer;
-        private CircleCollider2D circleCollider2D;
+        public int itemUid;
+        public int itemCount;
+        public GameObject prefabTagNameItem;
+        private GameObject containerItemName;
+        private GameObject objectTagNameItem;
         
+        [Header("드랍 애니메이션 속성")]
         public float minDistance = 40f; // 최소 드랍 거리 (픽셀)
         public float maxDistance = 80f; // 최대 드랍 거리 (픽셀)
         public float flightTime = 0.3f; // 비행 시간 (짧을수록 빠르게 떨어짐)
@@ -34,11 +38,14 @@ namespace GGemCo.Scripts.Items
         private float bounceTime; // 바운스 지속 시간
         private float rotationDirection; // 랜덤 회전 방향
 
+        [Tooltip("드랍 후 dropItemDestroyTimeSec 시간 후 destroy")]
         private Coroutine coroutineDropItemDestroy;
         private int dropItemDestroyTimeSec; // 드랍된 후 사라지는 시간(초)
 
-        public int itemUid;
-        public int itemCount;
+        private Renderer itemRenderer;
+        private SpriteRenderer spriteRenderer;
+        private CircleCollider2D circleCollider2D;
+
         private bool isStart;
         private ItemManager itemManager;
         
@@ -48,7 +55,7 @@ namespace GGemCo.Scripts.Items
             isBouncing = false;
             bounceTime = 0.1f;
             originalScale = transform.localScale; // 원래 크기 저장
-            
+
             itemRenderer = GetComponent<Renderer>();
             spriteRenderer = GetComponent<SpriteRenderer>();
             circleCollider2D = GetComponent<CircleCollider2D>();
@@ -128,9 +135,29 @@ namespace GGemCo.Scripts.Items
             rotationDirection = Random.Range(-1f, 1f);
             
             isStart = true;
+
+            CreateTagName();
         }
-        
-        void Update()
+        /// <summary>
+        /// 아이템 이름 tag 만들기
+        /// </summary>
+        private void CreateTagName()
+        {
+            if (prefabTagNameItem == null) return;
+            if (containerItemName == null)
+            {
+                containerItemName = SceneGame.Instance.containerDropItemName;
+            }
+            objectTagNameItem = Instantiate(prefabTagNameItem, containerItemName.transform);
+            if (objectTagNameItem == null) return;
+            TagNameItem tagNameItem = objectTagNameItem.GetComponent<TagNameItem>();
+            if (tagNameItem == null) return;
+            tagNameItem.Initialize(gameObject, itemCount);
+        }
+        /// <summary>
+        /// 드랍 애니메이션 처리  
+        /// </summary>
+        private void Update()
         {
             if (!isStart) return;
             
@@ -157,8 +184,11 @@ namespace GGemCo.Scripts.Items
                 StartCoroutine(BounceEffect());
             }
         }
-        
-        IEnumerator BounceEffect()
+        /// <summary>
+        /// 드랍된 후 bounce 애니메이션 처리
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerator BounceEffect()
         {
             isBouncing = true;
             Vector2 groundPos = transform.position;
@@ -207,6 +237,10 @@ namespace GGemCo.Scripts.Items
         {
             StopCoroutineDropItemDestroy();
             circleCollider2D.enabled = false;
+            if (objectTagNameItem != null)
+            {
+                objectTagNameItem.SetActive(false);
+            }
         }
         /// <summary>
         /// 플레이어가 아이템을 먹 후, 사라지는 시간이 다 되었을때 처리
