@@ -61,8 +61,8 @@ namespace GGemCo.Scripts.Items
             poolDropItem.Clear();
             InitializePool();
             tableItem = TableLoaderManager.Instance.TableItem;
-            dictionaryByCategory = TableLoaderManager.Instance.TableItem.DictionaryByCategory;
-            dictionaryBySubCategory = TableLoaderManager.Instance.TableItem.DictionaryBySubCategory;
+            dictionaryByCategory = tableItem.DictionaryByCategory;
+            dictionaryBySubCategory = tableItem.DictionaryBySubCategory;
             dropGroupDictionary = TableLoaderManager.Instance.TableItemDropGroup.DropGroupDictionary;
             monsterDropDictionary = TableLoaderManager.Instance.TableMonsterDropRate.MonsterDropDictionary;
         }
@@ -72,7 +72,7 @@ namespace GGemCo.Scripts.Items
         private void InitializePool()
         {
             if (AddressableSettingsLoader.Instance == null) return;
-            prefabDropItem = AddressableSettingsLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeySpriteDropItem);
+            prefabDropItem = AddressableSettingsLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabDropItem);
             if (prefabDropItem == null) return;
             containerPoolDropItem = new GameObject("ContainerPoolDropItem");
             ExpandPool(poolSize); // 초기 풀 생성
@@ -124,7 +124,7 @@ namespace GGemCo.Scripts.Items
         /// <param name="itemUid"></param>
         private void ShowDropItem(Vector3 worldPosition, int itemUid)
         {
-            var info = TableLoaderManager.Instance.TableItem.GetDataByUid(itemUid);
+            var info = tableItem.GetDataByUid(itemUid);
             if (info == null) return;
             Item item = GetOrCreateItem();
             item.itemUid = itemUid;

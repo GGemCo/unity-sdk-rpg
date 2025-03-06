@@ -59,6 +59,7 @@ namespace GGemCo.Scripts.Scenes
             }
             
             InitializeManagers();
+            CacheReferences();
 
             isStateDirty = false;
             SetState(GameState.Begin);
@@ -66,9 +67,10 @@ namespace GGemCo.Scripts.Scenes
 
         private void CacheReferences()
         {
-            mainCamera = GameObject.FindWithTag(ConfigTags.GetMainCamera())?.GetComponent<Camera>();
-            canvasUI = GameObject.FindWithTag(ConfigTags.GetCanvasUI())?.GetComponent<Canvas>();
-            cameraManager = GameObject.FindWithTag(ConfigTags.GetMainCamera())?.GetComponent<CameraManager>();
+            mainCamera = GameObject.FindWithTag(ConfigTags.GetValue(ConfigTags.Keys.MainCamera))?.GetComponent<Camera>();
+            canvasUI = GameObject.FindWithTag(ConfigTags.GetValue(ConfigTags.Keys.CanvasUI))?.GetComponent<Canvas>();
+            cameraManager = GameObject.FindWithTag(ConfigTags.GetValue(ConfigTags.Keys.MainCamera))?.GetComponent<CameraManager>();
+            uIWindowManager = GameObject.FindWithTag(ConfigTags.GetValue(ConfigTags.Keys.WindowManager))?.GetComponent<UIWindowManager>();
         }
 
         private void InitializeManagers()
@@ -76,7 +78,6 @@ namespace GGemCo.Scripts.Scenes
             GameObject managerContainer = new GameObject("Managers");
 
             calculateManager = CreateManager<CalculateManager>(managerContainer);
-            uIWindowManager = CreateManager<UIWindowManager>(managerContainer);
             mapManager = CreateManager<MapManager>(managerContainer);
             popupManager = CreateManager<PopupManager>(managerContainer);
             saveDataManager = CreateManager<SaveDataManager>(managerContainer);
@@ -96,7 +97,6 @@ namespace GGemCo.Scripts.Scenes
         private void Start()
         {
             if (TableLoaderManager.Instance == null) return;
-            CacheReferences();
             mapManager.LoadMap(TableLoaderManager.Instance.TableConfig.GetStartMapUid());
             StartCoroutine(UpdateStateRoutine());
         }
