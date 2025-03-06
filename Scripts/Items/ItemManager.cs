@@ -5,9 +5,9 @@ using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
+using GGemCo.Scripts.UI;
+using GGemCo.Scripts.UI.Window;
 using UnityEngine;
-using UnityEngine.ResourceManagement.AsyncOperations;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
@@ -77,19 +77,6 @@ namespace GGemCo.Scripts.Items
             containerPoolDropItem = new GameObject("ContainerPoolDropItem");
             ExpandPool(poolSize); // 초기 풀 생성
         }
-        private void OnPrefabLoaded(AsyncOperationHandle<GameObject> handle)
-        {
-            if (handle.Status == AsyncOperationStatus.Succeeded)
-            {
-                containerPoolDropItem = new GameObject("ContainerPoolDropItem");
-                prefabDropItem = handle.Result;
-                ExpandPool(poolSize); // 초기 풀 생성
-            }
-            else
-            {
-                GcLogger.LogError("Addressables에서 프리팹을 로드하지 못했습니다.");
-            }
-        }
         /// <summary>
         /// 풀에서 아이템을 가져오고, 부족하면 새로운 아이템을 생성한다.
         /// </summary>
@@ -122,14 +109,16 @@ namespace GGemCo.Scripts.Items
         /// </summary>
         /// <param name="worldPosition"></param>
         /// <param name="itemUid"></param>
-        private void ShowDropItem(Vector3 worldPosition, int itemUid)
+        /// <param name="itemCount"></param>
+        public void ShowDropItem(Vector3 worldPosition, int itemUid, int itemCount)
         {
             var info = tableItem.GetDataByUid(itemUid);
             if (info == null) return;
             Item item = GetOrCreateItem();
             item.itemUid = itemUid;
+            item.itemCount = itemCount;
             item.startPos= worldPosition;
-            item.gameObject.SetActive(true);
+            item.StartDrop();
             
             // 풀을 일정 시간이 지나면 정리하도록 코루틴 시작
             reducePoolCoroutine ??= SceneGame.Instance.StartCoroutine(ReducePoolSize());
@@ -220,7 +209,7 @@ namespace GGemCo.Scripts.Items
         {
             int itemUid = GetDropItem(monsterUid);
             if (itemUid <= 0) return;
-            ShowDropItem(monsterObject.transform.position, itemUid);
+            ShowDropItem(monsterObject.transform.position, itemUid, 1);
         }
         /// <summary>
         /// Item Drop Group 테이블에서 Type 별로 찾아보기 
@@ -255,8 +244,20 @@ namespace GGemCo.Scripts.Items
         {
             Item item = dropItem.GetComponent<Item>();
             if (item ==null || item.itemUid <= 0) return;
-            SceneGame.Instance.saveDataManager.Inventory.AddItem(item.itemUid, 1);
+            SceneGame.Instance.saveDataManager.Inventory.AddItem(item.itemUid, item.itemCount);
             item.Reset();
+            // 인벤토리가 열려있으면 바로 업데이트 해주기 
+            var inventory =
+                SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
+                    .Inventory);
+            if (inventory != null)
+            {
+                inventory.LoadIcons();
+            }
+        }
+
+        public void AddPoolDropItem(Item item)
+        {
             poolDropItem.Enqueue(item);
         }
 #if UNITY_EDITOR
@@ -268,7 +269,7 @@ namespace GGemCo.Scripts.Items
         {
             public int MonsterUid;
             public int Iterations;
-            public Dictionary<ItemManager.MonsterDropRateType, int> DropRateCounts;
+            public Dictionary<MonsterDropRateType, int> DropRateCounts;
             public Dictionary<ItemConstants.Category, int> CategoryCounts;
             public Dictionary<ItemConstants.SubCategory, int> SubCategoryCounts;
             public int TotalDrops;
@@ -292,15 +293,15 @@ namespace GGemCo.Scripts.Items
             monsterDropDictionary = pmonsterDropDictionary;
             tableItem = ptableItem;
             
-            foreach (MonsterDropRateType type in System.Enum.GetValues(typeof(MonsterDropRateType)))
+            foreach (MonsterDropRateType type in Enum.GetValues(typeof(MonsterDropRateType)))
             {
                 lastTestResult.DropRateCounts[type] = 0;
             }
-            foreach (ItemConstants.Category category in System.Enum.GetValues(typeof(ItemConstants.Category)))
+            foreach (ItemConstants.Category category in Enum.GetValues(typeof(ItemConstants.Category)))
             {
                 lastTestResult.CategoryCounts[category] = 0;
             }
-            foreach (ItemConstants.SubCategory subCategory in System.Enum.GetValues(typeof(ItemConstants.SubCategory)))
+            foreach (ItemConstants.SubCategory subCategory in Enum.GetValues(typeof(ItemConstants.SubCategory)))
             {
                 lastTestResult.SubCategoryCounts[subCategory] = 0;
             }
@@ -318,18 +319,21 @@ namespace GGemCo.Scripts.Items
                     lastTestResult.DropRateCounts[MonsterDropRateType.ItemDropGroupUid]++;
                     var info = tableItem.GetDataByUid(itemUid);
                     if (info == null) continue;
-                
-                    if (System.Enum.IsDefined(typeof(ItemConstants.Category), info.Category))
+
+                    if (Enum.IsDefined(typeof(ItemConstants.Category), info.Category))
                     {
                         lastTestResult.CategoryCounts[info.Category]++;
                     }
-                    if (System.Enum.IsDefined(typeof(ItemConstants.SubCategory), info.SubCategory))
+
+                    if (Enum.IsDefined(typeof(ItemConstants.SubCategory), info.SubCategory))
                     {
                         lastTestResult.SubCategoryCounts[info.SubCategory]++;
                     }
+
                     lastTestResult.TotalDrops++;
                 }
             }
+
             // GcLogger.Log($"테스트 완료: 몬스터 UID {monsterUid}, {iterations}회 실행됨.");
             return lastTestResult;
         }

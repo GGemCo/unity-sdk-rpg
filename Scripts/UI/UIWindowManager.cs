@@ -1,6 +1,9 @@
+using GGemCo.Scripts.Addressable;
+using GGemCo.Scripts.Configs;
+using GGemCo.Scripts.TableLoader;
+using GGemCo.Scripts.UI.Icon;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace GGemCo.Scripts.UI
 {
@@ -8,15 +11,22 @@ namespace GGemCo.Scripts.UI
     {
         public enum WindowUid 
         {
+            None,
+            Hud,
+            Inventory,
+            ItemInfo,
         }
+        [Header("기본속성")]
+        [Tooltip("윈도우 리스트")]
+        [SerializeField] private UIWindow[] uiWindows;
+        // 아이템 아이콘용 프리팹
+        private GameObject prefabIconItem;
 
-        public UIWindow[] uiWindows;
-        
-        public GameObject prefabFloatingText;
-        public VerticalLayoutGroup debugMessageVerticalLayoutGroup;
-        public GameObject prefabDebugMessage;
-
-        // Start is called before the first frame update
+        private void Awake()
+        {
+            if (AddressableSettingsLoader.Instance == null) return;
+            prefabIconItem = AddressableSettingsLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconItem);
+        }
         private void Start()
         {
             InitializationShowDisable();
@@ -26,6 +36,19 @@ namespace GGemCo.Scripts.UI
         /// </summary>
         private void InitializationShowDisable()
         {
+            TableWindow tableWindow = TableLoaderManager.Instance.TableWindow;
+            var tables = tableWindow.GetDatas();
+            if (tables == null) return;
+            foreach (var table in tables)
+            {
+                int uid = table.Key;
+                if (uid == 0) continue;
+                var info = tableWindow.GetDataByUid(uid);
+                if (info == null || info.Uid <= 0 || info.DefaultActive) continue;
+                GameObject window = uiWindows[uid].gameObject;
+                if (window == null) continue;
+                window.SetActive(false);
+            }
         }
         /// <summary>
         /// 윈도우 보임/안보임 처리 
@@ -39,7 +62,7 @@ namespace GGemCo.Scripts.UI
                 GcLogger.LogError("UIWindow 컴포넌트가 없습니다. uid:"+uid);
                 return;
             }
-            if (uiWindow.gameObject.activeSelf == show) return;
+            // if (uiWindow.gameObject.activeSelf == show) return;
             UIWindowFade uiWindowFade = uiWindow.GetComponent<UIWindowFade>();
             if (uiWindowFade == null) return;
             if (show) {
@@ -48,9 +71,6 @@ namespace GGemCo.Scripts.UI
             else {
                 uiWindowFade.HidePanel();
             }
-
-            // uiWindow.OnShow(show);
-            // window.SetActive(show);
         }
         /// <summary>
         /// 윈도우 간에 아이콘 이동시키기 
@@ -91,13 +111,13 @@ namespace GGemCo.Scripts.UI
                 // fromWindow.DetachIcon(fromIndex);
                 // toWindow.DetachIcon(toIndex);
             
-                fromWindow.SetIcon(toIcon, fromIndex);
-                toWindow.SetIcon(fromIcon, toIndex);
+                fromWindow.SetIcon(fromIndex, toIcon);
+                toWindow.SetIcon(toIndex, fromIcon);
             }
             else
             {
                 // fromWindow.DetachIcon(fromIndex);
-                toWindow.SetIcon(fromIcon, toIndex);
+                toWindow.SetIcon(toIndex, fromIcon);
             }
         }
         /// <summary>
@@ -126,7 +146,7 @@ namespace GGemCo.Scripts.UI
         /// <returns></returns>
         public GameObject RegisterIcon(WindowUid srcWindowUid, int srcIndex, WindowUid toWindowUid, int toIndex)
         {
-            GameObject srcIcon = this.GetIconByWindowUid(srcWindowUid, srcIndex);
+            GameObject srcIcon = GetIconByWindowUid(srcWindowUid, srcIndex);
             if(srcIcon == null) 
             {
                 GcLogger.LogError("원본 아이콘이 없습니다. window uid: "+srcWindowUid+ " / srcIndex: "+srcIndex);
@@ -139,10 +159,10 @@ namespace GGemCo.Scripts.UI
                 GcLogger.LogError("원본 아이콘에 UIIcon 컴포넌트가 없습니다. window uid: "+srcWindowUid+ " / srcIndex: "+srcIndex);
                 return null;
             }
-            GameObject registerIcon = this.GetIconByWindowUid(toWindowUid, toIndex);
+            GameObject registerIcon = GetIconByWindowUid(toWindowUid, toIndex);
             if (registerIcon == null)
             {
-                registerIcon = AddIcon(toWindowUid, toIndex, UIIcon.Type.Skill, uiIcon.uid, 0);
+                registerIcon = AddIcon(toWindowUid, toIndex, uiIcon.GetIconType(), uiIcon.uid);
             }
             else
             {
@@ -150,61 +170,78 @@ namespace GGemCo.Scripts.UI
                 UIWindow uiWindow = GetUIWindowByUid<UIWindow>(toWindowUid);
                 if (uiWindow != null)
                 {
-                    uiWindow.SetIcon(registerIcon, toIndex);
+                    uiWindow.SetIcon(toIndex, registerIcon);
                 }
             }
             return registerIcon;
         }
         /// <summary>
-        /// 아이콘 추가하기. 보류
+        /// 아이콘 만들기
+        /// </summary>
+        /// <param name="toWindowUid"></param>
+        /// <param name="type"></param>
+        /// <param name="itemUid"></param>
+        /// <returns></returns>
+        GameObject CreateIcon(WindowUid toWindowUid, IIcon.Type type, int itemUid)
+        {
+            if (prefabIconItem == null) return null;
+            UIWindow uiWindow = GetUIWindowByUid<UIWindow>(toWindowUid);
+            if(uiWindow == null) {
+                GcLogger.LogError("등록된 윈도우가 아닙니다. windowUid: "+toWindowUid);
+                return null;
+            }
+            GameObject icon = Instantiate(prefabIconItem, uiWindow.gameObject.transform);
+            if (icon == null)
+            {
+                GcLogger.LogError("아이콘을 만들지 못했습니다.");
+                return null;
+            }
+            UIIcon uiIcon = icon.GetComponent<UIIcon>();
+            if (uiIcon == null)
+            {
+                GcLogger.LogError("UIIcon 스크립트 컴포넌트가 없습니다.");
+                return null;
+            }
+
+            int uid = 0;
+            switch (type)
+            {
+                case IIcon.Type.Item:
+                    var table = TableLoaderManager.Instance.TableItem.GetDataByUid(itemUid);
+                    if (table == null || table.Uid <= 0)
+                    {
+                        GcLogger.LogError("아이템 테이블에 정보가 없습니다. uid:"+itemUid);
+                        return null;
+                    }
+                    uid = table.Uid;
+                    break;
+                case IIcon.Type.Skill:
+                case IIcon.Type.None:
+                default:
+                        break;
+            }
+            uiIcon.uid = uid;
+            return icon;
+        }
+        /// <summary>
+        /// 아이콘 추가하기
         /// </summary>
         /// <param name="toWindowUid"></param>
         /// <param name="toIndex"></param>
         /// <param name="type"></param>
         /// <param name="uid"></param>
-        /// <param name="vid"></param>
         /// <returns></returns>
-        private GameObject AddIcon(WindowUid toWindowUid, int toIndex, UIIcon.Type type, int uid, int vid)
+        private GameObject AddIcon(WindowUid toWindowUid, int toIndex, IIcon.Type type, int uid)
         {
-            // let icon = this.createIcon(type, uid, dragging, click, byClient, item_class, authority);
-            // if(!icon) return null;
-            //
-            // icon.vid = vid;
-            // if (byClient === true)
-            //     icon.vid = uid;
-            //
-            // if(wnd === Def.WINDOW.SKILLTIER) {
-            //     icon.createName();
-            // }
-            //
-            // if (wnd === Def.WINDOW.QUICKSLOT_ITEM) {
-            //     wnd = Def.WINDOW.HUDMANAGER;
-            //     index = index + Def.QSLOT_SKILL_COUNT;
-            // }
-            //
-            // if(wnd === Def.WINDOW.QUICKSLOT) {
-            //     wnd = Def.WINDOW.HUDMANAGER;
-            //     // index = index % Def.QSLOT_SKILL_COUNT;
-            // }
-            //
-            // if(wnd == Def.WINDOW.REPURCHASE_ITEM){
-            //     wnd = Def.WINDOW.SHOP;
-            // }
-            //
-            // let wndObj = this.getWindow(wnd);
-            // if(wndObj == undefined) {
-            //     if(DEBUG) {
-            //         if (Config.debug_icons) {
-            //             console.log('ADD_ICON: UNDEFINED %d', wnd);
-            //         }
-            //     }
-            //     return null;
-            // }
-            //
-            //
-            // wndObj.setIcon(icon, index);
-            // return icon;
-            return null;
+            var icon = CreateIcon(toWindowUid, type, uid);
+            if(!icon) return null;
+            
+            UIWindow uiWindow = GetUIWindowByUid<UIWindow>(toWindowUid);
+            if(uiWindow == null) {
+                return null;
+            }
+            uiWindow.SetIcon(toIndex, icon);
+            return icon;
         }
         /// <summary>
         /// UIWindow 찾기 
@@ -237,42 +274,21 @@ namespace GGemCo.Scripts.UI
             }
             uiWindow.DetachIcon(slotIndex);
         }
-        public void ShowFloatingText(string text, Vector3 position)
-        {
-            ShowFloatingText(text, position, Color.yellow);
-        }
-        public void ShowFloatingText(string text, Vector3 position, float fontSize)
-        {
-            ShowFloatingText(text, position, Color.yellow);
-        }
-        public void ShowFloatingText(string text, Vector3 position, Color textColor, float fontSize = 55)
-        {
-            // UIFloatingText uiFloatingText = Instantiate(prefabFloatingText, MySceneGame.Instance.uIWindowManager.transform).GetComponent<UIFloatingText>();
-            // uiFloatingText.SetText(text);
-            // uiFloatingText.SetColor(textColor);
-            // uiFloatingText.SetFontSize(fontSize);
-            // uiFloatingText.transform.position = position;
-        }
-        public void AddDebugMessage(string text)
-        {
-            if (debugMessageVerticalLayoutGroup == null || prefabDebugMessage == null || GameObject.Find("ScrollViewDebugMessage") == null) return;
-            Instantiate(prefabDebugMessage, debugMessageVerticalLayoutGroup.transform);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(debugMessageVerticalLayoutGroup.GetComponent<RectTransform >());
-            GameObject.Find("ScrollViewDebugMessage").GetComponent<ScrollRect>().verticalNormalizedPosition = 0;
-        }
         /// <summary>
-        /// 썸네일, 칭호 아이콘 이미지 변경하기
+        /// 윈도우가 활성화 되어있는지 체크
         /// </summary>
-        /// <param name="index"></param>
-        public void ChangeHudCharacterInfo(string index)
-        {
-        }
-
+        /// <param name="windowUid"></param>
+        /// <returns></returns>
         public bool IsShowByWindowUid(WindowUid windowUid)
         {
             UIWindow uiWindow = GetUIWindowByUid<UIWindow>(windowUid);
             if (uiWindow == null) return false;
             return uiWindow.gameObject.activeSelf;
+        }
+
+        public GameObject GetPrefabIconItem()
+        {
+            return prefabIconItem;
         }
     }
 }

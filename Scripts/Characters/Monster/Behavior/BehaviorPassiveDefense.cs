@@ -295,8 +295,11 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         }
         public override void PlayDeadAnimation()
         {
-            StopCoroutine(coroutineAttack);
-            coroutineAttack = null;
+            if (coroutineAttack != null)
+            {
+                StopCoroutine(coroutineAttack);
+                coroutineAttack = null;
+            }
             SkeletonAnimation.AnimationState.SetAnimation(0, deadAnim, false);
         }
         private void UpdateCheckMaxBounds()

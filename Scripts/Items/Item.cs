@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using GGemCo.Scripts.Configs;
+using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -33,8 +34,13 @@ namespace GGemCo.Scripts.Items
         private float bounceTime; // 바운스 지속 시간
         private float rotationDirection; // 랜덤 회전 방향
 
+        private Coroutine coroutineDropItemDestroy;
+        private int dropItemDestroyTimeSec; // 드랍된 후 사라지는 시간(초)
+
         public int itemUid;
+        public int itemCount;
         private bool isStart;
+        private ItemManager itemManager;
         
         private void Awake()
         {
@@ -47,6 +53,20 @@ namespace GGemCo.Scripts.Items
             spriteRenderer = GetComponent<SpriteRenderer>();
             circleCollider2D = GetComponent<CircleCollider2D>();
             circleCollider2D.enabled = false;
+            
+            dropItemDestroyTimeSec = TableLoaderManager.Instance.TableConfig.GetDropItemDestroyTimeSec();
+        }
+
+        private void Start()
+        {
+            itemManager = SceneGame.Instance.itemManager;
+        }
+        /// <summary>
+        /// 맵에 드랍하기 시작 
+        /// </summary>
+        public void StartDrop()
+        {
+            gameObject.SetActive(true);
         }
 
         private void OnEnable()
@@ -165,7 +185,9 @@ namespace GGemCo.Scripts.Items
             // 최종적으로 원래 크기로 복귀
             OnEnd();
         }
-
+        /// <summary>
+        /// 드랍 완료
+        /// </summary>
         private void OnEnd()
         {
             isStart = false;
@@ -175,19 +197,39 @@ namespace GGemCo.Scripts.Items
             itemRenderer.sortingLayerName = ConfigSortingLayer.GetValue(ConfigSortingLayer.Keys.Character);
             itemRenderer.sortingOrder = -(int)(transform.position.y * 100);
             circleCollider2D.enabled = true;
-        }
 
+            coroutineDropItemDestroy = StartCoroutine(CheckDestroyTime());
+        }
+        /// <summary>
+        /// 플레이어가 아이템을 먹거나 맵에서 없어졌을때 
+        /// </summary>
         private void OnDisable()
         {
+            StopCoroutineDropItemDestroy();
             circleCollider2D.enabled = false;
         }
         /// <summary>
-        /// 플레이어가 아이템을 먹 후 처리
+        /// 플레이어가 아이템을 먹 후, 사라지는 시간이 다 되었을때 처리
         /// </summary>
         public void Reset()
         {
             itemUid = 0;
             gameObject.SetActive(false);
+            itemManager.AddPoolDropItem(this);
+        }
+
+        IEnumerator CheckDestroyTime()
+        {
+            yield return new WaitForSeconds(dropItemDestroyTimeSec);
+            Reset();
+        }
+        /// <summary>
+        /// 시간 되면 자동으로 파괴되는 코루틴 정지 
+        /// </summary>
+        private void StopCoroutineDropItemDestroy()
+        {
+            if (coroutineDropItemDestroy == null) return;
+            StopCoroutine(coroutineDropItemDestroy);
         }
     }
 }

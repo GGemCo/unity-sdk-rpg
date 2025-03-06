@@ -1,32 +1,104 @@
+using GGemCo.Scripts.Addressable;
+using GGemCo.Scripts.Configs;
+using GGemCo.Scripts.SaveData;
+using GGemCo.Scripts.Scenes;
+using GGemCo.Scripts.UI.Icon;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace GGemCo.Scripts.UI
 {
+    
     public class UIWindow : MonoBehaviour, IDropHandler
     {
+        // 공개(public) → 보호(protected) → 내부(internal) → 비공개(private) 
+        // 상수(const), 정적(static) 필드 → 인스턴스 필드 → 속성(Properties) → 생성자(Constructors) → 메서드(Methods)
+        // 윈도우 고유번호
         public UIWindowManager.WindowUid uid;
-        public string id;
-
-        public GameObject[] slots;
-        public GameObject[] icons;
-
+        [Header("기본속성")] 
+        [Tooltip("사용할 최대 아이콘 개수")]
+        public int maxCountIcon;
+        [Tooltip("윈도우 On/Off 시 fade in/Out 효과 사용 여부")]
+        public bool useFade = true;
+        [HideInInspector] public GameObject[] slots;
+        [HideInInspector] public GameObject[] icons;
+        [Tooltip("slot 사이즈. 보통 icon size 보다 크게 설정")]
+        public Vector2 slotSize;
+        [Tooltip("icon 사이즈")]
+        public Vector2 iconSize;
+        
+        [Header("오브젝트")]
+        [Tooltip("icon 이 들어갈 panel")]
+        public GridLayoutGroup containerIcon;
+        
         private UIWindowFade uiWindowFade;
+        private InventoryData inventoryData;
 
         protected virtual void Awake()
         {
-            this.gameObject.AddComponent<CanvasGroup>();
-            uiWindowFade = gameObject.AddComponent<UIWindowFade>();
+            slots = new GameObject[maxCountIcon];
+            icons = new GameObject[maxCountIcon];
+            gameObject.AddComponent<CanvasGroup>();
+            if (useFade)
+            {
+                uiWindowFade = gameObject.AddComponent<UIWindowFade>();
+            }
+
+            if (containerIcon != null && slotSize != Vector2.zero)
+            {
+                containerIcon.cellSize = new Vector2(slotSize.x, slotSize.y);
+            }
+
+            InitializePool();
         }
 
-        // Start is called before the first frame update
-        protected virtual void Start()
+        private void InitializePool()
         {
-        
+            ExpandPool(maxCountIcon);
         }
         /// <summary>
-        /// 아이콘 가져오기
+        /// 특정 개수만큼 풀을 확장하여 아이템을 추가 생성.
+        /// </summary>
+        private void ExpandPool(int amount)
+        {
+            if (AddressableSettingsLoader.Instance == null || containerIcon == null) return;
+            if (amount <= 0) return;
+            GameObject iconItem = AddressableSettingsLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconItem);
+            GameObject slot = AddressableSettingsLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabSlot);
+            if (iconItem == null) return;
+            for (int i = 0; i < amount; i++)
+            {
+                GameObject slotObject = Instantiate(slot, containerIcon.gameObject.transform);
+                UISlot uiSlot = slotObject.GetComponent<UISlot>();
+                if (uiSlot == null) continue;
+                uiSlot.ChangeSlotImageSize(slotSize);
+                
+                uiSlot.window = this;
+                uiSlot.windowUid = uid;
+                uiSlot.index = i;
+                slots[i] = slotObject;
+                
+                GameObject icon = Instantiate(iconItem, slotObject.transform);
+                UIIcon uiIcon = icon.GetComponent<UIIcon>();
+                if (uiIcon == null) continue;
+                uiIcon.ChangeIconImageSize(iconSize, slotSize);
+                uiIcon.index = i;
+                uiIcon.slotIndex = i;
+                uiIcon.window = this;
+                uiIcon.windowUid = uid;
+                uiIcon.SetCount(0);
+                icons[i] = icon;
+            }
+            // GcLogger.Log($"풀 확장: {amount}개 아이템 추가 (총 {poolDropItem.Count}개)");
+        }
+        protected virtual void Start()
+        {
+            inventoryData = SceneGame.Instance.saveDataManager.Inventory;
+        }
+        /// <summary>
+        /// index 로 아이콘 가져오기
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
@@ -41,7 +113,7 @@ namespace GGemCo.Scripts.UI
             return icons[index];
         }
         /// <summary>
-        /// 아이콘 가져오기
+        /// Uid 로 아이콘 가져오기
         /// </summary>
         /// <param name="iconUid"></param>
         /// <returns></returns>
@@ -67,7 +139,7 @@ namespace GGemCo.Scripts.UI
             return null;
         }
         /// <summary>
-        /// 아이콘 정보 지워주기 
+        /// 아이콘 지우기 
         /// </summary>
         /// <param name="slotIndex"></param>
         public void DetachIcon(int slotIndex)
@@ -79,7 +151,11 @@ namespace GGemCo.Scripts.UI
                 GcLogger.LogError("슬롯에 아이콘이 없습니다. slot index: " +slotIndex);
                 return;
             }
-            icon.GetComponent<UIIcon>().ClearIconInfos();
+            UIIcon uiIcon = icon.GetComponent<UIIcon>();
+            uiIcon.ClearIconInfos();
+            
+            inventoryData.RemoveItemCount(slotIndex);
+            
             OnDetachIcon(slotIndex);
         }
 
@@ -90,9 +166,9 @@ namespace GGemCo.Scripts.UI
         /// <summary>
         /// 아이콘 붙여주기 
         /// </summary>
-        /// <param name="icon"></param>
         /// <param name="slotIndex"></param>
-        public void SetIcon(GameObject icon, int slotIndex)
+        /// <param name="icon"></param>
+        public void SetIcon(int slotIndex, GameObject icon)
         {
             GameObject slot = slots[slotIndex];
             if (slot == null)
@@ -102,9 +178,12 @@ namespace GGemCo.Scripts.UI
             }
             icon.transform.SetParent(slot.transform);
             icon.transform.position = slot.transform.position;
-            icon.GetComponent<UIIcon>().iconIndex = slotIndex;
-            icon.GetComponent<UIIcon>().iconSlotIndex = slotIndex;
+            UIIcon uiIcon = icon.GetComponent<UIIcon>();
+            uiIcon.index = slotIndex;
+            uiIcon.slotIndex = slotIndex;
             icons[slotIndex] = icon;
+
+            inventoryData.SetItemCount(slotIndex, uiIcon.uid, uiIcon.count);
             
             OnSetIcon(icon, slotIndex);
         }
@@ -123,39 +202,43 @@ namespace GGemCo.Scripts.UI
         /// 아이콘 위에서 드래그가 끝났을때 처리 
         /// </summary>
         /// <param name="droppedIcon">드랍한 한 아이콘</param>
-        /// <param name="originalIcon">드랍되는 곳에 있는 아이콘</param>
-        public virtual void OnEndDragInIcon(GameObject droppedIcon, GameObject originalIcon)
+        /// <param name="targetIcon">드랍되는 곳에 있는 아이콘</param>
+        public virtual void OnEndDragInIcon(GameObject droppedIcon, GameObject targetIcon)
         {
             // GcLogger.Log("OnEndDragInIcon");
         }
         /// <summary>
-        /// 아이템 구매
+        ///  window 밖에다 드래그앤 드랍 했을때 처리 
         /// </summary>
-        /// <param name="item"></param>
-        public virtual void PurchaseItem(GameObject item)
+        /// <param name="eventData"></param>
+        /// <param name="droppedIcon"></param>
+        /// <param name="targetIcon"></param>
+        /// <param name="originalPosition"></param>
+        public virtual void OnEndDragOutWindow(PointerEventData eventData, GameObject droppedIcon, GameObject targetIcon, Vector3 originalPosition)
         {
+            // GcLogger.Log("OnEndDragInIcon");
         }
         /// <summary>
         /// 아이콘 등급 이미지 path 가져오기
         /// </summary>
         /// <param name="valueGrade"></param>
-        /// <param name="valueGradeLevel"></param>
         /// <returns></returns>
-        public static string GetIconGradePath(UIIcon.Grade valueGrade, int valueGradeLevel)
+        public static string GetIconGradePath(IIcon.Grade valueGrade)
         {
-            return $"Images/UI/{UIIcon.IconGradeImagePath[valueGrade]}{valueGradeLevel}";
+            return $"Images/UI/{IIcon.IconGradeImagePath[valueGrade]}";
         }
         /// <summary>
-        /// 윈도우가 show 가 된 후 처리 
+        /// 윈도우 open/close
         /// </summary>
-        public virtual void OnShow(bool show)
-        {
-            
-        }
-
+        /// <param name="show"></param>
         public void Show(bool show)
         {
-            if (uiWindowFade == null) return;
+            if (uiWindowFade == null)
+            {
+                gameObject.SetActive(show);
+                OnShow(show);
+                return;
+            }
             if (gameObject.activeSelf == show) return;
             if (show)
             {
@@ -165,6 +248,20 @@ namespace GGemCo.Scripts.UI
             {
                 uiWindowFade.HidePanel();
             }
+        }
+        /// <summary>
+        /// 윈도우가 show 가 된 후 처리 
+        /// </summary>
+        public virtual void OnShow(bool show)
+        {
+            
+        }
+
+        public void OnClickClose()
+        {
+            if (uiWindowFade == null) return;
+            if (!gameObject.activeSelf) return;
+            uiWindowFade.HidePanel();
         }
     }
 }

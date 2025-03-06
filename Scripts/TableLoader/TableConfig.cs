@@ -14,6 +14,7 @@
             DelayDestroyMonster = 7, // 몬스터 죽었을때 없어지기까지 시간
             MaxLevel = 8, // 플레이어 최대 레벨
             PolyPlayerStatHp = 9, // 플레이어 기본 hp
+            DropItemDestroyTimeSec = 10, // 드랍된 아이템 사라지는 시간
         }
 
         // 제네릭 메서드를 사용하여 공통 로직 처리
@@ -39,5 +40,6 @@
         public long GetDelayDestroyMonster() => GetConfigValue<long>(ColumnIndex.DelayDestroyMonster);
         public int GetMaxLevel() => GetConfigValue<int>(ColumnIndex.MaxLevel);
         public long GetPolyPlayerStatHp() => GetConfigValue<long>(ColumnIndex.PolyPlayerStatHp);
+        public int GetDropItemDestroyTimeSec() => GetConfigValue<int>(ColumnIndex.DropItemDestroyTimeSec);
     }
 }
