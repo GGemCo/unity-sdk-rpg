@@ -73,22 +73,13 @@ namespace GGemCo.Scripts.UI
                 GameObject slotObject = Instantiate(slot, containerIcon.gameObject.transform);
                 UISlot uiSlot = slotObject.GetComponent<UISlot>();
                 if (uiSlot == null) continue;
-                uiSlot.ChangeSlotImageSize(slotSize);
-                
-                uiSlot.window = this;
-                uiSlot.windowUid = uid;
-                uiSlot.index = i;
+                uiSlot.Initialize(this, uid, i, slotSize);
                 slots[i] = slotObject;
                 
                 GameObject icon = Instantiate(iconItem, slotObject.transform);
                 UIIcon uiIcon = icon.GetComponent<UIIcon>();
                 if (uiIcon == null) continue;
-                uiIcon.ChangeIconImageSize(iconSize, slotSize);
-                uiIcon.index = i;
-                uiIcon.slotIndex = i;
-                uiIcon.window = this;
-                uiIcon.windowUid = uid;
-                uiIcon.SetCount(0);
+                uiIcon.Initialize(this, uid, i, i, iconSize, slotSize);
                 icons[i] = icon;
             }
             // GcLogger.Log($"풀 확장: {amount}개 아이템 추가 (총 {poolDropItem.Count}개)");

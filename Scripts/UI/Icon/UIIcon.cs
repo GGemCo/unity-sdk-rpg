@@ -24,7 +24,7 @@ namespace GGemCo.Scripts.UI.Icon
         private IIcon.Status status;
 
         // 아이콘 이미지
-        public Image imageIcon;
+        private Image imageIcon;
         // 개수
         [HideInInspector] public int count;
         // 등급
@@ -42,6 +42,7 @@ namespace GGemCo.Scripts.UI.Icon
 
         protected virtual void Awake()
         {
+            imageIcon = GetComponent<Image>();
             dragHandler = gameObject.AddComponent<UIDragHandler>();
             coolTimeHandler = gameObject.AddComponent<UICoolTimeHandler>();
             rectTransform = GetComponent<RectTransform>();
@@ -56,6 +57,17 @@ namespace GGemCo.Scripts.UI.Icon
             {
                 SetIconLock(count <= 0);
             }
+        }
+
+        public void Initialize(UIWindow pwindow, UIWindowManager.WindowUid pwindowUid, int pindex, int pslotIndex, 
+            Vector2 iconSize, Vector2 slotSize)
+        {
+            window = pwindow;
+            windowUid = pwindowUid;
+            index = pindex;
+            slotIndex = pslotIndex;
+            SetCount(0);
+            ChangeIconImageSize(iconSize, slotSize);
         }
 
         public IIcon.Type GetIconType() => type;

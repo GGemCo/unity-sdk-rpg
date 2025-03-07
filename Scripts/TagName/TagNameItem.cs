@@ -7,10 +7,16 @@ namespace GGemCo.Scripts.TagName
 {
     public class TagNameItem : MonoBehaviour
     {
+        [Header("기본오브젝트")]
+        [Tooltip("이름을 표시할 UI Text 오브젝트")]
         public TextMeshProUGUI textName;
         
+        [Header("기본속성")]
+        [Tooltip("폰트 크기")]
         public float fontSize = 24;
+        [Tooltip("폰트 색상")]
         public Color color = Color.white;
+        [Tooltip("네임 태그 위치. 아이템 이미지 가운데를 기준으로 계산하여 입력.")]
         public Vector3 diffTextPosition;
         
         private Item item;

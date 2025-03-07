@@ -1,17 +1,27 @@
+using UnityEditor;
 using UnityEngine;
 
 namespace GGemCo.Scripts.UI.Icon
 {
     public class UISlot : MonoBehaviour
     {
-        public UIWindow window;
-        public UIWindowManager.WindowUid windowUid;
-        public int index;
+        private UIWindow window;
+        private UIWindowManager.WindowUid windowUid;
+        private int index;
 
         private RectTransform rectTransform;
         protected void Awake()
         {
             rectTransform = GetComponent<RectTransform>();
+        }
+
+        public void Initialize(UIWindow pwindow, UIWindowManager.WindowUid pwindowUid, int pindex, Vector2 slotSize)
+        {
+            window = pwindow;
+            windowUid = pwindowUid;
+            index = pindex;
+            
+            ChangeSlotImageSize(slotSize);
         }
         /// <summary>
         /// 슬롯 이미지 사이즈 변경하기
