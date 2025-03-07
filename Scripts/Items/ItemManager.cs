@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
+using GGemCo.Scripts.SystemMessage;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI;
 using GGemCo.Scripts.UI.Window;
+using GGemCo.Scripts.Utils;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
@@ -247,7 +249,13 @@ namespace GGemCo.Scripts.Items
         {
             Item item = dropItem.GetComponent<Item>();
             if (item ==null || item.itemUid <= 0) return;
-            SceneGame.Instance.saveDataManager.Inventory.AddItem(item.itemUid, item.itemCount);
+            var result = SceneGame.Instance.saveDataManager.Inventory.AddItem(item.itemUid, item.itemCount);
+            if (result.Code == ResultCommon.Type.Fail)
+            {
+                GcLogger.LogError(result.Message);
+                SceneGame.Instance.systemMessageManager.ShowMessageWarning(result.Message);
+                return;
+            }
             item.Reset();
             // 인벤토리가 열려있으면 바로 업데이트 해주기 
             var inventory =

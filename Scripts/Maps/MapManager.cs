@@ -56,7 +56,6 @@ namespace GGemCo.Scripts.Maps
             characterVid = 1;
             
             CreateGrid();
-            InitializeCanvasBlockInteraction();
         }
         /// <summary>
         /// 타일맵을 추가할 grid 오브젝트 만들기
@@ -72,14 +71,6 @@ namespace GGemCo.Scripts.Maps
             grid.cellSize = new Vector3(tilemapGridSize.x, tilemapGridSize.y, 0);
             grid.cellLayout = GridLayout.CellLayout.Rectangle;
         }
-        /// <summary>
-        /// 맵 이동시 보여줄 검정 로딩 canvas
-        /// </summary>
-        private void InitializeCanvasBlockInteraction()
-        {
-            GameObject gameObjectCanvasBlockInteraction = GameObject.FindWithTag(ConfigTags.GetValue(ConfigTags.Keys.CanvasBlockInteraction));
-            bgBlackForMapLoading = gameObjectCanvasBlockInteraction.transform.GetChild(0).gameObject;
-        }
         protected void Start()
         {
             sceneGame = SceneGame.Instance;
@@ -87,7 +78,14 @@ namespace GGemCo.Scripts.Maps
             tableLoaderManager = TableLoaderManager.Instance;
             defaultMonsterRegenTimeSec = tableLoaderManager.TableConfig.GetDefaultMonsterRegenTimeSec();
         }
-
+        /// <summary>
+        /// 초기 셋팅
+        /// </summary>
+        /// <param name="pbgBlackForMapLoading"></param>
+        public void Initialize(GameObject pbgBlackForMapLoading)
+        {
+            bgBlackForMapLoading = pbgBlackForMapLoading;
+        }
         protected void Reset()
         {
             isLoadComplete = false;
@@ -265,7 +263,6 @@ namespace GGemCo.Scripts.Maps
         private void DestroyOthers()
         {
             DestroyByTag(ConfigTags.GetValue(ConfigTags.Keys.Map));
-            DestroyByTag(ConfigTags.GetValue(ConfigTags.Keys.ButtonNpcQuest));
         }
 
         /// <summary>

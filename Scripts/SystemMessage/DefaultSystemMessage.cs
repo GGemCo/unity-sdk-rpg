@@ -1,21 +1,28 @@
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 
 namespace GGemCo.Scripts.SystemMessage
 {
-    public class DefaultSystemMessage : MonoBehaviour
+    public class SystemMessage
     {
-        private int mDelay;
-        private int mDuration;
-        private Vector3 mMovePosition;
+        public SystemMessageManager.MessageType Type;
+        public float Duration;
+        public float FadeInTime;
+        public float FadeOutTime;
+        public Color TextColor;
+        public int FontSize;
 
-        private void Awake()
+        public SystemMessage(SystemMessageManager.MessageType type, float duration, float fadeInTime, float fadeOutTime, 
+            Color color, int fontSize)
         {
+            Type = type;
+            Duration = duration;
+            FadeInTime = fadeInTime;
+            FadeOutTime = fadeOutTime;
+            TextColor = color;
+            FontSize = fontSize;
         }
-
-        public void Show(string message, int delay, int duration, Vector3 movePosition)
-        {
-            GcLogger.Log("showNotice " + delay + " / duration : " + duration + " / movePositionY : " + movePosition.y);
-        }
+    }
+    public class DefaultSystemMessage 
+    {
     }
 }

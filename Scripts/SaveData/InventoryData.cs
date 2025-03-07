@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GGemCo.Scripts.Scenes;
+using GGemCo.Scripts.SystemMessage;
 using GGemCo.Scripts.UI;
 using GGemCo.Scripts.UI.Window;
 using GGemCo.Scripts.Utils;
@@ -84,7 +85,7 @@ namespace GGemCo.Scripts.SaveData
         /// </summary>
         /// <param name="itemUid"></param>
         /// <param name="value">추가할 개수</param>
-        public void AddItem(int itemUid, int value)
+        public ResultCommon AddItem(int itemUid, int value)
         {
             if (maxCountIcon <= 0)
             {
@@ -96,8 +97,7 @@ namespace GGemCo.Scripts.SaveData
                     maxCountIcon = uiWindowInventory.maxCountIcon;
                 }
             }
-
-            int emptyIndex = 0;
+            
             var result = itemCounts.Values.FirstOrDefault(item => item.ItemUid == itemUid);
             if (result != null)
             {
@@ -106,6 +106,7 @@ namespace GGemCo.Scripts.SaveData
             }
             else
             {
+                int emptyIndex = -1;
                 for (int index = 0; index < maxCountIcon; index++)
                 {
                     var item = itemCounts.GetValueOrDefault(index);
@@ -115,8 +116,18 @@ namespace GGemCo.Scripts.SaveData
                         break;
                     }
                 }
-                AddItem(emptyIndex, itemUid, value);
+                // 남은 슬롯이 있는지 체크
+                if (emptyIndex == -1)
+                {
+                    return new ResultCommon(ResultCommon.Type.Fail, "인벤토리가 꽉 찾습니다.");
+                }
+                else
+                {
+                    AddItem(emptyIndex, itemUid, value);
+                }
             }
+
+            return new ResultCommon(ResultCommon.Type.Success);
         }
         /// <summary>
         /// 아이템 추가하기

@@ -1,10 +1,10 @@
 ﻿using System.Collections;
-using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Core;
 using GGemCo.Scripts.Items;
 using GGemCo.Scripts.Maps;
 using GGemCo.Scripts.Popup;
 using GGemCo.Scripts.SaveData;
+using GGemCo.Scripts.SystemMessage;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI;
 using UnityEngine;
@@ -26,21 +26,29 @@ namespace GGemCo.Scripts.Scenes
         private bool isStateDirty;
 
         [HideInInspector] public GameObject player;
-        [HideInInspector] public Camera mainCamera;
+        [Header("기본오브젝트")]
+        [Tooltip("메인으로 사용되는 Camera")]
+        public Camera mainCamera;
+        [Tooltip("UI 에 사용되는 메인 Canvas")]
+        public Canvas canvasUI;
+        [Tooltip("드랍 아이템의 이름 text 오브젝트가 들어갈 오브젝트 입니다.")]
+        public GameObject containerDropItemName;
+        [Tooltip("워프로 맵 이동시 화면을 가려줄 검정화면")]
+        public GameObject bgBlackForMapLoading;
         
+        [Header("매니저")]
+        [Tooltip("윈도우 매니저")]
+        public UIWindowManager uIWindowManager;
+        [Tooltip("시스템 메시지 매니저")]
+        public SystemMessageManager systemMessageManager;
+        [Tooltip("카메라 매니저")]
+        public CameraManager cameraManager;
         [HideInInspector] public SaveDataManager saveDataManager;
         [HideInInspector] public CalculateManager calculateManager;
-        [HideInInspector] public CameraManager cameraManager;
-        [HideInInspector] public UIWindowManager uIWindowManager;
         [HideInInspector] public MapManager mapManager;
         [HideInInspector] public PopupManager popupManager;
         [HideInInspector] public DamageTextManager damageTextManager;
         [HideInInspector] public ItemManager itemManager;
-
-        [Tooltip("드랍 아이템의 이름 text 오브젝트가 들어갈 오브젝트 입니다.")]
-        public GameObject containerDropItemName;
-
-        private Canvas canvasUI;
 
         private void Awake()
         {
@@ -62,18 +70,9 @@ namespace GGemCo.Scripts.Scenes
             }
             
             InitializeManagers();
-            CacheReferences();
 
             isStateDirty = false;
             SetState(GameState.Begin);
-        }
-
-        private void CacheReferences()
-        {
-            mainCamera = GameObject.FindWithTag(ConfigTags.GetValue(ConfigTags.Keys.MainCamera))?.GetComponent<Camera>();
-            canvasUI = GameObject.FindWithTag(ConfigTags.GetValue(ConfigTags.Keys.CanvasUI))?.GetComponent<Canvas>();
-            cameraManager = GameObject.FindWithTag(ConfigTags.GetValue(ConfigTags.Keys.MainCamera))?.GetComponent<CameraManager>();
-            uIWindowManager = GameObject.FindWithTag(ConfigTags.GetValue(ConfigTags.Keys.WindowManager))?.GetComponent<UIWindowManager>();
         }
 
         private void InitializeManagers()
@@ -100,6 +99,7 @@ namespace GGemCo.Scripts.Scenes
         private void Start()
         {
             if (TableLoaderManager.Instance == null) return;
+            mapManager.Initialize(bgBlackForMapLoading);
             mapManager.LoadMap(TableLoaderManager.Instance.TableConfig.GetStartMapUid());
             StartCoroutine(UpdateStateRoutine());
         }
