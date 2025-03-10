@@ -93,6 +93,11 @@ namespace GGemCo.Scripts.SaveData
             
             // 로드한 세이브 데이터 가져오기 
             SaveDataContainer saveDataContainer = SaveDataLoader.Instance.GetSaveDataContainer();
+            // 데이터가 없으면 강제로 한번 저장하기 
+            if (saveDataContainer == null)
+            {
+                SaveData();
+            }
 
             // 초기화 실행
             Player.Initialize(tableLoaderManager, saveDataContainer);
