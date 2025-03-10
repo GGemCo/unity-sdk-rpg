@@ -2,12 +2,18 @@
 
 namespace GGemCo.Scripts.TableLoader
 {
+    /// <summary>
+    /// 속성 테이블 Structure
+    /// </summary>
     public class StruckTableAttribute
     {
         public int Uid;
         public string Id;
         public string Name;
     }
+    /// <summary>
+    /// 속성 테이블
+    /// </summary>
     public class TableAttribute : DefaultTable
     {
         public StruckTableAttribute GetDataByUid(int uid)

@@ -3,6 +3,9 @@ using GGemCo.Scripts.Items;
 
 namespace GGemCo.Scripts.TableLoader
 {
+    /// <summary>
+    /// 드랍 아이템 그룹 Structure
+    /// </summary>
     public class StruckTableItemDropGroup
     {
         public int Uid;
@@ -11,6 +14,9 @@ namespace GGemCo.Scripts.TableLoader
         public string Value;
         public int Rate;
     }
+    /// <summary>
+    /// 드랍 아이템 그룹 테이블
+    /// </summary>
     public class TableItemDropGroup : DefaultTable
     {
         private static readonly Dictionary<string, ItemManager.ItemDropGroup> MapType;

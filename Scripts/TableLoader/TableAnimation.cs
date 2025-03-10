@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace GGemCo.Scripts.TableLoader
 {
+    /// <summary>
+    /// 애니메이션 테이블 Structure
+    /// </summary>
     public class StruckTableAnimation
     {
         public int Uid;
@@ -12,6 +15,9 @@ namespace GGemCo.Scripts.TableLoader
         public float MoveStep;
         public Vector2 ColliderSize;
     }
+    /// <summary>
+    /// 애니메이션 테이블
+    /// </summary>
     public class TableAnimation : DefaultTable
     {
         public string GetPrefabPath(int uid) => GetDataColumn(uid, "PrefabPath");

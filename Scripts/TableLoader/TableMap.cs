@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace GGemCo.Scripts.TableLoader
 {
+    /// <summary>
+    /// 맵 테이블 Structure
+    /// </summary>
     public class StruckTableMap
     {
         public int Uid;
@@ -15,6 +18,9 @@ namespace GGemCo.Scripts.TableLoader
         public Vector2 PlayerSpawnPosition;
         public int BgmUid;
     }
+    /// <summary>
+    /// 맵 테이블
+    /// </summary>
     public class TableMap : DefaultTable
     {
         private static readonly Dictionary<string, MapConstants.Type> MapType;

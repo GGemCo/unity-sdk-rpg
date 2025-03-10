@@ -2,12 +2,18 @@
 
 namespace GGemCo.Scripts.TableLoader
 {
+    /// <summary>
+    /// Window 테이블 Structure
+    /// </summary>
     public class StruckTableWindow
     {
         public int Uid;
         public string Name;
         public bool DefaultActive;
     }
+    /// <summary>
+    /// Window 테이블
+    /// </summary>
     public class TableWindow : DefaultTable
     {
         public StruckTableWindow GetDataByUid(int uid)

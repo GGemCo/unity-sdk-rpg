@@ -2,6 +2,9 @@
 
 namespace GGemCo.Scripts.TableLoader
 {
+    /// <summary>
+    /// 경험치 테이블 
+    /// </summary>
     public class TableExp : DefaultTable
     {
         public long GetNeedExp(int level) => long.TryParse(GetDataColumn(level, "NeedExp"), out var v) ? v : 0;

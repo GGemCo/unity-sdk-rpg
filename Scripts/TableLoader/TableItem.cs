@@ -5,6 +5,9 @@ using GGemCo.Scripts.Utils;
 
 namespace GGemCo.Scripts.TableLoader
 {
+    /// <summary>
+    /// 아이템 테이블 Structure
+    /// </summary>
     public class StruckTableItem
     {
         public int Uid;
@@ -17,6 +20,9 @@ namespace GGemCo.Scripts.TableLoader
         public AttributesConstants.Type OptionType1;
         public float OptionValue1;
     }
+    /// <summary>
+    /// 아이템 테이블
+    /// </summary>
     public class TableItem : DefaultTable
     {
         private static readonly Dictionary<string, ItemConstants.Type> MapType;

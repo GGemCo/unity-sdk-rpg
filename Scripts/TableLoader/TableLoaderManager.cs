@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace GGemCo.Scripts.TableLoader
 {
+    /// <summary>
+    /// 데이터 테이블 Loader
+    /// </summary>
     public class TableLoaderManager : MonoBehaviour
     {
         public static TableLoaderManager Instance;

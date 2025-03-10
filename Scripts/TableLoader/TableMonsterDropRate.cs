@@ -4,6 +4,9 @@ using GGemCo.Scripts.Utils;
 
 namespace GGemCo.Scripts.TableLoader
 {
+    /// <summary>
+    /// 아이템 드랍 확률 테이블 Structure
+    /// </summary>
     public class StruckTableMonsterDropRate
     {
         public int Uid;
@@ -13,6 +16,9 @@ namespace GGemCo.Scripts.TableLoader
         public int Value;
         public int Rate;
     }
+    /// <summary>
+    /// 아이템 드랍 확률 테이블
+    /// </summary>
     public class TableMonsterDropRate : DefaultTable
     {
         private static readonly Dictionary<string, ItemManager.MonsterDropRateType> MapType;

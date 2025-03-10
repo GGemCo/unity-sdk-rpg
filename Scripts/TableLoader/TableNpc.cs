@@ -4,6 +4,9 @@ using GGemCo.Scripts.Utils;
 
 namespace GGemCo.Scripts.TableLoader
 {
+    /// <summary>
+    /// Npc 테이블 Structure
+    /// </summary>
     public class StruckTableNpc
     {
         public int Uid;
@@ -14,6 +17,9 @@ namespace GGemCo.Scripts.TableLoader
         public ICharacter.Grade Grade;
         public float StatMoveSpeed;
     }
+    /// <summary>
+    /// Npc 테이블
+    /// </summary>
     public class TableNpc : DefaultTable
     {
         private static readonly Dictionary<string, ICharacter.Grade> MapGrade;

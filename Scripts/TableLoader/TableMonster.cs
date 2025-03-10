@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace GGemCo.Scripts.TableLoader
 {
+    /// <summary>
+    /// 몬스터 테이블 Structure
+    /// </summary>
     public class StruckTableMonster
     {
         public int Uid;
@@ -20,6 +23,9 @@ namespace GGemCo.Scripts.TableLoader
         public long RewardExp;
         public long RewardGold;
     }
+    /// <summary>
+    /// 몬스터 테이블
+    /// </summary>
     public class TableMonster : DefaultTable
     {
         private static readonly Dictionary<string, ICharacter.Grade> MapGrade;
