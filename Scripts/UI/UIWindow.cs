@@ -65,8 +65,8 @@ namespace GGemCo.Scripts.UI
         {
             if (AddressableSettingsLoader.Instance == null || containerIcon == null) return;
             if (amount <= 0) return;
-            GameObject iconItem = AddressableSettingsLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconItem);
-            GameObject slot = AddressableSettingsLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabSlot);
+            GameObject iconItem = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconItem);
+            GameObject slot = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabSlot);
             if (iconItem == null) return;
             for (int i = 0; i < amount; i++)
             {
@@ -86,7 +86,10 @@ namespace GGemCo.Scripts.UI
         }
         protected virtual void Start()
         {
-            inventoryData = SceneGame.Instance.saveDataManager.Inventory;
+            if (SceneGame.Instance != null && SceneGame.Instance.saveDataManager != null)
+            {
+                inventoryData = SceneGame.Instance.saveDataManager.Inventory;
+            }
         }
         /// <summary>
         /// index 로 아이콘 가져오기

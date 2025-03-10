@@ -1,4 +1,5 @@
-﻿using GGemCo.Scripts.Scenes;
+﻿using GGemCo.Scripts.SaveData;
+using GGemCo.Scripts.Scenes;
 using R3;
 using TMPro;
 using UnityEngine;
@@ -11,7 +12,7 @@ namespace GGemCo.Scripts.UI.UIText
     public class UITextPlayerLevel : MonoBehaviour
     {
         private TextMeshProUGUI levelText;
-        private readonly CompositeDisposable disposables = new CompositeDisposable();
+        private PlayerData playerData;
 
         private void Awake()
         {
@@ -20,16 +21,15 @@ namespace GGemCo.Scripts.UI.UIText
 
         private void Start()
         {
-            SceneGame.Instance.saveDataManager.Player.CurrentLevel
-                .Subscribe(newLevel =>
-                {
-                    levelText.text = $"Lv. {newLevel}";
-                })
-                .AddTo(disposables);
+            playerData = SceneGame.Instance.saveDataManager.Player;
+            playerData.OnCurrentLevelChanged()
+                .Subscribe(UpdateText) // 값이 변경될 때마다 UI 업데이트
+                .AddTo(this);
         }
-        private void OnDestroy()
+
+        private void UpdateText(int newLevel)
         {
-            disposables.Dispose();
+            levelText.text = $"Lv. {newLevel}";
         }
     }
 }

@@ -25,30 +25,40 @@ namespace GGemCo.Scripts.TableLoader
                 { "Nothing", ItemManager.MonsterDropRateType.Nothing },
             };
         }
-        private static ItemManager.MonsterDropRateType ConvertType(string type) => MapType.GetValueOrDefault(type, ItemManager.MonsterDropRateType.None);
+        private static ItemManager.MonsterDropRateType ConvertType(string type) =>
+            MapType.GetValueOrDefault(type, ItemManager.MonsterDropRateType.None);
 
-        public readonly Dictionary<int, List<StruckTableMonsterDropRate>> MonsterDropDictionary = new Dictionary<int, List<StruckTableMonsterDropRate>>();
+        private readonly Dictionary<int, List<StruckTableMonsterDropRate>> monsterDropDictionary =
+            new Dictionary<int, List<StruckTableMonsterDropRate>>();
+
         protected override void OnLoadedData(Dictionary<string, string> data)
         {
             int uid = int.Parse(data["Uid"]);
             int monsterUid = int.Parse(data["MonsterUid"]);
 
-            if (!MonsterDropDictionary.ContainsKey(monsterUid))
+            if (!monsterDropDictionary.ContainsKey(monsterUid))
             {
-                MonsterDropDictionary[monsterUid] = new List<StruckTableMonsterDropRate>();
+                monsterDropDictionary[monsterUid] = new List<StruckTableMonsterDropRate>();
             }
 
             StruckTableMonsterDropRate struckTableMonsterDropRate = GetDataByUid(uid);
-            MonsterDropDictionary[monsterUid].Add(struckTableMonsterDropRate);
+            monsterDropDictionary[monsterUid].Add(struckTableMonsterDropRate);
         }
-        public StruckTableMonsterDropRate GetDataByUid(int uid)
+
+        public Dictionary<int, List<StruckTableMonsterDropRate>> GetMonsterDropDictionary()
+        {
+            return monsterDropDictionary;
+        }
+
+        private StruckTableMonsterDropRate GetDataByUid(int uid)
         {
             if (uid <= 0)
             {
                 GcLogger.LogError("uid is 0.");
-                return new StruckTableMonsterDropRate();
+                return null;
             }
             var data = GetData(uid);
+            if (data == null) return null;
             return new StruckTableMonsterDropRate
             {
                 Uid = int.Parse(data["Uid"]),

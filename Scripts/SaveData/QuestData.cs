@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.Utils;
 
 namespace GGemCo.Scripts.SaveData
@@ -7,7 +8,7 @@ namespace GGemCo.Scripts.SaveData
     {
         private Dictionary<int, bool> completedQuests = new Dictionary<int, bool>();
 
-        public void Initialize()
+        public void Initialize(TableLoaderManager loader, SaveDataContainer saveDataContainer = null)
         {
             completedQuests.Clear();
         }

@@ -2,7 +2,13 @@
 {
     public static class SaveDataConstants
     {
-        public const string PlayerPrefsKeyLevel = "Level";
-        public const string PlayerPrefsKeyExp = "Exp";
+        public enum Type
+        {
+            None,
+            Player,
+            Item,
+            Quest,
+            Skill,
+        }
     }
 }

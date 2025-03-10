@@ -25,7 +25,7 @@ namespace GGemCo.Scripts.UI
         private void Awake()
         {
             if (AddressableSettingsLoader.Instance == null) return;
-            prefabIconItem = AddressableSettingsLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconItem);
+            prefabIconItem = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconItem);
         }
         private void Start()
         {

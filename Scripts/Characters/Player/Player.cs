@@ -1,6 +1,8 @@
+using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Maps.Objects;
 using GGemCo.Scripts.Scenes;
+using GGemCo.Scripts.ScriptableSettings;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
@@ -61,12 +63,12 @@ namespace GGemCo.Scripts.Characters.Player
         {
             if (TableLoaderManager.Instance != null)
             {
-                StatAtk = TableLoaderManager.Instance.TableConfig.GetPolyPlayerStatAtk();
+                StatAtk = AddressableSettingsLoader.Instance.playerSettings.statAtk;
                 CurrentAtk = StatAtk;
-                StatHp = TableLoaderManager.Instance.TableConfig.GetPolyPlayerStatHp();
+                StatHp = AddressableSettingsLoader.Instance.playerSettings.statHp;
                 CurrentHp = StatHp;
-                StatMoveStep = TableLoaderManager.Instance.TableConfig.GetPolyPlayerStatMoveStep();
-                StatMoveSpeed = TableLoaderManager.Instance.TableConfig.GetPolyPlayerStatMoveSpeed();
+                StatMoveStep = AddressableSettingsLoader.Instance.playerSettings.statMoveStep;
+                StatMoveSpeed = AddressableSettingsLoader.Instance.playerSettings.statMoveSpeed;
                 CurrentMoveSpeed = StatMoveSpeed;
                 CurrentMoveStep = StatMoveStep;
                 OriginalScaleX = transform.localScale.x;

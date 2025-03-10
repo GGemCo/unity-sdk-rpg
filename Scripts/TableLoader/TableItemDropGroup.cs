@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using GGemCo.Scripts.Items;
-using GGemCo.Scripts.Utils;
 
 namespace GGemCo.Scripts.TableLoader
 {
@@ -29,14 +28,14 @@ namespace GGemCo.Scripts.TableLoader
         }
         private static ItemManager.ItemDropGroup ConvertType(string type) => MapType.GetValueOrDefault(type, ItemManager.ItemDropGroup.None);
 
-        public readonly Dictionary<int, List<StruckTableItemDropGroup>> DropGroupDictionary = new Dictionary<int, List<StruckTableItemDropGroup>>();
+        private readonly Dictionary<int, List<StruckTableItemDropGroup>> dropGroupDictionary = new Dictionary<int, List<StruckTableItemDropGroup>>();
         protected override void OnLoadedData(Dictionary<string, string> data)
         {
             int uid = int.Parse(data["Uid"]);
 
-            if (!DropGroupDictionary.ContainsKey(uid))
+            if (!dropGroupDictionary.ContainsKey(uid))
             {
-                DropGroupDictionary[uid] = new List<StruckTableItemDropGroup>();
+                dropGroupDictionary[uid] = new List<StruckTableItemDropGroup>();
             }
             StruckTableItemDropGroup struckTableItemDropGroup = new StruckTableItemDropGroup
             {
@@ -46,7 +45,12 @@ namespace GGemCo.Scripts.TableLoader
                 Value = data["Value"],
                 Rate = int.Parse(data["Rate"]),
             };
-            DropGroupDictionary[uid].Add(struckTableItemDropGroup);
+            dropGroupDictionary[uid].Add(struckTableItemDropGroup);
+        }
+
+        public Dictionary<int, List<StruckTableItemDropGroup>> GetDropGroups()
+        {
+            return dropGroupDictionary;
         }
     }
 }

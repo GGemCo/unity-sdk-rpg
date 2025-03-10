@@ -1,122 +1,154 @@
-﻿using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
+﻿using GGemCo.Scripts.Addressable;
+using GGemCo.Scripts.Scenes;
+using GGemCo.Scripts.TableLoader;
 using R3;
+using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 
 namespace GGemCo.Scripts.SaveData
 {
     public class PlayerData : DefaultData, ISaveData
     {
-        private readonly int maxPlayerLevel;
+        private int maxPlayerLevel;
+        private TableLoaderManager tableLoaderManager;
+        private readonly CompositeDisposable disposables = new CompositeDisposable();
         
-        public readonly BehaviorSubject<int> CurrentChapter = new BehaviorSubject<int>(1);
-        public readonly BehaviorSubject<int> CurrentLevel = new BehaviorSubject<int>(1);
-        public readonly BehaviorSubject<long> CurrentExp = new BehaviorSubject<long>(0);
-        public readonly BehaviorSubject<long> CurrentNeedExp = new BehaviorSubject<long>(0);
+        private readonly BehaviorSubject<int> currentChapter = new(1);
+        private readonly BehaviorSubject<int> currentLevel = new(1);
+        private readonly BehaviorSubject<long> currentExp = new(0);
+        private readonly BehaviorSubject<long> currentNeedExp = new(0);
+        
+        public int CurrentChapter
+        {
+            get => currentChapter.Value;
+            set => currentChapter.OnNext(value);
+        }
 
-        private readonly TableLoaderManager tableLoaderManager;
+        public int CurrentLevel
+        {
+            get => currentLevel.Value;
+            set => currentLevel.OnNext(value);
+        }
+
+        public long CurrentExp
+        {
+            get => currentExp.Value;
+            set => currentExp.OnNext(value);
+        }
+        // json 에 포함되지 않도록 함수화 
+        public Observable<int> OnCurrentLevelChanged()
+        {
+            return currentLevel.DistinctUntilChanged();
+        }
+
+        public Observable<int> OnCurrentChapterChanged()
+        {
+            return currentChapter.DistinctUntilChanged();
+        }
+
+        public Observable<long> OnCurrentExpChanged()
+        {
+            return currentExp.DistinctUntilChanged();
+        }
+
+        public Observable<long> OnCurrentNeedExpChanged()
+        {
+            return currentNeedExp.DistinctUntilChanged();
+        }
+
+        [JsonIgnore] public long CurrentNeedExp => currentNeedExp.Value;
+
         private TableMonster tableMonster;
         private TableExp tableExp;
 
-        public const string PlayerPrefsKeyLevel = "GGemCo_PlayerPrefs_Player_Level";
-        public const string PlayerPrefsKeyExp = "GGemCo_PlayerPrefs_Player_Exp";
-        public PlayerData(TableLoaderManager loader)
+        /// <summary>
+        /// 초기화 (저장된 데이터를 불러오거나 새로운 데이터 생성)
+        /// </summary>
+        public void Initialize(TableLoaderManager loader, SaveDataContainer saveDataContainer = null)
         {
             tableLoaderManager = loader;
-            maxPlayerLevel = tableLoaderManager.TableConfig.GetMaxLevel();
-        }
+            maxPlayerLevel = AddressableSettingsLoader.Instance.playerSettings.maxLevel;
+            // 최대 레벨이 없을때는 경험치 테이블에서 가져온다
+            if (maxPlayerLevel <= 0)
+            {
+                maxPlayerLevel = loader.TableExp.GetLastLevel();
+            }
 
-        public void Initialize()
-        {
             tableMonster = tableLoaderManager.TableMonster;
             tableExp = tableLoaderManager.TableExp;
-            
-            LoadLevel();
-            LoadExp();
+
+            // 저장된 데이터가 있을 경우 불러오기
+            LoadPlayerData(saveDataContainer);
+
+            // 저장 이벤트 구독
+            InitializeSubscriptions();
         }
+
         /// <summary>
-        /// 저장된 레벨 가져오기, 레벨업 필요한 경험치 설정
+        /// 변경 감지를 통해 자동으로 저장
         /// </summary>
-        private void LoadLevel()
+        private void InitializeSubscriptions()
         {
-            int level = PlayerPrefsLoadInt(PlayerPrefsKeyLevel, "1");
-            SetLevel(level);
-            SetNeedExp(tableExp.GetNeedExp(level + 1));
+            currentLevel.DistinctUntilChanged()
+                .CombineLatest(currentChapter, currentExp, (_, _, _) => Unit.Default)
+                .Subscribe(_ => SavePlayerData())
+                .AddTo(disposables);
         }
+
         /// <summary>
-        /// 저장된 경험치 가져오기
+        /// 데이터 저장
         /// </summary>
-        private void LoadExp()
+        private void SavePlayerData()
         {
-            SetExp(PlayerPrefsLoadInt(PlayerPrefsKeyExp));
+            SceneGame.Instance.saveDataManager.StartSaveData();
+        }
+
+        /// <summary>
+        /// 저장된 데이터를 불러와서 적용
+        /// </summary>
+        private void LoadPlayerData(SaveDataContainer saveDataContainer)
+        {
+            if (saveDataContainer != null)
+            {
+                CurrentChapter = saveDataContainer.PlayerData.CurrentChapter;
+                CurrentLevel = saveDataContainer.PlayerData.CurrentLevel;
+                CurrentExp = saveDataContainer.PlayerData.CurrentExp;
+            }
+
+            // 필요 경험치 업데이트
+            UpdateRequiredExp(tableExp.GetNeedExp(CurrentLevel + 1));
         }
         /// <summary>
-        /// 경험치 추가하기
+        /// 몬스터 처치 시 경험치 추가
         /// </summary>
         /// <param name="monsterVid"></param>
         /// <param name="monsterUid"></param>
         /// <param name="monsterObject"></param>
         public void AddExp(int monsterVid, int monsterUid, GameObject monsterObject)
         {
-            var info = tableMonster.GetDataByUid(monsterUid);
-            if (info == null) return;
+            var monsterData = tableMonster.GetDataByUid(monsterUid);
+            if (monsterData == null) return;
 
-            long newExp = CurrentExp.Value + info.RewardExp;
-            int nextLevel = CurrentLevel.Value + 1;
-
-            if (nextLevel > maxPlayerLevel)
+            long newExp = CurrentExp + monsterData.RewardExp;
+            int nextLevel = CurrentLevel;
+            while (nextLevel < maxPlayerLevel && newExp >= tableExp.GetNeedExp(nextLevel + 1))
             {
-                GcLogger.Log("현재 최대 레벨입니다. maxPlayerLevel :" + maxPlayerLevel);
-                return;
+                newExp -= tableExp.GetNeedExp(nextLevel + 1);
+                nextLevel++;
             }
 
-            long needExp = tableExp.GetNeedExp(nextLevel);
-            while (newExp >= needExp && needExp > 0)
-            {
-                newExp -= needExp;
-                int level = SetLevel(CurrentLevel.Value + 1);
-                SetExp(0);
-
-                if (level >= maxPlayerLevel)
-                {
-                    GcLogger.LogError("현재 최대 레벨입니다. maxPlayerLevel :" + maxPlayerLevel);
-                    SetNeedExp(0);
-                    break;
-                }
-
-                needExp = tableExp.GetNeedExp(level + 1);
-                SetNeedExp(needExp);
-            }
-
-            SetExp(newExp);
+            // 최종 값 업데이트
+            CurrentLevel = Mathf.Min(nextLevel, maxPlayerLevel);
+            CurrentExp = nextLevel < maxPlayerLevel ? newExp : 0;
+            UpdateRequiredExp(nextLevel < maxPlayerLevel ? tableExp.GetNeedExp(nextLevel + 1) : 0);
         }
+
         /// <summary>
-        /// 경험치 셋팅
+        /// 필요 경험치 업데이트
         /// </summary>
-        /// <param name="value"></param>
-        private void SetExp(long value)
+        private void UpdateRequiredExp(long value)
         {
-            CurrentExp.OnNext(value);
-            PlayerPrefsSave(PlayerPrefsKeyExp, value.ToString());
-        }
-        /// <summary>
-        /// 레벨 셋팅
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        private int SetLevel(int value)
-        {
-            CurrentLevel.OnNext(value);
-            PlayerPrefsSave(PlayerPrefsKeyLevel, value.ToString());
-            return CurrentLevel.Value;
-        }
-        /// <summary>
-        /// 필요한 경험치 셋팅
-        /// </summary>
-        /// <param name="value"></param>
-        private void SetNeedExp(long value)
-        {
-            CurrentNeedExp.OnNext(value);
+            currentNeedExp.OnNext(value);
         }
     }
 }

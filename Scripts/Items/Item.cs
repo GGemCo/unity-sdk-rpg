@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
@@ -61,7 +62,7 @@ namespace GGemCo.Scripts.Items
             circleCollider2D = GetComponent<CircleCollider2D>();
             circleCollider2D.enabled = false;
             
-            dropItemDestroyTimeSec = TableLoaderManager.Instance.TableConfig.GetDropItemDestroyTimeSec();
+            dropItemDestroyTimeSec = AddressableSettingsLoader.Instance.settings.dropItemDestroyTimeSec;
         }
 
         private void Start()

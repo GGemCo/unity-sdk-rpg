@@ -22,8 +22,8 @@ namespace GGemCo.Scripts.UI.UIText
         private void Start()
         {
             playerData = SceneGame.Instance.saveDataManager.Player;
-            playerData.CurrentExp
-                .Merge(playerData.CurrentNeedExp) // 두 개의 Observable을 합침
+            playerData.OnCurrentExpChanged()
+                .Merge(playerData.OnCurrentNeedExpChanged()) // 두 개의 Observable을 합침
                 .Subscribe(_ => UpdateExpText()) // 값이 변경될 때마다 UI 업데이트
                 .AddTo(this);
         }
@@ -33,7 +33,7 @@ namespace GGemCo.Scripts.UI.UIText
         /// </summary>
         private void UpdateExpText()
         {
-            textExp.text = $"{playerData.CurrentExp.Value}/{playerData.CurrentNeedExp.Value}";
+            textExp.text = $"{playerData.CurrentExp}/{playerData.CurrentNeedExp}";
         }
     }
 }

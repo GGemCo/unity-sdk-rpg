@@ -1,3 +1,4 @@
+using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Characters.Monster.Behavior;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
@@ -44,7 +45,7 @@ namespace GGemCo.Scripts.Characters.Monster
             PossibleAttack = true;
 
             attackType = AttackType.PassiveDefense;
-            delayDestroy = TableLoaderManager.Instance.TableConfig.GetDelayDestroyMonster();
+            delayDestroy = AddressableSettingsLoader.Instance.settings.delayDestroyMonster;
             
 #if GGEMCO_USE_SPINE
             DefaultCharacterBehavior = gameObject.AddComponent<BehaviorPassiveDefense>();

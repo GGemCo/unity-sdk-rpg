@@ -11,7 +11,6 @@ namespace GGemCo.Scripts.TableLoader
 
         private string[] dataFiles;
         
-        public TableConfig TableConfig { get; private set; } = new TableConfig();
         public TableNpc TableNpc { get; private set; } = new TableNpc();
         public TableMap TableMap { get; private set; } = new TableMap();
         public TableMonster TableMonster { get; private set; } = new TableMonster();
@@ -56,9 +55,6 @@ namespace GGemCo.Scripts.TableLoader
                     {
                         switch (fileName)
                         {
-                            case ConfigTableFileName.Config:
-                                TableConfig.LoadData(content);
-                                break;
                             case ConfigTableFileName.Animation:
                                 TableAnimation.LoadData(content);
                                 break;

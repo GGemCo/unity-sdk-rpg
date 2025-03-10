@@ -43,10 +43,10 @@ namespace GGemCo.Editor.GGemCoTool.Test
             TableItemDropGroup tableItemDropGroup = TableLoaderManager.LoadItemDropGroupTable();
             TableMonsterDropRate tableMonsterDropRate = TableLoaderManager.LoadMonsterDropRateTable();
             
-            dictionaryByCategory = tableItem.DictionaryByCategory;
-            dictionaryBySubCategory = tableItem.DictionaryBySubCategory;
-            dropGroupDictionary = tableItemDropGroup.DropGroupDictionary;
-            monsterDropDictionary = tableMonsterDropRate.MonsterDropDictionary;
+            dictionaryByCategory = tableItem.GetDictionaryByCategory();
+            dictionaryBySubCategory = tableItem.GetDictionaryBySubCategory();
+            dropGroupDictionary = tableItemDropGroup.GetDropGroups();
+            monsterDropDictionary = tableMonsterDropRate.GetMonsterDropDictionary();
 
             LoadMonsterInfoData();
         }

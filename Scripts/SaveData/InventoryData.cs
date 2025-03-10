@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.SystemMessage;
+using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI;
 using GGemCo.Scripts.UI.Window;
-using GGemCo.Scripts.Utils;
-using Unity.Plastic.Newtonsoft.Json;
 
 namespace GGemCo.Scripts.SaveData
 {
@@ -15,45 +13,37 @@ namespace GGemCo.Scripts.SaveData
     /// </summary>
     public class InventoryData : DefaultData, ISaveData
     {
-        private Dictionary<int, StructInventoryIcon> itemCounts = new Dictionary<int, StructInventoryIcon>();
-        public const string PlayerPrefsKeyInventoryItemCount = "GGemCo_PlayerPrefs_Inventory_Item_Count";
+        public Dictionary<int, StructInventoryIcon> ItemCounts = new Dictionary<int, StructInventoryIcon>();
         private int maxCountIcon;
         
         /// <summary>
         /// 초기화. Awake 에서 호출 중
         /// </summary>
-        public void Initialize()
+        public void Initialize(TableLoaderManager loader, SaveDataContainer saveDataContainer = null)
         {
-            itemCounts.Clear();
-            LoadItemCount();
+            ItemCounts.Clear();
+            LoadItemCount(saveDataContainer);
         }
 
-        private void LoadItemCount()
+        private void LoadItemCount(SaveDataContainer saveDataContainer)
         {
-            string itemCountJson = PlayerPrefsLoad(PlayerPrefsKeyInventoryItemCount);
-            
-            // JSON 파일을 읽기
-            try
+            if (saveDataContainer == null) return;
+            ItemCounts.Clear();
+            foreach (var info in saveDataContainer.InventoryData.ItemCounts)
             {
-                if (string.IsNullOrEmpty(itemCountJson)) return;
-                itemCounts = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<int, StructInventoryIcon>>(itemCountJson);
-            }
-            catch (Exception ex)
-            {
-                GcLogger.LogError($"Error reading : {ex.Message}");
+                ItemCounts.TryAdd(info.Key, info.Value);
             }
         }
 
         private void SaveItemCounts()
         {
-            if (itemCounts == null) return;
-            string json = JsonConvert.SerializeObject(itemCounts);
-            PlayerPrefsSave(PlayerPrefsKeyInventoryItemCount, json);
+            if (ItemCounts == null) return;
+            SceneGame.Instance.saveDataManager.StartSaveData();
         }
 
         public void RemoveItemCount(int slotIndex)
         {
-            var item = itemCounts.GetValueOrDefault(slotIndex);
+            var item = ItemCounts.GetValueOrDefault(slotIndex);
             if (item == null) return;
             item.ItemUid = 0;
             item.ItemCount = 0;
@@ -68,7 +58,7 @@ namespace GGemCo.Scripts.SaveData
         /// <param name="value">셋팅할 개수</param>
         public void SetItemCount(int slotIndex, int itemUid, int value)
         {
-            var item = itemCounts.GetValueOrDefault(slotIndex);
+            var item = ItemCounts.GetValueOrDefault(slotIndex);
             if (item == null)
             {
                 AddItem(slotIndex, itemUid, value);
@@ -98,7 +88,7 @@ namespace GGemCo.Scripts.SaveData
                 }
             }
             
-            var result = itemCounts.Values.FirstOrDefault(item => item.ItemUid == itemUid);
+            var result = ItemCounts.Values.FirstOrDefault(item => item.ItemUid == itemUid);
             if (result != null)
             {
                 result.ItemCount += value;
@@ -109,7 +99,7 @@ namespace GGemCo.Scripts.SaveData
                 int emptyIndex = -1;
                 for (int index = 0; index < maxCountIcon; index++)
                 {
-                    var item = itemCounts.GetValueOrDefault(index);
+                    var item = ItemCounts.GetValueOrDefault(index);
                     if (item == null || item.ItemCount <= 0)
                     {
                         emptyIndex = index;
@@ -139,9 +129,9 @@ namespace GGemCo.Scripts.SaveData
         private void AddItem(int index, int itemUid, int value)
         {
             if (itemUid <= 0) return;
-            if (!itemCounts.TryGetValue(index, out var icon))
+            if (!ItemCounts.TryGetValue(index, out var icon))
             {
-                itemCounts.TryAdd(index, new StructInventoryIcon(itemUid, value));
+                ItemCounts.TryAdd(index, new StructInventoryIcon(itemUid, value));
             }
             else
             {
@@ -154,12 +144,12 @@ namespace GGemCo.Scripts.SaveData
 
         public int GetItemCount(int index, int itemUid)
         {
-            return itemCounts[index].ItemCount;
+            return ItemCounts[index].ItemCount;
         }
         public int GetItemCount(int itemUid)
         {
             int count = 0;
-            foreach (var info in itemCounts)
+            foreach (var info in ItemCounts)
             {
                 if (info.Value.ItemUid == itemUid)
                 {
@@ -171,7 +161,7 @@ namespace GGemCo.Scripts.SaveData
 
         public Dictionary<int, StructInventoryIcon> GetAllItemCounts()
         {
-            return itemCounts;
+            return ItemCounts;
         }
     }
 }

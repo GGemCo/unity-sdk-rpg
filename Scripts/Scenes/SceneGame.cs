@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Core;
 using GGemCo.Scripts.Items;
 using GGemCo.Scripts.Maps;
@@ -7,6 +8,7 @@ using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.SystemMessage;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI;
+using GGemCo.Scripts.Utils;
 using UnityEngine;
 
 namespace GGemCo.Scripts.Scenes
@@ -100,7 +102,20 @@ namespace GGemCo.Scripts.Scenes
         {
             if (TableLoaderManager.Instance == null) return;
             mapManager.Initialize(bgBlackForMapLoading);
-            mapManager.LoadMap(TableLoaderManager.Instance.TableConfig.GetStartMapUid());
+            int startMapUid = AddressableSettingsLoader.Instance.mapSettings.startMapUid;
+            if (startMapUid <= 0)
+            {
+                GcLogger.LogError("시작 맵 고유번호가 잘 못 되었습니다. GGemCoMapSettins 에 startMapUid 를 입력해주세요.");
+                return;
+            }
+
+            var info = TableLoaderManager.Instance.TableMap.GetDataByUid(startMapUid);
+            if (info == null)
+            {
+                GcLogger.LogError("맵 테이블에 없는 고유번호 입니다. GGemCoMapSettins 에 startMapUid 를 확인해주세요.");
+                return;
+            }
+            mapManager.LoadMap(startMapUid);
             StartCoroutine(UpdateStateRoutine());
         }
 

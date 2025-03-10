@@ -63,8 +63,8 @@ namespace GGemCo.Scripts.TableLoader
         private static ItemConstants.Class ConvertClass(string type) => MapClass.GetValueOrDefault(type, ItemConstants.Class.None);
         private static AttributesConstants.Type ConvertAttributesType(string type) => MapAttributesType.GetValueOrDefault(type, AttributesConstants.Type.None);
         
-        public readonly Dictionary<ItemConstants.Category, List<StruckTableItem>> DictionaryByCategory = new Dictionary<ItemConstants.Category, List<StruckTableItem>>();
-        public readonly Dictionary<ItemConstants.SubCategory, List<StruckTableItem>> DictionaryBySubCategory = new Dictionary<ItemConstants.SubCategory, List<StruckTableItem>>();
+        private readonly Dictionary<ItemConstants.Category, List<StruckTableItem>> dictionaryByCategory = new Dictionary<ItemConstants.Category, List<StruckTableItem>>();
+        private readonly Dictionary<ItemConstants.SubCategory, List<StruckTableItem>> dictionaryBySubCategory = new Dictionary<ItemConstants.SubCategory, List<StruckTableItem>>();
         protected override void OnLoadedData(Dictionary<string, string> data)
         {
             int uid = int.Parse(data["Uid"]);
@@ -73,21 +73,30 @@ namespace GGemCo.Scripts.TableLoader
             
             StruckTableItem struckTableItemDropGroup = GetDataByUid(uid);
             {
-                if (!DictionaryByCategory.ContainsKey(category))
+                if (!dictionaryByCategory.ContainsKey(category))
                 {
-                    DictionaryByCategory[category] = new List<StruckTableItem>();
+                    dictionaryByCategory[category] = new List<StruckTableItem>();
                 }
 
-                DictionaryByCategory[category].Add(struckTableItemDropGroup);
+                dictionaryByCategory[category].Add(struckTableItemDropGroup);
             }
             {
-                if (!DictionaryBySubCategory.ContainsKey(subCategory))
+                if (!dictionaryBySubCategory.ContainsKey(subCategory))
                 {
-                    DictionaryBySubCategory[subCategory] = new List<StruckTableItem>();
+                    dictionaryBySubCategory[subCategory] = new List<StruckTableItem>();
                 }
 
-                DictionaryBySubCategory[subCategory].Add(struckTableItemDropGroup);
+                dictionaryBySubCategory[subCategory].Add(struckTableItemDropGroup);
             }
+        }
+
+        public Dictionary<ItemConstants.Category, List<StruckTableItem>> GetDictionaryByCategory()
+        {
+            return dictionaryByCategory;
+        }
+        public Dictionary<ItemConstants.SubCategory, List<StruckTableItem>> GetDictionaryBySubCategory()
+        {
+            return dictionaryBySubCategory;
         }
         
         public StruckTableItem GetDataByUid(int uid)
@@ -95,9 +104,10 @@ namespace GGemCo.Scripts.TableLoader
             if (uid <= 0)
             {
                 GcLogger.LogError("uid is 0.");
-                return new StruckTableItem();
+                return null;
             }
             var data = GetData(uid);
+            if (data == null) return null;
             return new StruckTableItem
             {
                 Uid = int.Parse(data["Uid"]),

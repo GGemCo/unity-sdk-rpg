@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GGemCo.Scripts.Configs;
+using GGemCo.Scripts.ScriptableSettings;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -9,146 +9,90 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace GGemCo.Scripts.Addressable
 {
+    /// <summary>
+    /// GGemCo Settings 불러오기
+    /// </summary>
     public class AddressableSettingsLoader : MonoBehaviour
     {
         public static AddressableSettingsLoader Instance { get; private set; }
-        private GGemCoSettings settings;
-        private Dictionary<string, GameObject> preLoadGamePrefabs;
-        private float prefabLoadProgress;
-        
-        private async void Awake()
+
+        public GGemCoSettings settings;
+        public GGemCoPlayerSettings playerSettings;
+        public GGemCoMapSettings mapSettings;
+        public GGemCoSaveSettings saveSettings;
+
+        public delegate void DelegateLoadSettings();
+        public event DelegateLoadSettings OnLoadSettings;
+
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        /// <summary>
+        /// Addressable Settings를 비동기적으로 로드하는 함수
+        /// </summary>
+        public async Task InitializeAsync()
+        {
+            await LoadAllSettingsAsync();
+        }
+
+        /// <summary>
+        /// 모든 설정 파일을 Addressables에서 로드
+        /// </summary>
+        private async Task LoadAllSettingsAsync()
         {
             try
             {
-                prefabLoadProgress = 0f;
-                try
-                {
-                    if (Instance == null)
-                    {
-                        Instance = this;
-                        DontDestroyOnLoad(gameObject);
-                    }
-                    else
-                    {
-                        Destroy(gameObject);
-                    }
-                    settings = await LoadSettings();
-                    if (settings != null)
-                    {
-                        GcLogger.Log("Spine2d 사용여부 : " + settings.useSpine2d);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    GcLogger.LogError($"addressable 로딩중 오류. : {ex.Message}");
-                }
+                // 여러 개의 설정을 병렬적으로 로드
+                var settingsTask = LoadSettingsAsync<GGemCoSettings>(ConfigAddressables.KeySettings);
+                var playerSettingsTask = LoadSettingsAsync<GGemCoPlayerSettings>(ConfigAddressables.KeyPlayerSettings);
+                var mapSettingsTask = LoadSettingsAsync<GGemCoMapSettings>(ConfigAddressables.KeyMapSettings);
+                var saveSettingsTask = LoadSettingsAsync<GGemCoSaveSettings>(ConfigAddressables.KeySaveSettings);
+
+                // 모든 작업이 완료될 때까지 대기
+                await Task.WhenAll(settingsTask, playerSettingsTask, mapSettingsTask, saveSettingsTask);
+
+                // 결과 저장
+                settings = settingsTask.Result;
+                playerSettings = playerSettingsTask.Result;
+                mapSettings = mapSettingsTask.Result;
+                saveSettings = saveSettingsTask.Result;
+
+                // 로그 출력
+                if (settings != null)
+                    GcLogger.Log("Spine2d 사용여부 : " + settings.useSpine2d);
+                if (playerSettings != null)
+                    GcLogger.Log("Player statAtk : " + playerSettings.statAtk);
+                if (mapSettings != null)
+                    GcLogger.Log("Tilemap 크기 : " + mapSettings.tilemapGridCellSize);
+                if (saveSettings != null)
+                    GcLogger.Log("최대 저장 슬롯 개수 : " + saveSettings.saveDataMaxSlotCount);
+
+                // 이벤트 호출
+                OnLoadSettings?.Invoke();
             }
             catch (Exception ex)
             {
-                GcLogger.LogError($"프리팹 로드중 오류 : {ex.Message}");
+                GcLogger.LogError($"설정 로딩 중 오류 발생: {ex.Message}");
             }
         }
-        /// <summary>
-        /// 기본 셋팅 Srcriptable Object 로드하기
-        /// </summary>
-        /// <returns></returns>
-        private async Task<GGemCoSettings> LoadSettings()
-        {
-            if (settings == null)
-            {
-                AsyncOperationHandle<GGemCoSettings> handle = Addressables.LoadAssetAsync<GGemCoSettings>(ConfigAddressables.KeySettings);
-                settings = await handle.Task;
 
-                if (settings == null)
-                {
-                    GcLogger.LogError("GGemCoSettings을 Addressables에서 불러오지 못했습니다!");
-                }
-            }
-            return settings;
-        }
         /// <summary>
-        /// Spine2d 사용여부 가져오기
+        /// 제네릭을 사용하여 Addressables에서 설정을 로드하는 함수
         /// </summary>
-        /// <returns></returns>
-        public bool GetUseSpine2d()
+        private async Task<T> LoadSettingsAsync<T>(string key) where T : ScriptableObject
         {
-            return settings.useSpine2d;
-        }
-        /// <summary>
-        /// 타일맵 사이즈 가져오기
-        /// </summary>
-        /// <returns></returns>
-        public Vector2 GetTilemapGridSize()
-        {
-            return settings.tilemapGridCellSize;
-        }
-        /// <summary>
-        /// 프리팹 이름으로 프리팹 가져오기
-        /// </summary>
-        /// <param name="prefabName"></param>
-        /// <returns></returns>
-        public GameObject GetPreLoadGamePrefabByName(string prefabName)
-        {
-            if (preLoadGamePrefabs.ContainsKey(prefabName)) return preLoadGamePrefabs.GetValueOrDefault(prefabName);
-            GcLogger.LogError($"Addressables 에 {prefabName} 프리팹이 없습니다.");
-            return null;
-        }
-        /// <summary>
-        /// 진행률 가져오기
-        /// </summary>
-        /// <returns></returns>
-        public float GetPrefabLoadProgress()
-        {
-            return prefabLoadProgress;
-        }
-        /// <summary>
-        /// 게임에서 사용할 프리팹 로드하기
-        /// </summary>
-        /// <returns></returns>
-        public async Task<Dictionary<string, GameObject>> LoadAllPreLoadGamePrefabsAsync()
-        {
-            Dictionary<string, GameObject> prefabs = new Dictionary<string, GameObject>();
-            var locationHandle = Addressables.LoadResourceLocationsAsync(ConfigAddressables.LabelPreLoadGamePrefabs);
-            await locationHandle.Task;
-        
-            if (!locationHandle.IsValid() || locationHandle.Status != AsyncOperationStatus.Succeeded)
-            {
-                GcLogger.LogError($"{ConfigAddressables.LabelPreLoadGamePrefabs} 레이블을 가진 리소스를 찾을 수 없습니다.");
-                return prefabs;
-            }
-        
-            int totalCount = locationHandle.Result.Count;
-            int loadedCount = 0;
-        
-            foreach (var location in locationHandle.Result)
-            {
-                string address = location.PrimaryKey;
-                var loadHandle = Addressables.LoadAssetAsync<GameObject>(address);
-                
-                while (!loadHandle.IsDone)
-                {
-                    prefabLoadProgress = (loadedCount + loadHandle.PercentComplete) / totalCount;
-                    await Task.Yield();
-                }
-        
-                GameObject prefab = await loadHandle.Task;
-                if (prefab != null)
-                {
-                    prefabs[address] = prefab;
-                    loadedCount++;
-                }
-            }
-        
-            prefabLoadProgress = 1f; // 100%
-            return prefabs;
-        }
-        /// <summary>
-        /// 로드된 프리팹 저장하기
-        /// </summary>
-        /// <param name="gamePrefabs"></param>
-        public void SetPreLoadGamePrefabs(Dictionary<string, GameObject> gamePrefabs)
-        {
-            preLoadGamePrefabs = gamePrefabs;
+            AsyncOperationHandle<T> handle = Addressables.LoadAssetAsync<T>(key);
+            return await handle.Task;
         }
     }
 }

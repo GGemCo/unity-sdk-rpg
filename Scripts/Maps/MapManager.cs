@@ -67,7 +67,12 @@ namespace GGemCo.Scripts.Maps
                 tag = ConfigTags.GetValue(ConfigTags.Keys.GridTileMap)
             };
             Grid grid = gridTileMap.gameObject.AddComponent<Grid>();
-            Vector2 tilemapGridSize = AddressableSettingsLoader.Instance.GetTilemapGridSize();
+            Vector2 tilemapGridSize = AddressableSettingsLoader.Instance.mapSettings.tilemapGridCellSize;
+            if (tilemapGridSize == Vector2.zero)
+            {
+                GcLogger.LogError("타일맵 Grid 사이즈가 정해지지 않았습니다. GGemCoMapSettings 에 Tilemap Grid Cell Size 를 입력해주세요.");
+                return;
+            }
             grid.cellSize = new Vector3(tilemapGridSize.x, tilemapGridSize.y, 0);
             grid.cellLayout = GridLayout.CellLayout.Rectangle;
         }
@@ -76,7 +81,7 @@ namespace GGemCo.Scripts.Maps
             sceneGame = SceneGame.Instance;
             saveDataManager = sceneGame.saveDataManager;
             tableLoaderManager = TableLoaderManager.Instance;
-            defaultMonsterRegenTimeSec = tableLoaderManager.TableConfig.GetDefaultMonsterRegenTimeSec();
+            defaultMonsterRegenTimeSec = AddressableSettingsLoader.Instance.settings.defaultMonsterRegenTimeSec;
         }
         /// <summary>
         /// 초기 셋팅
@@ -102,7 +107,11 @@ namespace GGemCo.Scripts.Maps
                 return;
             }
 
-            if (mapUid <= 0) return;
+            if (mapUid <= 0)
+            {
+                GcLogger.LogError("맵 고유번호가 잘 못되었습니다.");
+                return;
+            }
             // GcLogger.Log("LoadMap start");
             Reset();
             currentState = MapConstants.State.FadeIn;
@@ -279,7 +288,7 @@ namespace GGemCo.Scripts.Maps
 
             if (currentMapUid == 0)
             {
-                currentMapUid = saveDataManager.Player.CurrentChapter.Value;
+                currentMapUid = saveDataManager.Player.CurrentChapter;
             }
             if (tableLoaderManager.TableMap.GetCount() <= 0)
             {
@@ -545,7 +554,7 @@ namespace GGemCo.Scripts.Maps
         {
             StopAllCoroutines();
 
-            // SceneGame.saveDataManager.SetChapter(currentMapUid);
+            sceneGame.saveDataManager.Player.CurrentChapter = currentMapUid;
             isLoadComplete = true;
             playSpawnPosition = Vector3.zero;
             

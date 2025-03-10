@@ -66,10 +66,10 @@ namespace GGemCo.Scripts.Items
             poolDropItem.Clear();
             InitializePool();
             tableItem = TableLoaderManager.Instance.TableItem;
-            dictionaryByCategory = tableItem.DictionaryByCategory;
-            dictionaryBySubCategory = tableItem.DictionaryBySubCategory;
-            dropGroupDictionary = TableLoaderManager.Instance.TableItemDropGroup.DropGroupDictionary;
-            monsterDropDictionary = TableLoaderManager.Instance.TableMonsterDropRate.MonsterDropDictionary;
+            dictionaryByCategory = tableItem.GetDictionaryByCategory();
+            dictionaryBySubCategory = tableItem.GetDictionaryBySubCategory();
+            dropGroupDictionary = TableLoaderManager.Instance.TableItemDropGroup.GetDropGroups();
+            monsterDropDictionary = TableLoaderManager.Instance.TableMonsterDropRate.GetMonsterDropDictionary();
         }
         /// <summary>
         /// Addressable 에 등록된 damageText 를 불러와서 pool 을 만든다 
@@ -77,7 +77,7 @@ namespace GGemCo.Scripts.Items
         private void InitializePool()
         {
             if (AddressableSettingsLoader.Instance == null) return;
-            prefabDropItem = AddressableSettingsLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabDropItem);
+            prefabDropItem = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabDropItem);
             if (prefabDropItem == null) return;
             containerPoolDropItem = new GameObject("ContainerPoolDropItem");
             ExpandPool(poolSize); // 초기 풀 생성
