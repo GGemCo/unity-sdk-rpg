@@ -59,7 +59,7 @@ namespace GGemCo.Scripts.SaveData
             string savePath = GetThumbnailPath(slot);
             File.WriteAllBytes(savePath, resizedScreenshot.EncodeToPNG());
 
-            GcLogger.Log($"썸네일 저장 완료: {savePath}");
+            // GcLogger.Log($"썸네일 저장 완료: {savePath}");
 
             mainCamera.targetTexture = null;
             RenderTexture.active = null;
