@@ -126,7 +126,7 @@ namespace GGemCo.Scripts.Scenes
         {
             // PlayerPrefs 에서 가져온 값이 있는지 체크 
             if (currentSaveDataSlotIndex <= 0) return;
-            GcLogger.Log("currentSaveDataSlotIndex: " + currentSaveDataSlotIndex);
+            // GcLogger.Log("currentSaveDataSlotIndex: " + currentSaveDataSlotIndex);
             SceneManager.ChangeScene(ConfigDefine.SceneNameLoading);
         }
         /// <summary>
@@ -141,10 +141,7 @@ namespace GGemCo.Scripts.Scenes
                 GcLogger.LogError("남은 저장 슬롯이 없습니다. 저장되어있는 데이터를 지워주세요.");
                 return;
             }
-            GcLogger.Log("slotindex : " + slotIndex);
-            
-            // 빈 슬롯에 해당하는 디폴트 세이브 파일 만들어 주기
-            saveFileController.SaveData(slotIndex, new SaveDataContainer());
+            // GcLogger.Log("slotindex : " + slotIndex);
             
             // PlayerPrefs 에 저장하기
             PlayerPrefsManager prefsManager = new PlayerPrefsManager();

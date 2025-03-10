@@ -23,33 +23,48 @@ namespace GGemCo.Scripts.Maps
     /// </summary>
     public class MapManager : MonoBehaviour
     {
-        public GameObject gridTileMap;
-        public GameObject bgBlackForMapLoading;  // 페이드 인에 사용할 검정색 스프라이트 오브젝트
-        public float fadeDuration = 0.3f;  // 페이드 인 지속 시간
-        
-        private MapConstants.State currentState = MapConstants.State.None;
-        private bool isLoadComplete;
+        // 타일맵이 들갈 grid 오브젝트
+        private GameObject gridTileMap;
+        // 페이드 인에 사용할 검정색 스프라이트 오브젝트
+        private GameObject bgBlackForMapLoading;
+        // 페이드 인 지속 시간
+        private const float FADE_DURATION = 0.3f;
 
-        private int currentMapUid; // 현재 맵 uid
+        // 맵 로드 상태
+        private MapConstants.State currentState = MapConstants.State.None;
+        // 맵 로드가 완료되었는지
+        private bool isLoadComplete;
+        // 현재 맵 uid
+        private int currentMapUid;
 
         private SceneGame sceneGame;
         private SaveDataManager saveDataManager;
+        private TableLoaderManager tableLoaderManager;
+        
+        // 현재 맵에서 플레이어가 스폰될 위치
         private Vector3 playSpawnPosition;
+        // 몬스터가 죽었을때 다시 리젠될는 시간
         private float defaultMonsterRegenTimeSec;
+        // 캐릭터 스폰시 부여되는 가상 고유번호
         private int characterVid;
 
-        public UnityEvent onLoadCompleteMap;
+        // 맵 로드 완료되었을때 발생되는 이벤트
+        private UnityEvent onLoadCompleteMap;
         
+        // 스폰된 npc 리스트
         private List<NpcData> npcList;
+        // 스폰된 몬스터 리스트
         private List<MonsterData> monsterList;
+        // 만들어진 워프 리스트
         private List<WarpData> warpDatas;
-        private StruckTableMap resultChapterData;
-        
+        // 현재 맵 테이블 데이터
+        private StruckTableMap currentMapTableData;
+        // 현재 타이맬 스크립트
         private MapTileCommon mapTileCommon;
+        // 타일맵이 로드 완료되었을때 발생하는 이벤트
         private UnityEvent onLoadTileMap;
-
+        // 몬스터 리젠 코루틴
         private Coroutine coroutineRegenMonster;
-        private TableLoaderManager tableLoaderManager;
         protected void Awake()
         {
             isLoadComplete = false;
@@ -79,17 +94,39 @@ namespace GGemCo.Scripts.Maps
         protected void Start()
         {
             sceneGame = SceneGame.Instance;
+            bgBlackForMapLoading = sceneGame.bgBlackForMapLoading;
             saveDataManager = sceneGame.saveDataManager;
             tableLoaderManager = TableLoaderManager.Instance;
             defaultMonsterRegenTimeSec = AddressableSettingsLoader.Instance.settings.defaultMonsterRegenTimeSec;
+            
+            // 저장된 맵 불러오기
+            int startMapUid = GetStartMapUid();
+
+            LoadMap(startMapUid);
         }
-        /// <summary>
-        /// 초기 셋팅
-        /// </summary>
-        /// <param name="pbgBlackForMapLoading"></param>
-        public void Initialize(GameObject pbgBlackForMapLoading)
+
+        private int GetStartMapUid()
         {
-            bgBlackForMapLoading = pbgBlackForMapLoading;
+            int startMapUid = saveDataManager.Player.CurrentMapUid;
+            // 시작 맵 불러오기
+            if (startMapUid <= 0)
+            {
+                startMapUid = AddressableSettingsLoader.Instance.mapSettings.startMapUid;
+                if (startMapUid <= 0)
+                {
+                    GcLogger.LogError("시작 맵 고유번호가 잘 못 되었습니다. GGemCoMapSettins 에 startMapUid 를 입력해주세요.");
+                    return 0;
+                }
+
+                var info = TableLoaderManager.Instance.TableMap.GetDataByUid(startMapUid);
+                if (info == null)
+                {
+                    GcLogger.LogError("맵 테이블에 없는 고유번호 입니다. GGemCoMapSettins 에 startMapUid 를 확인해주세요.");
+                    return 0;
+                }
+            }
+
+            return startMapUid;
         }
         protected void Reset()
         {
@@ -99,7 +136,8 @@ namespace GGemCo.Scripts.Maps
                 StopCoroutine(coroutineRegenMonster);
             }
         }
-        public void LoadMap(int mapUid = 0)
+
+        private void LoadMap(int mapUid = 0)
         {
             if (IsPossibleLoad() != true)
             {
@@ -226,10 +264,10 @@ namespace GGemCo.Scripts.Maps
             spriteRenderer.color = new Color(0, 0, 0, 0);
             float elapsedTime = 0.0f;
 
-            while (elapsedTime < fadeDuration)
+            while (elapsedTime < FADE_DURATION)
             {
                 elapsedTime += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsedTime / fadeDuration);
+                float t = Mathf.Clamp01(elapsedTime / FADE_DURATION);
                 float alpha = Mathf.Lerp(0, 1, Easing.EaseOutQuintic(t));
                 spriteRenderer.color = new Color(0, 0, 0, alpha);
                 yield return null;
@@ -288,15 +326,15 @@ namespace GGemCo.Scripts.Maps
 
             if (currentMapUid == 0)
             {
-                currentMapUid = saveDataManager.Player.CurrentChapter;
+                currentMapUid = saveDataManager.Player.CurrentMapUid;
             }
             if (tableLoaderManager.TableMap.GetCount() <= 0)
             {
                 SetLoadFailed("맵 테이블에 내용이 없습니다.");
                 yield break;
             }
-            resultChapterData = tableLoaderManager.TableMap.GetDataByUid(currentMapUid);
-            if (resultChapterData == null)
+            currentMapTableData = tableLoaderManager.TableMap.GetDataByUid(currentMapUid);
+            if (currentMapTableData == null)
             {
                 SetLoadFailed($"맵 테이블에서 찾을 수 없습니다. Uid: {currentMapUid}");
                 yield break;
@@ -309,7 +347,7 @@ namespace GGemCo.Scripts.Maps
                 yield break;
             }
             // bgm 플레이
-            if (resultChapterData.BgmUid > 0)
+            if (currentMapTableData.BgmUid > 0)
             {
             }
 
@@ -319,7 +357,7 @@ namespace GGemCo.Scripts.Maps
             }
             GameObject currentMap = Instantiate(prefab, gridTileMap.transform);
             mapTileCommon = currentMap.GetComponent<MapTileCommon>();
-            mapTileCommon.Initialize(resultChapterData.Uid, resultChapterData.Name, resultChapterData.Type, resultChapterData.Subtype);
+            mapTileCommon.Initialize(currentMapTableData.Uid, currentMapTableData.Name, currentMapTableData.Type, currentMapTableData.Subtype);
             var result = mapTileCommon.GetMapSize();
 
             // 로드된 맵에 맞게 맵 영역 사이즈 갱신하기 
@@ -424,7 +462,7 @@ namespace GGemCo.Scripts.Maps
             }
             
             // 플레이어 위치
-            Vector3 spawnPosition = resultChapterData.PlayerSpawnPosition;
+            Vector3 spawnPosition = currentMapTableData.PlayerSpawnPosition;
             if (playSpawnPosition != Vector3.zero)
             {
                 spawnPosition = playSpawnPosition;
@@ -447,10 +485,10 @@ namespace GGemCo.Scripts.Maps
             spriteRenderer.color = new Color(0, 0, 0, 1);
             float elapsedTime = 0.0f;
 
-            while (elapsedTime < fadeDuration)
+            while (elapsedTime < FADE_DURATION)
             {
                 elapsedTime += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsedTime / fadeDuration);
+                float t = Mathf.Clamp01(elapsedTime / FADE_DURATION);
                 float alpha = Mathf.Lerp(1, 0, Easing.EaseInQuintic(t));
                 spriteRenderer.color = new Color(0, 0, 0, alpha);
                 yield return null;
@@ -554,7 +592,7 @@ namespace GGemCo.Scripts.Maps
         {
             StopAllCoroutines();
 
-            sceneGame.saveDataManager.Player.CurrentChapter = currentMapUid;
+            sceneGame.saveDataManager.Player.CurrentMapUid = currentMapUid;
             isLoadComplete = true;
             playSpawnPosition = Vector3.zero;
             
@@ -573,7 +611,7 @@ namespace GGemCo.Scripts.Maps
 
         string GetFilePath(string fileName)
         {
-            return MapConstants.ResourceMapPath + resultChapterData.FolderName + "/" + fileName;
+            return MapConstants.ResourceMapPath + currentMapTableData.FolderName + "/" + fileName;
         }
 
         private void SetPlaySpawnPosition(Vector3 position)

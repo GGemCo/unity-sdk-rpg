@@ -13,15 +13,15 @@ namespace GGemCo.Scripts.SaveData
         private TableLoaderManager tableLoaderManager;
         private readonly CompositeDisposable disposables = new CompositeDisposable();
         
-        private readonly BehaviorSubject<int> currentChapter = new(1);
+        private readonly BehaviorSubject<int> currentMapUid = new(0);
         private readonly BehaviorSubject<int> currentLevel = new(1);
         private readonly BehaviorSubject<long> currentExp = new(0);
         private readonly BehaviorSubject<long> currentNeedExp = new(0);
         
-        public int CurrentChapter
+        public int CurrentMapUid
         {
-            get => currentChapter.Value;
-            set => currentChapter.OnNext(value);
+            get => currentMapUid.Value;
+            set => currentMapUid.OnNext(value);
         }
 
         public int CurrentLevel
@@ -43,7 +43,7 @@ namespace GGemCo.Scripts.SaveData
 
         public Observable<int> OnCurrentChapterChanged()
         {
-            return currentChapter.DistinctUntilChanged();
+            return currentMapUid.DistinctUntilChanged();
         }
 
         public Observable<long> OnCurrentExpChanged()
@@ -90,7 +90,7 @@ namespace GGemCo.Scripts.SaveData
         private void InitializeSubscriptions()
         {
             currentLevel.DistinctUntilChanged()
-                .CombineLatest(currentChapter, currentExp, (_, _, _) => Unit.Default)
+                .CombineLatest(currentMapUid, currentExp, (_, _, _) => Unit.Default)
                 .Subscribe(_ => SavePlayerData())
                 .AddTo(disposables);
         }
@@ -110,7 +110,7 @@ namespace GGemCo.Scripts.SaveData
         {
             if (saveDataContainer?.PlayerData != null)
             {
-                CurrentChapter = saveDataContainer.PlayerData.CurrentChapter;
+                CurrentMapUid = saveDataContainer.PlayerData.CurrentMapUid;
                 CurrentLevel = saveDataContainer.PlayerData.CurrentLevel;
                 CurrentExp = saveDataContainer.PlayerData.CurrentExp;
             }

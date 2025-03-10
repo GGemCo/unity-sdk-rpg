@@ -45,6 +45,7 @@ namespace GGemCo.Scripts.SaveData
             // 메타파일이 없으면 기본 데이터 생성
             if (!File.Exists(metaFilePath))
             {
+                Directory.CreateDirectory(saveDirectory);
                 MetaData = new SaveMetaData(maxSlots);
                 SaveMetaToFile();
             }

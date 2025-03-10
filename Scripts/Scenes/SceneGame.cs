@@ -76,7 +76,9 @@ namespace GGemCo.Scripts.Scenes
             isStateDirty = false;
             SetState(GameState.Begin);
         }
-
+        /// <summary>
+        /// 매니저 스크립트 오브젝트 생성하기
+        /// </summary>
         private void InitializeManagers()
         {
             GameObject managerContainer = new GameObject("Managers");
@@ -101,24 +103,8 @@ namespace GGemCo.Scripts.Scenes
         private void Start()
         {
             if (TableLoaderManager.Instance == null) return;
-            mapManager.Initialize(bgBlackForMapLoading);
-            int startMapUid = AddressableSettingsLoader.Instance.mapSettings.startMapUid;
-            if (startMapUid <= 0)
-            {
-                GcLogger.LogError("시작 맵 고유번호가 잘 못 되었습니다. GGemCoMapSettins 에 startMapUid 를 입력해주세요.");
-                return;
-            }
-
-            var info = TableLoaderManager.Instance.TableMap.GetDataByUid(startMapUid);
-            if (info == null)
-            {
-                GcLogger.LogError("맵 테이블에 없는 고유번호 입니다. GGemCoMapSettins 에 startMapUid 를 확인해주세요.");
-                return;
-            }
-            mapManager.LoadMap(startMapUid);
             StartCoroutine(UpdateStateRoutine());
         }
-
         private IEnumerator UpdateStateRoutine()
         {
             while (true)

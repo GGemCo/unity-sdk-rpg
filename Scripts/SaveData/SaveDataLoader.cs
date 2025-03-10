@@ -8,9 +8,13 @@ using UnityEngine;
 
 namespace GGemCo.Scripts.SaveData
 {
+    /// <summary>
+    /// 세이브 데이터 json 파일 로드
+    /// </summary>
     public class SaveDataLoader : MonoBehaviour
     {
-        public static SaveDataLoader Instance;
+        public static SaveDataLoader Instance { get; private set; }
+        
         private SaveDataContainer saveDataContainer;
         private float loadProgress;
         
@@ -63,10 +67,14 @@ namespace GGemCo.Scripts.SaveData
             onProgressUpdate?.Invoke(loadProgress);
             yield return null;
 
-            saveDataContainer = JsonConvert.DeserializeObject<SaveDataContainer>(json);
+            if (json != "")
+            {
+                saveDataContainer = JsonConvert.DeserializeObject<SaveDataContainer>(json);
+            }
+
             loadProgress = 1f; // JSON 파싱 완료
             onProgressUpdate?.Invoke(loadProgress);
-            GcLogger.Log($"데이터가 불러와졌습니다. 슬롯 {slotIndex}");
+            // GcLogger.Log($"데이터가 불러와졌습니다. 슬롯 {slotIndex}");
         }
 
         public SaveDataContainer GetSaveDataContainer()

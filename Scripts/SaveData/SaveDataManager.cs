@@ -93,19 +93,11 @@ namespace GGemCo.Scripts.SaveData
             
             // 로드한 세이브 데이터 가져오기 
             SaveDataContainer saveDataContainer = SaveDataLoader.Instance.GetSaveDataContainer();
-            // 데이터가 없으면 강제로 한번 저장하기 
-            if (saveDataContainer == null)
-            {
-                SaveData();
-            }
 
             // 초기화 실행
             Player.Initialize(tableLoaderManager, saveDataContainer);
             Inventory.Initialize(tableLoaderManager, saveDataContainer);
             Quest.Initialize(tableLoaderManager, saveDataContainer);
-            
-            // 로드한 세이브 데이터 가져온 후 Loader 는 삭제 처리 
-            Destroy(SaveDataLoader.Instance.gameObject);
         }
         private void Start()
         {
@@ -118,8 +110,17 @@ namespace GGemCo.Scripts.SaveData
         /// </summary>
         public void StartSaveData()
         {
-            CancelInvoke(nameof(SaveData));
-            Invoke(nameof(SaveData), saveDelay);
+            // 데이터가 없으면 강제로 한번 저장하기 
+            SaveDataContainer saveDataContainer = SaveDataLoader.Instance.GetSaveDataContainer();
+            if (saveDataContainer == null)
+            {
+                SaveData();
+            }
+            else
+            {
+                CancelInvoke(nameof(SaveData));
+                Invoke(nameof(SaveData), saveDelay);
+            }
         }
         /// <summary>
         /// 강제 저장하기
