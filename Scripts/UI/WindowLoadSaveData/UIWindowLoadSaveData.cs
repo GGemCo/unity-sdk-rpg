@@ -5,6 +5,7 @@ using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Core;
 using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.Scenes;
+using GGemCo.Scripts.Utils;
 using UnityEngine;
 
 namespace GGemCo.Scripts.UI.WindowLoadSaveData
@@ -106,7 +107,11 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
         /// </summary>
         public void OnClickLoad()
         {
-            if (currentCheckSlotIndex <= 0) return;
+            if (currentCheckSlotIndex <= 0)
+            {
+                GcLogger.LogError("선택된 슬롯이 없습니다.");
+                return;
+            }
             PlayerPrefsManager playerPrefsManager = new PlayerPrefsManager();
             playerPrefsManager.SaveSaveDataSlotIndex(currentCheckSlotIndex);
             SceneManager.ChangeScene(ConfigDefine.SceneNameLoading);
@@ -129,6 +134,9 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
             if (uiElementSaveDataSlot == null) return;
             uiElementSaveDataSlot.ClearInfo();
             uiElementSaveDataSlot.gameObject.SetActive(false);
+            currentCheckSlotIndex = 0;
+            PlayerPrefsManager prefsManager = new PlayerPrefsManager();
+            prefsManager.SaveSaveDataSlotIndex(0);
         }
         /// <summary>
         /// 현재 선택된 UIElementSaveDataSlot 가져오기
