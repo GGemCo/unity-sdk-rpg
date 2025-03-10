@@ -16,10 +16,10 @@ namespace GGemCo.Scripts.Addressable
     {
         public static AddressableSettingsLoader Instance { get; private set; }
 
-        public GGemCoSettings settings;
-        public GGemCoPlayerSettings playerSettings;
-        public GGemCoMapSettings mapSettings;
-        public GGemCoSaveSettings saveSettings;
+        [HideInInspector] public GGemCoSettings settings;
+        [HideInInspector] public GGemCoPlayerSettings playerSettings;
+        [HideInInspector] public GGemCoMapSettings mapSettings;
+        [HideInInspector] public GGemCoSaveSettings saveSettings;
 
         public delegate void DelegateLoadSettings();
         public event DelegateLoadSettings OnLoadSettings;
@@ -68,14 +68,14 @@ namespace GGemCo.Scripts.Addressable
                 saveSettings = saveSettingsTask.Result;
 
                 // 로그 출력
-                if (settings != null)
-                    GcLogger.Log("Spine2d 사용여부 : " + settings.useSpine2d);
-                if (playerSettings != null)
-                    GcLogger.Log("Player statAtk : " + playerSettings.statAtk);
-                if (mapSettings != null)
-                    GcLogger.Log("Tilemap 크기 : " + mapSettings.tilemapGridCellSize);
-                if (saveSettings != null)
-                    GcLogger.Log("최대 저장 슬롯 개수 : " + saveSettings.saveDataMaxSlotCount);
+                // if (settings != null)
+                //     GcLogger.Log("Spine2d 사용여부 : " + settings.useSpine2d);
+                // if (playerSettings != null)
+                //     GcLogger.Log("Player statAtk : " + playerSettings.statAtk);
+                // if (mapSettings != null)
+                //     GcLogger.Log("Tilemap 크기 : " + mapSettings.tilemapGridCellSize);
+                // if (saveSettings != null)
+                //     GcLogger.Log("최대 저장 슬롯 개수 : " + saveSettings.saveDataMaxSlotCount);
 
                 // 이벤트 호출
                 OnLoadSettings?.Invoke();

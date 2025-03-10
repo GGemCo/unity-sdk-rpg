@@ -11,6 +11,9 @@ using UnityEngine.UI;
 
 namespace GGemCo.Scripts.Scenes
 {
+    /// <summary>
+    /// 인트로 씬
+    /// </summary>
     public class SceneIntro : MonoBehaviour
     {
         public static SceneIntro Instance { get; private set; }

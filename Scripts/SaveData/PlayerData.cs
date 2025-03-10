@@ -108,7 +108,7 @@ namespace GGemCo.Scripts.SaveData
         /// </summary>
         private void LoadPlayerData(SaveDataContainer saveDataContainer)
         {
-            if (saveDataContainer != null)
+            if (saveDataContainer?.PlayerData != null)
             {
                 CurrentChapter = saveDataContainer.PlayerData.CurrentChapter;
                 CurrentLevel = saveDataContainer.PlayerData.CurrentLevel;

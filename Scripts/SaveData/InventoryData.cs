@@ -27,7 +27,7 @@ namespace GGemCo.Scripts.SaveData
 
         private void LoadItemCount(SaveDataContainer saveDataContainer)
         {
-            if (saveDataContainer == null) return;
+            if (saveDataContainer?.InventoryData == null) return;
             ItemCounts.Clear();
             foreach (var info in saveDataContainer.InventoryData.ItemCounts)
             {

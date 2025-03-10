@@ -72,7 +72,7 @@ namespace GGemCo.Scripts.Addressable
                 }
 
                 prefabLoadProgress = 1f; // 100%
-                GcLogger.Log($"총 {loadedCount}/{totalCount}개의 프리팹을 성공적으로 로드했습니다.");
+                // GcLogger.Log($"총 {loadedCount}/{totalCount}개의 프리팹을 성공적으로 로드했습니다.");
             }
             catch (Exception ex)
             {

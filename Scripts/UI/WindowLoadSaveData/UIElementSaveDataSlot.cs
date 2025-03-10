@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.Scenes;
 using TMPro;
@@ -39,6 +38,8 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
             }
             if (textLevel != null) textLevel.text = $"Lv.{slotMetaInfo.Level}";
             if (textSaveDate != null) textSaveDate.text = slotMetaInfo.SaveTime;
+            
+            gameObject.SetActive(slotMetaInfo.Exists);
         }
         /// <summary>
         /// 현재 element 를 선택하기
@@ -54,6 +55,14 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
         public void SetIconCheck(bool isCheck)
         {
             iconCheck?.gameObject.SetActive(isCheck);
+        }
+
+        public void ClearInfo()
+        {
+            imageThumnail.sprite = null;
+            textLevel.text = "빈 슬롯";
+            textSaveDate.text = "";
+            SetIconCheck(false);
         }
     }
 }

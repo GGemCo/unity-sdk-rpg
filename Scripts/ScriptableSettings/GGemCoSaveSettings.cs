@@ -10,8 +10,11 @@ namespace GGemCo.Scripts.ScriptableSettings
         [Header("세이브 데이터 자장할 폴더 이름 입니다.")] [SerializeField] private string saveDataFolderName;
         [Header("저장 슬롯 최대 개수. UI 를 고려하여 개수를 정해주세요.")] public int saveDataMaxSlotCount;
         [Header("세이브 데이터 썸네일을 자장할 폴더 이름 입니다.")] [SerializeField] private string saveDataThumnailFolderName;
-        [Header("저장시 생성되는 썸네일의 width 크기(pixel). 0 이면 생성하지 않습니다.")] public int saveDataThumnailWidth;
-        [Header("이 시간안에 저장 요청이 오면 기존 요청은 취소된다.(초)")] public float saveDataDelay;
+        [Header("썸네일의 width 크기(pixel). 0 이면 생성하지 않습니다.")] public int saveDataThumnailWidth;
+
+        [Header("저장 대기 시간")]
+        [Tooltip("saveDataDelay 시간 후 저장 처리. 저장 처리되기전에 재요청이 오면 기존 요청은 취소되고 saveDataDelay 시간 동안 기다린다.(초)")]
+        public float saveDataDelay;
         [Header("강제로 저장할 시간(초)")] public float saveDataForceSaveInterval;
         
         /// <summary>

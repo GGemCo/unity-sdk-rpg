@@ -9,6 +9,9 @@ using UnityEngine;
 
 namespace GGemCo.Scripts.UI.WindowLoadSaveData
 {
+    /// <summary>
+    /// 세이브 데이터 불러오기 Window
+    /// </summary>
     public class UIWindowLoadSaveData : MonoBehaviour
     {
         [Header("기본오브젝트")]
@@ -17,9 +20,14 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
         [Tooltip("슬롯 프리팹이 들어갈 Panel")]
         public GameObject containerelementSaveDataSlot;
 
+        // 현재 선택된 slot index
         private int currentCheckSlotIndex;
+        // UIElementSaveDataSlot 배열
         private List<UIElementSaveDataSlot> uiElementSaveDataSlots;
         private AddressableSettingsLoader addressableSettingsLoader;
+        private SaveFileController saveFileController;
+        private ThumbnailController thumbnailController;
+        private SlotMetaDatController slotMetaDatController;
 
         private void Awake()
         {
@@ -41,10 +49,9 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
             currentCheckSlotIndex = prefsManager.LoadSaveDataSlotIndex();
             SetSelectElement(currentCheckSlotIndex);
         }
-
-        private SaveFileController saveFileController;
-        private ThumbnailController thumbnailController;
-        private SlotMetaDatController slotMetaDatController;
+        /// <summary>
+        /// Settings 에서 최대 슬롯 개수를 가져와 UIElementSaveDataSlot 만들어주기
+        /// </summary>
         private void InitializeSaveDataSlots()
         {
             if (elementSaveDataSlot == null || containerelementSaveDataSlot == null) return;
@@ -118,9 +125,21 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
             if (File.Exists(thumbnailPath)) File.Delete(thumbnailPath);
             
             slotMetaDatController.DeleteSlot(currentCheckSlotIndex);
+            UIElementSaveDataSlot uiElementSaveDataSlot = GetCurrentUIElementSaveDataSlot();
+            if (uiElementSaveDataSlot == null) return;
+            uiElementSaveDataSlot.ClearInfo();
+            uiElementSaveDataSlot.gameObject.SetActive(false);
         }
         /// <summary>
-        /// element 선택처리 하기  
+        /// 현재 선택된 UIElementSaveDataSlot 가져오기
+        /// </summary>
+        /// <returns></returns>
+        private UIElementSaveDataSlot GetCurrentUIElementSaveDataSlot()
+        {
+            return uiElementSaveDataSlots[currentCheckSlotIndex - 1];
+        }
+        /// <summary>
+        /// element 클릭 처리 하기  
         /// </summary>
         /// <param name="slotIndex"></param>
         public void SetSelectElement(int slotIndex)
