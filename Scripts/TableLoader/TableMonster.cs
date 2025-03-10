@@ -40,9 +40,10 @@ namespace GGemCo.Scripts.TableLoader
             if (uid <= 0)
             {
                 GcLogger.LogError("uid is 0.");
-                return new StruckTableMonster();
+                return null;
             }
             var data = GetData(uid);
+            if (data == null) return null;
             return new StruckTableMonster
             {
                 Uid = int.Parse(data["Uid"]),
@@ -62,7 +63,7 @@ namespace GGemCo.Scripts.TableLoader
         
         public GameObject GetPrefab(int uid) {
             var info = GetDataByUid(uid);
-            if (info.SpineUid == 0) return null;
+            if (info == null) return null;
         
             string prefabPath = TableLoaderManager.Instance.TableAnimation.GetPrefabPath(info.SpineUid);
             if (prefabPath == "") {
@@ -70,16 +71,14 @@ namespace GGemCo.Scripts.TableLoader
                 return null;
             }
             GameObject prefab = Resources.Load<GameObject>(prefabPath);
-            if (prefab == null) {
-                GcLogger.LogError("prefab 오브젝트가 없습니다. prefabPath: "+prefabPath);
-                return null;
-            }
-            return prefab;
+            if (prefab != null) return prefab;
+            GcLogger.LogError("prefab 오브젝트가 없습니다. prefabPath: "+prefabPath);
+            return null;
         }
         public string GetShapePath(int uid)
         {
             var info = GetDataByUid(uid);
-            return info.SpineUid <= 0 ? "" : TableLoaderManager.Instance.TableAnimation.GetPrefabPath(info.SpineUid);
+            return info == null || info.SpineUid <= 0 ? "" : TableLoaderManager.Instance.TableAnimation.GetPrefabPath(info.SpineUid);
         }
     }
 }

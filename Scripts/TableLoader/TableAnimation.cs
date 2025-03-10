@@ -21,9 +21,10 @@ namespace GGemCo.Scripts.TableLoader
             if (uid <= 0)
             {
                 GcLogger.LogError("uid is 0.");
-                return new StruckTableAnimation();
+                return null;
             }
             var data = GetData(uid);
+            if (data == null) return null;
             return new StruckTableAnimation
             {
                 Uid = int.Parse(data["Uid"]),
@@ -36,7 +37,7 @@ namespace GGemCo.Scripts.TableLoader
         }
         public GameObject GetPrefab(int uid) {
             var info = GetDataByUid(uid);
-            if (info.Uid == 0) return null;
+            if (info == null) return null;
             return info.Prefab;
         }
     }

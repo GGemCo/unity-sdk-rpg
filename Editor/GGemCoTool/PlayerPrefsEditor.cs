@@ -133,9 +133,7 @@ namespace GGemCo.Editor.GGemCoTool
             }
 
             // 여기에 미리 알고 있는 키 추가 가능 (예제)
-            keys.Add(PlayerData.PlayerPrefsKeyLevel);
-            keys.Add(PlayerData.PlayerPrefsKeyExp);
-            keys.Add(InventoryData.PlayerPrefsKeyInventoryItemCount);
+            // keys.Add(InventoryData.PlayerPrefsKeyInventoryItemCount);
 
             return keys.Distinct().ToArray();
         }

@@ -34,9 +34,10 @@ namespace GGemCo.Scripts.TableLoader
             if (uid <= 0)
             {
                 GcLogger.LogError("uid is 0.");
-                return new StruckTableNpc();
+                return null;
             }
             var data = GetData(uid);
+            if (data == null) return null;
             return new StruckTableNpc
             {
                 Uid = int.Parse(data["Uid"]),
