@@ -1,266 +1,218 @@
 using System.Collections;
-using System.Collections.Generic;
-using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.Utils;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace GGemCo.Scripts.Popup
 {
+    /// <summary>
+    /// 팝업 메타 데이터
+    /// </summary>
     public class PopupMetadata
     {
-        public PopupType PopupType = PopupType.NormalReward;
-        public string Title = "";
-        public string Message = "";
+        // 타입
+        public PopupManager.Type PopupType = PopupManager.Type.OnlyMessage;
+        // 타이틀
+        public string Title;
+        // 메시지
+        public string Message;
+        // 메시지 색상
+        public Color MessageColor = Color.gray;
+        // 확인 버튼 보임/안보임
         public bool ShowConfirmButton = true;
+        // 취소 버튼 보임/안보임
         public bool ShowCancelButton = false;
-        public System.Action OnConfirm = null;
-        public System.Action OnCancel = null;
-        public bool ShowBgBlack = false;
-        public bool DontShowCoolTimeGauage = false;
+        // 확인 버튼 콜백 함수
+        public System.Action OnConfirm;
+        // 취소 버튼 콜백 함수
+        public System.Action OnCancel;
+        // 강제로 팝업창을 띄울 것인지
         public bool ForceShow = false;
-        public long RewardDia = 0;
-        public long RewardGold = 0;
+        // 마우스 클릭했을때도 닫히게 할 것인지 
         public bool IsClosableByClick = true;
-        public Color MessageColor = Color.white;
-        public Dictionary<int, int> DictionaryRewardItems = new Dictionary<int, int>();
     }
     
-    // TextMeshPro 사용을 위해
+    /// <summary>
+    /// 디폴트 팝업창
+    /// </summary>
     public class DefaultPopup : MonoBehaviour, IPointerClickHandler
     {
-        protected PopupType PopupType;
-        public Button buttonConfirm; // 확인 버튼
-        public Button buttonCancel; // 취소 버튼
-        protected CanvasGroup CanvasGroup; // 페이드 인/아웃을 위한 CanvasGroup
-        public RectTransform panelContent; // 내용, 보상 아이템이 들어가는 패널
-
-        protected bool IsClosableByClick;
-        public float autoCloseTime; // 자동 닫힘 시간을 저장할 변수
-        public Image gaugeBarAutoClose;
-        
+        protected PopupManager.Type PopupType;
+        [Header("기본오브젝트")]
+        [Tooltip("타이틀")]
+        public TextMeshProUGUI textTitle;
+        [Tooltip("메시지")]
+        public TextMeshProUGUI textMessage;
+        [Tooltip("확인 버튼")]
+        public Button buttonConfirm;
+        [Tooltip("취소 버튼")]
+        public Button buttonCancel;
+        [Tooltip("내용이 들어가는 Panel")]
+        public RectTransform panelContent;
+        [Tooltip("팝업창이 보여질때 Fade in/out 시간(초)")]
         public float fadeDuration;
+        // 페이드 인/아웃을 위한 CanvasGroup
+        private CanvasGroup canvasGroup;
+        // 마우스 클릭했을때도 닫히게 할 것인지 
+        private bool isClosableByClick;
 
         private void Awake()
         {
-            IsClosableByClick = true;
-            CanvasGroup = GetComponent<CanvasGroup>();
+            canvasGroup = GetComponent<CanvasGroup>();
         }
-
+        /// <summary>
+        /// 초기화
+        /// </summary>
+        /// <param name="popupMetadata"></param>
         public virtual void Initialize(PopupMetadata popupMetadata)
         {
-            if (popupMetadata.PopupType != PopupType.None)
-            {
-                PopupType = popupMetadata.PopupType;
-            }
-
-            SetRewardDiaGold(popupMetadata.RewardDia, popupMetadata.RewardGold);
-
-            if (popupMetadata.DictionaryRewardItems != null && SceneGame.Instance != null)
-            {
-                PopupManager popupManager = SceneGame.Instance.popupManager;
-                if (popupManager.elementRewardItem != null && popupMetadata.DictionaryRewardItems.Count > 0)
-                {
-                    panelContent.gameObject.SetActive(true);
-                    foreach (var info in popupMetadata.DictionaryRewardItems)
-                    {
-                        GameObject element = Instantiate(popupManager.elementRewardItem, panelContent);
-                    }
-                }
-            }
-
-            if (popupMetadata.ShowConfirmButton && buttonConfirm == null)
-            {
-                GcLogger.LogError("Confirm 버튼이 없습니다.");
-            }
-            if (buttonConfirm != null)
-            {
-                buttonConfirm.gameObject.SetActive(popupMetadata.ShowConfirmButton);
-                if (popupMetadata.ShowConfirmButton)
-                {
-                    buttonConfirm.onClick.AddListener(() => {
-                        if (popupMetadata.OnConfirm != null)
-                        {
-                            popupMetadata.OnConfirm.Invoke();
-                        }
-                        ClosePopup();
-                    });
-                }
-            }
-
-            if (popupMetadata.ShowCancelButton && buttonCancel == null)
-            {
-                GcLogger.LogError("Cancel 버튼이 없습니다.");
-            }
-            if (buttonCancel != null)
-            {
-                buttonCancel.gameObject.SetActive(popupMetadata.ShowCancelButton);
-                if (popupMetadata.ShowCancelButton)
-                {
-                    buttonCancel.onClick.AddListener(() => {
-                        if (popupMetadata.OnCancel != null)
-                        {
-                            popupMetadata.OnCancel.Invoke();
-                        }
-                        ClosePopup();
-                    });
-                }
-            }
-
-            IsClosableByClick = popupMetadata.IsClosableByClick;
-
-            // 확인, 닫기 버튼이 있는 경우는 선택해야 되기 때문에 자동으로 닫하지 않는다.
-            if (popupMetadata.DontShowCoolTimeGauage || (popupMetadata.ShowConfirmButton && popupMetadata.ShowCancelButton))
-            {
-                autoCloseTime = -1;
-                if (gaugeBarAutoClose != null)
-                {
-                    Destroy(gaugeBarAutoClose.transform.parent.gameObject);
-                }
-            }
+            PopupType = popupMetadata.PopupType;
+            isClosableByClick = popupMetadata.IsClosableByClick;
             
-            if (autoCloseTime > 0f)
-            {
-                if (gaugeBarAutoClose == null)
-                {
-                    // GcLogger.LogError("dont exist gauge image.");
-                }
-                else
-                {
-                    gaugeBarAutoClose.gameObject.SetActive(true);
-                    gaugeBarAutoClose.fillAmount = 1;
-                }
+            SetupTitle(popupMetadata.Title);
+            SetupMessage(popupMetadata.Message, popupMetadata.MessageColor);
+            SetupButtons(popupMetadata);
 
-                StartCoroutine(AutoCloseCoroutine());
-            }
-            else
-            {
-                if (gaugeBarAutoClose != null)
-                {
-                    gaugeBarAutoClose.gameObject.SetActive(false);
-                }
-            }
-            if (popupMetadata.ShowBgBlack)
-            {
-            }
-            
             // 레이아웃 업데이트
             LayoutRebuilder.ForceRebuildLayoutImmediate(panelContent);
         }
-
-        public void SetRewardDiaGold(long rewardDia, long rewardGold)
+        /// <summary>
+        /// 타이틀 셋팅하기
+        /// </summary>
+        /// <param name="title"></param>
+        private void SetupTitle(string title)
         {
-        }
-
-        public void ShowPopup()
-        {
-            StartCoroutine(FadeIn());
-        }
-
-        public virtual void ClosePopup()
-        {
-            StartCoroutine(FadeOutAndDestroy());
-        }
-
-        protected virtual void OnFadeInStart()
-        {
-            
-        }
-        protected virtual void OnFadeInEnd()
-        {
-            CanvasGroup.alpha = 1.0f;
-        }
-        private IEnumerator FadeIn()
-        {
-            float elapsedTime = 0.0f;
-            CanvasGroup.alpha = 0.0f;
-
-            OnFadeInStart();
-            while (elapsedTime < fadeDuration)
+            if (!string.IsNullOrEmpty(title) && textTitle != null)
             {
-                elapsedTime += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsedTime / fadeDuration);
-                CanvasGroup.alpha = Easing.EaseOutQuintic(t);
-                yield return null;
+                textTitle.text = title;
             }
-            OnFadeInEnd();
         }
-
-        protected IEnumerator FadeOutAndDestroy()
+        /// <summary>
+        /// 메시지 셋팅하기
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="color"></param>
+        private void SetupMessage(string message, Color color)
         {
-            float elapsedTime = 0.0f;
-            CanvasGroup.alpha = 1.0f;
+            if (textMessage == null) return;
 
-            OnFadeOutDestroyStart();
-            
-            while (elapsedTime < fadeDuration)
+            if (!string.IsNullOrEmpty(message))
             {
-                elapsedTime += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsedTime / fadeDuration);
-                CanvasGroup.alpha = Easing.EaseInQuintic(1.0f - t);
-                yield return null;
-            }
-
-            OnFadeOutDestroyEnd();
-        }
-        
-        protected virtual void OnFadeOutDestroyStart()
-        {
-        }
-        protected virtual void OnFadeOutDestroyEnd()
-        {
-            CanvasGroup.alpha = 0.0f;
-            Destroy(gameObject);
-        }
-
-        protected IEnumerator AutoCloseCoroutine()
-        {
-            if (gaugeBarAutoClose != null)
-            {
-                float elapsedTime = 0f;
-                while (elapsedTime < autoCloseTime)
-                {
-                    elapsedTime += Time.deltaTime;
-                    gaugeBarAutoClose.fillAmount = 1 - Mathf.Clamp01(elapsedTime / autoCloseTime);
-                    yield return null;
-                }
-
-                gaugeBarAutoClose.fillAmount = 0;
+                textMessage.gameObject.SetActive(true);
+                textMessage.text = message;
+                textMessage.color = color;
             }
             else
             {
-                yield return new WaitForSeconds(autoCloseTime);
+                textMessage.gameObject.SetActive(false);
+            }
+        }
+        /// <summary>
+        /// 확인, 취소 버튼 셋팅하기
+        /// </summary>
+        /// <param name="popupMetadata"></param>
+        private void SetupButtons(PopupMetadata popupMetadata)
+        {
+            popupMetadata.OnConfirm ??= ClosePopup;
+            popupMetadata.OnCancel ??= ClosePopup;
+
+            SetupButton(buttonConfirm, popupMetadata.ShowConfirmButton, popupMetadata.OnConfirm, "Confirm 버튼이 없습니다.");
+            SetupButton(buttonCancel, popupMetadata.ShowCancelButton, popupMetadata.OnCancel, "Cancel 버튼이 없습니다.");
+        }
+        /// <summary>
+        /// 버튼 셋팅하기
+        /// </summary>
+        /// <param name="button"></param>
+        /// <param name="isActive"></param>
+        /// <param name="callback"></param>
+        /// <param name="errorMessage"></param>
+        private void SetupButton(Button button, bool isActive, System.Action callback, string errorMessage)
+        {
+            if (button == null)
+            {
+                if (isActive)
+                {
+                    GcLogger.LogError(errorMessage);
+                }
+                return;
             }
 
-            ClosePopup();
+            button.gameObject.SetActive(isActive);
+
+            if (isActive)
+            {
+                button.onClick.RemoveAllListeners();
+                button.onClick.AddListener(callback.Invoke);
+                button.onClick.AddListener(ClosePopup);
+            }
         }
+        /// <summary>
+        /// 팝업창 띄우기
+        /// </summary>
+        public void ShowPopup()
+        {
+            StartCoroutine(FadeCoroutine(0f, 1f, OnFadeInStart, OnFadeInEnd));
+        }
+        /// <summary>
+        /// 팝업창 닫기
+        /// </summary>
+        public virtual void ClosePopup()
+        {
+            StartCoroutine(FadeCoroutine(1f, 0f, OnFadeOutDestroyStart, OnFadeOutDestroyEnd));
+        }
+        private IEnumerator FadeCoroutine(float startAlpha, float endAlpha, System.Action onStart, System.Action onEnd)
+        {
+            float elapsedTime = 0f;
+            canvasGroup.alpha = startAlpha;
+
+            onStart?.Invoke();
+
+            while (elapsedTime < fadeDuration)
+            {
+                elapsedTime += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsedTime / fadeDuration);
+                canvasGroup.alpha = Mathf.Lerp(startAlpha, endAlpha, Easing.EaseOutQuintic(t));
+                yield return null;
+            }
+
+            onEnd?.Invoke();
+        }
+        protected virtual void OnFadeInStart() { }
+        protected virtual void OnFadeInEnd() => canvasGroup.alpha = 1.0f;
+
+        protected virtual void OnFadeOutDestroyStart() { }
+        protected virtual void OnFadeOutDestroyEnd()
+        {
+            Destroy(gameObject);
+        }
+        /// <summary>
+        /// 마우스 클릭했을때 처리 
+        /// </summary>
+        /// <param name="eventData"></param>
         public virtual void OnPointerClick(PointerEventData eventData)
         {
-            if (IsClosableByClick)
+            if (isClosableByClick)
             {
-                CanvasGroup.alpha = 0.0f;
-                
-                Destroy(gameObject);
+                ClosePopup();
             }
         }
-
+        /// <summary>
+        /// 비활성화 되면 버튼 리스너 삭제하기
+        /// </summary>
         private void OnDisable()
         {
-            if (buttonConfirm != null)
-            {
-                buttonConfirm.onClick.RemoveAllListeners();
-            }
-
-            if (buttonCancel != null)
-            {
-                buttonCancel.onClick.RemoveAllListeners();
-            }
+            RemoveButtonListeners(buttonConfirm);
+            RemoveButtonListeners(buttonCancel);
         }
 
-        public void SetType(PopupType type)
+        private void RemoveButtonListeners(Button button)
         {
-            PopupType = type;
+            if (button != null)
+            {
+                button.onClick.RemoveListener(ClosePopup);
+            }
         }
     }
 }
