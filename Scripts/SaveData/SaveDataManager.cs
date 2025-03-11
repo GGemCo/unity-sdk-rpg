@@ -66,7 +66,7 @@ namespace GGemCo.Scripts.SaveData
             GGemCoSaveSettings saveSettings = AddressableSettingsLoader.Instance.saveSettings;
             saveDelay = saveSettings.saveDataDelay;
             forceSaveInterval = saveSettings.saveDataForceSaveInterval;
-            thumbnailWidth = saveSettings.saveDataThumnailWidth;
+            thumbnailWidth = saveSettings.saveDataThumbnailWidth;
             maxSaveSlotCount = saveSettings.saveDataMaxSlotCount;
 
             saveDirectory = saveSettings.SaveDataFolderName;

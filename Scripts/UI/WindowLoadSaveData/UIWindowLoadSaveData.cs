@@ -5,10 +5,10 @@ using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Core;
 using GGemCo.Scripts.Popup;
 using GGemCo.Scripts.SaveData;
-using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.ScriptableSettings;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace GGemCo.Scripts.UI.WindowLoadSaveData
 {
@@ -18,11 +18,12 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
     public class UIWindowLoadSaveData : MonoBehaviour
     {
         [Header("기본오브젝트")]
-        [Tooltip("세이브 데이터를 보여줄 슬롯 Prefab")]
-        [SerializeField] private GameObject elementSaveDataSlot;
-        [Tooltip("슬롯 프리팹이 들어갈 Panel")]
-        [SerializeField] private GameObject containerElementSaveDataSlot;
-        [SerializeField] private PopupManager popupManager;
+        [Tooltip("세이브 데이터를 보여줄 슬롯 Prefab")] [SerializeField] private GameObject elementSaveDataSlot;
+        [Tooltip("슬롯 프리팹이 들어갈 Panel")] [SerializeField] private GameObject containerElementSaveDataSlot;
+        [Tooltip("닫기 버튼")] [SerializeField] private Button buttonClose;
+        [Tooltip("불러오기 버튼")] [SerializeField] private Button buttonLoad;
+        [Tooltip("삭제하기 버튼")] [SerializeField] private Button buttonDelete;
+        [Tooltip("팝업 매니저")] [SerializeField] private PopupManager popupManager;
 
         // 현재 선택된 slot index
         private int currentCheckSlotIndex;
@@ -40,8 +41,15 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
         {
             uiElementSaveDataSlots = new List<UIElementSaveDataSlot>();
             currentCheckSlotIndex = 0;
+            InitButtons();
         }
-        
+
+        private void InitButtons()
+        {
+            buttonClose?.onClick.AddListener(OnClickClose);
+            buttonLoad?.onClick.AddListener(OnClickLoad);
+            buttonDelete?.onClick.AddListener(OnClickDelete);
+        }
         private void Start()
         {
             gameObject.SetActive(false);
@@ -80,14 +88,14 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
             gameObject.SetActive(show);
         }
 
-        public void OnClickClose()
+        private void OnClickClose()
         {
             Show(false);
         }
         /// <summary>
         /// 불러오기을 클릭하면 PlayerPrefs 에 선택한 슬롯 index 를 저장하고, 로딩씬으로 넘어간다. 
         /// </summary>
-        public void OnClickLoad()
+        private void OnClickLoad()
         {
             if (currentCheckSlotIndex <= 0)
             {
@@ -104,7 +112,7 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
         /// <summary>
         /// 삭제하기를 클릭하면 확인 팝업창이 뜨고, 확인을 클릭하면 선택된 슬롯을 삭제한다.
         /// </summary>
-        public void OnClickDelete()
+        private void OnClickDelete()
         {
             if (currentCheckSlotIndex <= 0)
             {
