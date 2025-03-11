@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using GGemCo.Scripts.SaveData;
-using GGemCo.Scripts.Scenes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,31 +8,38 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
 {
     public class UIElementSaveDataSlot : MonoBehaviour
     {
-        public Image imageThumnail;
+        [Header("기본오브젝트")]
+        [Tooltip("썸네일 이미지")]
+        public Image imageThumbnail;
+        [Tooltip("선택 표시 아이콘")]
         public Image iconCheck;
+        [Tooltip("레벨")]
         public TextMeshProUGUI textLevel;
+        [Tooltip("저장된 시간")]
         public TextMeshProUGUI textSaveDate;
-
-        [HideInInspector] public int slotIndex = 0;
+        
+        private UIWindowLoadSaveData uiWindowLoadSaveData;
+        private int slotIndex;
         private Button button;
         private void Awake()
         {
             button = GetComponent<Button>();
             button.onClick.AddListener(SetElement);
         }
-        public void Initialize(SlotMetaInfo slotMetaInfo, ThumbnailController thumbnailController, bool isCheck)
+        public void Initialize(SlotMetaInfo slotMetaInfo, bool isCheck, UIWindowLoadSaveData puiWindowLoadSaveData)
         {
+            uiWindowLoadSaveData = puiWindowLoadSaveData;
             slotIndex = slotMetaInfo.SlotIndex;
             iconCheck?.gameObject.SetActive(isCheck);
-            if (imageThumnail != null)
+            if (imageThumbnail != null)
             {
-                string thumbnailPath = thumbnailController.GetThumbnailPath(slotMetaInfo.SlotIndex);
+                string thumbnailPath = slotMetaInfo.ThumbnailFilePath;
                 if (File.Exists(thumbnailPath))
                 {
                     byte[] fileData = File.ReadAllBytes(thumbnailPath);
                     Texture2D tex = new Texture2D(2, 2);
                     tex.LoadImage(fileData);
-                    imageThumnail.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+                    imageThumbnail.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
                 }
             }
             if (textLevel != null) textLevel.text = $"Lv.{slotMetaInfo.Level}";
@@ -46,7 +52,7 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
         /// </summary>
         private void SetElement()
         {
-            SceneIntro.Instance.uIWindowLoadSaveData.SetSelectElement(slotIndex);
+            uiWindowLoadSaveData?.SetSelectElement(slotIndex);
         }
         /// <summary>
         /// 체크 아이콘 on/off
@@ -59,7 +65,7 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
 
         public void ClearInfo()
         {
-            imageThumnail.sprite = null;
+            imageThumbnail.sprite = null;
             textLevel.text = "빈 슬롯";
             textSaveDate.text = "";
             SetIconCheck(false);

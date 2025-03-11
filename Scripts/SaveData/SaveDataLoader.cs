@@ -42,8 +42,7 @@ namespace GGemCo.Scripts.SaveData
         /// </summary>
         public IEnumerator LoadData(System.Action<float> onProgressUpdate)
         {
-            PlayerPrefsManager prefsManager = new PlayerPrefsManager();
-            int slotIndex = prefsManager.LoadSaveDataSlotIndex();
+            int slotIndex = PlayerPrefsManager.LoadSaveDataSlotIndex();
 
             int maxSlotCount = AddressableSettingsLoader.Instance.saveSettings.saveDataMaxSlotCount;
             string saveDirectory = AddressableSettingsLoader.Instance.saveSettings.SaveDataFolderName;
@@ -52,7 +51,7 @@ namespace GGemCo.Scripts.SaveData
 
             if (!File.Exists(filePath))
             {
-                GcLogger.LogError($"저장된 데이터가 없습니다. 슬롯 {slotIndex}");
+                // GcLogger.LogError($"저장된 데이터가 없습니다. 슬롯 {slotIndex}");
                 loadProgress = 1f;
                 onProgressUpdate?.Invoke(loadProgress);
                 yield break;

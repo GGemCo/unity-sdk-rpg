@@ -14,7 +14,6 @@ namespace GGemCo.Scripts.SaveData
     /// </summary>
     public class SaveDataContainer
     {
-        // public StruckPlayerSaveData StruckPlayerSaveData;
         public PlayerData PlayerData;
         public InventoryData InventoryData;
         public QuestData QuestData;
@@ -88,8 +87,7 @@ namespace GGemCo.Scripts.SaveData
             Inventory = new InventoryData();
             Quest = new QuestData();
 
-            PlayerPrefsManager prefsManager = new PlayerPrefsManager();
-            currentSaveSlot = prefsManager.LoadSaveDataSlotIndex();
+            currentSaveSlot = PlayerPrefsManager.LoadSaveDataSlotIndex();
             
             // 로드한 세이브 데이터 가져오기 
             SaveDataContainer saveDataContainer = SaveDataLoader.Instance.GetSaveDataContainer();
@@ -146,12 +144,13 @@ namespace GGemCo.Scripts.SaveData
             }
 
             string filePath = saveFileController.GetSaveFilePath(currentSaveSlot);
-            string thumbnailFileName = $"Thumbnail_{currentSaveSlot}.png";
+            string thumbnailPath = thumbnailController.GetThumbnailPath(currentSaveSlot);
             
             SaveDataContainer saveData = new SaveDataContainer
             {
                 PlayerData = Player,
                 InventoryData = Inventory,
+                QuestData = Quest,
             };
 
             string json = JsonConvert.SerializeObject(saveData);
@@ -165,7 +164,7 @@ namespace GGemCo.Scripts.SaveData
             }
             
             // 메타파일 업데이트
-            slotMetaDatController.UpdateSlot(currentSaveSlot, thumbnailFileName, true, Player.CurrentLevel);
+            slotMetaDatController.UpdateSlot(currentSaveSlot, thumbnailPath, true, Player.CurrentLevel, filePath);
         }
         /// <summary>
         /// 슬롯 삭제 + 메타파일 업데이트

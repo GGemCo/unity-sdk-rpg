@@ -114,7 +114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6a98cd1de3a4f8ab01db70054fc6ce2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imageThumnail: {fileID: 5261471877499756179}
+  imageThumbnail: {fileID: 5261471877499756179}
   iconCheck: {fileID: 4179865036036095982}
   textLevel: {fileID: 2545166090011413358}
   textSaveDate: {fileID: 7352490733775835879}

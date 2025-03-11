@@ -450,7 +450,7 @@ GameObject:
   - component: {fileID: 6235337939478414824}
   - component: {fileID: 2292065774335021750}
   - component: {fileID: 4977205895040495017}
-  - component: {fileID: 8389838242592689012}
+  - component: {fileID: 7468319872292026481}
   m_Layer: 5
   m_Name: PopupOnlyMessage
   m_TagString: Untagged
@@ -528,7 +528,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8389838242592689012
+--- !u!114 &7468319872292026481
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -537,7 +537,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2729538335748069006}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 491c7693d70740b2b7dcb5d25be7aa84, type: 3}
+  m_Script: {fileID: 11500000, guid: 1cad4f5a05501454faa0be65c372e4e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   textTitle: {fileID: 4885265992769728235}
@@ -545,8 +545,6 @@ MonoBehaviour:
   buttonConfirm: {fileID: 4554355478654253024}
   buttonCancel: {fileID: 1060099784313948803}
   panelContent: {fileID: 1225802833543785299}
-  autoCloseTime: 0
-  gaugeBarAutoClose: {fileID: 0}
   fadeDuration: 0.3
 --- !u!1 &3978017493240651038
 GameObject:

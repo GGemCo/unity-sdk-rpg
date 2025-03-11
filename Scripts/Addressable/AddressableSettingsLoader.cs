@@ -21,7 +21,8 @@ namespace GGemCo.Scripts.Addressable
         [HideInInspector] public GGemCoMapSettings mapSettings;
         [HideInInspector] public GGemCoSaveSettings saveSettings;
 
-        public delegate void DelegateLoadSettings();
+        public delegate void DelegateLoadSettings(GGemCoSettings settings, GGemCoPlayerSettings playerSettings,
+            GGemCoMapSettings mapSettings, GGemCoSaveSettings saveSettings);
         public event DelegateLoadSettings OnLoadSettings;
 
         private void Awake()
@@ -78,7 +79,7 @@ namespace GGemCo.Scripts.Addressable
                 //     GcLogger.Log("최대 저장 슬롯 개수 : " + saveSettings.saveDataMaxSlotCount);
 
                 // 이벤트 호출
-                OnLoadSettings?.Invoke();
+                OnLoadSettings?.Invoke(settings, playerSettings, mapSettings, saveSettings);
             }
             catch (Exception ex)
             {

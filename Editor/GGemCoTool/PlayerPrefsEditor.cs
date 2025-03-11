@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using GGemCo.Scripts.SaveData;
+using GGemCo.Scripts.Core;
 
 namespace GGemCo.Editor.GGemCoTool
 {
@@ -133,7 +133,7 @@ namespace GGemCo.Editor.GGemCoTool
             }
 
             // 여기에 미리 알고 있는 키 추가 가능 (예제)
-            // keys.Add(InventoryData.PlayerPrefsKeyInventoryItemCount);
+            keys.Add(PlayerPrefsManager.KeySaveDataSlotIndex);
 
             return keys.Distinct().ToArray();
         }

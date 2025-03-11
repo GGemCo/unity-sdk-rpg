@@ -3,8 +3,10 @@ using System.IO;
 using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Core;
+using GGemCo.Scripts.Popup;
 using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.Scenes;
+using GGemCo.Scripts.ScriptableSettings;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
 
@@ -17,19 +19,23 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
     {
         [Header("기본오브젝트")]
         [Tooltip("세이브 데이터를 보여줄 슬롯 Prefab")]
-        public GameObject elementSaveDataSlot;
+        [SerializeField] private GameObject elementSaveDataSlot;
         [Tooltip("슬롯 프리팹이 들어갈 Panel")]
-        public GameObject containerelementSaveDataSlot;
+        [SerializeField] private GameObject containerElementSaveDataSlot;
+        [SerializeField] private PopupManager popupManager;
 
         // 현재 선택된 slot index
         private int currentCheckSlotIndex;
         // UIElementSaveDataSlot 배열
         private List<UIElementSaveDataSlot> uiElementSaveDataSlots;
         private AddressableSettingsLoader addressableSettingsLoader;
-        private SaveFileController saveFileController;
-        private ThumbnailController thumbnailController;
         private SlotMetaDatController slotMetaDatController;
-
+        
+        // 델리게이트 선언
+        public delegate void DelegateOnUpdateSlotData();
+        // 델리게이트 이벤트 정의
+        public event DelegateOnUpdateSlotData OnUpdateSlotData;
+        
         private void Awake()
         {
             uiElementSaveDataSlots = new List<UIElementSaveDataSlot>();
@@ -38,39 +44,21 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
         
         private void Start()
         {
-            if (SceneIntro.Instance == null) return;
-            addressableSettingsLoader = SceneIntro.Instance.addressableSettingsLoader;
-            addressableSettingsLoader.OnLoadSettings += InitializeSaveDataSlots;
             gameObject.SetActive(false);
         }
-
-        private void OnEnable()
-        {
-            PlayerPrefsManager prefsManager = new PlayerPrefsManager();
-            currentCheckSlotIndex = prefsManager.LoadSaveDataSlotIndex();
-            SetSelectElement(currentCheckSlotIndex);
-        }
         /// <summary>
-        /// Settings 에서 최대 슬롯 개수를 가져와 UIElementSaveDataSlot 만들어주기
+        /// Settings 에서 최대 슬롯 개수를 가져와 UIElementSaveDataSlot 을 만든다.
         /// </summary>
-        private void InitializeSaveDataSlots()
+        public void InitializeSaveDataSlots(GGemCoSaveSettings saveSettings, SlotMetaDatController pslotMetaDatController)
         {
-            if (elementSaveDataSlot == null || containerelementSaveDataSlot == null) return;
-            int maxSlotCount = addressableSettingsLoader.saveSettings.saveDataMaxSlotCount;
-            string saveDirectory = addressableSettingsLoader.saveSettings.SaveDataFolderName;
-            
-            int thumbnailWidth = addressableSettingsLoader.saveSettings.saveDataThumnailWidth;
-            string thumbnailDirectory =addressableSettingsLoader.saveSettings.SaveDataThumnailFolderName;
-            
-            slotMetaDatController = new SlotMetaDatController(saveDirectory, maxSlotCount);
-            saveFileController = new SaveFileController(saveDirectory, maxSlotCount);
-            thumbnailController = new ThumbnailController(thumbnailDirectory, thumbnailWidth);
-            
+            if (elementSaveDataSlot == null || containerElementSaveDataSlot == null) return;
+            int maxSlotCount = saveSettings.saveDataMaxSlotCount;
+            slotMetaDatController = pslotMetaDatController;   
             List<SlotMetaInfo> slotMetaInfos = slotMetaDatController.GetMetaDataSlots();
             
             for (int i = 0; i < maxSlotCount; i++)
             {
-                GameObject slot = Instantiate(elementSaveDataSlot, containerelementSaveDataSlot.transform);
+                GameObject slot = Instantiate(elementSaveDataSlot, containerElementSaveDataSlot.transform);
                 if (slot == null) continue;
                 UIElementSaveDataSlot uiElementSaveDataSlot = slot.GetComponent<UIElementSaveDataSlot>();
                 if (uiElementSaveDataSlot == null) continue;
@@ -78,21 +66,15 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
                 SlotMetaInfo slotMetaInfo = slotMetaInfos[i];
                 if (slotMetaInfo != null)
                 {
-                    bool isCheck = slotMetaInfo.SlotIndex == SceneIntro.Instance.currentSaveDataSlotIndex;
+                    bool isCheck = slotMetaInfo.SlotIndex == PlayerPrefsManager.LoadSaveDataSlotIndex();
                     if (isCheck)
                     {
                         currentCheckSlotIndex = slotMetaInfo.SlotIndex;
                     }
-                    uiElementSaveDataSlot.Initialize(slotMetaInfo, thumbnailController, isCheck);
+                    uiElementSaveDataSlot.Initialize(slotMetaInfo, isCheck, this);
                 }
             }
         }
-        private void OnDestroy()
-        {
-            if (SceneIntro.Instance == null) return;
-            addressableSettingsLoader.OnLoadSettings -= InitializeSaveDataSlots;
-        }
-
         public void Show(bool show)
         {
             gameObject.SetActive(show);
@@ -103,40 +85,76 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
             Show(false);
         }
         /// <summary>
-        /// 불러오기
+        /// 불러오기을 클릭하면 PlayerPrefs 에 선택한 슬롯 index 를 저장하고, 로딩씬으로 넘어간다. 
         /// </summary>
         public void OnClickLoad()
         {
             if (currentCheckSlotIndex <= 0)
             {
                 GcLogger.LogError("선택된 슬롯이 없습니다.");
+                popupManager.ShowPopupError("선택된 슬롯이 없습니다.");
                 return;
             }
-            PlayerPrefsManager playerPrefsManager = new PlayerPrefsManager();
-            playerPrefsManager.SaveSaveDataSlotIndex(currentCheckSlotIndex);
+            // PlayerPrefs 에 선택한 슬롯 index 를 저장
+            PlayerPrefsManager.SaveSaveDataSlotIndex(currentCheckSlotIndex);
+            // 로딩씬으로 넘어간다. 
             SceneManager.ChangeScene(ConfigDefine.SceneNameLoading);
         }
+
         /// <summary>
-        /// 삭제하기
+        /// 삭제하기를 클릭하면 확인 팝업창이 뜨고, 확인을 클릭하면 선택된 슬롯을 삭제한다.
         /// </summary>
         public void OnClickDelete()
         {
-            if (currentCheckSlotIndex <= 0) return;
-            
-            string filePath = saveFileController.GetSaveFilePath(currentCheckSlotIndex);
-            string thumbnailPath = thumbnailController.GetThumbnailPath(currentCheckSlotIndex);
+            if (currentCheckSlotIndex <= 0)
+            {
+                GcLogger.LogError("선택된 슬롯이 없습니다.");
+                popupManager.ShowPopupError("선택된 슬롯이 없습니다.");
+                return;
+            }
 
+            PopupMetadata popupMetadata = new PopupMetadata
+            {
+                PopupType = PopupManager.Type.OnlyMessage,
+                MessageColor = Color.red,
+                Title = "슬롯 삭제",
+                Message = "삭제한 데이터는 복구할 수 없습니다.\n정말로 삭제하시겠습니까?",
+                OnConfirm = DeleteElement,
+                ShowCancelButton = true
+            };
+            popupManager.ShowPopup(popupMetadata);
+        }
+        /// <summary>
+        /// 선택된 슬롯을 삭제한다.
+        /// </summary>
+        private void DeleteElement()
+        {
+            if (currentCheckSlotIndex <= 0)
+            {
+                GcLogger.LogError("선택된 슬롯이 없습니다.");
+                popupManager.ShowPopupError("선택된 슬롯이 없습니다.");
+                return;
+            }
+
+            string filePath = slotMetaDatController.GetFilePath(currentCheckSlotIndex);
+            string thumbnailPath = slotMetaDatController.GetThumbnailFilePath(currentCheckSlotIndex);
+            
+            // 삭제 후 json 파일과 썸네일 파일을 삭제한다.
             if (File.Exists(filePath)) File.Delete(filePath);
             if (File.Exists(thumbnailPath)) File.Delete(thumbnailPath);
             
+            // 삭제한 element 는 비활성화 처리를 한다.
             slotMetaDatController.DeleteSlot(currentCheckSlotIndex);
             UIElementSaveDataSlot uiElementSaveDataSlot = GetCurrentUIElementSaveDataSlot();
             if (uiElementSaveDataSlot == null) return;
             uiElementSaveDataSlot.ClearInfo();
             uiElementSaveDataSlot.gameObject.SetActive(false);
+            
+            // 현재 선턱된 슬롯 index 와 PlayerPrefs 에 저장되어있는 값을 0 으로 초기화 시킨다.
             currentCheckSlotIndex = 0;
-            PlayerPrefsManager prefsManager = new PlayerPrefsManager();
-            prefsManager.SaveSaveDataSlotIndex(0);
+            PlayerPrefsManager.SaveSaveDataSlotIndex(0);
+            // 인트로 씬의 새로운 게임 버튼을 활성화 시킨다.
+            OnUpdateSlotData?.Invoke();
         }
         /// <summary>
         /// 현재 선택된 UIElementSaveDataSlot 가져오기
@@ -147,7 +165,7 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
             return uiElementSaveDataSlots[currentCheckSlotIndex - 1];
         }
         /// <summary>
-        /// element 클릭 처리 하기  
+        /// element 클릭하면 현재 선택된 currentCheckSlotIndex 값을 업데이트 해준다.
         /// </summary>
         /// <param name="slotIndex"></param>
         public void SetSelectElement(int slotIndex)
@@ -159,8 +177,9 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
             {
                 slot.SetIconCheck(false);
             }
-            // 선택한것만 체크 아이콘 on
+            // 선택된 currentCheckSlotIndex 값을 업데이트 해준다.
             currentCheckSlotIndex = slotIndex;
+            // icon check 이미지를 활성화 시켜준다.
             uiElementSaveDataSlots[slotIndex-1]?.SetIconCheck(true);
         }
     }

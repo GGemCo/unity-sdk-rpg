@@ -2,39 +2,39 @@
 
 namespace GGemCo.Scripts.Core
 {
-    public class PlayerPrefsManager
+    public static class PlayerPrefsManager
     {
-        private const string KEY_SAVE_DATA_SLOT_INDEX = "GGEMCO_KEY_SAVE_DATA_SLOT_INDEX";
+        public const string KeySaveDataSlotIndex = "GGEMCO_KEY_SAVE_DATA_SLOT_INDEX";
 
         private static void PlayerPrefsSave(string key, string value)
         {
             PlayerPrefs.SetString(key, value);
             PlayerPrefs.Save();
         }
-        private int PlayerPrefsLoadInt(string key, string defaultValue = "0")
+        private static int PlayerPrefsLoadInt(string key, string defaultValue = "0")
         {
             return int.Parse(PlayerPrefs.GetString(key, defaultValue));
         }
-        private float PlayerPrefsLoadFloat(string key, string defaultValue = "0")
+        private static float PlayerPrefsLoadFloat(string key, string defaultValue = "0")
         {
             return float.Parse(PlayerPrefs.GetString(key, defaultValue));
         }
-        private long PlayerPrefsLoadLong(string key, string defaultValue = "0")
+        private static long PlayerPrefsLoadLong(string key, string defaultValue = "0")
         {
             return long.Parse(PlayerPrefs.GetString(key, defaultValue));
         }
-        private string PlayerPrefsLoad(string key)
+        private static string PlayerPrefsLoad(string key)
         {
             return PlayerPrefs.GetString(key);
         }
         
-        public void SaveSaveDataSlotIndex(int gameLoadSlotIndex)
+        public static void SaveSaveDataSlotIndex(int gameLoadSlotIndex)
         {
-            PlayerPrefsSave(KEY_SAVE_DATA_SLOT_INDEX, gameLoadSlotIndex.ToString());
+            PlayerPrefsSave(KeySaveDataSlotIndex, gameLoadSlotIndex.ToString());
         }
-        public int LoadSaveDataSlotIndex()
+        public static int LoadSaveDataSlotIndex()
         {
-            return PlayerPrefsLoadInt(KEY_SAVE_DATA_SLOT_INDEX);
+            return PlayerPrefsLoadInt(KeySaveDataSlotIndex);
         }
     }
 }

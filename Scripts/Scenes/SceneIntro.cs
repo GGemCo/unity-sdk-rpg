@@ -1,6 +1,7 @@
 ﻿using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Core;
+using GGemCo.Scripts.Popup;
 using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.ScriptableSettings;
 using GGemCo.Scripts.UI.WindowLoadSaveData;
@@ -16,49 +17,34 @@ namespace GGemCo.Scripts.Scenes
     /// </summary>
     public class SceneIntro : MonoBehaviour
     {
-        public static SceneIntro Instance { get; private set; }
         [HideInInspector] public AddressableSettingsLoader addressableSettingsLoader;
         
         [Header("기본오브젝트")]
         [Tooltip("계속하기 버튼")]
-        public Button buttonGameContinue;
+        [SerializeField] private Button buttonGameContinue;
         [Tooltip("새로운 게임 버튼")]
-        public Button buttonNewGame;
+        [SerializeField] private Button buttonNewGame;
         [Tooltip("불러오기 버튼")]
-        public Button buttonOpenSaveDataWindow;
+        [SerializeField] private Button buttonOpenSaveDataWindow;
         [Tooltip("옵션 버튼")]
-        public Button buttonOption;
+        [SerializeField] private Button buttonOption;
         [Tooltip("게임종료 버튼")]
-        public Button buttonGameExit;
+        [SerializeField] private Button buttonGameExit;
         [Tooltip("불러오기 window")]
-        public UIWindowLoadSaveData uIWindowLoadSaveData;
+        [SerializeField] private UIWindowLoadSaveData uIWindowLoadSaveData;
+        [Tooltip("팝업 매니저")]
+        [SerializeField] private PopupManager popupManager;
 
-        [HideInInspector] public int currentSaveDataSlotIndex;
         private SlotMetaDatController slotMetaDatController;
-        private SaveFileController saveFileController;
         private void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-            else
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            InitializeAddressableSettingLoader();
-            LoadCurrentSaveDataSlotIndex();
             InitButtons();
-        }
-        /// <summary>
-        /// PlayerPrefs 에서 진행중인 게임이 있는지 체크
-        /// </summary>
-        private void LoadCurrentSaveDataSlotIndex()
-        {
-            PlayerPrefsManager prefsManager = new PlayerPrefsManager();
-            currentSaveDataSlotIndex = prefsManager.LoadSaveDataSlotIndex();
+            InitializeAddressableSettingLoader();
+
+            if (uIWindowLoadSaveData != null)
+            {
+                uIWindowLoadSaveData.OnUpdateSlotData += UpdateButtons;
+            }
         }
         /// <summary>
         /// GGemCo Settings 파일 읽어오기
@@ -74,28 +60,28 @@ namespace GGemCo.Scripts.Scenes
         private void OnDestroy()
         {
             addressableSettingsLoader.OnLoadSettings -= InitializeSlotMetaDataManager;
-            
             buttonGameContinue?.onClick.RemoveListener(OnClickGameContinue);
             buttonNewGame?.onClick.RemoveListener(OnClickNewGame);
-            buttonOpenSaveDataWindow?.onClick.RemoveListener(OnClickOpenSaveDataWindow);
             buttonOption?.onClick.RemoveListener(OnClickOption);
-            buttonGameExit?.onClick.RemoveListener(OnClickGameExit);
         }
         /// <summary>
         /// 세이븓 데이터 슬롯 정보를 읽어서 버튼 처리 
         /// </summary>
-        private void InitializeSlotMetaDataManager()
+        private void InitializeSlotMetaDataManager(GGemCoSettings settings, GGemCoPlayerSettings playerSettings,
+            GGemCoMapSettings mapSettings, GGemCoSaveSettings saveSettings)
         {
-            GGemCoSaveSettings saveSettings = addressableSettingsLoader.saveSettings;
             slotMetaDatController = new SlotMetaDatController(saveSettings.SaveDataFolderName, saveSettings.saveDataMaxSlotCount);
-            saveFileController = new SaveFileController(saveSettings.SaveDataFolderName, saveSettings.saveDataMaxSlotCount);
-            
-            // 남은 슬롯 개수를 채크해서 없으면 buttonNewGame 버튼 disable 처리 
-            int slotIndex = slotMetaDatController.GetEmptySlot();
-            if (slotIndex <= 0)
+            if (uIWindowLoadSaveData != null)
             {
-                buttonNewGame?.gameObject.SetActive(false);
+                uIWindowLoadSaveData.InitializeSaveDataSlots(saveSettings, slotMetaDatController);
             }
+
+            // // 남은 슬롯 index 채크해서 없으면 buttonNewGame 버튼 disable 처리 
+            // int slotIndex = slotMetaDatController.GetEmptySlotIndex();
+            // buttonNewGame.gameObject.SetActive(slotIndex > 0);
+            // // slot 데이터가 있는지 채크해서 있으면 buttonOpenSaveDataWindow 버튼 enable 처리 
+            // buttonOpenSaveDataWindow.gameObject.SetActive(slotMetaDatController.GetExistSlotCounts() > 0);
+            UpdateButtons();
         }
         /// <summary>
         /// 버튼 초기화. 진행중인 게임이 없을때는 계속하기, 불러오기 버튼은 안보이도록 처리 
@@ -104,15 +90,24 @@ namespace GGemCo.Scripts.Scenes
         {
             buttonGameContinue?.onClick.AddListener(OnClickGameContinue);
             buttonNewGame?.onClick.AddListener(OnClickNewGame);
-            buttonOpenSaveDataWindow?.onClick.AddListener(OnClickOpenSaveDataWindow);
+            buttonOpenSaveDataWindow?.onClick.AddListener(() => uIWindowLoadSaveData?.Show(true));
             buttonOption?.onClick.AddListener(OnClickOption);
-            buttonGameExit?.onClick.AddListener(OnClickGameExit);
+            buttonGameExit?.onClick.AddListener(Application.Quit);
             // 진행중인 게임이 없을때 
-            if (currentSaveDataSlotIndex <= 0)
+            if (PlayerPrefsManager.LoadSaveDataSlotIndex() <= 0)
             {
                 buttonGameContinue?.gameObject.SetActive(false);
                 buttonOpenSaveDataWindow?.gameObject.SetActive(false);
             }
+        }
+        private void UpdateButtons()
+        {
+            // 남은 슬롯 index 채크해서 없으면 buttonNewGame 버튼 disable 처리 
+            int slotIndex = slotMetaDatController.GetEmptySlotIndex();
+            buttonNewGame.gameObject.SetActive(slotIndex > 0);
+            buttonGameContinue.gameObject.SetActive(PlayerPrefsManager.LoadSaveDataSlotIndex() > 0);
+            // slot 데이터가 있는지 채크해서 있으면 buttonOpenSaveDataWindow 버튼 enable 처리 
+            buttonOpenSaveDataWindow.gameObject.SetActive(slotMetaDatController.GetExistSlotCounts() > 0);
         }
         private void PlayModeStateChanged(PlayModeStateChange state)
         {
@@ -125,7 +120,11 @@ namespace GGemCo.Scripts.Scenes
         private void OnClickGameContinue()
         {
             // PlayerPrefs 에서 가져온 값이 있는지 체크 
-            if (currentSaveDataSlotIndex <= 0) return;
+            if (PlayerPrefsManager.LoadSaveDataSlotIndex() <= 0)
+            {
+                popupManager.ShowPopupError("선택된 슬롯이 없습니다. 불러오기를 해주세요.");
+                return;
+            }
             // GcLogger.Log("currentSaveDataSlotIndex: " + currentSaveDataSlotIndex);
             SceneManager.ChangeScene(ConfigDefine.SceneNameLoading);
         }
@@ -135,7 +134,7 @@ namespace GGemCo.Scripts.Scenes
         private void OnClickNewGame()
         {
             // 남은 슬롯이 있는지 체크
-            int slotIndex = slotMetaDatController.GetEmptySlot();
+            int slotIndex = slotMetaDatController.GetEmptySlotIndex();
             if (slotIndex <= 0)
             {
                 GcLogger.LogError("남은 저장 슬롯이 없습니다. 저장되어있는 데이터를 지워주세요.");
@@ -144,31 +143,15 @@ namespace GGemCo.Scripts.Scenes
             // GcLogger.Log("slotindex : " + slotIndex);
             
             // PlayerPrefs 에 저장하기
-            PlayerPrefsManager prefsManager = new PlayerPrefsManager();
-            prefsManager.SaveSaveDataSlotIndex(slotIndex);
+            PlayerPrefsManager.SaveSaveDataSlotIndex(slotIndex);
             
             SceneManager.ChangeScene(ConfigDefine.SceneNameLoading);
-        }
-        /// <summary>
-        /// 불러오기
-        /// </summary>
-        private void OnClickOpenSaveDataWindow()
-        {
-            if (uIWindowLoadSaveData == null) return;
-            uIWindowLoadSaveData.Show(true);
         }
         /// <summary>
         /// 옵션
         /// </summary>
         private void OnClickOption()
         {
-        }
-        /// <summary>
-        /// 게임 종료
-        /// </summary>
-        private void OnClickGameExit()
-        {
-            Application.Quit();
         }
     }
 }
