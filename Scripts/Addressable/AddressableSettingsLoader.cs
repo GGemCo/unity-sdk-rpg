@@ -92,8 +92,24 @@ namespace GGemCo.Scripts.Addressable
         /// </summary>
         private async Task<T> LoadSettingsAsync<T>(string key) where T : ScriptableObject
         {
+            // 키가 Addressables에 등록되어 있는지 확인
+            var locationsHandle = Addressables.LoadResourceLocationsAsync(key);
+            await locationsHandle.Task;
+
+            if (!locationsHandle.Status.Equals(AsyncOperationStatus.Succeeded) || locationsHandle.Result.Count == 0)
+            {
+                GcLogger.LogError($"[AddressableSettingsLoader] '{key}' 가 Addressables에 등록되지 않았습니다. '{key}' 를 생성한 후 GGemCoTool > 기본 셋팅하기 메뉴를 열고 Addressable 추가하기 버튼을 클릭해주세요.");
+                Addressables.Release(locationsHandle);
+                return null;
+            }
+
+            // 설정 로드
             AsyncOperationHandle<T> handle = Addressables.LoadAssetAsync<T>(key);
-            return await handle.Task;
+            T asset = await handle.Task;
+
+            // 핸들 해제
+            Addressables.Release(locationsHandle);
+            return asset;
         }
     }
 }
