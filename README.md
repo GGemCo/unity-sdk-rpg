@@ -5,6 +5,8 @@
 - 플레이어 이동
 - 일반 전투
 - 맵 이동
+- 인벤토리
+- 게임 데이터 저장
 
 ## 제작 환경
 - Unity : 2022.3.16f1 이상
@@ -15,6 +17,8 @@
 - Newtonsoft Json (https://docs.unity3d.com/Packages/com.unity.nuget.newtonsoft-json@3.2/manual/index.html)
 - TextMeshPro (https://docs.unity3d.com/Packages/com.unity.textmeshpro@2.1/manual/index.html)
 - Spine2d (https://ko.esotericsoftware.com/spine-unity-download/)
+- NeGet (https://github.com/GlitchEnzo/NuGetForUnity/releases/tag/v4.3.0)
+  - R3
 
 ## 관련 링크
 - 설명 동영상 : https://www.youtube.com/@ggemco
