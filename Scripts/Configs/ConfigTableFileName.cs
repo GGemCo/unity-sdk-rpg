@@ -15,6 +15,6 @@
         public const string ItemDropGroup = "item_drop_group";
         public const string Exp = "Exp";
         public const string Window = "Window";
-        public const string Attribute = "Attribute";
+        public const string Status = "Status";
     }
 }
