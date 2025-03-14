@@ -109,10 +109,6 @@ namespace GGemCo.Scripts.Scenes
             // slot 데이터가 있는지 채크해서 있으면 buttonOpenSaveDataWindow 버튼 enable 처리 
             buttonOpenSaveDataWindow.gameObject.SetActive(slotMetaDatController.GetExistSlotCounts() > 0);
         }
-        private void PlayModeStateChanged(PlayModeStateChange state)
-        {
-            GcLogger.Log("PlayModeStateChanged: "+state);
-        }
         
         /// <summary>
         /// 계속 하기

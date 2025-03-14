@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using GGemCo.Scripts.Utils;
-using Unity.Plastic.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace GGemCo.Scripts.SaveData
 {
