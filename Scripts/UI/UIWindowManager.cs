@@ -15,6 +15,8 @@ namespace GGemCo.Scripts.UI
             Hud,
             Inventory,
             ItemInfo,
+            Equip,
+            PlayerInfo,
         }
         [Header("기본속성")]
         [Tooltip("윈도우 리스트")]
@@ -62,15 +64,8 @@ namespace GGemCo.Scripts.UI
                 GcLogger.LogError("UIWindow 컴포넌트가 없습니다. uid:"+uid);
                 return;
             }
-            // if (uiWindow.gameObject.activeSelf == show) return;
-            UIWindowFade uiWindowFade = uiWindow.GetComponent<UIWindowFade>();
-            if (uiWindowFade == null) return;
-            if (show) {
-                uiWindowFade.ShowPanel();
-            }
-            else {
-                uiWindowFade.HidePanel();
-            }
+
+            uiWindow.Show(show);
         }
         /// <summary>
         /// 윈도우 간에 아이콘 이동시키기 

@@ -4,7 +4,7 @@ using GGemCo.Scripts.Core;
 using GGemCo.Scripts.ScriptableSettings;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.Utils;
-using Unity.Plastic.Newtonsoft.Json;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace GGemCo.Scripts.SaveData
@@ -16,6 +16,7 @@ namespace GGemCo.Scripts.SaveData
     {
         public PlayerData PlayerData;
         public InventoryData InventoryData;
+        public EquipData EquipData;
         public QuestData QuestData;
     }
     /// <summary>
@@ -25,6 +26,7 @@ namespace GGemCo.Scripts.SaveData
     {
         public PlayerData Player { get; private set; }
         public InventoryData Inventory { get; private set; }
+        public EquipData Equip { get; private set; }
         public QuestData Quest { get; private set; }
 
         private TableLoaderManager tableLoaderManager;
@@ -85,6 +87,7 @@ namespace GGemCo.Scripts.SaveData
             // 각 데이터 클래스 초기화
             Player = new PlayerData();
             Inventory = new InventoryData();
+            Equip = new EquipData();
             Quest = new QuestData();
 
             currentSaveSlot = PlayerPrefsManager.LoadSaveDataSlotIndex();
@@ -95,6 +98,7 @@ namespace GGemCo.Scripts.SaveData
             // 초기화 실행
             Player.Initialize(tableLoaderManager, saveDataContainer);
             Inventory.Initialize(tableLoaderManager, saveDataContainer);
+            Equip.Initialize(tableLoaderManager, saveDataContainer);
             Quest.Initialize(tableLoaderManager, saveDataContainer);
         }
         private void Start()
@@ -150,6 +154,7 @@ namespace GGemCo.Scripts.SaveData
             {
                 PlayerData = Player,
                 InventoryData = Inventory,
+                EquipData = Equip,
                 QuestData = Quest,
             };
 

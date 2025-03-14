@@ -7,12 +7,13 @@ namespace GGemCo.Scripts.ScriptableSettings
     {
         [Header("플레이어 디폴트 값 설정")] 
         [Header("플레이어 최대 레벨")] public int maxLevel;
-        [Header("기본 공격력")] public long statAtk;
-        [Header("기본 방어력")] public long statDef;
-        [Header("기본 생명력")] public long statHp;
-        [Header("기본 마력")] public long statMp;
-        [Header("애니메이션 스텝 당 이동거리")] public float statMoveStep;
-        [Header("이동 속도")] public float statMoveSpeed;
+        [Header("시작 scale")] public float startScale;
+        [Header("기본 공격력")] public int statAtk;
+        [Header("기본 방어력")] public int statDef;
+        [Header("기본 생명력")] public int statHp;
+        [Header("기본 마력")] public int statMp;
+        [Header("애니메이션 스텝 당 이동거리(픽셀)")] public int statMoveStep;
+        [Header("이동 속도(100->1)")] public int statMoveSpeed;
         
         /// <summary>
         /// 기존 값이 비어있을 때만 기본값을 설정
@@ -25,12 +26,13 @@ namespace GGemCo.Scripts.ScriptableSettings
         /// </summary>
         private void Reset()
         {
+            startScale = 1;
             statAtk = 100;
             statDef = 100;
             statHp = 100;
             statMp = 100;
             statMoveStep = 100;
-            statMoveSpeed = 1;
+            statMoveSpeed = 100;
         }
     }
 }

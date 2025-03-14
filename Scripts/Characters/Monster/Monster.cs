@@ -19,7 +19,7 @@ namespace GGemCo.Scripts.Characters.Monster
     public class Monster : DefaultCharacter, IMonster
     {
         // 어그로
-        [HideInInspector] public bool isAggro;
+        public bool isAggro;
         // 몬스터 데이터
         public MonsterData MonsterData;
         
@@ -27,19 +27,17 @@ namespace GGemCo.Scripts.Characters.Monster
         private AttackType attackType;
         // 맵에서 지우기까지에 시간
         private float delayDestroy;
-        // 공격 속도
-        [HideInInspector] public float currentAttackSpeed;
         
         // 1. 델리게이트 선언
         public delegate void DelegateMonsterDead(int monsterVid, int monsterUid, GameObject monsterObject);
         // 2. 델리게이트 이벤트 정의
         public event DelegateMonsterDead OnMonsterDead;
+        public MonsterStat MonsterStat;
         
         // Start is called before the first frame update
         protected override void Awake()
         {
             base.Awake();
-            currentAttackSpeed = 1f;
             isAggro = false;
             MonsterData = null;
             PossibleAttack = true;
@@ -94,14 +92,8 @@ namespace GGemCo.Scripts.Characters.Monster
             var info = tableLoaderManager.TableMonster.GetDataByUid(Uid);
             // GcLogger.Log("InitializationStat uid: "+uid+" / info.uid: "+info.uid+" / StatMoveSpeed: "+info.statMoveSpeed);
             if (info.Uid <= 0) return;
-            StatAtk = info.StatAtk;
-            CurrentAtk = StatAtk;
-            currentAttackSpeed = info.StatAttackSpeed;
-            StatMoveSpeed = info.StatMoveSpeed;
-            CurrentMoveSpeed = StatMoveSpeed;
-            CurrentMoveStep = StatMoveStep;
-            StatHp = info.StatHp;
-            CurrentHp = StatHp;
+            MonsterStat.SetBaseInfos(info);            
+            CurrentHp = MonsterStat.TotalHp;
             float scale = info.Scale;
             SetScale(scale);
 
@@ -132,7 +124,7 @@ namespace GGemCo.Scripts.Characters.Monster
 
             CurrentHp -= damage;
             // -1 이면 죽지 않는다
-            if (StatHp < 0)
+            if (MonsterStat.BaseHp < 0)
             {
                 CurrentHp = 1;
             }
@@ -199,6 +191,15 @@ namespace GGemCo.Scripts.Characters.Monster
             base.OnDestroy();
             OnMonsterDead -= SceneGame.Instance.itemManager.OnMonsterDead;
             OnMonsterDead -= SceneGame.Instance.saveDataManager.Player.AddExp;
+        }
+        protected override void InitCharacterStat()
+        {
+            MonsterStat = new MonsterStat();
+            MonsterStat.Initialize(gameObject);
+        }
+        public override float GetCurrentMoveSpeed()
+        {
+            return MonsterStat.TotalMoveSpeed / 100f;
         }
     }
 }

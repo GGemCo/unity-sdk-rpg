@@ -34,7 +34,6 @@ namespace GGemCo.Scripts.UI
         public GridLayoutGroup containerIcon;
         
         private UIWindowFade uiWindowFade;
-        private InventoryData inventoryData;
 
         protected virtual void Awake()
         {
@@ -86,10 +85,6 @@ namespace GGemCo.Scripts.UI
         }
         protected virtual void Start()
         {
-            if (SceneGame.Instance != null && SceneGame.Instance.saveDataManager != null)
-            {
-                inventoryData = SceneGame.Instance.saveDataManager.Inventory;
-            }
         }
         /// <summary>
         /// index 로 아이콘 가져오기
@@ -148,14 +143,11 @@ namespace GGemCo.Scripts.UI
             UIIcon uiIcon = icon.GetComponent<UIIcon>();
             uiIcon.ClearIconInfos();
             
-            inventoryData.RemoveItemCount(slotIndex);
-            
             OnDetachIcon(slotIndex);
         }
 
         protected virtual void OnDetachIcon(int slotIndex)
         {
-            
         }
         /// <summary>
         /// 아이콘 붙여주기 
@@ -173,17 +165,16 @@ namespace GGemCo.Scripts.UI
             icon.transform.SetParent(slot.transform);
             icon.transform.position = slot.transform.position;
             UIIcon uiIcon = icon.GetComponent<UIIcon>();
+            uiIcon.window = this;
+            uiIcon.windowUid = uid;
             uiIcon.index = slotIndex;
             uiIcon.slotIndex = slotIndex;
             icons[slotIndex] = icon;
-
-            inventoryData.SetItemCount(slotIndex, uiIcon.uid, uiIcon.count);
             
-            OnSetIcon(icon, slotIndex);
+            OnSetIcon(slotIndex, icon);
         }
-        protected virtual void OnSetIcon(GameObject icon, int slotIndex)
+        protected virtual void OnSetIcon(int slotIndex, GameObject icon)
         {
-            
         }
         public virtual void OnClickIcon(UIIcon icon)
         {
@@ -225,15 +216,15 @@ namespace GGemCo.Scripts.UI
         /// 윈도우 open/close
         /// </summary>
         /// <param name="show"></param>
-        public void Show(bool show)
+        public virtual bool Show(bool show)
         {
             if (uiWindowFade == null)
             {
                 gameObject.SetActive(show);
                 OnShow(show);
-                return;
+                return false;
             }
-            if (gameObject.activeSelf == show) return;
+            if (gameObject.activeSelf == show) return false;
             if (show)
             {
                 uiWindowFade.ShowPanel();
@@ -242,6 +233,8 @@ namespace GGemCo.Scripts.UI
             {
                 uiWindowFade.HidePanel();
             }
+
+            return true;
         }
         /// <summary>
         /// 윈도우가 show 가 된 후 처리 
@@ -254,8 +247,7 @@ namespace GGemCo.Scripts.UI
         public void OnClickClose()
         {
             if (uiWindowFade == null) return;
-            if (!gameObject.activeSelf) return;
-            uiWindowFade.HidePanel();
+            Show(false);
         }
     }
 }

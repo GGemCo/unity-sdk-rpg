@@ -54,6 +54,7 @@ namespace GGemCo.Scripts.UI.Icon
             image.raycastTarget = true;
 
             GameObject droppedIcon = eventData.pointerDrag;
+            UIIcon droppedUiIcon = droppedIcon.GetComponent<UIIcon>();
             GameObject targetIcon = eventData.pointerEnter;
             
             if (droppedIcon != null)
@@ -61,19 +62,19 @@ namespace GGemCo.Scripts.UI.Icon
                 // 윈도우 밖에 드래그 앤 드랍했을때  
                 if (targetIcon == null)
                 {
-                    icon.window.OnEndDragOutWindow(eventData, droppedIcon, targetIcon, originalPosition);
+                    droppedUiIcon.window.OnEndDragOutWindow(eventData, droppedIcon, targetIcon, originalPosition);
+                    return;
                 }
-                else if (icon.window != null)
+                UIIcon targetUiIcon = targetIcon.GetComponent<UIIcon>();
+                if (targetUiIcon != null && targetUiIcon.window != null)
                 {
-                    icon.window.OnEndDragInIcon(droppedIcon, targetIcon);
+                    targetUiIcon.window.OnEndDragInIcon(droppedIcon, targetIcon);
+                    return;
                 }
             }
-            else
-            {
-                GameObject targetSlot = icon.window.slots[icon.slotIndex];
-                droppedIcon.transform.SetParent(targetSlot.transform);
-                droppedIcon.transform.position = originalPosition;
-            }
+            GameObject targetSlot = droppedUiIcon.window.slots[droppedUiIcon.slotIndex];
+            droppedIcon.transform.SetParent(targetSlot.transform);
+            droppedIcon.transform.position = originalPosition;
         }
         public Vector3 GetOriginalPosition() => originalPosition;
     }

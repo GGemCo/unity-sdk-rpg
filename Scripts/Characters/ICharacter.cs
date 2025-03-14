@@ -72,23 +72,11 @@ namespace GGemCo.Scripts.Characters
         int Uid { get; set; }
         /// <value>캐릭터 생성시 부여된 id</value>
         int Vid { get; set; }
-        /// <value>캐릭터 기본 hp</value>
-        long StatHp { get; set; }
-        /// <value>캐릭터 기본 공격력</value>
-        long StatAtk { get; set; }
-        /// <value>캐릭터 기본 이동거리</value>
-        float StatMoveStep { get; set; }
-        /// <value>캐릭터 기본 이동속도</value>
-        float StatMoveSpeed { get; set; }
         
-        /// <value>캐릭터 현재 hp</value>
+        // <value>캐릭터 현재 hp</value>
         long CurrentHp { get; set; }
-        /// <value>캐릭터 현재 공격력</value>
-        long CurrentAtk { get; set; }
         /// <value>캐릭터 현재 이동거리</value>
         float CurrentMoveStep { get; set; }
-        /// <value>캐릭터 현재 이동속도</value>
-        float CurrentMoveSpeed { get; set; }
         CharacterStatus CurrentStatus { get; set; }
         
         CharacterSortingOrder SortingOrder { get; set; }

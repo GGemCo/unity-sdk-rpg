@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Maps.Objects;
@@ -17,20 +18,21 @@ namespace GGemCo.Scripts.Characters.Player
         // 공격할 몬스터 
         private GameObject targetMonster;
         // 주변에 npc 가 있는지 체크 
-        protected bool IsNpcNearby;
-        
-        public float startScale;
-
-        private GGemCoSettings gGemCoSettings;
+        private bool isNpcNearby;
+        private GGemCoSettings gGemCoSettings; 
+        private EquipController equipController;
+        public PlayerStat PlayerStat;
         protected override void Awake()
         {
             base.Awake();
-            IsNpcNearby = false;
+            isNpcNearby = false;
 #if GGEMCO_USE_SPINE
             DefaultCharacterBehavior = gameObject.AddComponent<BehaviorPlayerSpine>();
 #else
             DefaultCharacterBehavior = gameObject.AddComponent<BehaviorPlayerSprite>();
 #endif
+            equipController = new EquipController();
+            equipController.Initialize(this);
         }
         /// <summary>
         /// tag, sorting layer, layer 셋팅하기
@@ -57,26 +59,18 @@ namespace GGemCo.Scripts.Characters.Player
                 ~ (1 << LayerMask.NameToLayer(ConfigLayer.GetValue(ConfigLayer.Keys.TileMapWall))));
         }
         /// <summary>
-        /// 테이블에서 가져온 몬스터 정보 셋팅
+        /// GGemCoPlayerSettings 에서 가져온 정보 셋팅
         /// </summary>
-        protected override void InitializeByTable() 
+        protected override void InitializeByTable()
         {
-            if (TableLoaderManager.Instance != null)
+            if (AddressableSettingsLoader.Instance == null) return;
             {
-                StatAtk = AddressableSettingsLoader.Instance.playerSettings.statAtk;
-                CurrentAtk = StatAtk;
-                StatHp = AddressableSettingsLoader.Instance.playerSettings.statHp;
-                CurrentHp = StatHp;
-                StatMoveStep = AddressableSettingsLoader.Instance.playerSettings.statMoveStep;
-                StatMoveSpeed = AddressableSettingsLoader.Instance.playerSettings.statMoveSpeed;
-                CurrentMoveSpeed = StatMoveSpeed;
-                CurrentMoveStep = StatMoveStep;
+                GGemCoPlayerSettings playerSettings = AddressableSettingsLoader.Instance.playerSettings;
+                PlayerStat.SetBaseInfos(playerSettings);
+                CurrentHp = PlayerStat.TotalHp;
+                CurrentMoveStep = playerSettings.statMoveStep;
                 OriginalScaleX = transform.localScale.x;
-            }
-
-            if (startScale > 0)
-            {
-                SetScale(startScale);
+                SetScale(playerSettings.startScale);
             }
         }
         /// <summary>
@@ -108,7 +102,7 @@ namespace GGemCo.Scripts.Characters.Player
                 
             CurrentHp -= damage;
             // -1 이면 죽지 않는다
-            if (StatHp < 0)
+            if (PlayerStat.BaseAtk < 0)
             {
                 CurrentHp = 1;
             }
@@ -180,7 +174,7 @@ namespace GGemCo.Scripts.Characters.Player
             }
             else if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Npc)))
             {
-                IsNpcNearby = true;
+                isNpcNearby = true;
             }
             else if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.MapObjectWarp)))
             {
@@ -200,8 +194,35 @@ namespace GGemCo.Scripts.Characters.Player
             }
             else if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Npc)))
             {
-                IsNpcNearby = false;
+                isNpcNearby = false;
             }
+        }
+        public void EquipItem(int partIndex, int itemUid)
+        {
+            bool result = equipController.EquipItem(partIndex, itemUid);
+            if (!result) return;
+            DefaultCharacterBehavior.ChangeImageByEquiped(partIndex, itemUid);
+        }
+        public void UnEquipItem(int partIndex)
+        {
+            bool result = equipController.UnEquipItem(partIndex);
+        }
+        protected override void InitCharacterStat()
+        {
+            PlayerStat = new PlayerStat();
+            PlayerStat.Initialize(gameObject);
+        }
+        public override Dictionary<int, StruckTableItem> GetEquippedItems()
+        {
+            return equipController.GetEquippedItems();
+        }
+        public override float GetCurrentMoveSpeed()
+        {
+            return PlayerStat.TotalMoveSpeed / 100f;
+        }
+        public float GetCurrentMoveStep()
+        {
+            return CurrentMoveStep;
         }
     }
 }

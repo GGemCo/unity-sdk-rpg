@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.Attributes;
 using GGemCo.Scripts.Items;
 using GGemCo.Scripts.Utils;
 
@@ -17,8 +16,10 @@ namespace GGemCo.Scripts.TableLoader
         public ItemConstants.SubCategory SubCategory;
         public ItemConstants.Class Class;
         public string ImagePath;
-        public AttributesConstants.Type OptionType1;
-        public float OptionValue1;
+        public string StatusID1;
+        public int StatusValue1;
+        public string OptionType1;
+        public int OptionValue1;
     }
     /// <summary>
     /// 아이템 테이블
@@ -29,7 +30,6 @@ namespace GGemCo.Scripts.TableLoader
         private static readonly Dictionary<string, ItemConstants.Category> MapCategory;
         private static readonly Dictionary<string, ItemConstants.SubCategory> MapSubCategory;
         private static readonly Dictionary<string, ItemConstants.Class> MapClass;
-        private static readonly Dictionary<string, AttributesConstants.Type> MapAttributesType;
 
         static TableItem()
         {
@@ -48,6 +48,7 @@ namespace GGemCo.Scripts.TableLoader
             {
                 { "Sword", ItemConstants.SubCategory.Sword },
                 { "Top", ItemConstants.SubCategory.Top },
+                { "Leg", ItemConstants.SubCategory.Leg },
                 { "RecoverHp", ItemConstants.SubCategory.RecoverHp },
                 { "RecoverMp", ItemConstants.SubCategory.RecoverMp },
                 { "IncreaseAttackSpeed", ItemConstants.SubCategory.IncreaseAttackSpeed },
@@ -57,17 +58,11 @@ namespace GGemCo.Scripts.TableLoader
             {
                 { "Normal", ItemConstants.Class.Normal },
             };
-            MapAttributesType = new Dictionary<string, AttributesConstants.Type>
-            {
-                { "Atk", AttributesConstants.Type.Atk },
-                { "Def", AttributesConstants.Type.Def },
-            };
         }
         private static ItemConstants.Type ConvertType(string type) => MapType.GetValueOrDefault(type, ItemConstants.Type.None);
         private static ItemConstants.Category ConvertCategory(string type) => MapCategory.GetValueOrDefault(type, ItemConstants.Category.None);
         private static ItemConstants.SubCategory ConvertSubCategory(string type) => MapSubCategory.GetValueOrDefault(type, ItemConstants.SubCategory.None);
         private static ItemConstants.Class ConvertClass(string type) => MapClass.GetValueOrDefault(type, ItemConstants.Class.None);
-        private static AttributesConstants.Type ConvertAttributesType(string type) => MapAttributesType.GetValueOrDefault(type, AttributesConstants.Type.None);
         
         private readonly Dictionary<ItemConstants.Category, List<StruckTableItem>> dictionaryByCategory = new Dictionary<ItemConstants.Category, List<StruckTableItem>>();
         private readonly Dictionary<ItemConstants.SubCategory, List<StruckTableItem>> dictionaryBySubCategory = new Dictionary<ItemConstants.SubCategory, List<StruckTableItem>>();
@@ -123,8 +118,10 @@ namespace GGemCo.Scripts.TableLoader
                 SubCategory = ConvertSubCategory(data["SubCategory"]),
                 Class = ConvertClass(data["Class"]),
                 ImagePath = data["ImagePath"],
-                OptionType1 = ConvertAttributesType(data["OptionType1"]),
-                OptionValue1 = float.Parse(data["OptionValue1"]),
+                StatusID1 = data["StatusID1"],
+                StatusValue1 = int.Parse(data["StatusValue1"]),
+                OptionType1 = data["OptionType1"],
+                OptionValue1 = int.Parse(data["OptionValue1"]),
             };
         }
     }

@@ -45,7 +45,7 @@ namespace GGemCo.Scripts.Characters.Player
                 playerTransform.localScale = new Vector3(myPlayer.OriginalScaleX * -1, playerTransform.localScale.y, playerTransform.localScale.z);
             }
             
-            playerTransform.Translate(direction * (myPlayer.CurrentMoveStep * myPlayer.CurrentMoveSpeed * Time.deltaTime));
+            playerTransform.Translate(direction * (myPlayer.CurrentMoveStep * myPlayer.GetCurrentMoveSpeed() * Time.deltaTime));
         }
 
         public override float GetCharacterHeight()

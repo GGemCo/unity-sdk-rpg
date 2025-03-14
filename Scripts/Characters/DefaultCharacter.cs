@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.TableLoader;
 #if GGEMCO_USE_SPINE
@@ -17,15 +18,8 @@ namespace GGemCo.Scripts.Characters
         public int Uid { get; set; }
         // 스폰될때 vid
         public int Vid { get; set; }
-        public long StatHp { get; set; }
-        public long StatAtk { get; set; }
-        public float StatMoveStep { get; set; }
-        public float StatMoveSpeed { get; set; }
-        
         public long CurrentHp { get; set; }
-        public long CurrentAtk { get; set; }
         public float CurrentMoveStep { get; set; }
-        public float CurrentMoveSpeed { get; set; }
         public ICharacter.CharacterStatus CurrentStatus { get; set; }
         
         public ICharacter.CharacterSortingOrder SortingOrder { get; set; }
@@ -54,21 +48,16 @@ namespace GGemCo.Scripts.Characters
         
         protected virtual void Awake()
         {
-            StatAtk = 100;
-            StatHp = 100;
-            StatMoveStep = 10f;
-            StatMoveSpeed = 1f;
-            
             IsAttacking = false;
             CurrentStatus = ICharacter.CharacterStatus.None;
             
-            SetScale(1f);
             characterRenderer = GetComponent<Renderer>();
 #if GGEMCO_USE_SPINE
             skeletonAnimation = GetComponent<SkeletonAnimation>();
 #else
             spriteRenderer = GetComponent<SpriteRenderer>();
 #endif
+            InitCharacterStat();
             InitComponents();
             InitTagSortingLayer();
         }
@@ -92,11 +81,6 @@ namespace GGemCo.Scripts.Characters
         }
         protected virtual void Start()
         {
-            // statatk 값들은 table 에서 불러올 수 있기 때문에 Start 에서 처리한다.
-            CurrentAtk = StatAtk;
-            CurrentHp = StatHp;
-            CurrentMoveStep = StatMoveStep;
-            CurrentMoveSpeed = StatMoveSpeed;
             OriginalScaleX = transform.localScale.x;
             InitializeByTable();
             InitializeByRegenData();
@@ -164,7 +148,7 @@ namespace GGemCo.Scripts.Characters
         /// <returns></returns>
         private bool IsPossibleRun()
         {
-            return !IsAttacking && CurrentMoveSpeed > 0 &&
+            return !IsAttacking && GetCurrentMoveSpeed() > 0 &&
                    (CurrentStatus == ICharacter.CharacterStatus.Idle || CurrentStatus == ICharacter.CharacterStatus.None);
         }
         /// <summary>
@@ -213,11 +197,6 @@ namespace GGemCo.Scripts.Characters
         {
             transform.position = new Vector3(x, y, transform.position.z);
         }
-        public void SetMoveSpeed(float speed)
-        {
-            CurrentMoveSpeed = Mathf.Approximately(speed, -1) ? StatMoveSpeed : speed;
-        }
-        
         public bool IsStatusDead() => CurrentStatus == ICharacter.CharacterStatus.Dead;
         protected bool IsStatusAttack() => CurrentStatus == ICharacter.CharacterStatus.Attack;
         protected bool IsStatusRun() => CurrentStatus == ICharacter.CharacterStatus.Run;
@@ -304,6 +283,19 @@ namespace GGemCo.Scripts.Characters
         protected virtual void OnDestroy()
         {
             
+        }
+        protected virtual void InitCharacterStat()
+        {
+            
+        }
+        public virtual float GetCurrentMoveSpeed()
+        {
+            return 0;
+        }
+
+        public virtual Dictionary<int, StruckTableItem> GetEquippedItems()
+        {
+            return null;
         }
     }
 }

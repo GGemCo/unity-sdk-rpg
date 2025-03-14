@@ -1,6 +1,5 @@
 using UnityEngine;
 
-#if UNITY_EDITOR
 namespace GGemCo.Scripts.Utils
 {
     public static class GcLogger
@@ -81,4 +80,3 @@ namespace GGemCo.Scripts.Utils
         }
     }
 }
-#endif

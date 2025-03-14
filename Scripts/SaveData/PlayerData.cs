@@ -2,7 +2,6 @@
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using R3;
-using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 
 namespace GGemCo.Scripts.SaveData
@@ -56,7 +55,7 @@ namespace GGemCo.Scripts.SaveData
             return currentNeedExp.DistinctUntilChanged();
         }
 
-        [JsonIgnore] public long CurrentNeedExp => currentNeedExp.Value;
+        public long CurrentNeedExp => currentNeedExp.Value;
 
         private TableMonster tableMonster;
         private TableExp tableExp;

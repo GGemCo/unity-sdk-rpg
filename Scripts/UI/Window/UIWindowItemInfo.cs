@@ -75,8 +75,8 @@ namespace GGemCo.Scripts.UI.Window
         private void SetOption()
         {
             if (currentStruckTableItem == null) return;
-            textOption1.text = $"{currentStruckTableItem.OptionType1}: {currentStruckTableItem.OptionValue1}";
-            valueOption1 = currentStruckTableItem.OptionValue1;
+            textOption1.text = $"{currentStruckTableItem.StatusID1}: {currentStruckTableItem.StatusValue1}";
+            valueOption1 = currentStruckTableItem.StatusValue1;
         }
     }
 }

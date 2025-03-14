@@ -63,5 +63,9 @@ namespace GGemCo.Scripts.Characters
         {
             
         }
+        public virtual void ChangeImageByEquiped(int partIndex, int itemUid)
+        {
+            
+        }
     }
 }

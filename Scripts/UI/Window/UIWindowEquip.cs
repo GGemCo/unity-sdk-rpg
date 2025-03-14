@@ -1,4 +1,4 @@
-﻿using GGemCo.Scripts.Items;
+﻿using GGemCo.Scripts.Characters.Player;
 using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
@@ -9,53 +9,27 @@ using UnityEngine.EventSystems;
 
 namespace GGemCo.Scripts.UI.Window
 {
-    public class StructInventoryIcon
+    public class UIWindowEquip : UIWindow
     {
-        public int ItemUid;
-        public int ItemCount;
-
-        public StructInventoryIcon(int uid, int count)
-        {
-            ItemUid = uid;
-            ItemCount = count;
-        }
-    }
-    public class UIWindowInventory : UIWindow
-    {
-        public UIWindowEquip uIWindowEquip;
-        public UIWindowPlayerInfo uiWindowPlayerInfo;
-        
-        private GameObject iconItem;
         private TableItem tableItem;
-        private Camera mainCamera;
-        private ItemManager itemManager;
-        private InventoryData inventoryData;
+        private EquipData equipData;
         
         protected override void Awake()
         {
             base.Awake();
             if (TableLoaderManager.Instance == null) return;
             tableItem = TableLoaderManager.Instance.TableItem;
+            uid = UIWindowManager.WindowUid.Equip;
         }
-
         protected override void Start()
         {
             base.Start();
-            mainCamera = SceneGame.Instance.mainCamera;
-            itemManager = SceneGame.Instance.itemManager;
             if (SceneGame.Instance != null && SceneGame.Instance.saveDataManager != null)
             {
-                inventoryData = SceneGame.Instance.saveDataManager.Inventory;
+                equipData = SceneGame.Instance.saveDataManager.Equip;
             }
         }
-
-        public override bool Show(bool show)
-        {
-            if (!base.Show(show)) return false;
-            uIWindowEquip?.Show(show);
-            uiWindowPlayerInfo?.Show(show);
-            return true;
-        }
+        
         public override void OnShow(bool show)
         {
             if (SceneGame.Instance == null || TableLoaderManager.Instance == null) return;
@@ -67,7 +41,7 @@ namespace GGemCo.Scripts.UI.Window
         /// </summary>
         public void LoadIcons()
         {
-            var datas = SceneGame.Instance.saveDataManager.Inventory.GetAllItemCounts();
+            var datas = SceneGame.Instance.saveDataManager.Equip.GetAllItemCounts();
             if (datas == null) return;
             foreach (var info in datas)
             {
@@ -87,6 +61,7 @@ namespace GGemCo.Scripts.UI.Window
                 uiIcon.SetCount(itemCount);
             }
         }
+        
         /// <summary>
         /// 아이템 아이콘 드랍이 끝났을때 
         /// </summary>
@@ -94,6 +69,7 @@ namespace GGemCo.Scripts.UI.Window
         public override void OnDrop(PointerEventData eventData)
         {
         }
+        
         /// <summary>
         ///  window 밖에 드래그앤 드랍 했을때 처리 
         /// </summary>
@@ -104,19 +80,13 @@ namespace GGemCo.Scripts.UI.Window
         public override void OnEndDragOutWindow(PointerEventData eventData, GameObject droppedIcon, GameObject targetIcon, Vector3 originalPosition)
         {
             // GcLogger.Log("OnEndDragOutWindow");
-            Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(eventData.position.x,
-                eventData.position.y, mainCamera.nearClipPlane));
             UIIcon icon = droppedIcon.GetComponent<UIIcon>();
-            
-            // 맵에 드랍하기
-            itemManager.ShowDropItem(worldPosition, icon.uid, icon.count);
-            // 윈도우에서 아이콘 정보 지워주기 
-            icon.window.DetachIcon(icon.slotIndex);
             // 아이콘 원래 자리로 이동시키기
             GameObject targetSlot = icon.window.slots[icon.slotIndex];
             droppedIcon.transform.SetParent(targetSlot.transform);
             droppedIcon.transform.position = originalPosition;
         }
+        
         /// <summary>
         /// 아이콘 위에서 드래그가 끝났을때 처리 
         /// </summary>
@@ -171,11 +141,18 @@ namespace GGemCo.Scripts.UI.Window
             base.OnSetIcon(slotIndex, icon);
             UIIcon uiIcon = icon.GetComponent<UIIcon>();
             if (uiIcon == null) return;
-            inventoryData.SetItemCount(slotIndex, uiIcon.uid, uiIcon.count);
+
+            equipData.SetItemCount(slotIndex, uiIcon.uid, uiIcon.count);
+            
+            // 장착하기
+            Player player = SceneGame.Instance?.player?.GetComponent<Player>();
+            if (player == null) return;
+            player.EquipItem(slotIndex, uiIcon.uid);
         }
         protected override void OnDetachIcon(int slotIndex)
         {
-            inventoryData.RemoveItemCount(slotIndex);
+            base.OnDetachIcon(slotIndex);
+            equipData.RemoveItemCount(slotIndex);
         }
     }
 }

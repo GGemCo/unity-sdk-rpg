@@ -1,9 +1,11 @@
 ﻿#if GGEMCO_USE_SPINE
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.Spine2d;
+using GGemCo.Scripts.TableLoader;
 using Spine.Unity;
 using UnityEngine;
 using Event = Spine.Event;
@@ -64,11 +66,11 @@ namespace GGemCo.Scripts.Characters.Player
             }
         }
 
-        private void PlayAnimation(string animationName, float scaleX)
+        private void PlayAnimation(string animationName, float scaleX, float timeScale = 1)
         {
             SkeletonAnimation.AnimationName = animationName;
             player.transform.localScale = new Vector3(player.OriginalScaleX * scaleX, player.transform.localScale.y,player.transform.localScale.z);
-            SkeletonAnimation.timeScale = player.CurrentMoveSpeed;
+            SkeletonAnimation.timeScale = timeScale;
         }
 
         private void UpdateDirectionAnimation()
@@ -79,22 +81,30 @@ namespace GGemCo.Scripts.Characters.Player
             // 정지 상태 처리
             if (Direction == Vector3.zero)
             {
-                string idleAnim = DirectionPrev.y != 0 
-                    ? (DirectionPrev.y > 0 ? waitBackwardAnim : waitForwardAnim) 
-                    : waitForwardAnim;
-
-                PlayAnimation(idleAnim, DirectionPrev.x >= 0 ? -1 : 1);
+                PlayWaitAnimation();
             }
             // 이동 상태 처리
             else
             {
-                string moveAnim = Direction.y != 0 
-                    ? (Direction.y > 0 ? walkBackwardAnim : walkForwardAnim) 
-                    : walkForwardAnim;
-
-                PlayAnimation(moveAnim, Direction.x >= 0 ? -1 : 1);
-                DirectionPrev = Direction;
+                PlayRunAnimation();
             }
+        }
+
+        private void PlayWaitAnimation()
+        {
+            string idleAnim = DirectionPrev.y != 0 
+                ? (DirectionPrev.y > 0 ? waitBackwardAnim : waitForwardAnim) 
+                : waitForwardAnim;
+
+            PlayAnimation(idleAnim, DirectionPrev.x >= 0 ? -1 : 1, player.GetCurrentMoveSpeed());
+        }
+        private void PlayRunAnimation()
+        {
+            string moveAnim = Direction.y != 0 
+                ? (Direction.y > 0 ? walkBackwardAnim : walkForwardAnim) 
+                : walkForwardAnim;
+            PlayAnimation(moveAnim, Direction.x >= 0 ? -1 : 1, player.GetCurrentMoveSpeed());
+            DirectionPrev = Direction;
         }
         private void Update()
         {
@@ -106,7 +116,7 @@ namespace GGemCo.Scripts.Characters.Player
 
             UpdateCheckMaxBounds();
             // 이동 처리
-            Vector3 nextPosition = player.transform.position + Direction * (player.CurrentMoveStep * player.CurrentMoveSpeed * Time.deltaTime);
+            Vector3 nextPosition = player.transform.position + Direction * (player.GetCurrentMoveStep() * player.GetCurrentMoveSpeed() * Time.deltaTime);
 
             // 경계 체크 (타일맵 범위를 벗어나지 않도록 제한)
             nextPosition.x = Mathf.Clamp(nextPosition.x, minBounds.x, maxBounds.x);
@@ -224,6 +234,37 @@ namespace GGemCo.Scripts.Characters.Player
             mapSize = SceneGame.Instance.mapManager.GetCurrentMapSize();
             minBounds.x = characterSize.x / 2;
             maxBounds = new Vector2(mapSize.width - (characterSize.x/2), mapSize.height - characterSize.y);   // 우측 상단 경계
+        }
+        /// <summary>
+        /// 아이템 장칙시 slot 이미지 변경
+        /// </summary>
+        /// <param name="partIndex"></param>
+        /// <param name="itemUid"></param>
+        public override void ChangeImageByEquiped(int partIndex, int itemUid)
+        {
+            var info = TableLoaderManager.Instance.TableItem.GetDataByUid(itemUid);
+            if (info == null) return;
+            
+            EquipController.PartsType partsType = (EquipController.PartsType)partIndex;
+            List<string> slotNames = EquipController.SlotNameByPartsType[partsType];
+
+            List<StruckChangeSlotImage> changeImages = new List<StruckChangeSlotImage>();
+            foreach (var slotName in slotNames)
+            {
+                string attachmentName = EquipController.AttachmentNameBySlotName[slotName];
+                
+                string changeSpritePath = $"Images/Parts/{info.SubCategory}/{info.ImagePath}_{slotName}";
+                var sprite = Resources.Load<Sprite>(changeSpritePath);
+                
+                StruckChangeSlotImage struckChangeSlotImage = new StruckChangeSlotImage
+                {
+                    SlotName = slotName,
+                    AttachmentName = attachmentName,
+                    Sprite = sprite
+                };
+                changeImages.Add(struckChangeSlotImage);
+            }
+            ChangeImageInSlot(changeImages);
         }
     }
 }

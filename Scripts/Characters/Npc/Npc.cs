@@ -50,11 +50,6 @@ namespace GGemCo.Scripts.Characters.Npc
             // GcLogger.Log("InitializationStat uid: "+uid+" / info.uid: "+info.uid+" / StatMoveSpeed: "+info.statMoveSpeed);
             if (info.Uid > 0)
             {
-                CurrentAtk = (long)StatAtk;
-                StatMoveSpeed = info.StatMoveSpeed;
-                CurrentMoveSpeed = StatMoveSpeed;
-                CurrentMoveStep = StatMoveStep;
-                CurrentHp = (long)StatHp;
                 float scale = info.Scale;
                 SetScale(scale);
                 

@@ -22,6 +22,7 @@
             None,
             Sword, // 칼
             Top, // 상의
+            Leg, // 상의
             RecoverHp, // hp 물약
             RecoverMp, // mp 물약
             IncreaseAttackSpeed, // 공격속도 증가

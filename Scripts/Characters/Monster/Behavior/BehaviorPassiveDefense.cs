@@ -85,7 +85,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
             HandleInput();
             UpdateMonsterScale(Direction);
             TrackEntry attack = SkeletonAnimation.AnimationState.SetAnimation(0, attackAnim, false);
-            attack.TimeScale = monster.currentAttackSpeed;
+            attack.TimeScale = monster.MonsterStat.GetTotalAttackSpeed();
         }
 
         /// <summary>
@@ -186,6 +186,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
                 ? (DirectionPrev.y > 0 ? waitBackwardAnim : waitForwardAnim) 
                 : waitForwardAnim;
 
+            SkeletonAnimation.timeScale = monster.GetCurrentMoveSpeed();
             PlayAnimation(idleAnim);
         }
 
@@ -200,11 +201,12 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
                 ? (Direction.y > 0 ? walkBackwardAnim : walkForwardAnim) 
                 : walkForwardAnim;
 
+            SkeletonAnimation.timeScale = monster.GetCurrentMoveSpeed();
             PlayAnimation(moveAnim);
             
             UpdateCheckMaxBounds();
             // 이동 처리
-            Vector3 nextPosition = monster.transform.position + Direction * (monster.CurrentMoveStep * monster.CurrentMoveSpeed * Time.deltaTime);
+            Vector3 nextPosition = monster.transform.position + Direction * (monster.CurrentMoveStep * monster.GetCurrentMoveSpeed() * Time.deltaTime);
 
             // 경계 체크 (타일맵 범위를 벗어나지 않도록 제한)
             nextPosition.x = Mathf.Clamp(nextPosition.x, minBounds.x, maxBounds.x);
@@ -221,7 +223,6 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
             if (monster.IsStatusDead()) return;
             SkeletonAnimation.AnimationName = animationName;
             UpdateMonsterScale(Direction);
-            SkeletonAnimation.timeScale = monster.CurrentMoveSpeed;
             DirectionPrev = Direction;
         }
 

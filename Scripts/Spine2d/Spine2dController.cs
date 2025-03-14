@@ -1,18 +1,30 @@
 #if GGEMCO_USE_SPINE
+using System.Collections.Generic;
 using GGemCo.Scripts.Characters;
 using Spine;
 using Spine.Unity;
 using GGemCo.Scripts.Utils;
+using Spine.Unity.AttachmentTools;
+using UnityEngine;
 using Event = Spine.Event;
 
 namespace GGemCo.Scripts.Spine2d
 {
+    public class StruckChangeSlotImage
+    {
+        public string SlotName;
+        public string AttachmentName;
+        public Sprite Sprite;
+    }
     /// <summary>
     /// 스파인 컨트롤러
     /// </summary>
     public class Spine2dController : DefaultCharacterBehavior
     {
         protected SkeletonAnimation SkeletonAnimation;
+        private Skeleton skeleton;
+        private SkeletonData skeletonData;
+        private Material sourceMaterial;
 
         protected override void Awake() {
             // Spine 오브젝트의 SkeletonAnimation 컴포넌트 가져오기
@@ -22,7 +34,10 @@ namespace GGemCo.Scripts.Spine2d
             {
                 GcLogger.LogError("SkeletonAnimation component 가 없습니다.");
             }
+            skeleton = SkeletonAnimation.skeleton;
+            skeletonData = skeleton.Data;
             SkeletonAnimation.AnimationState.Event += HandleEvent;
+            sourceMaterial = GetComponent<MeshRenderer>().material;
         }
 
         private void HandleEvent(TrackEntry trackEntry, Event e)
@@ -179,6 +194,40 @@ namespace GGemCo.Scripts.Spine2d
             float[] vertexBuffer = new float[8];
             SkeletonAnimation.Skeleton.GetBounds(out float x, out float y, out float width, out float height, ref vertexBuffer);
             return width;
+        }
+        
+        /// <summary>
+        /// slot 위치에 Attachment 이미지 바꾸기 
+        /// </summary>
+        /// <param name="slotName"></param>
+        /// <param name="attachmentName"></param>
+        /// <param name="sprite"></param>
+        /// <param name="defaultSkin"></param>
+        private void ChangeImageInSlot(string slotName, string attachmentName, Sprite sprite, Skin defaultSkin) 
+        {
+            var slotData = skeletonData.FindSlot(slotName);
+            int slotIndex = slotData.Index;
+            Attachment templateAttachment = defaultSkin.GetAttachment(slotIndex, attachmentName);
+
+            // Clone the template gun Attachment, and map the sprite onto it.
+            // This sample uses the sprite and material set in the inspector.
+            Attachment newAttachment = templateAttachment.GetRemappedClone(sprite, sourceMaterial); // This has some optional parameters. See below.
+
+            // Add the gun to your new custom skin.
+            if (newAttachment != null) defaultSkin.SetAttachment(slotIndex, attachmentName, newAttachment);
+        }
+        protected void ChangeImageInSlot(List<StruckChangeSlotImage> changeImages)
+        {
+            string skinName = "default";
+            Skin defaultSkin = skeletonData.FindSkin(skinName);
+            foreach (var info in changeImages)
+            {
+                ChangeImageInSlot(info.SlotName, info.AttachmentName, info.Sprite, defaultSkin);
+            }
+            // Set and apply the Skin to the skeleton.
+            skeleton.SetSkin(defaultSkin);
+            skeleton.SetSlotsToSetupPose();
+            SkeletonAnimation.Update(0);
         }
     }
 }
