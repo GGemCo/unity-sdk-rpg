@@ -23,7 +23,7 @@ namespace GGemCo.Scripts.TableLoader
         public TableItemDropGroup TableItemDropGroup { get; private set; } = new TableItemDropGroup();
         public TableExp TableExp { get; private set; } = new TableExp();
         public TableWindow TableWindow { get; private set; } = new TableWindow();
-        public TableAttribute TableAttribute { get; private set; } = new TableAttribute();
+        public TableStatus TableStatus { get; private set; } = new TableStatus();
 
         protected void Awake()
         {
@@ -42,7 +42,7 @@ namespace GGemCo.Scripts.TableLoader
                 ConfigTableFileName.Config, ConfigTableFileName.Map, ConfigTableFileName.Monster,
                 ConfigTableFileName.Npc, ConfigTableFileName.Animation, ConfigTableFileName.Item,
                 ConfigTableFileName.MonsterDropRate, ConfigTableFileName.ItemDropGroup, ConfigTableFileName.Exp,
-                ConfigTableFileName.Window, ConfigTableFileName.Attribute
+                ConfigTableFileName.Window, ConfigTableFileName.Status
             };
         }
 
@@ -85,8 +85,8 @@ namespace GGemCo.Scripts.TableLoader
                             case ConfigTableFileName.Window:
                                 TableWindow.LoadData(content);
                                 break;
-                            case ConfigTableFileName.Attribute:
-                                TableAttribute.LoadData(content);
+                            case ConfigTableFileName.Status:
+                                TableStatus.LoadData(content);
                                 break;
                         }
                     }
