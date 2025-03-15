@@ -1,51 +1,94 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using GGemCo.Scripts.TableLoader;
 using UnityEngine;
 
 namespace GGemCo.Scripts.Characters
 {
-    // public class Buff
-    // {
-    //     public string Name;
-    //     public string OptionType;
-    //     public int OptionValue;
-    // }
-    public class DefaultCharacterStat
+    /// <summary>
+    /// 캐릭터 스탯 관리
+    /// </summary>
+    public class CharacterStat : MonoBehaviour
     {
-        private GameObject character;
         // 기본 스탯
-        public int BaseAtk { get; protected set; }
-        protected int BaseDef { get; set; }
-        public int BaseHp { get; protected set; }
-        protected int BaseMp { get; set; }
-        protected int BaseMoveSpeed { get; set; }
-        
-        protected int BaseAttackSpeed { get; set; }
+        private int BaseAtk { get; set; }
+        private int BaseDef { get; set; }
+        protected int BaseHp { get; set; }
+        private int BaseMp { get; set; }
+        private int BaseMoveSpeed { get; set; }
+
+        private int BaseAttackSpeed { get; set; }
         protected int BaseCriticalDamage { get; set; }
         protected int BaseCriticalProbability { get; set; }
-
+        
         // 최종 적용된 스탯 (캐싱)
         public long TotalAtk { get; private set; }
-        public long TotalDef { get; private set; }
-        public long TotalHp { get; private set; }
-        public long TotalMp { get; private set; }
-        public long TotalMoveSpeed { get; private set; }
-        public long TotalAttackSpeed { get; private set; }
+        private long TotalDef { get; set; }
+        protected long TotalHp { get; private set; }
+        private long TotalMp { get; set; }
+        private long TotalMoveSpeed { get; set; }
+        private long TotalAttackSpeed { get; set; }
         private long TotalCriticalDamage { get; set; }
         private long TotalCriticalProbability { get; set; }
-
+       
         // 현재 활성화된 버프
         // protected readonly List<Buff> ActiveBuffs = new List<Buff>();
         
         // 스탯 캐싱을 위한 Dictionary
-        protected readonly Dictionary<string, int> PlusValues = new Dictionary<string, int>();  // 고정 추가
-        protected readonly Dictionary<string, int> MinusValues = new Dictionary<string, int>(); // 고정 감소
-        protected readonly Dictionary<string, float> IncreaseValues = new Dictionary<string, float>(); // % 증가
-        protected readonly Dictionary<string, float> DecreaseValues = new Dictionary<string, float>(); // % 감소
+        private readonly Dictionary<string, int> plusValues = new Dictionary<string, int>();  // 고정 추가
+        private readonly Dictionary<string, int> minusValues = new Dictionary<string, int>(); // 고정 감소
+        private readonly Dictionary<string, float> increaseValues = new Dictionary<string, float>(); // % 증가
+        private readonly Dictionary<string, float> decreaseValues = new Dictionary<string, float>(); // % 감소
 
-        public virtual void Initialize(GameObject pcharacter)
+        protected virtual void Awake()
         {
-            if (pcharacter == null) return;
-            character = pcharacter;
+        }
+
+        protected virtual void Start()
+        {
+        }
+        /// <summary>
+        /// 스크립터블 오브젝트에 설정된 base 값 셋팅 
+        /// </summary>
+        /// <param name="statAtk"></param>
+        /// <param name="statDef"></param>
+        /// <param name="statHp"></param>
+        /// <param name="statMp"></param>
+        /// <param name="statMoveSpeed"></param>
+        /// <param name="statAttackSpeed"></param>
+        protected void SetBaseInfos(int statAtk, int statDef, int statHp, int statMp, int statMoveSpeed, int statAttackSpeed)
+        {
+            BaseAtk = statAtk;
+            BaseDef = statDef;
+            BaseHp = statHp;
+            BaseMp = statMp;
+            BaseMoveSpeed = statMoveSpeed;
+            BaseAttackSpeed = statAttackSpeed;
+            RecalculateStats();
+        }
+        // 값 업데이트
+        public void UpdateStatCache(Dictionary<int, StruckTableItem> equippedItems)
+        {
+            plusValues.Clear();
+            minusValues.Clear();
+            increaseValues.Clear();
+            decreaseValues.Clear();
+
+            // 아이템 효과 적용
+            foreach (var item in equippedItems.Select(items => items.Value))
+            {
+                if (item == null) continue;
+                ApplyStatEffect(item.StatusID1, item.StatusValue1);
+                ApplyStatEffect(item.OptionType1, item.OptionValue1);
+            }
+
+            // 버프 효과 적용
+            // foreach (var buff in ActiveBuffs)
+            // {
+            //     ApplyStatEffect(buff.OptionType, buff.OptionValue);
+            // }
+
+            RecalculateStats();
         }
         // // 버프 적용
         // private void ApplyBuff(Buff buff, float duration)
@@ -62,45 +105,41 @@ namespace GGemCo.Scripts.Characters
         //     ActiveBuffs.Remove(buff);
         //     RecalculateStats();
         // }
-        // 값 업데이트
-        public virtual void UpdateStatCache()
-        {
-        }
         // 스탯을 적절한 Dictionary에 추가하는 함수
-        protected void ApplyStatEffect(string statType, float value)
+        private void ApplyStatEffect(string statType, float value)
         {
             if (string.IsNullOrEmpty(statType)) return;
 
             if (statType.EndsWith("_PLUS"))
             {
                 string baseStat = statType.Replace("_PLUS", "");
-                PlusValues.TryAdd(baseStat, 0);
-                PlusValues[baseStat] += (int)value;
+                plusValues.TryAdd(baseStat, 0);
+                plusValues[baseStat] += (int)value;
             }
             else if (statType.EndsWith("_MINUS"))
             {
                 string baseStat = statType.Replace("_MINUS", "");
-                MinusValues.TryAdd(baseStat, 0);
-                MinusValues[baseStat] += (int)value;
+                minusValues.TryAdd(baseStat, 0);
+                minusValues[baseStat] += (int)value;
             }
             else if (statType.EndsWith("_INCREASE"))
             {
                 string baseStat = statType.Replace("_INCREASE", "");
-                IncreaseValues.TryAdd(baseStat, 0);
-                IncreaseValues[baseStat] += value;
+                increaseValues.TryAdd(baseStat, 0);
+                increaseValues[baseStat] += value;
             }
             else if (statType.EndsWith("_DECREASE"))
             {
                 string baseStat = statType.Replace("_DECREASE", "");
-                DecreaseValues.TryAdd(baseStat, 0);
-                DecreaseValues[baseStat] += value;
+                decreaseValues.TryAdd(baseStat, 0);
+                decreaseValues[baseStat] += value;
             }
         }
-
-        // 최종 스탯 재계산
-        protected void RecalculateStats()
+        /// <summary>
+        /// 최종 스탯 재계산
+        /// </summary>
+        private void RecalculateStats()
         {
-            if (character == null) return;
             // 기본값 + 추가값 적용
             TotalAtk = BaseAtk + GetTotalPlusValue("STAT_ATK") - GetTotalMinusValue("STAT_ATK");
             TotalDef = BaseDef + GetTotalPlusValue("STAT_DEF") - GetTotalMinusValue("STAT_DEF");
@@ -114,7 +153,9 @@ namespace GGemCo.Scripts.Characters
             // % 증가 및 감소 적용
             ApplyPercentageModifiers();
         }
-        // % 증가 및 감소 적용
+        /// <summary>
+        /// % 증가 및 감소 적용
+        /// </summary>
         private void ApplyPercentageModifiers()
         {
             TotalAtk = (int)(TotalAtk * (1 + GetTotalIncreaseValue("STAT_ATK") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_ATK") / 100.0f));
@@ -127,10 +168,23 @@ namespace GGemCo.Scripts.Characters
             TotalCriticalProbability *= (long)((1 + GetTotalIncreaseValue("STAT_CRITIAL_PROBABILITY") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_CRITIAL_PROBABILITY") / 100.0f));
         }
         
-        // 스탯 조회 함수
-        private int GetTotalPlusValue(string stat) => PlusValues.GetValueOrDefault(stat, 0);
-        private int GetTotalMinusValue(string stat) => MinusValues.GetValueOrDefault(stat, 0);
-        private float GetTotalIncreaseValue(string stat) => IncreaseValues.GetValueOrDefault(stat, 0);
-        private float GetTotalDecreaseValue(string stat) => DecreaseValues.GetValueOrDefault(stat, 0);
+        /// <summary>
+        /// 스탯 조회 함수
+        /// </summary>
+        /// <param name="stat"></param>
+        /// <returns></returns>
+        private int GetTotalPlusValue(string stat) => plusValues.GetValueOrDefault(stat, 0);
+        private int GetTotalMinusValue(string stat) => minusValues.GetValueOrDefault(stat, 0);
+        private float GetTotalIncreaseValue(string stat) => increaseValues.GetValueOrDefault(stat, 0);
+        private float GetTotalDecreaseValue(string stat) => decreaseValues.GetValueOrDefault(stat, 0);
+        
+        public float GetCurrentMoveSpeed()
+        {
+            return TotalMoveSpeed / 100f;
+        }
+        public float GetCurrentAttackSpeed()
+        {
+            return TotalAttackSpeed / 100f;
+        }
     }
 }

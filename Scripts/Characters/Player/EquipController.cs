@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using GGemCo.Scripts.TableLoader;
+using UnityEngine;
 
 namespace GGemCo.Scripts.Characters.Player
 {
     /// <summary>
     /// 장비 착용, 해제 관리
     /// </summary>
-    public class EquipController
+    public class EquipController : MonoBehaviour
     {
         public enum PartsType
         {
@@ -31,31 +32,29 @@ namespace GGemCo.Scripts.Characters.Player
         };
         
         private Player player;
-        private PlayerStat playerStat;
         // 현재 장착 중인 아이템
         private readonly Dictionary<int, StruckTableItem> equippedItems = new Dictionary<int, StruckTableItem>();
         
-        private delegate void DelegateOnEquiped();
+        private delegate void DelegateOnEquiped(Dictionary<int, StruckTableItem> equippedItems);
         private event DelegateOnEquiped OnEquiped;
-        private delegate void DelegateOnUnEquiped();
+        private delegate void DelegateOnUnEquiped(Dictionary<int, StruckTableItem> equippedItems);
         private event DelegateOnUnEquiped OnUnEquiped;
         
         TableItem tableItem;
-        /// <summary>
-        /// 초기화
-        /// </summary>
-        /// <param name="pplayer"></param>
-        public void Initialize(Player pplayer)
+
+        private void Awake()
         {
             tableItem = TableLoaderManager.Instance.TableItem;
+        }
+
+        private void Start()
+        {
+            player = GetComponent<Player>();
             equippedItems.Clear();
-            if (pplayer == null) return;
-            player = pplayer;
-            if (player.PlayerStat != null)
+            if (player != null)
             {
-                playerStat = player.PlayerStat;
-                OnEquiped += playerStat.UpdateStatCache;
-                OnUnEquiped += playerStat.UpdateStatCache;
+                OnEquiped += player.UpdateStatCache;
+                OnUnEquiped += player.UpdateStatCache;
             }
         }
         /// <summary>
@@ -69,7 +68,7 @@ namespace GGemCo.Scripts.Characters.Player
             StruckTableItem item = tableItem.GetDataByUid(itemUid);
             if (equippedItems.TryAdd(partIndex, item))
             {
-                OnEquiped?.Invoke();
+                OnEquiped?.Invoke(equippedItems);
             }
 
             return true;
@@ -83,7 +82,7 @@ namespace GGemCo.Scripts.Characters.Player
             if (player == null) return false;
             if (equippedItems.Remove(partIndex))
             {
-                OnUnEquiped?.Invoke();
+                OnUnEquiped?.Invoke(equippedItems);
             }
 
             return true;

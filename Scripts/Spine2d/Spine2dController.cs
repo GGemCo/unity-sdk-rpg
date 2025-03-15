@@ -1,6 +1,5 @@
 #if GGEMCO_USE_SPINE
 using System.Collections.Generic;
-using GGemCo.Scripts.Characters;
 using Spine;
 using Spine.Unity;
 using GGemCo.Scripts.Utils;
@@ -10,25 +9,48 @@ using Event = Spine.Event;
 
 namespace GGemCo.Scripts.Spine2d
 {
-    public class StruckChangeSlotImage
+     public class StruckChangeSlotImage
+     {
+         public string SlotName;
+         public string AttachmentName;
+         public Sprite Sprite;
+
+         public StruckChangeSlotImage(string slotName, string attachmentName, Sprite sprite)
+         {
+             SlotName = slotName;
+             AttachmentName = attachmentName;
+             Sprite = sprite;
+         }
+     }
+    public class StruckAddAnimation
     {
-        public string SlotName;
-        public string AttachmentName;
-        public Sprite Sprite;
+        public readonly string AnimationName;
+        public readonly bool Loop;
+        public readonly float Delay;
+        public readonly float TimeScale;
+
+        public StruckAddAnimation(string animationName, bool loop, float delay, float timeScale)
+        {
+            AnimationName = animationName;
+            Loop = loop;
+            Delay = delay;
+            TimeScale = timeScale;
+        }
     }
     /// <summary>
     /// 스파인 컨트롤러
     /// </summary>
-    public class Spine2dController : DefaultCharacterBehavior
+    public class Spine2dController : MonoBehaviour
     {
         protected SkeletonAnimation SkeletonAnimation;
         private Skeleton skeleton;
         private SkeletonData skeletonData;
         private Material sourceMaterial;
 
-        protected override void Awake() {
+        protected virtual void Awake() {
             // Spine 오브젝트의 SkeletonAnimation 컴포넌트 가져오기
             SkeletonAnimation = GetComponent<SkeletonAnimation>();
+            sourceMaterial = GetComponent<MeshRenderer>().material;
 
             if (SkeletonAnimation == null)
             {
@@ -36,8 +58,19 @@ namespace GGemCo.Scripts.Spine2d
             }
             skeleton = SkeletonAnimation.skeleton;
             skeletonData = skeleton.Data;
+            
+            // 애니메이션 이벤트 리스너 등록
+            SkeletonAnimation.AnimationState.Complete += OnAnimationComplete;
+            SkeletonAnimation.AnimationState.Interrupt += OnAnimationInterrupt;
             SkeletonAnimation.AnimationState.Event += HandleEvent;
-            sourceMaterial = GetComponent<MeshRenderer>().material;
+        }
+
+        private void OnDestroy()
+        {
+            SkeletonAnimation.AnimationState.Complete -= OnAnimationComplete;
+            SkeletonAnimation.AnimationState.End -= OnAnimationEnd;
+            SkeletonAnimation.AnimationState.Interrupt -= OnAnimationInterrupt;
+            SkeletonAnimation.AnimationState.Event -= HandleEvent;
         }
 
         private void HandleEvent(TrackEntry trackEntry, Event e)
@@ -72,7 +105,7 @@ namespace GGemCo.Scripts.Spine2d
         protected virtual void OnSpineEventSound(Event eEvent) 
         {
         }
-        protected override void Start()
+        protected virtual void Start()
         {
         }
         /// <summary>
@@ -80,11 +113,24 @@ namespace GGemCo.Scripts.Spine2d
         /// </summary>
         /// <param name="animationName"></param>
         /// <param name="loop"></param>
-        protected virtual void PlayAnimation(string animationName, bool loop = false)
+        /// <param name="timeScale"></param>
+        /// <param name="addAnimations"></param>
+        protected void PlayAnimation(string animationName, bool loop = false, float timeScale = 1.0f, List<StruckAddAnimation> addAnimations = null)
         {
             if (SkeletonAnimation == null) return;
-            //  GcLogger.Log("PlayAnimation gameobject: " + this.gameObject.name + " / animationName: " + animationName + " / " + loop);
-            SkeletonAnimation.AnimationState.SetAnimation(0, animationName, loop);
+            // GcLogger.Log("PlayAnimation gameobject: " + this.gameObject.name + " / animationName: " + animationName + " / " + loop);
+            TrackEntry trackEntry = SkeletonAnimation.AnimationState.SetAnimation(0, animationName, loop);
+            trackEntry.TimeScale = timeScale;
+            if (addAnimations == null) return;
+            foreach (StruckAddAnimation info in addAnimations)
+            {
+                if (info == null) continue;
+                TrackEntry entry = SkeletonAnimation.AnimationState.AddAnimation(0, info.AnimationName, info.Loop, info.Delay);
+                if (info.TimeScale > 0)
+                {
+                    entry.TimeScale = info.TimeScale;
+                }
+            }
         }
         /// <summary>
         /// 현재 재생 중인 애니메이션 이름 가져오기
@@ -95,55 +141,6 @@ namespace GGemCo.Scripts.Spine2d
             if (SkeletonAnimation == null || SkeletonAnimation.AnimationState == null) return null;
             TrackEntry currentEntry = SkeletonAnimation.AnimationState.GetCurrent(0);
             return currentEntry?.Animation.Name;
-        }
-        /// <summary>
-        /// 애니메이션을 한 번 실행하고, 그 후에 다른 애니메이션을 loop로 실행
-        /// </summary>
-        /// <param name="animationName"></param>
-        protected virtual void PlayAnimationOnceAndThenLoop(string animationName)
-        {
-            if (SkeletonAnimation == null) return;
-            // GcLogger.Log("PlayAnimationOnceAndThenLoop gameobject: " + this.gameObject.name + " / animationName: " + animationName );
-            // 애니메이션 실행
-            SkeletonAnimation.AnimationState.SetAnimation(0, animationName, false);
-
-            // 애니메이션 이벤트 리스너 등록
-            SkeletonAnimation.AnimationState.Complete += OnAnimationCompleteToIdle;
-        }
-        /// <summary>
-        /// 애니메이션이 끝나면 호출되는 콜백 함수
-        /// </summary>
-        /// <param name="entry"></param>
-        protected virtual void OnAnimationCompleteToIdle(TrackEntry entry)
-        {
-            if (SkeletonAnimation == null) return;
-            // 애니메이션 이벤트 리스너 제거
-            SkeletonAnimation.AnimationState.Complete -= OnAnimationCompleteToIdle;
-
-            // 다른 애니메이션 loop로 실행
-            SkeletonAnimation.AnimationState.SetAnimation(0, SpineCharacter.CharacterDefaultAnimationName["idle"], true);
-        }
-        protected virtual void AddCompleteEvent() 
-        {
-            SkeletonAnimation.AnimationState.Complete += OnAnimationCompleteToIdle;
-        }
-        protected virtual void RemoveCompleteEvent() 
-        {
-            if (SkeletonAnimation == null) return;
-            SkeletonAnimation.AnimationState.Complete -= OnAnimationCompleteToIdle;
-        }
-        protected float GetAnimationDuration(string animationName, bool isMilliseconds = true)
-        {
-            var findAnimation = SkeletonAnimation.Skeleton.Data.FindAnimation(animationName);
-
-            if (findAnimation == null)
-            {
-                GcLogger.LogWarning($"애니메이션 클립을 찾을 수 없습니다. AnimationName: {animationName}");
-                return 0;
-            }
-
-            float duration = findAnimation.Duration;
-            return isMilliseconds ? duration * 1000 : duration;
         }
         protected void SetTrackNoEnd(int trackId = 0)
         {
@@ -177,7 +174,7 @@ namespace GGemCo.Scripts.Spine2d
         /// 캐릭터 height 값 구하기
         /// </summary>
         /// <returns></returns>
-        public override float GetCharacterHeight()
+        protected float GetHeight()
         {
             // Skeleton에서 바운딩 박스 계산
             float[] vertexBuffer = new float[8];
@@ -188,14 +185,17 @@ namespace GGemCo.Scripts.Spine2d
         /// 캐릭터 width 값 구하기
         /// </summary>
         /// <returns></returns>
-        protected override float GetCharacterWidth()
+        protected float GetWidth()
         {
             // Skeleton에서 바운딩 박스 계산
             float[] vertexBuffer = new float[8];
             SkeletonAnimation.Skeleton.GetBounds(out float x, out float y, out float width, out float height, ref vertexBuffer);
             return width;
         }
-        
+        protected Vector2 GetSize()
+        {
+            return new Vector2(GetWidth(), GetHeight());
+        }
         /// <summary>
         /// slot 위치에 Attachment 이미지 바꾸기 
         /// </summary>
@@ -228,6 +228,40 @@ namespace GGemCo.Scripts.Spine2d
             skeleton.SetSkin(defaultSkin);
             skeleton.SetSlotsToSetupPose();
             SkeletonAnimation.Update(0);
+        }
+        protected float GetAnimationDuration(string animationName, bool isMilliseconds = true)
+        {
+            var findAnimation = SkeletonAnimation.Skeleton.Data.FindAnimation(animationName);
+
+            if (findAnimation == null)
+            {
+                GcLogger.LogWarning($"애니메이션 클립을 찾을 수 없습니다. AnimationName: {animationName}");
+                return 0;
+            }
+
+            float duration = findAnimation.Duration;
+            return isMilliseconds ? duration * 1000 : duration;
+        }
+        /// <summary>
+        /// 애니메이션이 끝나면 호출되는 콜백 함수
+        /// </summary>
+        /// <param name="entry"></param>
+        protected virtual void OnAnimationComplete(TrackEntry entry)
+        {
+        }
+        /// <summary>
+        /// 애니메이션이 끝나면 호출되는 콜백 함수
+        /// </summary>
+        /// <param name="entry"></param>
+        protected virtual void OnAnimationEnd(TrackEntry entry)
+        {
+        }
+        /// <summary>
+        /// 애니메이션이 중단되면 호출되는 콜백 함수
+        /// </summary>
+        /// <param name="entry"></param>
+        protected virtual void OnAnimationInterrupt(TrackEntry entry)
+        {
         }
     }
 }

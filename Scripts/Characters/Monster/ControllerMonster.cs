@@ -1,22 +1,21 @@
-﻿#if GGEMCO_USE_SPINE
-using System;
+﻿using System;
 using System.Collections;
-using GGemCo.Scripts.Spine2d;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
-using Spine;
-using Spine.Unity;
+using GGemCo.Scripts.Utils;
 using UnityEngine;
-using Event = Spine.Event;
+using Event = UnityEngine.Event;
 
-namespace GGemCo.Scripts.Characters.Monster.Behavior
+namespace GGemCo.Scripts.Characters.Monster
 {
     /// <summary>
-    /// 방어 행동 클래스
+    /// 몬스터 선공, 후공 처리 
     /// </summary>
-    public class BehaviorPassiveDefense : Spine2dController
+    public class ControllerMonster : MonoBehaviour
     {
         private Monster monster;
+        private ICharacterAnimationController iCharacterAnimationController;
+
         private CapsuleCollider2D capsuleCollider;
         private Coroutine coroutineAttack;
 
@@ -24,24 +23,22 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         private Vector2 minBounds, maxBounds; // 타일맵의 최소/최대 경계
         private (float width, float height) mapSize;
 
-        protected override void Awake()
+        private void Awake()
         {
-            base.Awake();
-            monster = GetComponent<Monster>();
-            capsuleCollider = monster.GetComponent<CapsuleCollider2D>();
-            SkeletonAnimation.state.Complete += OnAttackComplete;
+            capsuleCollider = GetComponent<CapsuleCollider2D>();
         }
-        protected override void Start()
+        private void Start()
         {
-            base.Start();
+            monster = GetComponent<Monster>();
+            iCharacterAnimationController = monster.CharacterAnimationController;
             // 타일맵의 경계를 가져오는 코드 (직접 설정 가능)
             minBounds = new Vector2(0f, 0f); // 좌측 하단 경계
             mapSize = SceneGame.Instance.mapManager.GetCurrentMapSize();
         }
-
+        
         private void Update()
         {
-            if (IsAttackAnimationing() || monster.IsStatusDead()) return;
+            if (monster.IsAttacking || monster.IsStatusDead()) return;
 
             HandleInput();
 
@@ -60,19 +57,36 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
             else
             {
                 StopAttackCoroutine();
-                PlayIdleAnimation();
+                iCharacterAnimationController?.PlayWaitAnimation();
             }
         }
 
         #region Attack Handling
+        private void PlayRunAnimation()
+        {
+            if (monster.IsAttacking) return;
+            if (monster.IsStatusDead()) return;
+            
+            iCharacterAnimationController?.PlayRunAnimation();
+            
+            UpdateCheckMaxBounds();
+            // 이동 처리
+            Vector3 nextPosition = monster.transform.position + monster.direction * (monster.CurrentMoveStep * monster.GetCurrentMoveSpeed() * Time.deltaTime);
+
+            // 경계 체크 (타일맵 범위를 벗어나지 않도록 제한)
+            nextPosition.x = Mathf.Clamp(nextPosition.x, minBounds.x, maxBounds.x);
+            nextPosition.y = Mathf.Clamp(nextPosition.y, minBounds.y, maxBounds.y);
+
+            monster.transform.position = nextPosition;
+        }
 
         /// <summary>
         /// 입력 처리 - 공격자 방향 계산
         /// </summary>
         private void HandleInput()
         {
-            if (!monster.isAggro || AttackerTransform == null || monster.IsStatusDead()) return;
-            Direction = (AttackerTransform.position - monster.transform.position).normalized;
+            if (!monster.isAggro || monster.AttackerTransform == null || monster.IsStatusDead()) return;
+            monster.direction = (monster.AttackerTransform.position - monster.transform.position).normalized;
         }
 
         /// <summary>
@@ -80,41 +94,25 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         /// </summary>
         private void HandleAttack()
         {
-            if (IsAttackAnimationing() || monster.IsStatusDead()) return;
+            if (monster.IsAttacking || monster.IsStatusDead()) return;
 
             HandleInput();
-            UpdateMonsterScale(Direction);
-            TrackEntry attack = SkeletonAnimation.AnimationState.SetAnimation(0, attackAnim, false);
-            attack.TimeScale = monster.MonsterStat.GetTotalAttackSpeed();
+            UpdateMonsterScale(monster.direction);
+            monster.IsAttacking = true;
+            iCharacterAnimationController?.PlayAttackAnimation();
         }
-
-        /// <summary>
-        /// 공격 애니메이션 완료 이벤트
-        /// </summary>
-        private void OnAttackComplete(TrackEntry trackEntry)
-        {
-            if (trackEntry.Animation.Name != attackAnim || monster.IsStatusDead()) return;
-
-            PlayIdleAnimation();
-        }
-
-        private void OnDestroy()
-        {
-            SkeletonAnimation.state.Complete -= OnAttackComplete;
-        }
-
         /// <summary>
         /// 주위에서 공격자를 검색
         /// </summary>
         private bool SearchAttackerTarget()
         {
-            if (AttackerTransform == null || monster.IsStatusDead()) return false;
+            if (monster.AttackerTransform == null || monster.IsStatusDead()) return false;
             Vector2 size = new Vector2(capsuleCollider.size.x * Mathf.Abs(transform.localScale.x), capsuleCollider.size.y * transform.localScale.y);
             Collider2D[] collider2Ds = Physics2D.OverlapCapsuleAll(transform.position, size, capsuleCollider.direction, 0f);
 
             foreach (var hit in collider2Ds)
             {
-                if (hit.CompareTag(AttackerTransform.tag) && hit.GetComponent<Player.Player>() != null)
+                if (hit.CompareTag(monster.AttackerTransform.tag) && hit.GetComponent<Player.Player>() != null)
                 {
                     return true;
                 }
@@ -138,7 +136,7 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
             coroutineAttack = StartCoroutine(DownAttackByTime());
         }
 
-        private void StopAttackCoroutine()
+        public void StopAttackCoroutine()
         {
             if (coroutineAttack == null) return;
 
@@ -149,14 +147,6 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         #endregion
 
         #region Animation Handling
-
-        /// <summary>
-        /// 현재 애니메이션 이름이 공격 애니메이션인지 확인
-        /// </summary>
-        private bool IsAttackAnimationing()
-        {
-            return GetCurrentAnimation() == attackAnim;
-        }
 
         /// <summary>
         /// 몬스터의 방향에 따른 스케일 설정
@@ -176,79 +166,6 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         {
             return direction.x >= 0 ? -1 : 1;
         }
-
-        /// <summary>
-        /// 정지 상태 애니메이션
-        /// </summary>
-        private void PlayIdleAnimation()
-        {
-            string idleAnim = DirectionPrev.y != 0 
-                ? (DirectionPrev.y > 0 ? waitBackwardAnim : waitForwardAnim) 
-                : waitForwardAnim;
-
-            SkeletonAnimation.timeScale = monster.GetCurrentMoveSpeed();
-            PlayAnimation(idleAnim);
-        }
-
-        /// <summary>
-        /// 이동 상태 애니메이션
-        /// </summary>
-        private void PlayRunAnimation()
-        {
-            if (monster.IsStatusDead()) return;
-            
-            string moveAnim = Direction.y != 0 
-                ? (Direction.y > 0 ? walkBackwardAnim : walkForwardAnim) 
-                : walkForwardAnim;
-
-            SkeletonAnimation.timeScale = monster.GetCurrentMoveSpeed();
-            PlayAnimation(moveAnim);
-            
-            UpdateCheckMaxBounds();
-            // 이동 처리
-            Vector3 nextPosition = monster.transform.position + Direction * (monster.CurrentMoveStep * monster.GetCurrentMoveSpeed() * Time.deltaTime);
-
-            // 경계 체크 (타일맵 범위를 벗어나지 않도록 제한)
-            nextPosition.x = Mathf.Clamp(nextPosition.x, minBounds.x, maxBounds.x);
-            nextPosition.y = Mathf.Clamp(nextPosition.y, minBounds.y, maxBounds.y);
-
-            monster.transform.position = nextPosition;
-        }
-
-        /// <summary>
-        /// 애니메이션 실행
-        /// </summary>
-        private void PlayAnimation(string animationName)
-        {
-            if (monster.IsStatusDead()) return;
-            SkeletonAnimation.AnimationName = animationName;
-            UpdateMonsterScale(Direction);
-            DirectionPrev = Direction;
-        }
-
-        #endregion
-
-        #region Fade Effect
-
-        public override IEnumerator FadeEffect(float duration, bool fadeIn)
-        {
-            float elapsedTime = 0f;
-            float startAlpha = fadeIn ? 0 : 1;
-            float endAlpha = fadeIn ? 1 : 0;
-
-            var color = SkeletonAnimation.Skeleton.GetColor();
-
-            while (elapsedTime < duration)
-            {
-                elapsedTime += Time.deltaTime;
-                color.a = Mathf.Lerp(startAlpha, endAlpha, elapsedTime / duration);
-                SkeletonAnimation.Skeleton.SetColor(color);
-                yield return null;
-            }
-
-            monster.SetIsStartFade(false);
-        }
-
         #endregion
 
         private void OnTriggerExit2D(Collider2D collision)
@@ -257,15 +174,15 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
             {
                 if (monster.IsStatusDead()) return;
                 
-                IsAttacking = false;
+                monster.IsAttacking = false;
                 StopAttackCoroutine();
             }
         }
-        protected override void OnSpineEventShake(Event @event) 
+        protected void OnSpineEventShake(Event @event) 
         {
         
         }
-        protected override void OnSpineEventAttack(Event @event) 
+        protected void OnSpineEventAttack(Event @event) 
         {
             if (monster.IsStatusDead()) return;
             // GcLogger.Log(@event);
@@ -285,28 +202,21 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
                     if (player != null)
                     {
                         // GcLogger.Log("Player attacked the monster after animation!");
-                        player.OnDamage(totalDamage, gameObject);
+                        player.TakeDamage(totalDamage, gameObject);
                         break;
                     }
                 }
             }
         }
-        protected override void OnSpineEventSound(Event @event) 
-        {
-        }
-        public override void PlayDeadAnimation()
-        {
-            if (coroutineAttack != null)
-            {
-                StopCoroutine(coroutineAttack);
-                coroutineAttack = null;
-            }
-            SkeletonAnimation.AnimationState.SetAnimation(0, deadAnim, false);
-        }
         private void UpdateCheckMaxBounds()
         {
+            if (iCharacterAnimationController == null)
+            {
+                GcLogger.LogError("애니메이션 컨트롤러가 없습니다.");
+                return;
+            }
             if (monster.IsStatusDead()) return;
-            var characterSize = GetCharacterSize();
+            var characterSize = iCharacterAnimationController.GetCharacterSize();
             characterSize.x *= Math.Abs(monster.transform.localScale.x);
             characterSize.y *= monster.transform.localScale.y;
             minBounds.x = characterSize.x / 2;
@@ -314,4 +224,3 @@ namespace GGemCo.Scripts.Characters.Monster.Behavior
         }
     }
 }
-#endif

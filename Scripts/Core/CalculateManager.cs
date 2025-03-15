@@ -22,7 +22,7 @@ namespace GGemCo.Scripts.Core
         /// <returns></returns>
         public long GetPlayerTotalAtk()
         {
-            return (long)SceneGame.Instance.player.GetComponent<Player>().PlayerStat.TotalAtk;
+            return (long)SceneGame.Instance.player.GetComponent<Player>().TotalAtk;
         }
         /// <summary>
         /// 몬스터 공격력 구하기

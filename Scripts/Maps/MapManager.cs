@@ -11,6 +11,7 @@ using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.Utils;
 using GGemCo.Scripts.Addressable;
+using GGemCo.Scripts.Characters;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Events;
@@ -457,7 +458,7 @@ namespace GGemCo.Scripts.Maps
                     GcLogger.LogError("플레이어 프리팹이 없습니다. path:"+ConfigCommon.PathPlayerPrefab);
                     yield break;
                 }
-                GameObject player = Instantiate(prefabPlayer, new Vector3(0, 0, 0), Quaternion.identity);
+                GameObject player = sceneGame.CharacterManager.CreateCharacter(CharacterManager.Type.Player, prefabPlayer, Vector3.zero);
                 SceneGame.Instance.player = player;
             }
             
@@ -518,7 +519,7 @@ namespace GGemCo.Scripts.Maps
                     GcLogger.LogError("프리팹이 없습니다. spine uid: " + info.SpineUid);
                     continue;
                 }
-                GameObject npc = Instantiate(npcPrefab, new Vector3(npcData.x, npcData.y, npcData.z), Quaternion.identity, mapTileCommon.gameObject.transform);
+                GameObject npc = sceneGame.CharacterManager.CreateCharacter(CharacterManager.Type.Npc, npcPrefab, new Vector3(npcData.x, npcData.y, npcData.z), mapTileCommon.gameObject.transform);
             
                 // NPC의 이름과 기타 속성 설정
                 Npc myNpcScript = npc.GetComponent<Npc>();
@@ -551,8 +552,8 @@ namespace GGemCo.Scripts.Maps
                     GcLogger.LogError("프리팹이 없습니다. spine uid: " + info.SpineUid);
                     continue;
                 }
-                GameObject monster = Instantiate(monsterPrefab, new Vector3(monsterData.x, monsterData.y, monsterData.z), Quaternion.identity, mapTileCommon.gameObject.transform);
-            
+                GameObject monster = sceneGame.CharacterManager.CreateCharacter(CharacterManager.Type.Monster, monsterPrefab, new Vector3(monsterData.x, monsterData.y, monsterData.z), mapTileCommon.gameObject.transform);
+                
                 // 몬스터의 이름과 기타 속성 설정
                 Monster myMonsterScript = monster.GetComponent<Monster>();
                 if (myMonsterScript != null)

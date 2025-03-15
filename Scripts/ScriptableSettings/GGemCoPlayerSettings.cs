@@ -13,6 +13,7 @@ namespace GGemCo.Scripts.ScriptableSettings
         [Header("기본 생명력")] public int statHp;
         [Header("기본 마력")] public int statMp;
         [Header("애니메이션 스텝 당 이동거리(픽셀)")] public int statMoveStep;
+        [Header("공격 속도(100->1)")] public int statAttackSpeed;
         [Header("이동 속도(100->1)")] public int statMoveSpeed;
         
         /// <summary>

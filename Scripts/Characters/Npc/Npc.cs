@@ -7,7 +7,7 @@ namespace GGemCo.Scripts.Characters.Npc
     /// <summary>
     /// Npc 기본 클레스
     /// </summary>
-    public class Npc : DefaultCharacter, INpc
+    public class Npc : CharacterBase
     {
         public NpcData NpcData;
         
@@ -16,12 +16,6 @@ namespace GGemCo.Scripts.Characters.Npc
         {
             base.Awake();
             NpcData = null;
-            
-#if GGEMCO_USE_SPINE
-            DefaultCharacterBehavior = gameObject.AddComponent<BehaviorNpcSpine>();
-#else
-            DefaultCharacterBehavior = gameObject.AddComponent<BehaviorNpcSprite>();
-#endif
         }
         /// <summary>
         /// tag, sorting layer, layer 셋팅하기
@@ -50,6 +44,13 @@ namespace GGemCo.Scripts.Characters.Npc
             // GcLogger.Log("InitializationStat uid: "+uid+" / info.uid: "+info.uid+" / StatMoveSpeed: "+info.statMoveSpeed);
             if (info.Uid > 0)
             {
+                const int statAtk = 0;
+                const int statDef = 0;
+                const int statHp = 0;
+                const int statMp = 0;
+                const int statMoveSpeed = 100;
+                const int statAttackSpeed = 0;
+                SetBaseInfos(statAtk, statDef, statHp, statMp, statMoveSpeed, statAttackSpeed);
                 float scale = info.Scale;
                 SetScale(scale);
                 
@@ -67,6 +68,9 @@ namespace GGemCo.Scripts.Characters.Npc
         {
             // 맵 배치툴로 저장한 정보가 있을 경우 
             if (NpcData == null) return;
+            // UpdateDirection() 에서 초기 방향 처리를 위해 추가
+            direction = new Vector3(NpcData.Flip?1:-1, 0, 0);
+            directionPrev = new Vector3(NpcData.Flip?1:-1, 0, 0);
             SetFlip(NpcData.Flip);
         }
         void OnTriggerEnter2D(Collider2D collision)

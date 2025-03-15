@@ -61,6 +61,9 @@ namespace GGemCo.Scripts.Spine2d
             if (skeletonGraphic == null) return;
             //  GcLogger.Log("PlayAnimation gameobject: " + this.gameObject.name + " / animationName: " + animationName + " / " + loop);
             skeletonGraphic.AnimationState.SetAnimation(0, animationName, loop);
+
+            // 애니메이션 이벤트 리스너 등록
+            skeletonGraphic.AnimationState.Complete += OnAnimationComplete;
         }
         /// <summary>
         /// 현재 재생 중인 애니메이션 이름 가져오기
@@ -73,41 +76,24 @@ namespace GGemCo.Scripts.Spine2d
             return currentEntry?.Animation.Name;
         }
         /// <summary>
-        /// 애니메이션을 한 번 실행하고, 그 후에 다른 애니메이션을 loop로 실행
-        /// </summary>
-        /// <param name="animationName"></param>
-        public void PlayAnimationOnceAndThenLoop(string animationName)
-        {
-            if (skeletonGraphic == null) return;
-            // GcLogger.Log("PlayAnimationOnceAndThenLoop gameobject: " + this.gameObject.name + " / animationName: " + animationName );
-            // 애니메이션 실행
-            skeletonGraphic.AnimationState.SetAnimation(0, animationName, false);
-
-            // 애니메이션 이벤트 리스너 등록
-            skeletonGraphic.AnimationState.Complete += OnAnimationCompleteToIdle;
-        }
-        /// <summary>
         /// 애니메이션이 끝나면 호출되는 콜백 함수
         /// </summary>
         /// <param name="entry"></param>
-        public void OnAnimationCompleteToIdle(TrackEntry entry)
+        private void OnAnimationComplete(TrackEntry entry)
         {
             if (skeletonGraphic == null) return;
             // 애니메이션 이벤트 리스너 제거
-            skeletonGraphic.AnimationState.Complete -= OnAnimationCompleteToIdle;
-
-            // 다른 애니메이션 loop로 실행
-            skeletonGraphic.AnimationState.SetAnimation(0, SpineCharacter.CharacterDefaultAnimationName["idle"], true);
+            skeletonGraphic.AnimationState.Complete -= OnAnimationComplete;
         }
         public void AddCompleteEvent() 
         {
             if (skeletonGraphic == null) return;
-            skeletonGraphic.AnimationState.Complete += OnAnimationCompleteToIdle;
+            skeletonGraphic.AnimationState.Complete += OnAnimationComplete;
         }
         public void RemoveCompleteEvent() 
         {
             if (skeletonGraphic == null) return;
-            skeletonGraphic.AnimationState.Complete -= OnAnimationCompleteToIdle;
+            skeletonGraphic.AnimationState.Complete -= OnAnimationComplete;
         }
         public float GetAnimationDuration(string animationName, bool isMilliseconds = true)
         {

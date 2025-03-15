@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using GGemCo.Scripts.Addressable;
+using GGemCo.Scripts.Characters;
 using GGemCo.Scripts.Core;
 using GGemCo.Scripts.Items;
 using GGemCo.Scripts.Maps;
@@ -8,7 +8,6 @@ using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.SystemMessage;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 
 namespace GGemCo.Scripts.Scenes
@@ -51,6 +50,7 @@ namespace GGemCo.Scripts.Scenes
         [HideInInspector] public PopupManager popupManager;
         [HideInInspector] public DamageTextManager damageTextManager;
         [HideInInspector] public ItemManager itemManager;
+        [HideInInspector] public CharacterManager CharacterManager;
 
         private void Awake()
         {
@@ -91,6 +91,8 @@ namespace GGemCo.Scripts.Scenes
             
             itemManager = new ItemManager();
             itemManager.Initialize();
+            CharacterManager = new CharacterManager();
+            CharacterManager.Initialize();
         }
 
         private T CreateManager<T>(GameObject parent) where T : Component

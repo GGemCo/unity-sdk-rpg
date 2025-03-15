@@ -1,5 +1,3 @@
-using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Characters.Monster.Behavior;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
@@ -16,7 +14,7 @@ namespace GGemCo.Scripts.Characters.Monster
     /// <summary>
     /// 몬스터 기본 클레스
     /// </summary>
-    public class Monster : DefaultCharacter, IMonster
+    public class Monster : CharacterBase
     {
         // 어그로
         public bool isAggro;
@@ -25,14 +23,12 @@ namespace GGemCo.Scripts.Characters.Monster
         
         // 선공/후공
         private AttackType attackType;
-        // 맵에서 지우기까지에 시간
-        private float delayDestroy;
         
         // 1. 델리게이트 선언
         public delegate void DelegateMonsterDead(int monsterVid, int monsterUid, GameObject monsterObject);
         // 2. 델리게이트 이벤트 정의
         public event DelegateMonsterDead OnMonsterDead;
-        public MonsterStat MonsterStat;
+        private ControllerMonster controllerMonster;
         
         // Start is called before the first frame update
         protected override void Awake()
@@ -43,16 +39,17 @@ namespace GGemCo.Scripts.Characters.Monster
             PossibleAttack = true;
 
             attackType = AttackType.PassiveDefense;
-            delayDestroy = AddressableSettingsLoader.Instance.settings.delayDestroyMonster;
             
-#if GGEMCO_USE_SPINE
-            DefaultCharacterBehavior = gameObject.AddComponent<BehaviorPassiveDefense>();
-#else
-            DefaultCharacterBehavior = gameObject.AddComponent<BehaviorMonsterSprite>();
-#endif
             OnMonsterDead += SceneGame.Instance.itemManager.OnMonsterDead;
             OnMonsterDead += SceneGame.Instance.saveDataManager.Player.AddExp;
         }
+
+        protected override void Start()
+        {
+            base.Start();
+            controllerMonster = GetComponent<ControllerMonster>();
+        }
+
         /// <summary>
         /// tag, sorting layer, layer 셋팅하기
         /// </summary>
@@ -78,6 +75,9 @@ namespace GGemCo.Scripts.Characters.Monster
         {
             // 맵 배치툴로 저장한 정보가 있을 경우 
             if (MonsterData == null) return;
+            // UpdateDirection() 에서 초기 방향 처리를 위해 추가
+            direction = new Vector3(MonsterData.IsFlip?1:-1, 0, 0);
+            directionPrev = new Vector3(MonsterData.IsFlip?1:-1, 0, 0);
             SetFlip(MonsterData.IsFlip);
         }
         /// <summary>
@@ -92,8 +92,8 @@ namespace GGemCo.Scripts.Characters.Monster
             var info = tableLoaderManager.TableMonster.GetDataByUid(Uid);
             // GcLogger.Log("InitializationStat uid: "+uid+" / info.uid: "+info.uid+" / StatMoveSpeed: "+info.statMoveSpeed);
             if (info.Uid <= 0) return;
-            MonsterStat.SetBaseInfos(info);            
-            CurrentHp = MonsterStat.TotalHp;
+            SetBaseInfos(info.StatAtk, info.StatDef, info.StatHp, 0, info.StatMoveSpeed, info.StatAttackSpeed);
+            CurrentHp = info.StatHp;
             float scale = info.Scale;
             SetScale(scale);
 
@@ -108,62 +108,25 @@ namespace GGemCo.Scripts.Characters.Monster
                 }
             }
         }
-        /// <summary>
-        /// 몬스터에게 데미지 주기 
-        /// </summary>
-        /// <param name="damage">데미지 수치</param>
-        /// <param name="attacker">공격한 대상</param>
-        public bool OnDamage(long damage, GameObject attacker)
+        protected override void OnDamage(GameObject attacker)
         {
-            if (IsStatusDead())
+            if (isAggro == false)
             {
-                // GcLogger.Log("monster dead");
-                return false;
+                isAggro = true;
             }
-            if (damage <= 0) return false;
-
-            CurrentHp -= damage;
-            // -1 이면 죽지 않는다
-            if (MonsterStat.BaseHp < 0)
+            // 후공
+            if (attackType == AttackType.PassiveDefense)
             {
-                CurrentHp = 1;
+                SetAttackerTarget(attacker.transform);
             }
-
-            Vector3 damageTextPosition = transform.position + new Vector3(0, DefaultCharacterBehavior.GetCharacterHeight() * Mathf.Abs(OriginalScaleX), 0);
-            SceneGame.Instance.damageTextManager.ShowDamageText(damageTextPosition, damage, Color.white);
-            
-            if (CurrentHp <= 0)
-            {
-                CurrentStatus = ICharacter.CharacterStatus.Dead;
-                SceneGame.Instance.mapManager.OnDeadMonster(Vid);
-                
-                //GcLogger.Log("dead vid : " + this.vid);
-                Destroy(gameObject, delayDestroy);
-
-                OnDead();
-            }
-            else
-            {
-                if (isAggro == false)
-                {
-                    isAggro = true;
-                }
-                CurrentStatus = ICharacter.CharacterStatus.Damage;
-                // 후공
-                if (attackType == AttackType.PassiveDefense)
-                {
-                    DefaultCharacterBehavior.SetAttackerTarget(attacker.transform);
-                }
-            }
-
-            return true;
         }
         /// <summary>
         /// 몬스터가 죽었을때 처리 
         /// </summary>
-        private void OnDead()
+        protected override void OnDead()
         {
-            DefaultCharacterBehavior.PlayDeadAnimation();
+            base.OnDead();
+            controllerMonster.StopAttackCoroutine();
             OnMonsterDead?.Invoke(Vid, Uid, gameObject);
         }
         /// <summary>
@@ -176,30 +139,46 @@ namespace GGemCo.Scripts.Characters.Monster
             {
                 if (IsStatusDead()) return;
                 
-                CurrentStatus = ICharacter.CharacterStatus.Idle;
+                CurrentStatus = CharacterStatus.Idle;
                 // 선공
                 if (attackType == AttackType.AggroFirst && isAggro == false)
                 {
                     isAggro = true;
-                    DefaultCharacterBehavior.SetAttackerTarget(collision.gameObject.transform);
+                    SetAttackerTarget(collision.gameObject.transform);
                 }
             }
         }
 
-        protected override void OnDestroy()
+        protected void OnDestroy()
         {
-            base.OnDestroy();
             OnMonsterDead -= SceneGame.Instance.itemManager.OnMonsterDead;
             OnMonsterDead -= SceneGame.Instance.saveDataManager.Player.AddExp;
         }
-        protected override void InitCharacterStat()
+        public override void OnSpineEventAttack()
         {
-            MonsterStat = new MonsterStat();
-            MonsterStat.Initialize(gameObject);
-        }
-        public override float GetCurrentMoveSpeed()
-        {
-            return MonsterStat.TotalMoveSpeed / 100f;
+            if (IsStatusDead()) return;
+            // GcLogger.Log(@event);
+            long totalDamage = SceneGame.Instance.calculateManager.GetMonsterTotalAtk(Uid);
+        
+            // 캡슐 콜라이더 2D와 충돌 중인 모든 콜라이더를 검색
+            CapsuleCollider2D capsuleCollider2D = GetComponent<CapsuleCollider2D>();
+            Vector2 size = new Vector2(capsuleCollider2D.size.x * Mathf.Abs(transform.localScale.x), capsuleCollider2D.size.y * transform.localScale.y);
+            Vector2 point = (Vector2)transform.position + capsuleCollider2D.offset * transform.localScale;
+            Collider2D[] collider2Ds = Physics2D.OverlapCapsuleAll(point, size, capsuleCollider2D.direction, 0f);
+
+            foreach (var hit in collider2Ds)
+            {
+                if (hit.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Player)))
+                {
+                    Player.Player player = hit.GetComponent<Player.Player>();
+                    if (player != null)
+                    {
+                        // GcLogger.Log("Player attacked the monster after animation!");
+                        player.TakeDamage(totalDamage, gameObject);
+                        break;
+                    }
+                }
+            }
         }
     }
 }

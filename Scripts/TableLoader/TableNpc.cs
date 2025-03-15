@@ -14,7 +14,7 @@ namespace GGemCo.Scripts.TableLoader
         public int SpineUid;
         public string DefaultSkin;
         public float Scale;
-        public ICharacter.Grade Grade;
+        public CharacterBase.Grade Grade;
         public float StatMoveSpeed;
     }
     /// <summary>
@@ -22,18 +22,18 @@ namespace GGemCo.Scripts.TableLoader
     /// </summary>
     public class TableNpc : DefaultTable
     {
-        private static readonly Dictionary<string, ICharacter.Grade> MapGrade;
+        private static readonly Dictionary<string, CharacterBase.Grade> MapGrade;
 
         static TableNpc()
         {
-            MapGrade = new Dictionary<string, ICharacter.Grade>
+            MapGrade = new Dictionary<string, CharacterBase.Grade>
             {
-                { "Common", ICharacter.Grade.Common },
-                { "Boss", ICharacter.Grade.Boss },
+                { "Common", CharacterBase.Grade.Common },
+                { "Boss", CharacterBase.Grade.Boss },
             };
         }
 
-        private ICharacter.Grade ConvertGrade(string grade) => MapGrade.GetValueOrDefault(grade, ICharacter.Grade.None);
+        private CharacterBase.Grade ConvertGrade(string grade) => MapGrade.GetValueOrDefault(grade, CharacterBase.Grade.None);
 
         public StruckTableNpc GetDataByUid(int uid)
         {

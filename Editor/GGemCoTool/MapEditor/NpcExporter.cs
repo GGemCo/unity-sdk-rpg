@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using GGemCo.Scripts.Characters;
 using GGemCo.Scripts.Characters.Npc;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Maps;
@@ -8,7 +9,6 @@ using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace GGemCo.Editor.GGemCoTool.MapEditor
 {
@@ -18,12 +18,15 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
         private TableNpc tableNpc;
         private TableAnimation tableAnimation;
         private DefaultMap defaultMap;
+        private CharacterManager characterManager;
         
         public void Initialize(TableNpc pTableNpc, TableAnimation pTableAnimation, DefaultMap pDefaultMap)
         {
             tableNpc = pTableNpc;
             tableAnimation = pTableAnimation;
             defaultMap = pDefaultMap;
+            characterManager = new CharacterManager();
+            characterManager.Initialize();
         }
         public void SetDefaultMap(DefaultMap pDefaultMap)
         {
@@ -65,8 +68,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                 return;
             }
 
-            GameObject npc = Object.Instantiate(npcPrefab, Vector3.zero, Quaternion.identity, defaultMap.transform);
-
+            GameObject npc = characterManager.CreateNpc(npcPrefab, Vector3.zero, defaultMap.gameObject.transform);
             var npcScript = npc.GetComponent<Npc>();
             if (npcScript != null)
             {
@@ -142,7 +144,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                     GcLogger.LogError("npc 프리팹이 없습니다. spine uid: " + info.SpineUid);
                     continue;
                 }
-                GameObject npc = Object.Instantiate(npcPrefab, new Vector3(npcData.x, npcData.y, npcData.z), Quaternion.identity, defaultMap.gameObject.transform);
+                GameObject npc = characterManager.CreateNpc(npcPrefab, new Vector3(npcData.x, npcData.y, npcData.z), defaultMap.gameObject.transform);
                 
                 // NPC의 속성을 설정하는 스크립트가 있을 경우 적용
                 Npc myNpcScript = npc.GetComponent<Npc>();

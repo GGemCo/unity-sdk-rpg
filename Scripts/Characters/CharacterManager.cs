@@ -1,64 +1,83 @@
-﻿using System;
-using GGemCo.Scripts.Utils;
+﻿using System.Collections.Generic;
+using GGemCo.Scripts.Characters.Monster;
+using GGemCo.Scripts.Characters.Npc;
+using GGemCo.Scripts.Characters.Player;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace GGemCo.Scripts.Characters
 {
+    /// <summary>
+    /// 캐릭터 관리 매니저
+    /// </summary>
     public class CharacterManager
     {
-        public enum CharacterType
+        public enum Type
         {
             None,
             Player,
-            Npc,
-            Monster
+            Monster,
+            Npc
         }
         
-        public DefaultCharacter CreateCharacter(CharacterType type, CharacterData data)
-        {
-            DefaultCharacter newCharacter;
-            switch (type)
-            {
-                case CharacterType.Player:
-                    // return new Player { Uid = data.Uid };
-                    newCharacter = CreatePlayerCharacter(data);
-                    break;
-                // case CharacterType.NPC:
-                //     return new NPC { Uid = data.Uid };
-                // case CharacterType.Monster:
-                //     return new Monster { Uid = data.Uid };
-                default:
-                    throw new ArgumentException("Invalid character type");
-            }
+         private readonly List<GameObject> characters = new List<GameObject>();
 
-            return newCharacter;
-        }
-        /// <summary>
-        /// 플레이어 캐릭터 생성
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        private GGemCo.Scripts.Characters.Player.Player CreatePlayerCharacter(CharacterData data)
-        {
-            // 플레이어 캐릭터 프리팹을 스폰합니다. (여기서는 프리팹 로드를 가정)
-            GameObject playerPrefab = Resources.Load<GameObject>("Characters/Player/Player");
-            if (playerPrefab ==null)
-            {
-                GcLogger.LogError("플레이어 프리팹이 없습니다.");
-                return null;
-            }
-            GameObject playerObject = Object.Instantiate(playerPrefab);
-        
-            // PlayerCharacter 설정
-            GGemCo.Scripts.Characters.Player.Player player = playerObject.GetComponent<GGemCo.Scripts.Characters.Player.Player>();
-            if (player == null)
-            {
-                GcLogger.LogError("플레이어 스크립트가 프리팹에 없습니다.");
-                return null;
-            }
+         public void Initialize() { }
+         /// <summary>
+         /// 캐릭터 만들기
+         /// </summary>
+         /// <param name="characterType"></param>
+         /// <param name="prefab"></param>
+         /// <param name="position"></param>
+         /// <param name="parent"></param>
+         /// <returns></returns>
+         public GameObject CreateCharacter(Type characterType, GameObject prefab, Vector3 position, Transform parent = null)
+         {
+             GameObject characterObj = Object.Instantiate(prefab, position, Quaternion.identity, parent);
+             switch (characterType)
+             {
+                 case Type.Player:
+                     Player.Player characterPlayer = characterObj.AddComponent<Player.Player>();
+                     ControllerPlayer controllerPlayer = characterObj.AddComponent<ControllerPlayer>();
+                     EquipController equipController = characterObj.AddComponent<EquipController>();
+                     break;
+                 case Type.Monster:
+                     Monster.Monster monster = characterObj.AddComponent<Monster.Monster>();
+                     ControllerMonster controllerMonster = characterObj.AddComponent<ControllerMonster>();
+                     break;
+                 case Type.Npc:
+                     Npc.Npc npc = characterObj.AddComponent<Npc.Npc>();
+                     ControllerNpc controllerNpc = characterObj.AddComponent<ControllerNpc>();
+                     break;
+             }
+#if GGEMCO_USE_SPINE
+             CharacterCharacterAnimationControllerSpine characterCharacterAnimationControllerSpine = characterObj.AddComponent<CharacterCharacterAnimationControllerSpine>();
+             ICharacterAnimationController iCharacterAnimationController = characterCharacterAnimationControllerSpine.GetComponent<ICharacterAnimationController>();
+#else
+             SpriteAnimator spriteAnimator = characterObj.AddComponent<SpriteAnimator>();
 
-            return player;
-        }
+#endif
+             characterObj.GetComponent<CharacterBase>().CharacterAnimationController = iCharacterAnimationController;
+             characters.Add(characterObj);
+             return characterObj;
+         }
+
+         public GameObject CreatePlayer(GameObject prefab, Vector3 position, Transform parent = null)
+         {
+             return CreateCharacter(Type.Player, prefab, position, parent);
+         }
+         public GameObject CreateNpc(GameObject prefab, Vector3 position, Transform parent = null)
+         {
+             return CreateCharacter(Type.Npc, prefab, position, parent);
+         }
+         public GameObject CreateMonster(GameObject prefab, Vector3 position, Transform parent = null)
+         {
+             return CreateCharacter(Type.Monster, prefab, position, parent);
+         }
+         public void RemoveCharacter(GameObject character)
+         {
+             if (!characters.Contains(character)) return;
+             characters.Remove(character);
+             Object.Destroy(character.gameObject);
+         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using GGemCo.Scripts.Characters;
 using GGemCo.Scripts.Characters.Monster;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Maps;
@@ -8,7 +9,6 @@ using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
-using Object = UnityEngine.Object;
 using StruckTableMonster = GGemCo.Scripts.TableLoader.StruckTableMonster;
 
 namespace GGemCo.Editor.GGemCoTool.MapEditor
@@ -19,12 +19,15 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
         private TableMonster tableMonster;
         private TableAnimation tableAnimation;
         private DefaultMap defaultMap;
+        private CharacterManager characterManager;
         
         public void Initialize(TableMonster pTableMonster, TableAnimation pTableAnimation, DefaultMap pDefaultMap)
         {
             tableMonster = pTableMonster;
             tableAnimation = pTableAnimation;
             defaultMap = pDefaultMap;
+            characterManager = new CharacterManager();
+            characterManager.Initialize();
         }
         public void SetDefaultMap(DefaultMap pDefaultMap)
         {
@@ -66,8 +69,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                 return;
             }
 
-            GameObject monster = Object.Instantiate(monsterPrefab, Vector3.zero, Quaternion.identity, defaultMap.transform);
-
+            GameObject monster = characterManager.CreateMonster(monsterPrefab, Vector3.zero, defaultMap.gameObject.transform);
             var monsterScript = monster.GetComponent<Monster>();
             if (monsterScript != null)
             {
@@ -143,8 +145,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                     GcLogger.LogError("monster 프리팹이 없습니다. spine uid: " + info.SpineUid);
                     continue;
                 }
-                GameObject monster = Object.Instantiate(monsterPrefab, new Vector3(monsterData.x, monsterData.y, monsterData.z), Quaternion.identity, defaultMap.gameObject.transform);
-                
+                GameObject monster = characterManager.CreateMonster(monsterPrefab, new Vector3(monsterData.x, monsterData.y, monsterData.z), defaultMap.gameObject.transform);
                 // 몬스터의 속성을 설정하는 스크립트가 있을 경우 적용
                 Monster myMonsterScript = monster.GetComponent<Monster>();
                 if (myMonsterScript != null)
