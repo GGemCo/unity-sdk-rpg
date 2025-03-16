@@ -13,12 +13,16 @@ namespace GGemCo.Scripts.Characters.Npc
         private Vector2 minBounds, maxBounds; // 타일맵의 최소/최대 경계
         private (float width, float height) mapSize;
         
-        private void Start()
+        private void Awake()
         {
             npc = GetComponent<Npc>();
-            iCharacterAnimationController = npc.CharacterAnimationController;
             // 타일맵의 경계를 가져오는 코드 (직접 설정 가능)
             minBounds = new Vector2(0f, 0f); // 좌측 하단 경계
+        }
+
+        private void Start()
+        {
+            iCharacterAnimationController = npc.CharacterAnimationController;
             mapSize = SceneGame.Instance.mapManager.GetCurrentMapSize();
             iCharacterAnimationController?.PlayWaitAnimation();
         }

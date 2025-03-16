@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using GGemCo.Scripts.Spine2d;
 using Spine;
+using Spine.Unity;
 using UnityEngine;
 using Event = Spine.Event;
 
@@ -27,15 +29,8 @@ namespace GGemCo.Scripts.Characters
             characterBase.SetHeight(GetHeight());
         }
 
-        private void UpdateDirection()
-        {
-            float scaleX = characterBase.directionPrev.x >= 0 ? -1 : 1;
-            characterBase.transform.localScale = new Vector3(characterBase.OriginalScaleX * scaleX, characterBase.transform.localScale.y,characterBase.transform.localScale.z);
-        }
-
         public void PlayWaitAnimation()
         {
-            UpdateDirection();
             string idleAnim = characterBase.directionPrev.y != 0 
                 ? (characterBase.directionPrev.y > 0 ? ICharacterAnimationController.WaitBackwardAnim : ICharacterAnimationController.WaitForwardAnim) 
                 : ICharacterAnimationController.WaitForwardAnim;
@@ -45,32 +40,12 @@ namespace GGemCo.Scripts.Characters
 
         public void PlayRunAnimation()
         {
-            UpdateDirection();
-            characterBase.directionPrev = characterBase.direction;
             string moveAnim = characterBase.direction.y != 0 
                 ? (characterBase.direction.y > 0 ? ICharacterAnimationController.WalkBackwardAnim : ICharacterAnimationController.WalkForwardAnim) 
                 : ICharacterAnimationController.WalkForwardAnim;
             if (GetCurrentAnimation() == moveAnim) return;
             PlayAnimation(moveAnim, true, characterBase.GetCurrentMoveSpeed());
         }
-
-        public void UpdateAnimation()
-        {
-            if (characterBase.IsAttacking) return; // 공격 중이면
-            if (characterBase.IsStatusDead()) return; // 죽었으면
-            
-            // 정지 상태 처리
-            if (characterBase.direction == Vector3.zero)
-            {
-                PlayWaitAnimation();
-            }
-            // 이동 상태 처리
-            else
-            {
-                PlayRunAnimation();
-            }
-        }
-
         public float GetCharacterHeight()
         {
             return GetHeight();
@@ -90,15 +65,14 @@ namespace GGemCo.Scripts.Characters
         {
             ChangeImageInSlot(changeSlotImages);
         }
+        public void RemoveCharacterImageInSlot(List<StruckChangeSlotImage> changeSlotImages)
+        {
+            RemoveImageInSlot(changeSlotImages);
+        }
 
         public void PlayAttackAnimation()
         {
-            UpdateDirection();
-            List<StruckAddAnimation> addAnimations = new List<StruckAddAnimation>
-            {
-                new StruckAddAnimation(ICharacterAnimationController.WaitForwardAnim, true, 0, characterBase.GetCurrentMoveSpeed())
-            };
-            PlayAnimation(ICharacterAnimationController.AttackAnim, false, characterBase.GetCurrentAttackSpeed(), addAnimations);
+            PlayAnimation(ICharacterAnimationController.AttackAnim, false, characterBase.GetCurrentAttackSpeed());
         }
         public void PlayDeadAnimation()
         {
@@ -108,13 +82,14 @@ namespace GGemCo.Scripts.Characters
         /// 애니메이션이 중단되면 호출되는 콜백 함수
         /// </summary>
         /// <param name="entry"></param>
-        protected override void OnAnimationInterrupt(TrackEntry entry)
+        protected override void OnAnimationComplete(TrackEntry entry)
         {
             // GcLogger.Log("OnAnimationInterrupt gameobject: " + this.gameObject.name + " / animationName: " + entry.Animation.Name);
             if (SkeletonAnimation == null) return;
             if (entry.Animation.Name == ICharacterAnimationController.AttackAnim)
             {
-                characterBase.IsAttacking = false; // 공격 상태 해제
+                characterBase.SetStatusIdle(); // 공격 상태 해제
+                PlayWaitAnimation();
             }
         }
         protected override void OnSpineEventShake(Event eEvent) 
@@ -124,12 +99,30 @@ namespace GGemCo.Scripts.Characters
 
         protected override void OnSpineEventAttack(Event eEvent)
         {
-            characterBase.OnSpineEventAttack();
+            characterBase.OnEventAttack();
         }
 
         protected override void OnSpineEventSound(Event eEvent) 
         {
         }
 
+        public IEnumerator FadeEffect(float duration, bool fadeIn)
+        {
+            float elapsedTime = 0f;
+            float startAlpha = fadeIn ? 0 : 1;
+            float endAlpha = fadeIn ? 1 : 0;
+
+            Color color = SkeletonAnimation.Skeleton.GetColor();
+
+            while (elapsedTime < duration)
+            {
+                elapsedTime += Time.deltaTime;
+                color.a = Mathf.Lerp(startAlpha, endAlpha, elapsedTime / duration);
+                SkeletonAnimation.Skeleton.SetColor(color);
+                yield return null;
+            }
+
+            characterBase.SetIsStartFade(false);
+        }
     }
 }

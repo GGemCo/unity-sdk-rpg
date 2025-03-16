@@ -43,14 +43,10 @@ namespace GGemCo.Scripts.Maps
             var size = GetMapSize();
             gameObject.transform.position = new Vector3(0, 0, 0);
         }
-
-        void LateUpdate()
-        {
-            // 카메라가 이동할 때마다 컬링 범위 및 오브젝트 상태 갱신
-            CalculateCullingBounds();
-        }
-
-        void CalculateCullingBounds()
+        /// <summary>
+        /// 컬링 처리 
+        /// </summary>
+        protected override void CalculateCullingBounds()
         {
             if (mainCamera == null || tilemapRenderer == null) return;
 
@@ -77,7 +73,11 @@ namespace GGemCo.Scripts.Maps
             UpdateObjectActivation(monsters, cullingBounds);
             UpdateObjectActivation(npcs, cullingBounds);
         }
-
+        /// <summary>
+        /// npc, 몬스터 컬링 처리
+        /// </summary>
+        /// <param name="objects"></param>
+        /// <param name="bounds"></param>
         void UpdateObjectActivation(Dictionary<int, GameObject> objects, Bounds bounds)
         {
             foreach (var info in objects)
@@ -102,7 +102,6 @@ namespace GGemCo.Scripts.Maps
                         obj.GetComponent<Npc>()?.StartFadeOut();
                         obj.GetComponent<Monster>()?.StartFadeOut();
                     }
-                    // obj.SetActive(isActive);
                 }
             }
         }
@@ -139,7 +138,11 @@ namespace GGemCo.Scripts.Maps
                 // npcQuestButton.OnChangeQuestStatus();
             }
         }
-
+        /// <summary>
+        /// vid 값으로 몬스터 찾기  
+        /// </summary>
+        /// <param name="vid"></param>
+        /// <returns></returns>
         public MonsterData GetMonsterDataByVid(int vid)
         {
             GameObject monster = monsters.GetValueOrDefault(vid);
@@ -148,7 +151,10 @@ namespace GGemCo.Scripts.Maps
             if (myMonster == null) return null;
             return myMonster.MonsterData;
         }
-
+#if UNITY_EDITOR
+        /// <summary>
+        /// 카메라 영역, 컬링 영역 시각화
+        /// </summary>
         void OnDrawGizmos()
         {
             if (mainCamera == null) return;
@@ -169,5 +175,6 @@ namespace GGemCo.Scripts.Maps
             Gizmos.color = Color.red;
             Gizmos.DrawWireCube(cullingBounds.center, cullingBounds.size);
         }
+#endif 
     }
 }

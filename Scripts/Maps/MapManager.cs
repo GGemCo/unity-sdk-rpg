@@ -105,7 +105,10 @@ namespace GGemCo.Scripts.Maps
 
             LoadMap(startMapUid);
         }
-
+        /// <summary>
+        /// 게임 시작시 맵 불러오기
+        /// </summary>
+        /// <returns></returns>
         private int GetStartMapUid()
         {
             int startMapUid = saveDataManager.Player.CurrentMapUid;
@@ -137,7 +140,10 @@ namespace GGemCo.Scripts.Maps
                 StopCoroutine(coroutineRegenMonster);
             }
         }
-
+        /// <summary>
+        /// 맵 불러오기
+        /// </summary>
+        /// <param name="mapUid"></param>
         private void LoadMap(int mapUid = 0)
         {
             if (IsPossibleLoad() != true)
@@ -158,7 +164,10 @@ namespace GGemCo.Scripts.Maps
             characterVid = 1;
             StartCoroutine(UpdateState());
         }
-
+        /// <summary>
+        /// 맵 로드 상태별 처리 
+        /// </summary>
+        /// <returns></returns>
         private IEnumerator UpdateState()
         {
             while (currentState != MapConstants.State.Complete && currentState != MapConstants.State.Failed)
@@ -247,6 +256,10 @@ namespace GGemCo.Scripts.Maps
             StartCoroutine(FadeOut());
             currentState = MapConstants.State.Failed;
         }
+        /// <summary>
+        /// 로딩시 보여주는 검은 화면 fade in 처리 
+        /// </summary>
+        /// <returns></returns>
         IEnumerator FadeIn()
         {
             if (bgBlackForMapLoading == null)
@@ -279,7 +292,10 @@ namespace GGemCo.Scripts.Maps
 
             // Logger.Log("Fade In 완료");
         }
-
+        /// <summary>
+        /// tag 로 맵에 있는 오브젝트 지우기
+        /// </summary>
+        /// <param name="pTag"></param>
         private void DestroyByTag(string pTag)
         {
             GameObject[] maps = GameObject.FindGameObjectsWithTag(pTag);
@@ -289,6 +305,10 @@ namespace GGemCo.Scripts.Maps
                 Destroy(map);
             }
         }
+        /// <summary>
+        /// 맵 이동시 메모리 해제 처리
+        /// </summary>
+        /// <returns></returns>
         IEnumerator UnloadPreviousStage()
         {
             // 현재 씬에 있는 모든 몬스터 오브젝트를 삭제
@@ -368,7 +388,10 @@ namespace GGemCo.Scripts.Maps
             // Logger.Log("타일맵 프리팹 로드 완료");
             yield return null;
         }
-
+        /// <summary>
+        /// 몬스터 스폰하기
+        /// </summary>
+        /// <returns></returns>
         private IEnumerator LoadMonsters()
         {
             string regenFileName = GetFilePath(MapConstants.FileNameRegenMonster);
@@ -395,7 +418,10 @@ namespace GGemCo.Scripts.Maps
 
             yield return null;
         }
-
+        /// <summary>
+        /// 워프 스폰하기
+        /// </summary>
+        /// <returns></returns>
         private IEnumerator LoadWarps()
         {
             string rPathWarp = GetFilePath(MapConstants.FileNameWarp);
@@ -421,7 +447,10 @@ namespace GGemCo.Scripts.Maps
             }
             yield return null;
         }
-
+        /// <summary>
+        /// npc 스폰하기
+        /// </summary>
+        /// <returns></returns>
         private IEnumerator LoadNpcs()
         {
             string regenFileName = GetFilePath(MapConstants.FileNameRegenNpc);
@@ -458,7 +487,7 @@ namespace GGemCo.Scripts.Maps
                     GcLogger.LogError("플레이어 프리팹이 없습니다. path:"+ConfigCommon.PathPlayerPrefab);
                     yield break;
                 }
-                GameObject player = sceneGame.CharacterManager.CreateCharacter(CharacterManager.Type.Player, prefabPlayer, Vector3.zero);
+                GameObject player = sceneGame.CharacterManager.CreatePlayer(prefabPlayer, Vector3.zero);
                 SceneGame.Instance.player = player;
             }
             
@@ -519,15 +548,15 @@ namespace GGemCo.Scripts.Maps
                     GcLogger.LogError("프리팹이 없습니다. spine uid: " + info.SpineUid);
                     continue;
                 }
-                GameObject npc = sceneGame.CharacterManager.CreateCharacter(CharacterManager.Type.Npc, npcPrefab, new Vector3(npcData.x, npcData.y, npcData.z), mapTileCommon.gameObject.transform);
+                GameObject npc = sceneGame.CharacterManager.CreateNpc(npcPrefab, new Vector3(npcData.x, npcData.y, npcData.z), mapTileCommon.gameObject.transform);
             
                 // NPC의 이름과 기타 속성 설정
                 Npc myNpcScript = npc.GetComponent<Npc>();
                 if (myNpcScript != null)
                 {
                     // npcExporter.cs:158 도 수정
-                    myNpcScript.Vid = characterVid;
-                    myNpcScript.Uid = npcData.Uid;
+                    myNpcScript.vid = characterVid;
+                    myNpcScript.uid = npcData.Uid;
                     myNpcScript.NpcData = npcData;
                     
                     mapTileCommon.AddNpc(characterVid, npc);
@@ -552,15 +581,15 @@ namespace GGemCo.Scripts.Maps
                     GcLogger.LogError("프리팹이 없습니다. spine uid: " + info.SpineUid);
                     continue;
                 }
-                GameObject monster = sceneGame.CharacterManager.CreateCharacter(CharacterManager.Type.Monster, monsterPrefab, new Vector3(monsterData.x, monsterData.y, monsterData.z), mapTileCommon.gameObject.transform);
+                GameObject monster = sceneGame.CharacterManager.CreateMonster(monsterPrefab, new Vector3(monsterData.x, monsterData.y, monsterData.z), mapTileCommon.gameObject.transform);
                 
                 // 몬스터의 이름과 기타 속성 설정
                 Monster myMonsterScript = monster.GetComponent<Monster>();
                 if (myMonsterScript != null)
                 {
                     // monsterExporter.cs:158 도 수정
-                    myMonsterScript.Vid = characterVid;
-                    myMonsterScript.Uid = monsterData.Uid;
+                    myMonsterScript.vid = characterVid;
+                    myMonsterScript.uid = monsterData.Uid;
                     myMonsterScript.MonsterData = monsterData;
                     
                     mapTileCommon.AddMonster(characterVid, monster);
@@ -626,11 +655,13 @@ namespace GGemCo.Scripts.Maps
         /// <summary>
         /// 몬스터 죽었을때 리젠 처리 
         /// </summary>
-        /// <param name="vid"></param>
-        public void OnDeadMonster(int vid)
+        /// <param name="monsterVid"></param>
+        /// <param name="monsterUid"></param>
+        /// <param name="monsterObject"></param>
+        public void OnDeadMonster(int monsterVid, int monsterUid, GameObject monsterObject)
         {
-            if (vid <= 0) return;
-            MonsterData monsterData = mapTileCommon.GetMonsterDataByVid(vid);
+            if (monsterVid <= 0) return;
+            MonsterData monsterData = mapTileCommon.GetMonsterDataByVid(monsterVid);
             if (monsterData == null) return;
             
             coroutineRegenMonster = StartCoroutine(RegenMonster(monsterData));
@@ -657,15 +688,15 @@ namespace GGemCo.Scripts.Maps
                 GcLogger.LogError("프리팹이 없습니다. spine uid: " + info.SpineUid);
                 yield break;
             }
-            GameObject monster = Instantiate(monsterPrefab, new Vector3(monsterData.x, monsterData.y, monsterData.z), Quaternion.identity, mapTileCommon.gameObject.transform);
+            GameObject monster = sceneGame.CharacterManager.CreateMonster(monsterPrefab, new Vector3(monsterData.x, monsterData.y, monsterData.z), mapTileCommon.gameObject.transform);
             
             // 몬스터의 이름과 기타 속성 설정
             Monster myMonsterScript = monster.GetComponent<Monster>();
             if (myMonsterScript != null)
             {
                 // monsterExporter.cs:158 도 수정
-                myMonsterScript.Vid = characterVid;
-                myMonsterScript.Uid = monsterData.Uid;
+                myMonsterScript.vid = characterVid;
+                myMonsterScript.uid = monsterData.Uid;
                 myMonsterScript.MonsterData = monsterData;
 
                 mapTileCommon.AddMonster(characterVid, monster);

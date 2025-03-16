@@ -12,6 +12,9 @@ using UnityEngine;
 
 namespace GGemCo.Editor.GGemCoTool.MapEditor
 {
+    /// <summary>
+    /// 맵 배치툴 > Npc 배치, 내보내기
+    /// </summary>
     public class NpcExporter
     {
         private List<NpcData> npcList;
@@ -20,6 +23,12 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
         private DefaultMap defaultMap;
         private CharacterManager characterManager;
         
+        /// <summary>
+        /// 초기화
+        /// </summary>
+        /// <param name="pTableNpc"></param>
+        /// <param name="pTableAnimation"></param>
+        /// <param name="pDefaultMap"></param>
         public void Initialize(TableNpc pTableNpc, TableAnimation pTableAnimation, DefaultMap pDefaultMap)
         {
             tableNpc = pTableNpc;
@@ -28,11 +37,18 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             characterManager = new CharacterManager();
             characterManager.Initialize();
         }
+        /// <summary>
+        /// 배치할 맵 셋팅
+        /// </summary>
+        /// <param name="pDefaultMap"></param>
         public void SetDefaultMap(DefaultMap pDefaultMap)
         {
             defaultMap = pDefaultMap;
         }
-
+        /// <summary>
+        /// 맵에 npc 추가하기
+        /// </summary>
+        /// <param name="selectedNpcIndex"></param>
         public void AddNpcToMap(int selectedNpcIndex)
         {
             if (defaultMap == null)
@@ -72,14 +88,19 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             var npcScript = npc.GetComponent<Npc>();
             if (npcScript != null)
             {
-                npcScript.Uid = npcData.Uid;
+                npcScript.uid = npcData.Uid;
                 npcScript.SetScale(npcData.Scale);
                 npcScript.InitTagSortingLayer();
             }
 
             Debug.Log($"{npcData.Name} NPC가 맵에 추가되었습니다.");
         }
-
+        /// <summary>
+        /// 배치한 정보 json 으로 내보내기
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="fileName"></param>
+        /// <param name="mapUid"></param>
         public void ExportNpcDataToJson(string filePath, string fileName, int mapUid)
         {
             GameObject mapObject = GameObject.FindGameObjectWithTag(ConfigTags.GetValue(ConfigTags.Keys.Map));
@@ -91,7 +112,7 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                 {
                     var npc = child.gameObject.GetComponent<Npc>();
                     if (npc == null) continue;
-                    saveNpcList.npcDataList.Add(new NpcData(npc.Uid, child.position, npc.flip, mapUid, true));
+                    saveNpcList.npcDataList.Add(new NpcData(npc.uid, child.position, npc.isFlip, mapUid, true));
                 }
             }
 
@@ -100,7 +121,10 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
             File.WriteAllText(path, json);
             Debug.Log("NPC data exported to " + path);
         }
-        
+        /// <summary>
+        /// json 에서 npc 정보 불러오기
+        /// </summary>
+        /// <param name="regenFileName"></param>
         public void LoadNpcData(string regenFileName)
         {
             // JSON 파일을 읽기
@@ -123,7 +147,9 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                 GcLogger.LogError($"Error reading file {regenFileName}: {ex.Message}");
             }
         }
-
+        /// <summary>
+        /// npc 생성하기
+        /// </summary>
         private void SpawnNpc()
         {
             if (defaultMap == null)
@@ -151,12 +177,12 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
                 if (myNpcScript != null)
                 {
                     // MapManager.cs:138 도 수정
-                    myNpcScript.Uid = npcData.Uid;
+                    myNpcScript.uid = npcData.Uid;
                     myNpcScript.NpcData = npcData;
                     // 추가적인 속성 설정을 여기에서 수행할 수 있습니다.
                     myNpcScript.SetScale(info.Scale);
                     // SetScale 다음에 처리해야 함
-                    myNpcScript.flip = npcData.Flip;
+                    myNpcScript.isFlip = npcData.Flip;
                     myNpcScript.SetFlip(npcData.Flip);
                     myNpcScript.InitTagSortingLayer();
                 }

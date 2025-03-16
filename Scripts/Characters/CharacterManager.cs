@@ -1,7 +1,4 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.Characters.Monster;
-using GGemCo.Scripts.Characters.Npc;
-using GGemCo.Scripts.Characters.Player;
 using UnityEngine;
 
 namespace GGemCo.Scripts.Characters
@@ -30,23 +27,19 @@ namespace GGemCo.Scripts.Characters
          /// <param name="position"></param>
          /// <param name="parent"></param>
          /// <returns></returns>
-         public GameObject CreateCharacter(Type characterType, GameObject prefab, Vector3 position, Transform parent = null)
+         private GameObject CreateCharacter(Type characterType, GameObject prefab, Vector3 position, Transform parent = null)
          {
              GameObject characterObj = Object.Instantiate(prefab, position, Quaternion.identity, parent);
              switch (characterType)
              {
                  case Type.Player:
-                     Player.Player characterPlayer = characterObj.AddComponent<Player.Player>();
-                     ControllerPlayer controllerPlayer = characterObj.AddComponent<ControllerPlayer>();
-                     EquipController equipController = characterObj.AddComponent<EquipController>();
+                     Player.Player player = characterObj.AddComponent<Player.Player>();
                      break;
                  case Type.Monster:
                      Monster.Monster monster = characterObj.AddComponent<Monster.Monster>();
-                     ControllerMonster controllerMonster = characterObj.AddComponent<ControllerMonster>();
                      break;
                  case Type.Npc:
                      Npc.Npc npc = characterObj.AddComponent<Npc.Npc>();
-                     ControllerNpc controllerNpc = characterObj.AddComponent<ControllerNpc>();
                      break;
              }
 #if GGEMCO_USE_SPINE

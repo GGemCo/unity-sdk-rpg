@@ -30,6 +30,8 @@ namespace GGemCo.Scripts.Characters.Npc
         /// </summary>
         protected override void InitComponents()
         {
+            base.InitComponents();
+            gameObject.AddComponent<ControllerNpc>();
         }
         /// <summary>
         /// 테이블에서 가져온 npc 정보 셋팅
@@ -38,9 +40,9 @@ namespace GGemCo.Scripts.Characters.Npc
         {
             base.InitializeByTable();
             if (TableLoaderManager.Instance == null) return;
-            if (Uid <= 0) return;
+            if (uid <= 0) return;
             TableLoaderManager tableLoaderManager = TableLoaderManager.Instance;
-            var info = tableLoaderManager.TableNpc.GetDataByUid(Uid);
+            var info = tableLoaderManager.TableNpc.GetDataByUid(uid);
             // GcLogger.Log("InitializationStat uid: "+uid+" / info.uid: "+info.uid+" / StatMoveSpeed: "+info.statMoveSpeed);
             if (info.Uid > 0)
             {
@@ -57,7 +59,7 @@ namespace GGemCo.Scripts.Characters.Npc
                 StruckTableAnimation struckTableAnimation = tableLoaderManager.TableAnimation.GetDataByUid(info.SpineUid);
                 if (struckTableAnimation is { Uid: > 0 })
                 {
-                    CurrentMoveStep = struckTableAnimation.MoveStep;
+                    currentMoveStep = struckTableAnimation.MoveStep;
                 }
             }
         }

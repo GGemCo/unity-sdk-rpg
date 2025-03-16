@@ -5,6 +5,9 @@ using UnityEngine.Tilemaps;
 
 namespace GGemCo.Scripts.Maps
 {
+    /// <summary>
+    /// 맵
+    /// </summary>
     public class DefaultMap : MonoBehaviour
     {
         private int chapterNumber;
@@ -105,7 +108,7 @@ namespace GGemCo.Scripts.Maps
                 if (childTransform == null) continue;
                 Npc npc = childTransform.GetComponent<Npc>();
                 if (npc == null) continue;
-                if (npc.Uid == npcUid)
+                if (npc.uid == npcUid)
                 {
                     return npc;
                 }
@@ -113,5 +116,15 @@ namespace GGemCo.Scripts.Maps
         
             return null;
         }
+        protected void LateUpdate()
+        {
+            // 카메라가 이동할 때마다 컬링 범위 및 오브젝트 상태 갱신
+            CalculateCullingBounds();
+        }
+
+        protected virtual void CalculateCullingBounds()
+        {
+        }
+
     }
 }

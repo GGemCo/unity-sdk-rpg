@@ -13,6 +13,9 @@ using UnityEngine;
 
 namespace GGemCo.Scripts.Characters.Player
 {
+    /// <summary>
+    /// 플레이어 
+    /// </summary>
     public class Player : CharacterBase
     {
         // 공격할 몬스터 
@@ -81,8 +84,8 @@ namespace GGemCo.Scripts.Characters.Player
                 GGemCoPlayerSettings playerSettings = AddressableSettingsLoader.Instance.playerSettings;
                 SetBaseInfos(playerSettings.statAtk, playerSettings.statDef, playerSettings.statHp, playerSettings.statMp, playerSettings.statMoveSpeed, playerSettings.statAttackSpeed);
                 CurrentHp = TotalHp;
-                CurrentMoveStep = playerSettings.statMoveStep;
-                OriginalScaleX = transform.localScale.x;
+                currentMoveStep = playerSettings.statMoveStep;
+                originalScaleX = transform.localScale.x;
                 SetScale(playerSettings.startScale);
             }
         }
@@ -104,15 +107,18 @@ namespace GGemCo.Scripts.Characters.Player
         }
         protected void OnTriggerEnter2D(Collider2D collision)
         {
+            // npc 일때
             if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Npc)))
             {
                 isNpcNearby = true;
             }
+            // 워프 일때
             else if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.MapObjectWarp)))
             {
                 ObjectWarp objectWarp = collision.gameObject.GetComponent<ObjectWarp>();
                 SceneGame.Instance.mapManager.LoadMapByWarp(objectWarp);
             }
+            // 드랍 아이템 일때
             else if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.DropItem)))
             {
                 SceneGame.Instance.itemManager.PlayerTaken(collision.gameObject);
@@ -184,8 +190,10 @@ namespace GGemCo.Scripts.Characters.Player
             }
             CharacterAnimationController.ChangeCharacterImageInSlot(changeImages);
         }
-
-        public override void OnSpineEventAttack()
+        /// <summary>
+        /// attack 이벤트 처리 
+        /// </summary>
+        public override void OnEventAttack()
         {
             // GcLogger.Log(@event);
             long totalDamage = SceneGame.Instance.calculateManager.GetPlayerTotalAtk();

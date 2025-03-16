@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using GGemCo.Scripts.Spine2d;
 using UnityEngine;
 
@@ -52,6 +53,11 @@ namespace GGemCo.Scripts.Characters
         public void RemoveCharacterImageInSlot(List<StruckChangeSlotImage> changeSlotImages)
         {
             
+        }
+
+        public IEnumerator FadeEffect(float duration, bool fadeIn)
+        {
+            yield break;
         }
     }
 }
