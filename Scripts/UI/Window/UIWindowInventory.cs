@@ -24,6 +24,7 @@ namespace GGemCo.Scripts.UI.Window
     {
         public UIWindowEquip uIWindowEquip;
         public UIWindowPlayerInfo uiWindowPlayerInfo;
+        public UIWindowItemInfo uIWindowItemInfo;
         
         private GameObject iconItem;
         private TableItem tableItem;
@@ -59,7 +60,11 @@ namespace GGemCo.Scripts.UI.Window
         public override void OnShow(bool show)
         {
             if (SceneGame.Instance == null || TableLoaderManager.Instance == null) return;
-            if (!show) return;
+            if (!show)
+            {
+                uIWindowItemInfo?.Show(false);
+                return;
+            }
             LoadIcons();
         }
         /// <summary>
