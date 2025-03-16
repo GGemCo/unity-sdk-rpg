@@ -1,4 +1,3 @@
-using UnityEditor;
 using UnityEngine;
 
 namespace GGemCo.Scripts.UI.Icon
@@ -10,10 +9,6 @@ namespace GGemCo.Scripts.UI.Icon
         private int index;
 
         private RectTransform rectTransform;
-        protected void Awake()
-        {
-            rectTransform = GetComponent<RectTransform>();
-        }
 
         public void Initialize(UIWindow pwindow, UIWindowManager.WindowUid pwindowUid, int pindex, Vector2 slotSize)
         {
@@ -21,6 +16,7 @@ namespace GGemCo.Scripts.UI.Icon
             windowUid = pwindowUid;
             index = pindex;
             
+            rectTransform = GetComponent<RectTransform>();
             ChangeSlotImageSize(slotSize);
         }
         /// <summary>

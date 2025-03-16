@@ -15,13 +15,27 @@ namespace GGemCo.Scripts.Characters.Player
             Leg,
             Weapon
         }
-
+        /// <summary>
+        /// 부위별 리소스 폴더 이름
+        /// </summary>
+        public static readonly Dictionary<PartsType, string> FolderNameByPartsType = new Dictionary<PartsType, string>
+        {
+            { PartsType.Body, "Top" },
+            { PartsType.Leg, "Leg" },
+            { PartsType.Weapon, "Weapon" },
+        };
+        /// <summary>
+        /// 부위별 스파인 슬롯 이름
+        /// </summary>
         public static readonly Dictionary<PartsType, List<string>> SlotNameByPartsType = new Dictionary<PartsType, List<string>>
         {
             { PartsType.Body, new List<string> { "body" } },
             { PartsType.Leg, new List<string> { "leg_l", "leg_r" } },
             { PartsType.Weapon, new List<string> { "knife" } },
         };
+        /// <summary>
+        /// 슬롯별 어태치먼트 이름
+        /// </summary>
         public static readonly Dictionary<string, string> AttachmentNameBySlotName = new Dictionary<string, string>
         {
             { "body", "body" },
@@ -35,27 +49,27 @@ namespace GGemCo.Scripts.Characters.Player
         // 현재 장착 중인 아이템
         private readonly Dictionary<int, StruckTableItem> equippedItems = new Dictionary<int, StruckTableItem>();
         
-        private delegate void DelegateOnEquiped(Dictionary<int, StruckTableItem> equippedItems);
-        private event DelegateOnEquiped OnEquiped;
-        private delegate void DelegateOnUnEquiped(Dictionary<int, StruckTableItem> equippedItems);
-        private event DelegateOnUnEquiped OnUnEquiped;
+        private delegate void DelegateOnPlayerEquiped(Dictionary<int, StruckTableItem> equippedItems);
+        private event DelegateOnPlayerEquiped OnPlayerEquiped;
+        private delegate void DelegateOnPlayerUnEquiped(Dictionary<int, StruckTableItem> equippedItems);
+        private event DelegateOnPlayerUnEquiped OnPlayerUnEquiped;
         
         TableItem tableItem;
 
         private void Awake()
         {
             tableItem = TableLoaderManager.Instance.TableItem;
+            player = GetComponent<Player>();
+            if (player != null)
+            {
+                OnPlayerEquiped += player.UpdateStatCache;
+                OnPlayerUnEquiped += player.UpdateStatCache;
+            }
         }
 
         private void Start()
         {
-            player = GetComponent<Player>();
             equippedItems.Clear();
-            if (player != null)
-            {
-                OnEquiped += player.UpdateStatCache;
-                OnUnEquiped += player.UpdateStatCache;
-            }
         }
         /// <summary>
         /// 장비 착용
@@ -65,10 +79,15 @@ namespace GGemCo.Scripts.Characters.Player
         public bool EquipItem(int partIndex, int itemUid)
         {
             if (player == null) return false;
+            if (itemUid <= 0)
+            {
+                UnEquipItem(partIndex);
+                return true;
+            }
             StruckTableItem item = tableItem.GetDataByUid(itemUid);
             if (equippedItems.TryAdd(partIndex, item))
             {
-                OnEquiped?.Invoke(equippedItems);
+                OnPlayerEquiped?.Invoke(equippedItems);
             }
 
             return true;
@@ -82,12 +101,15 @@ namespace GGemCo.Scripts.Characters.Player
             if (player == null) return false;
             if (equippedItems.Remove(partIndex))
             {
-                OnUnEquiped?.Invoke(equippedItems);
+                OnPlayerUnEquiped?.Invoke(equippedItems);
             }
 
             return true;
         }
-
+        /// <summary>
+        /// 장착된 모든 아이템 정보 가져오기
+        /// </summary>
+        /// <returns></returns>
         public Dictionary<int, StruckTableItem> GetEquippedItems()
         {
             return equippedItems;

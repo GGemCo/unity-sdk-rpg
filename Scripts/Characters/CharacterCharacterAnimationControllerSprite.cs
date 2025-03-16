@@ -48,5 +48,10 @@ namespace GGemCo.Scripts.Characters
         {
             
         }
+
+        public void RemoveCharacterImageInSlot(List<StruckChangeSlotImage> changeSlotImages)
+        {
+            
+        }
     }
 }

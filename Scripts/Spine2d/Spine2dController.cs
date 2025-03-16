@@ -46,6 +46,7 @@ namespace GGemCo.Scripts.Spine2d
         private Skeleton skeleton;
         private SkeletonData skeletonData;
         private Material sourceMaterial;
+        private Skin customSkin;
 
         protected virtual void Awake() {
             // Spine 오브젝트의 SkeletonAnimation 컴포넌트 가져오기
@@ -63,6 +64,8 @@ namespace GGemCo.Scripts.Spine2d
             SkeletonAnimation.AnimationState.Complete += OnAnimationComplete;
             SkeletonAnimation.AnimationState.Interrupt += OnAnimationInterrupt;
             SkeletonAnimation.AnimationState.Event += HandleEvent;
+            
+            customSkin = new Skin("customSkin");
         }
 
         private void OnDestroy()
@@ -202,30 +205,57 @@ namespace GGemCo.Scripts.Spine2d
         /// <param name="slotName"></param>
         /// <param name="attachmentName"></param>
         /// <param name="sprite"></param>
-        /// <param name="defaultSkin"></param>
-        private void ChangeImageInSlot(string slotName, string attachmentName, Sprite sprite, Skin defaultSkin) 
+        /// <param name="baseSkin"></param>
+        /// <param name="targetSkin"></param>
+        private void ChangeImageInSlot(string slotName, string attachmentName, Sprite sprite, Skin baseSkin, Skin targetSkin) 
         {
             var slotData = skeletonData.FindSlot(slotName);
             int slotIndex = slotData.Index;
-            Attachment templateAttachment = defaultSkin.GetAttachment(slotIndex, attachmentName);
+            
+            Attachment templateAttachment = baseSkin.GetAttachment(slotIndex, attachmentName);
 
             // Clone the template gun Attachment, and map the sprite onto it.
             // This sample uses the sprite and material set in the inspector.
             Attachment newAttachment = templateAttachment.GetRemappedClone(sprite, sourceMaterial); // This has some optional parameters. See below.
 
             // Add the gun to your new custom skin.
-            if (newAttachment != null) defaultSkin.SetAttachment(slotIndex, attachmentName, newAttachment);
+            if (newAttachment != null) targetSkin.SetAttachment(slotIndex, attachmentName, newAttachment);
         }
         protected void ChangeImageInSlot(List<StruckChangeSlotImage> changeImages)
         {
-            string skinName = "default";
-            Skin defaultSkin = skeletonData.FindSkin(skinName);
+            string baseSkinName = "default";
+            Skin baseSkin = skeletonData.FindSkin(baseSkinName);
+
             foreach (var info in changeImages)
             {
-                ChangeImageInSlot(info.SlotName, info.AttachmentName, info.Sprite, defaultSkin);
+                string equipSkinName = info.SlotName;
+                Skin equipSkin = skeletonData.FindSkin(equipSkinName);
+                if (equipSkin == null)
+                {
+                    equipSkin = new Skin(equipSkinName);
+                }
+                ChangeImageInSlot(info.SlotName, info.AttachmentName, info.Sprite, baseSkin, equipSkin);
+                customSkin.AddSkin(equipSkin);
             }
-            // Set and apply the Skin to the skeleton.
-            skeleton.SetSkin(defaultSkin);
+            skeleton.SetSkin(customSkin);
+            skeleton.SetSlotsToSetupPose();
+            SkeletonAnimation.Update(0);
+        }
+        protected void RemoveImageInSlot(List<StruckChangeSlotImage> changeImages)
+        {
+            string baseSkinName = "default";
+            Skin baseSkin = skeletonData.FindSkin(baseSkinName);
+
+            foreach (var info in changeImages)
+            {
+                string equipSkinName = info.SlotName;
+                Skin equipSkin = skeletonData.FindSkin(equipSkinName);
+                if (equipSkin == null) continue;
+                var slotData = skeletonData.FindSlot(equipSkinName);
+                int slotIndex = slotData.Index;
+                equipSkin.RemoveAttachment(slotIndex, equipSkinName);
+            }
+            skeleton.SetSkin(customSkin);
             skeleton.SetSlotsToSetupPose();
             SkeletonAnimation.Update(0);
         }

@@ -1,7 +1,5 @@
 using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.SaveData;
-using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.UI.Icon;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
@@ -60,7 +58,7 @@ namespace GGemCo.Scripts.UI
         /// <summary>
         /// 특정 개수만큼 풀을 확장하여 아이템을 추가 생성.
         /// </summary>
-        private void ExpandPool(int amount)
+        protected virtual void ExpandPool(int amount)
         {
             if (AddressableSettingsLoader.Instance == null || containerIcon == null) return;
             if (amount <= 0) return;

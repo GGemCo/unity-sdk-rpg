@@ -1,5 +1,5 @@
-﻿using GGemCo.Scripts.Characters.Player;
-using GGemCo.Scripts.SaveData;
+﻿using GGemCo.Scripts.Addressable;
+using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI.Icon;
@@ -12,8 +12,13 @@ namespace GGemCo.Scripts.UI.Window
     public class UIWindowEquip : UIWindow
     {
         private TableItem tableItem;
-        private EquipData equipData;
         
+        // 미리 만들어놓은 slot 이 있을 경우
+        public GameObject[] preLoadSlots;
+        public delegate void DelegateOnSetIconEquip(int slotIndex, int itemUid, int itemCount);
+        public event DelegateOnSetIconEquip OnSetIconEquip;
+        public delegate void DelegateOnDetachIconEquip(int slotIndex);
+        public event DelegateOnDetachIconEquip OnDetachIconEquip;
         protected override void Awake()
         {
             base.Awake();
@@ -21,15 +26,6 @@ namespace GGemCo.Scripts.UI.Window
             tableItem = TableLoaderManager.Instance.TableItem;
             uid = UIWindowManager.WindowUid.Equip;
         }
-        protected override void Start()
-        {
-            base.Start();
-            if (SceneGame.Instance != null && SceneGame.Instance.saveDataManager != null)
-            {
-                equipData = SceneGame.Instance.saveDataManager.Equip;
-            }
-        }
-        
         public override void OnShow(bool show)
         {
             if (SceneGame.Instance == null || TableLoaderManager.Instance == null) return;
@@ -37,9 +33,40 @@ namespace GGemCo.Scripts.UI.Window
             LoadIcons();
         }
         /// <summary>
+        /// 특정 개수만큼 풀을 확장하여 아이템을 추가 생성.
+        /// </summary>
+        protected override void ExpandPool(int amount)
+        {
+            if (AddressableSettingsLoader.Instance == null) return;
+            if (amount <= 0) return;
+            GameObject iconItem = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconItem);
+            GameObject slot = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabSlot);
+            if (iconItem == null) return;
+            for (int i = 0; i < amount; i++)
+            {
+                GameObject slotObject = preLoadSlots[i];
+                if (slotObject == null && containerIcon == null)
+                {
+                    slotObject = Instantiate(slot, containerIcon.gameObject.transform);
+                }
+                UISlot uiSlot = slotObject.GetComponent<UISlot>();
+                if (uiSlot == null) continue;
+                uiSlot.Initialize(this, uid, i, slotSize);
+
+                slots[i] = slotObject;
+                
+                GameObject icon = Instantiate(iconItem, slotObject.transform);
+                UIIcon uiIcon = icon.GetComponent<UIIcon>();
+                if (uiIcon == null) continue;
+                uiIcon.Initialize(this, uid, i, i, iconSize, slotSize);
+                icons[i] = icon;
+            }
+            // GcLogger.Log($"풀 확장: {amount}개 아이템 추가 (총 {poolDropItem.Count}개)");
+        }
+        /// <summary>
         /// 저장되어있는 아이템 정보로 아이콘 셋팅하기
         /// </summary>
-        public void LoadIcons()
+        private void LoadIcons()
         {
             var datas = SceneGame.Instance.saveDataManager.Equip.GetAllItemCounts();
             if (datas == null) return;
@@ -52,6 +79,7 @@ namespace GGemCo.Scripts.UI.Window
                 if (itemUid <= 0 || itemCount <= 0) continue;
                 var table = tableItem.GetDataByUid(itemUid);
                 if (table == null || table.Uid <= 0) continue;
+
                 // GcLogger.Log($"index: {index}, item: {table.Name} , count: {itemCount}");
                 var icon = icons[index];
                 if (icon == null) continue;
@@ -59,6 +87,7 @@ namespace GGemCo.Scripts.UI.Window
                 if (uiIcon == null) continue;
                 uiIcon.ChangeInfoByUid(table.Uid);
                 uiIcon.SetCount(itemCount);
+                OnSetIcon(index, icon);
             }
         }
         
@@ -142,17 +171,13 @@ namespace GGemCo.Scripts.UI.Window
             UIIcon uiIcon = icon.GetComponent<UIIcon>();
             if (uiIcon == null) return;
 
-            equipData.SetItemCount(slotIndex, uiIcon.uid, uiIcon.count);
-            
-            // 장착하기
-            Player player = SceneGame.Instance?.player?.GetComponent<Player>();
-            if (player == null) return;
-            player.EquipItem(slotIndex, uiIcon.uid);
+            OnSetIconEquip?.Invoke(slotIndex, uiIcon.uid, uiIcon.count);
         }
         protected override void OnDetachIcon(int slotIndex)
         {
             base.OnDetachIcon(slotIndex);
-            equipData.RemoveItemCount(slotIndex);
+            
+            OnDetachIconEquip?.Invoke(slotIndex);
         }
     }
 }

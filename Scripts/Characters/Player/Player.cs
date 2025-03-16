@@ -6,6 +6,8 @@ using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.ScriptableSettings;
 using GGemCo.Scripts.Spine2d;
 using GGemCo.Scripts.TableLoader;
+using GGemCo.Scripts.UI;
+using GGemCo.Scripts.UI.Window;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
 
@@ -19,6 +21,8 @@ namespace GGemCo.Scripts.Characters.Player
         private bool isNpcNearby;
         private GGemCoSettings gGemCoSettings; 
         private EquipController equipController;
+        private ControllerPlayer controllerPlayer;
+        private UIWindowEquip uiWindowEquip;
         
         protected override void Awake()
         {
@@ -28,7 +32,16 @@ namespace GGemCo.Scripts.Characters.Player
         protected override void Start()
         {
             base.Start();
-            equipController = GetComponent<EquipController>();
+            
+            // 장착하기
+            uiWindowEquip =
+                SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowEquip>(UIWindowManager.WindowUid.Equip);
+            if (uiWindowEquip != null)
+            {
+                uiWindowEquip.OnSetIconEquip += EquipItem;
+            }
+
+            LoadEquipItems();
         }
         /// <summary>
         /// tag, sorting layer, layer 셋팅하기
@@ -43,7 +56,10 @@ namespace GGemCo.Scripts.Characters.Player
         /// </summary>
         protected override void InitComponents()
         {
+            // AddComponent 순서 중요
             base.InitComponents();
+            controllerPlayer = gameObject.AddComponent<ControllerPlayer>();
+            equipController = gameObject.AddComponent<EquipController>();
             ComponentController.AddRigidbody2D(gameObject);
             Vector2 offset = Vector2.zero;
             Vector2 size = new Vector2(500, 250);
@@ -70,6 +86,22 @@ namespace GGemCo.Scripts.Characters.Player
                 SetScale(playerSettings.startScale);
             }
         }
+        /// <summary>
+        /// 세이브 데이터에 있는 장착 아이템 정보 가져와서 장착 시키기
+        /// </summary>
+        private void LoadEquipItems()
+        {
+            Dictionary<int, StructInventoryIcon> dictionary =
+                SceneGame.Instance.saveDataManager.Equip.GetAllItemCounts();
+            foreach (var info in dictionary)
+            {
+                if (info.Value == null) continue;
+                int itemUid = info.Value.ItemUid;
+                int itemCount = info.Value.ItemCount;
+                if (itemUid <= 0) continue;
+                EquipItem(info.Key, itemUid, itemCount);
+            }
+        }
         protected void OnTriggerEnter2D(Collider2D collision)
         {
             if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Npc)))
@@ -93,11 +125,21 @@ namespace GGemCo.Scripts.Characters.Player
                 isNpcNearby = false;
             }
         }
-        public void EquipItem(int partIndex, int itemUid)
+        /// <summary>
+        /// 장비 장착하기
+        /// </summary>
+        /// <param name="partIndex"></param>
+        /// <param name="itemUid"></param>
+        /// <param name="itemCount"></param>
+        private void EquipItem(int partIndex, int itemUid, int itemCount)
         {
             bool result = equipController.EquipItem(partIndex, itemUid);
             if (!result) return;
-            
+            if (itemUid <= 0)
+            {
+                UnEquipItem(partIndex);
+                return;
+            }
             var info = TableLoaderManager.Instance.TableItem.GetDataByUid(itemUid);
             if (info == null) return;
             
@@ -109,7 +151,7 @@ namespace GGemCo.Scripts.Characters.Player
             {
                 string attachmentName = EquipController.AttachmentNameBySlotName[slotName];
                 
-                string changeSpritePath = $"Images/Parts/{info.SubCategory}/{info.ImagePath}_{slotName}";
+                string changeSpritePath = $"Images/Parts/{EquipController.FolderNameByPartsType[partsType]}/{info.ImagePath}_{slotName}";
                 var sprite = Resources.Load<Sprite>(changeSpritePath);
 
                 StruckChangeSlotImage struckChangeSlotImage = new StruckChangeSlotImage(slotName, attachmentName, sprite);
@@ -117,9 +159,30 @@ namespace GGemCo.Scripts.Characters.Player
             }
             CharacterAnimationController.ChangeCharacterImageInSlot(changeImages);
         }
-        public void UnEquipItem(int partIndex)
+        /// <summary>
+        /// 장비 해제 하기
+        /// </summary>
+        /// <param name="partIndex"></param>
+        private void UnEquipItem(int partIndex)
         {
             bool result = equipController.UnEquipItem(partIndex);
+            if (!result) return;
+            
+            EquipController.PartsType partsType = (EquipController.PartsType)partIndex;
+            List<string> slotNames = EquipController.SlotNameByPartsType[partsType];
+
+            List<StruckChangeSlotImage> changeImages = new List<StruckChangeSlotImage>();
+            foreach (var slotName in slotNames)
+            {
+                string attachmentName = EquipController.AttachmentNameBySlotName[slotName];
+                
+                string changeSpritePath = $"Images/Parts/{EquipController.FolderNameByPartsType[partsType]}/{attachmentName}";
+                var sprite = Resources.Load<Sprite>(changeSpritePath);
+
+                StruckChangeSlotImage struckChangeSlotImage = new StruckChangeSlotImage(slotName, attachmentName, sprite);
+                changeImages.Add(struckChangeSlotImage);
+            }
+            CharacterAnimationController.ChangeCharacterImageInSlot(changeImages);
         }
 
         public override void OnSpineEventAttack()

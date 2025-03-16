@@ -23,6 +23,15 @@ namespace GGemCo.Scripts.SaveData
         {
             ItemCounts.Clear();
             LoadItemCount(saveDataContainer);
+            
+            // 장착, 해제 하기
+            UIWindowEquip uiWindowEquip =
+                SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowEquip>(UIWindowManager.WindowUid.Equip);
+            if (uiWindowEquip != null)
+            {
+                uiWindowEquip.OnSetIconEquip += SetItemCount;
+                uiWindowEquip.OnDetachIconEquip += RemoveItemCount;
+            }
         }
 
         private void LoadItemCount(SaveDataContainer saveDataContainer)

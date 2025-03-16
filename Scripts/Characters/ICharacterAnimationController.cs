@@ -20,7 +20,6 @@ namespace GGemCo.Scripts.Characters
         void PlayRunAnimation();
         void PlayAttackAnimation();
         void PlayDeadAnimation();
-        void UpdateAnimation();
 
         float GetCharacterHeight();
 
@@ -33,5 +32,6 @@ namespace GGemCo.Scripts.Characters
         Vector2 GetCharacterSize();
 
         void ChangeCharacterImageInSlot(List<StruckChangeSlotImage> changeSlotImages);
+        void RemoveCharacterImageInSlot(List<StruckChangeSlotImage> changeSlotImages);
     }
 }
