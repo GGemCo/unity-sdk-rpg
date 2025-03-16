@@ -89,17 +89,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e3dfdd3cad944d1a7db746b25d6d8a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  textCount: {fileID: 2402048115968840856}
   window: {fileID: 0}
   windowUid: 0
   index: 0
   slotIndex: 0
   uid: 0
-  imageIcon: {fileID: 1596522047070953864}
   count: 0
-  textCount: {fileID: 2402048115968840856}
   imageGrade: {fileID: 0}
   imageLock: {fileID: 0}
-  dragHandler: {fileID: 0}
 --- !u!1 &8582807080356821957
 GameObject:
   m_ObjectHideFlags: 0
@@ -135,7 +133,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 32, y: 32}
+  m_SizeDelta: {x: 64, y: 64}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &2790583563591196150
 CanvasRenderer:
@@ -165,7 +163,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 1
+  m_text: 999
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7bc0b695ead228f459784d87f8b8d34f, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: bbd7867dd6838e64b9e493034839d636, type: 2}
@@ -192,8 +190,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 22
-  m_fontSizeBase: 22
+  m_fontSize: 18
+  m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -202,7 +200,7 @@ MonoBehaviour:
   m_HorizontalAlignment: 4
   m_VerticalAlignment: 1024
   m_textAlignment: 65535
-  m_characterSpacing: 0
+  m_characterSpacing: -8
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
