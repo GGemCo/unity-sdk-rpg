@@ -7,8 +7,12 @@ using UnityEngine;
 
 namespace GGemCo.Scripts.UI
 {
+    /// <summary>
+    /// 윈도우 관리 매니저
+    /// </summary>
     public class UIWindowManager : MonoBehaviour
     {
+        // 윈도우 고유번호 
         public enum WindowUid 
         {
             None,
@@ -68,13 +72,13 @@ namespace GGemCo.Scripts.UI
             uiWindow.Show(show);
         }
         /// <summary>
-        /// 윈도우 간에 아이콘 이동시키기 
+        /// 윈도우 간에 아이콘 바꾸기 
         /// </summary>
         /// <param name="fromWindowUid"></param>
         /// <param name="fromIndex"></param>
         /// <param name="toWindowUid"></param>
         /// <param name="toIndex"></param>
-        public void MoveIcon(WindowUid fromWindowUid, int fromIndex, WindowUid toWindowUid, int toIndex)
+        public void SwitchIcon(WindowUid fromWindowUid, int fromIndex, WindowUid toWindowUid, int toIndex)
         {
             UIWindow fromWindow = GetUIWindowByUid<UIWindow>(fromWindowUid);
             GameObject fromIcon = null;

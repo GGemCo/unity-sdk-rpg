@@ -83,8 +83,9 @@ namespace GGemCo.Scripts.UI.Icon
         /// 다른 uid 로 변경하기
         /// </summary>
         /// <param name="iconUid"></param>
+        /// <param name="iconCount"></param>
         /// <param name="remainCoolTime"></param>
-        public virtual void ChangeInfoByUid(int iconUid, int remainCoolTime = 0)
+        public virtual void ChangeInfoByUid(int iconUid, int iconCount = 0, int remainCoolTime = 0)
         {
             coolTimeHandler?.SetRemainCoolTime(remainCoolTime);
         }

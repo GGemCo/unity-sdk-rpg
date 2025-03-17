@@ -10,224 +10,42 @@ using GGemCo.Scripts.UI.Window;
 namespace GGemCo.Scripts.SaveData
 {
     /// <summary>
-    /// 인벤토리 아이템 관리
+    /// 인벤토리 아이템 개수 관리
     /// </summary>
-    public class InventoryData : DefaultData, ISaveData
+    public class InventoryData : ItemStorageData
     {
-        public Dictionary<int, StructInventoryIcon> ItemCounts = new Dictionary<int, StructInventoryIcon>();
-        private int maxCountIcon;
-        
         /// <summary>
-        /// 초기화. Awake 에서 호출 중
+        /// 초기화. Awake 단계에서 실행
         /// </summary>
+        /// <param name="loader"></param>
+        /// <param name="saveDataContainer"></param>
         public void Initialize(TableLoaderManager loader, SaveDataContainer saveDataContainer = null)
         {
             ItemCounts.Clear();
-            LoadItemCount(saveDataContainer);
-        }
-
-        private void LoadItemCount(SaveDataContainer saveDataContainer)
-        {
-            if (saveDataContainer?.InventoryData == null) return;
-            ItemCounts.Clear();
-            foreach (var info in saveDataContainer.InventoryData.ItemCounts)
+            if (saveDataContainer?.InventoryData != null)
             {
-                ItemCounts.TryAdd(info.Key, info.Value);
+                ItemCounts = new Dictionary<int, StructInventoryIcon>(saveDataContainer.InventoryData.ItemCounts);
             }
         }
 
-        private void SaveItemCounts()
+        protected override int GetMaxSlotCount()
         {
-            if (ItemCounts == null) return;
+            return SceneGame.Instance.uIWindowManager
+                .GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid.Inventory)?.maxCountIcon ?? 0;
+        }
+
+        protected override void SaveItemCounts()
+        {
             SceneGame.Instance.saveDataManager.StartSaveData();
         }
-
-        public void RemoveItemCount(int slotIndex)
-        {
-            var item = ItemCounts.GetValueOrDefault(slotIndex);
-            if (item == null) return;
-            item.ItemUid = 0;
-            item.ItemCount = 0;
-            SaveItemCounts();
-        }
-
+        
         /// <summary>
-        /// 아이템 개수 셋팅하기
-        /// </summary>
-        /// <param name="slotIndex"></param>
-        /// <param name="itemUid"></param>
-        /// <param name="value">셋팅할 개수</param>
-        public void SetItemCount(int slotIndex, int itemUid, int value)
-        {
-            var item = ItemCounts.GetValueOrDefault(slotIndex);
-            if (item == null)
-            {
-                AddItem(slotIndex, itemUid, value);
-            }
-            else
-            {
-                item.ItemUid = itemUid;
-                item.ItemCount = value;
-                SaveItemCounts();
-            }
-        }
-        /// <summary>
-        /// 아이템 개수 추가하기
-        /// </summary>
-        /// <param name="itemUid"></param>
-        /// <param name="value">추가할 개수</param>
-        public ResultCommon AddItem(int itemUid, int value)
-        {
-            if (maxCountIcon <= 0)
-            {
-                UIWindowInventory uiWindowInventory =
-                    SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
-                        .Inventory);
-                if (uiWindowInventory != null)
-                {
-                    maxCountIcon = uiWindowInventory.maxCountIcon;
-                }
-            }
-
-            // 아이템 정보 가져오기
-            var info = TableLoaderManager.Instance.TableItem.GetDataByUid(itemUid);
-            if (info == null || info.Uid <= 0)
-            {
-                return new ResultCommon(ResultCommon.Type.Fail, $"아이템 정보가 없습니다. itemUid: {itemUid}");
-            }
-
-            int maxOverlayCount = info.MaxOverlayCount; // 최대 중첩 개수
-            int totalNeededSlots = 0; // 추가할 아이템을 위해 필요한 슬롯 개수
-
-            // 1. 기존 아이템 중 중첩 가능한 공간이 있는지 확인
-            int remainingValue = value;
-            foreach (var item in ItemCounts.Values.Where(i => i.ItemUid == itemUid))
-            {
-                int availableSpace = maxOverlayCount - item.ItemCount;
-                if (availableSpace > 0)
-                {
-                    int addedAmount = Math.Min(remainingValue, availableSpace);
-                    remainingValue -= addedAmount;
-                    if (remainingValue <= 0) break; // 모든 아이템이 추가되면 종료
-                }
-            }
-
-            // 2. 남은 개수를 저장할 새로운 슬롯이 필요한 경우 개수 확인
-            while (remainingValue > 0)
-            {
-                totalNeededSlots++;
-                remainingValue -= maxOverlayCount;
-            }
-
-            // 3. 현재 남은 슬롯 개수 확인
-            int emptySlotCount = 0;
-            for (int i = 0; i < maxCountIcon; i++)
-            {
-                var item = ItemCounts.GetValueOrDefault(i);
-                if (item == null || item.ItemCount <= 0)
-                {
-                    emptySlotCount++;
-                }
-            }
-
-            // 4. 필요한 슬롯이 부족하면 실패 반환
-            if (emptySlotCount < totalNeededSlots)
-            {
-                return new ResultCommon(ResultCommon.Type.Fail, "인벤토리에 공간이 부족합니다.");
-            }
-
-            // 5. 아이템 추가 (중첩 가능한 경우 먼저 추가)
-            remainingValue = value;
-            foreach (var item in ItemCounts.Values.Where(i => i.ItemUid == itemUid))
-            {
-                int availableSpace = maxOverlayCount - item.ItemCount;
-                if (availableSpace > 0)
-                {
-                    int addedAmount = Math.Min(remainingValue, availableSpace);
-                    item.ItemCount += addedAmount;
-                    remainingValue -= addedAmount;
-                    if (remainingValue <= 0) break; // 모든 아이템이 추가되면 종료
-                }
-            }
-
-            // 6. 남은 개수를 새로운 슬롯에 추가
-            while (remainingValue > 0)
-            {
-                int emptyIndex = FindEmptySlot();
-                if (emptyIndex == -1) break; // 공간이 없으면 종료 (이론상 발생하지 않음)
-
-                int addedAmount = Math.Min(remainingValue, maxOverlayCount);
-                AddItem(emptyIndex, itemUid, addedAmount);
-                remainingValue -= addedAmount;
-            }
-
-            SaveItemCounts();
-            return new ResultCommon(ResultCommon.Type.Success);
-        }
-        // 빈 슬롯 찾기
-        private int FindEmptySlot()
-        {
-            for (int i = 0; i < maxCountIcon; i++)
-            {
-                var item = ItemCounts.GetValueOrDefault(i);
-                if (item == null || item.ItemCount <= 0)
-                {
-                    return i;
-                }
-            }
-            return -1; // 빈 슬롯 없음
-        }
-        /// <summary>
-        /// 아이템 추가하기
-        /// </summary>
-        /// <param name="index">위치</param>
-        /// <param name="itemUid">아이템 고유번호</param>
-        /// <param name="value">개수</param>
-        /// <returns></returns>
-        private void AddItem(int index, int itemUid, int value)
-        {
-            if (itemUid <= 0) return;
-            if (!ItemCounts.TryGetValue(index, out var icon))
-            {
-                ItemCounts.TryAdd(index, new StructInventoryIcon(itemUid, value));
-            }
-            else
-            {
-                icon.ItemUid = itemUid;
-                icon.ItemCount += value;
-            }
-
-            SaveItemCounts();
-        }
-
-        public int GetItemCount(int index, int itemUid)
-        {
-            return ItemCounts[index].ItemCount;
-        }
-        public int GetItemCount(int itemUid)
-        {
-            int count = 0;
-            foreach (var info in ItemCounts)
-            {
-                if (info.Value.ItemUid == itemUid)
-                {
-                    count += info.Value.ItemCount;
-                }
-            }
-            return count;
-        }
-
-        public Dictionary<int, StructInventoryIcon> GetAllItemCounts()
-        {
-            return ItemCounts;
-        }
-        /// <summary>
-        /// 특정 슬롯의 아이템을 다른 슬롯으로 합친다.
+        /// 같은 아이템 uid 끼리 합치기 
         /// </summary>
         /// <param name="fromIndex">옮길 아이템이 있는 슬롯</param>
         /// <param name="toIndex">옮길 대상 슬롯</param>
         /// <returns>성공 여부</returns>
-        public ResultCommon MoveItemToSlot(int fromIndex, int toIndex)
+        public ResultCommon MergeItem(int fromIndex, int toIndex)
         {
             // 이동할 슬롯과 대상 슬롯이 동일하면 무시
             if (fromIndex == toIndex)

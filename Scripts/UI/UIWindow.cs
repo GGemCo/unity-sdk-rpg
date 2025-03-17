@@ -8,7 +8,9 @@ using UnityEngine.UI;
 
 namespace GGemCo.Scripts.UI
 {
-    
+    /// <summary>
+    /// 윈도우 
+    /// </summary>
     public class UIWindow : MonoBehaviour, IDropHandler
     {
         // 공개(public) → 보호(protected) → 내부(internal) → 비공개(private) 
@@ -246,6 +248,20 @@ namespace GGemCo.Scripts.UI
         {
             if (uiWindowFade == null) return;
             Show(false);
+        }
+        /// <summary>
+        /// 아이콘 원래 자리로 이동시키기
+        /// </summary>
+        /// <param name="droppedIcon"></param>
+        protected void GoBackToSlot(GameObject droppedIcon)
+        {
+            if (droppedIcon == null) return;
+            UIIcon icon = droppedIcon.GetComponent<UIIcon>();
+            if (icon == null) return;
+            GameObject targetSlot = icon.window.slots[icon.slotIndex];
+            droppedIcon.transform.SetParent(targetSlot.transform);
+            droppedIcon.transform.position = icon.GetDragOriginalPosition();
+            droppedIcon.transform.SetSiblingIndex(1);
         }
     }
 }

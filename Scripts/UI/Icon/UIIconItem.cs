@@ -1,3 +1,4 @@
+using GGemCo.Scripts.Items;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI.Window;
@@ -29,14 +30,16 @@ namespace GGemCo.Scripts.UI.Icon
         /// 다른 uid 로 변경하기
         /// </summary>
         /// <param name="iconUid"></param>
+        /// <param name="iconCount"></param>
         /// <param name="remainCoolTime"></param>
-        public override void ChangeInfoByUid(int iconUid, int remainCoolTime = 0)
+        public override void ChangeInfoByUid(int iconUid, int iconCount = 0, int remainCoolTime = 0)
         {
             base.ChangeInfoByUid(iconUid, remainCoolTime);
             var info = tableItem.GetDataByUid(iconUid);
             if (info == null || info.Uid <= 0) return;
             uid = iconUid;
             struckTableItem = info;
+            SetCount(iconCount);
             UpdateInfo();
         }
         protected override bool UpdateInfo()
@@ -71,5 +74,27 @@ namespace GGemCo.Scripts.UI.Icon
             if (struckTableItem == null) return null;
             return $"Images/Icon/{struckTableItem.Type.ToString()}/{struckTableItem.Category.ToString()}/{struckTableItem.SubCategory.ToString()}/{struckTableItem.ImagePath}";
         }
+        /// <summary>
+        /// 장착 가능한 타입 인지 체크 
+        /// </summary>
+        /// <returns></returns>
+        public bool IsTypeEquip()
+        {
+            return struckTableItem.Type == ItemConstants.Type.Equip;
+        }
+        /// <summary>
+        /// 장착 가능한 부위 아이템인지 체크 
+        /// </summary>
+        /// <param name="toEquipIndex">착용하려는 부위 slot index</param>
+        /// <returns></returns>
+        public bool IsEquipParts(int toEquipIndex)
+        {
+            return (int)struckTableItem.PartsID == toEquipIndex;
+        }
+        /// <summary>
+        /// 착용 부위 type 가져오기
+        /// </summary>
+        /// <returns></returns>
+        public ItemConstants.PartsType GetPartsType() => struckTableItem.PartsID;
     }
 }
