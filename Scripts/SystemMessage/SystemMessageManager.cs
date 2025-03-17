@@ -20,6 +20,7 @@ namespace GGemCo.Scripts.SystemMessage
             Code = type;
             Message = message;
         }
+        public bool IsSuccess() => Code == Type.Success;
     }
     public class SystemMessageManager : MonoBehaviour
     {

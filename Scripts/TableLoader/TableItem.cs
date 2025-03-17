@@ -16,6 +16,7 @@ namespace GGemCo.Scripts.TableLoader
         public ItemConstants.SubCategory SubCategory;
         public ItemConstants.Class Class;
         public string ImagePath;
+        public int MaxOverlayCount;
         public string StatusID1;
         public int StatusValue1;
         public string OptionType1;
@@ -118,6 +119,7 @@ namespace GGemCo.Scripts.TableLoader
                 SubCategory = ConvertSubCategory(data["SubCategory"]),
                 Class = ConvertClass(data["Class"]),
                 ImagePath = data["ImagePath"],
+                MaxOverlayCount = int.Parse(data["MaxOverlayCount"]),
                 StatusID1 = data["StatusID1"],
                 StatusValue1 = int.Parse(data["StatusValue1"]),
                 OptionType1 = data["OptionType1"],

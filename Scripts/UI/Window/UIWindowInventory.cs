@@ -6,6 +6,7 @@ using GGemCo.Scripts.UI.Icon;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace GGemCo.Scripts.UI.Window
 {
@@ -22,9 +23,14 @@ namespace GGemCo.Scripts.UI.Window
     }
     public class UIWindowInventory : UIWindow
     {
+        [Header("장비 윈도우")]
         public UIWindowEquip uIWindowEquip;
+        [Header("플레이어 정보 윈도우")]
         public UIWindowPlayerInfo uiWindowPlayerInfo;
+        [Header("아이템 정보 윈도우")]
         public UIWindowItemInfo uIWindowItemInfo;
+        [Header("모든 아이템 합치기 버튼")]
+        public Button buttonMergeAllItems;
         
         private GameObject iconItem;
         private TableItem tableItem;
@@ -37,6 +43,7 @@ namespace GGemCo.Scripts.UI.Window
             base.Awake();
             if (TableLoaderManager.Instance == null) return;
             tableItem = TableLoaderManager.Instance.TableItem;
+            buttonMergeAllItems?.onClick.AddListener(OnClickMergeAllItems);
         }
 
         protected override void Start()
@@ -69,25 +76,32 @@ namespace GGemCo.Scripts.UI.Window
         }
         /// <summary>
         /// 저장되어있는 아이템 정보로 아이콘 셋팅하기
+        /// 인벤토리가 열려있지 않으면 업데이트 하지 않음
         /// </summary>
         public void LoadIcons()
         {
+            if (gameObject.activeSelf != true) return;
             var datas = SceneGame.Instance.saveDataManager.Inventory.GetAllItemCounts();
             if (datas == null) return;
             foreach (var info in datas)
             {
                 int index = info.Key;
-                StructInventoryIcon structInventoryIcon = info.Value;
-                int itemUid = structInventoryIcon.ItemUid;
-                int itemCount = structInventoryIcon.ItemCount;
-                if (itemUid <= 0 || itemCount <= 0) continue;
-                var table = tableItem.GetDataByUid(itemUid);
-                if (table == null || table.Uid <= 0) continue;
-                // GcLogger.Log($"index: {index}, item: {table.Name} , count: {itemCount}");
+                if (index >= icons.Length) continue;
                 var icon = icons[index];
                 if (icon == null) continue;
                 UIIconItem uiIcon = icon.GetComponent<UIIconItem>();
                 if (uiIcon == null) continue;
+                StructInventoryIcon structInventoryIcon = info.Value;
+                int itemUid = structInventoryIcon.ItemUid;
+                int itemCount = structInventoryIcon.ItemCount;
+                if (itemUid <= 0 || itemCount <= 0)
+                {
+                    uiIcon.ClearIconInfos();
+                    continue;
+                }
+                var table = tableItem.GetDataByUid(itemUid);
+                if (table == null || table.Uid <= 0) continue;
+                // GcLogger.Log($"index: {index}, item: {table.Name} , count: {itemCount}");
                 uiIcon.ChangeInfoByUid(table.Uid);
                 uiIcon.SetCount(itemCount);
             }
@@ -155,7 +169,42 @@ namespace GGemCo.Scripts.UI.Window
 
             if (targetIconSlotIndex < maxCountIcon)
             {
-                uiWindowManager.MoveIcon(droppedUIIcon.window.uid, dropIconSlotIndex, targetUIIcon.window.uid, targetIconSlotIndex);
+                // 같은 아이템일때 
+                if (droppedUIIcon.uid == targetUIIcon.uid)
+                {
+                    // 중첩 가능한지 체크
+                    var info = tableItem.GetDataByUid(targetUIIcon.uid);
+                    if (info != null && info.MaxOverlayCount > 1)
+                    {
+                        var result = inventoryData.MoveItemToSlot(dropIconSlotIndex, targetIconSlotIndex);
+                        if (!result.IsSuccess())
+                        {
+                            GcLogger.LogError(result.Message);
+                            SceneGame.Instance.systemMessageManager.ShowMessageWarning(result.Message);
+                        }
+                        LoadIcons();
+
+                        GameObject targetSlot = slots[dropIconSlotIndex];
+                        if (targetSlot == null)
+                        {
+                            GcLogger.LogError("드랍하는 아이콘 slot index 아무것도 없습니다. dropIconSlotIndex:"+dropIconSlotIndex);
+                            return;
+                        }
+                        droppedUIIcon.transform.SetParent(targetSlot.transform);
+                        droppedUIIcon.transform.position = droppedUIIcon.GetDragOriginalPosition();
+                        droppedUIIcon.transform.SetSiblingIndex(1);
+                    }
+                    else
+                    {
+                        uiWindowManager.MoveIcon(droppedUIIcon.window.uid, dropIconSlotIndex, targetUIIcon.window.uid,
+                            targetIconSlotIndex);
+                    }
+                }
+                else
+                {
+                    uiWindowManager.MoveIcon(droppedUIIcon.window.uid, dropIconSlotIndex, targetUIIcon.window.uid,
+                        targetIconSlotIndex);
+                }
             }
             // regist icon 에서 리스트로 드래그 앤 드랍 했을때 원래 자리로 되돌리기
             else
@@ -181,6 +230,14 @@ namespace GGemCo.Scripts.UI.Window
         protected override void OnDetachIcon(int slotIndex)
         {
             inventoryData.RemoveItemCount(slotIndex);
+        }
+        /// <summary>
+        /// 모든 아이템 합치기
+        /// </summary>
+        private void OnClickMergeAllItems()
+        {
+            inventoryData.MergeAllItems();
+            LoadIcons();
         }
     }
 }

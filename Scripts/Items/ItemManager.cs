@@ -250,7 +250,7 @@ namespace GGemCo.Scripts.Items
             Item item = dropItem.GetComponent<Item>();
             if (item ==null || item.itemUid <= 0) return;
             var result = SceneGame.Instance.saveDataManager.Inventory.AddItem(item.itemUid, item.itemCount);
-            if (result.Code == ResultCommon.Type.Fail)
+            if (!result.IsSuccess())
             {
                 GcLogger.LogError(result.Message);
                 SceneGame.Instance.systemMessageManager.ShowMessageWarning(result.Message);
