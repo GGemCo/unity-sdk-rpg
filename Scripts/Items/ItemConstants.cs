@@ -1,4 +1,6 @@
-﻿namespace GGemCo.Scripts.Items
+﻿using System.Collections.Generic;
+
+namespace GGemCo.Scripts.Items
 {
     public static class ItemConstants
     {
@@ -21,8 +23,8 @@
         {
             None,
             Sword, // 칼
-            Top, // 상의
-            Leg, // 상의
+            Chest, // 상의
+            Boots, // 신발
             RecoverHp, // hp 물약
             RecoverMp, // mp 물약
             IncreaseAttackSpeed, // 공격속도 증가
@@ -34,5 +36,51 @@
             None,
             Normal, // 일반
         }
+        public enum PartsType
+        {
+            None,
+            Helmet,
+            Chest,
+            Shoulder,
+            Forearm,
+            Gloves,
+            Belt,
+            Pants,
+            Boots,
+            Weapon,
+            Necklace,
+            Ring,
+            Shield,
+        }
+        /// <summary>
+        /// 부위별 리소스 폴더 이름
+        /// </summary>
+        public static readonly Dictionary<PartsType, string> FolderNameByPartsType = new Dictionary<PartsType, string>
+        {
+            { PartsType.Chest, "Chest" },
+            { PartsType.Boots, "Boots" },
+            { PartsType.Weapon, "Weapon" },
+        };
+        /// <summary>
+        /// 부위별 스파인 슬롯 이름
+        /// </summary>
+        public static readonly Dictionary<PartsType, List<string>> SlotNameByPartsType = new Dictionary<PartsType, List<string>>
+        {
+            { PartsType.Chest, new List<string> { "body" } },
+            { PartsType.Boots, new List<string> { "leg_l", "leg_r" } },
+            { PartsType.Weapon, new List<string> { "knife" } },
+        };
+        /// <summary>
+        /// 슬롯별 어태치먼트 이름
+        /// </summary>
+        public static readonly Dictionary<string, string> AttachmentNameBySlotName = new Dictionary<string, string>
+        {
+            { "body", "body" },
+            { "leg_l", "leg_l" },
+            { "leg_r", "leg_r" },
+            { "knife", "knife" },
+            { "knife2", "knife" },
+        };
+
     }
 }

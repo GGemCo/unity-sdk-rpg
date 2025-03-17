@@ -6,6 +6,7 @@ namespace GGemCo.Scripts.UI.Window
     {
         protected override void Awake()
         {
+            uid = UIWindowManager.WindowUid.Hud;
             base.Awake();
         }
         /// <summary>

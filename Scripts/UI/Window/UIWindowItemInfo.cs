@@ -27,9 +27,10 @@ namespace GGemCo.Scripts.UI.Window
         
         protected override void Awake()
         {
-            base.Awake();
+            uid = UIWindowManager.WindowUid.ItemInfo;
             if (TableLoaderManager.Instance == null) return;
             tableItem = TableLoaderManager.Instance.TableItem;
+            base.Awake();
         }
 
         public void SetItemUid(int itemUid)

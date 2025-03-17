@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.SystemMessage;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI;
 using GGemCo.Scripts.UI.Window;

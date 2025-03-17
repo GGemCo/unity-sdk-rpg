@@ -7,9 +7,9 @@ namespace GGemCo.Scripts.UI.Window
         
         protected override void Awake()
         {
-            base.Awake();
+            uid = UIWindowManager.WindowUid.ItemInfo;
             if (TableLoaderManager.Instance == null) return;
-            uid = UIWindowManager.WindowUid.PlayerInfo;
+            base.Awake();
         }
         protected override void Start()
         {

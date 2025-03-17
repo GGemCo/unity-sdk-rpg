@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
+using GGemCo.Scripts.Items;
 using GGemCo.Scripts.Maps.Objects;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.ScriptableSettings;
@@ -149,15 +150,15 @@ namespace GGemCo.Scripts.Characters.Player
             var info = TableLoaderManager.Instance.TableItem.GetDataByUid(itemUid);
             if (info == null) return;
             
-            EquipController.PartsType partsType = (EquipController.PartsType)partIndex;
-            List<string> slotNames = EquipController.SlotNameByPartsType[partsType];
+            ItemConstants.PartsType partsType = (ItemConstants.PartsType)partIndex;
+            List<string> slotNames = ItemConstants.SlotNameByPartsType[partsType];
 
             List<StruckChangeSlotImage> changeImages = new List<StruckChangeSlotImage>();
             foreach (var slotName in slotNames)
             {
-                string attachmentName = EquipController.AttachmentNameBySlotName[slotName];
+                string attachmentName = ItemConstants.AttachmentNameBySlotName[slotName];
                 
-                string changeSpritePath = $"Images/Parts/{EquipController.FolderNameByPartsType[partsType]}/{info.ImagePath}_{slotName}";
+                string changeSpritePath = $"Images/Parts/{ItemConstants.FolderNameByPartsType[partsType]}/{info.ImagePath}_{slotName}";
                 var sprite = Resources.Load<Sprite>(changeSpritePath);
 
                 StruckChangeSlotImage struckChangeSlotImage = new StruckChangeSlotImage(slotName, attachmentName, sprite);
@@ -174,15 +175,15 @@ namespace GGemCo.Scripts.Characters.Player
             bool result = equipController.UnEquipItem(partIndex);
             if (!result) return;
             
-            EquipController.PartsType partsType = (EquipController.PartsType)partIndex;
-            List<string> slotNames = EquipController.SlotNameByPartsType[partsType];
+            ItemConstants.PartsType partsType = (ItemConstants.PartsType)partIndex;
+            List<string> slotNames = ItemConstants.SlotNameByPartsType[partsType];
 
             List<StruckChangeSlotImage> changeImages = new List<StruckChangeSlotImage>();
             foreach (var slotName in slotNames)
             {
-                string attachmentName = EquipController.AttachmentNameBySlotName[slotName];
+                string attachmentName = ItemConstants.AttachmentNameBySlotName[slotName];
                 
-                string changeSpritePath = $"Images/Parts/{EquipController.FolderNameByPartsType[partsType]}/{attachmentName}";
+                string changeSpritePath = $"Images/Parts/{ItemConstants.FolderNameByPartsType[partsType]}/{attachmentName}";
                 var sprite = Resources.Load<Sprite>(changeSpritePath);
 
                 StruckChangeSlotImage struckChangeSlotImage = new StruckChangeSlotImage(slotName, attachmentName, sprite);

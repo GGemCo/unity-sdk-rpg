@@ -9,42 +9,6 @@ namespace GGemCo.Scripts.Characters.Player
     /// </summary>
     public class EquipController : MonoBehaviour
     {
-        public enum PartsType
-        {
-            Body,
-            Leg,
-            Weapon
-        }
-        /// <summary>
-        /// 부위별 리소스 폴더 이름
-        /// </summary>
-        public static readonly Dictionary<PartsType, string> FolderNameByPartsType = new Dictionary<PartsType, string>
-        {
-            { PartsType.Body, "Top" },
-            { PartsType.Leg, "Leg" },
-            { PartsType.Weapon, "Weapon" },
-        };
-        /// <summary>
-        /// 부위별 스파인 슬롯 이름
-        /// </summary>
-        public static readonly Dictionary<PartsType, List<string>> SlotNameByPartsType = new Dictionary<PartsType, List<string>>
-        {
-            { PartsType.Body, new List<string> { "body" } },
-            { PartsType.Leg, new List<string> { "leg_l", "leg_r" } },
-            { PartsType.Weapon, new List<string> { "knife" } },
-        };
-        /// <summary>
-        /// 슬롯별 어태치먼트 이름
-        /// </summary>
-        public static readonly Dictionary<string, string> AttachmentNameBySlotName = new Dictionary<string, string>
-        {
-            { "body", "body" },
-            { "leg_l", "leg_l" },
-            { "leg_r", "leg_r" },
-            { "knife", "knife" },
-            { "knife2", "knife" },
-        };
-        
         private Player player;
         // 현재 장착 중인 아이템
         private readonly Dictionary<int, StruckTableItem> equippedItems = new Dictionary<int, StruckTableItem>();

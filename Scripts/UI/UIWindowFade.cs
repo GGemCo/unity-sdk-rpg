@@ -8,13 +8,12 @@ namespace GGemCo.Scripts.UI
     {
         private CanvasGroup canvasGroup;
         private const float FadeDuration = 0.3f;
+        private UIWindow uiWindow;
 
         private void Awake()
         {
-            if (canvasGroup == null)
-            {
-                canvasGroup = GetComponent<CanvasGroup>();
-            }
+            canvasGroup = GetComponent<CanvasGroup>();
+            uiWindow = GetComponent<UIWindow>();
         }
 
         private void StartFadeOut()
@@ -28,8 +27,9 @@ namespace GGemCo.Scripts.UI
             float elapsedTime = 0.0f;
             canvasGroup.alpha = 0.0f;
             
-            gameObject.GetComponent<UIWindow>()?.OnShow(true);
-
+            // 미리 처리해야 깔끔하게 보인다.
+            uiWindow?.OnShow(true);
+            
             while (elapsedTime < FadeDuration)
             {
                 elapsedTime += Time.deltaTime;
@@ -37,7 +37,6 @@ namespace GGemCo.Scripts.UI
                 canvasGroup.alpha = Easing.EaseOutQuintic(t);
                 yield return null;
             }
-
             canvasGroup.alpha = 1.0f;
         }
 
@@ -53,20 +52,24 @@ namespace GGemCo.Scripts.UI
                 canvasGroup.alpha = Easing.EaseInQuintic(1.0f - t);
                 yield return null;
             }
-
             canvasGroup.alpha = 0.0f;
-
-            gameObject.GetComponent<UIWindow>()?.OnShow(false);
+            uiWindow?.OnShow(false);
             // 페이드 아웃 완료 후 비활성화
             gameObject.SetActive(false);
         }
+        /// <summary>
+        /// window 열기
+        /// </summary>
         public void ShowPanel()
         {
+            // 먼저 활성화 해야 fade in 이 작동함
             gameObject.SetActive(true);
             // 패널 활성화 시 페이드 인
             StartCoroutine(FadeIn());
         }
-
+        /// <summary>
+        /// window 닫기
+        /// </summary>
         public void HidePanel()
         {
             // 페이드 아웃을 시작하도록 OnDisable을 호출

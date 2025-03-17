@@ -14,6 +14,7 @@ namespace GGemCo.Scripts.TableLoader
         public ItemConstants.Type Type;
         public ItemConstants.Category Category;
         public ItemConstants.SubCategory SubCategory;
+        public ItemConstants.PartsType PartsID;
         public ItemConstants.Class Class;
         public string ImagePath;
         public int MaxOverlayCount;
@@ -31,6 +32,7 @@ namespace GGemCo.Scripts.TableLoader
         private static readonly Dictionary<string, ItemConstants.Category> MapCategory;
         private static readonly Dictionary<string, ItemConstants.SubCategory> MapSubCategory;
         private static readonly Dictionary<string, ItemConstants.Class> MapClass;
+        private static readonly Dictionary<string, ItemConstants.PartsType> MapPartsID;
 
         static TableItem()
         {
@@ -48,8 +50,8 @@ namespace GGemCo.Scripts.TableLoader
             MapSubCategory = new Dictionary<string, ItemConstants.SubCategory>
             {
                 { "Sword", ItemConstants.SubCategory.Sword },
-                { "Top", ItemConstants.SubCategory.Top },
-                { "Leg", ItemConstants.SubCategory.Leg },
+                { "Chest", ItemConstants.SubCategory.Chest },
+                { "Boots", ItemConstants.SubCategory.Boots },
                 { "RecoverHp", ItemConstants.SubCategory.RecoverHp },
                 { "RecoverMp", ItemConstants.SubCategory.RecoverMp },
                 { "IncreaseAttackSpeed", ItemConstants.SubCategory.IncreaseAttackSpeed },
@@ -59,11 +61,19 @@ namespace GGemCo.Scripts.TableLoader
             {
                 { "Normal", ItemConstants.Class.Normal },
             };
+            MapPartsID = new Dictionary<string, ItemConstants.PartsType>
+            {
+                { "Helmet", ItemConstants.PartsType.Helmet },
+                { "Chest", ItemConstants.PartsType.Chest },
+                { "Boots", ItemConstants.PartsType.Boots },
+                { "Weapon", ItemConstants.PartsType.Weapon },
+            };
         }
         private static ItemConstants.Type ConvertType(string type) => MapType.GetValueOrDefault(type, ItemConstants.Type.None);
         private static ItemConstants.Category ConvertCategory(string type) => MapCategory.GetValueOrDefault(type, ItemConstants.Category.None);
         private static ItemConstants.SubCategory ConvertSubCategory(string type) => MapSubCategory.GetValueOrDefault(type, ItemConstants.SubCategory.None);
         private static ItemConstants.Class ConvertClass(string type) => MapClass.GetValueOrDefault(type, ItemConstants.Class.None);
+        private static ItemConstants.PartsType ConvertPartsID(string type) => MapPartsID.GetValueOrDefault(type, ItemConstants.PartsType.None);
         
         private readonly Dictionary<ItemConstants.Category, List<StruckTableItem>> dictionaryByCategory = new Dictionary<ItemConstants.Category, List<StruckTableItem>>();
         private readonly Dictionary<ItemConstants.SubCategory, List<StruckTableItem>> dictionaryBySubCategory = new Dictionary<ItemConstants.SubCategory, List<StruckTableItem>>();
@@ -116,6 +126,7 @@ namespace GGemCo.Scripts.TableLoader
                 Name = data["Name"],
                 Type = ConvertType(data["Type"]),
                 Category = ConvertCategory(data["Category"]),
+                PartsID = ConvertPartsID(data["PartsID"]),
                 SubCategory = ConvertSubCategory(data["SubCategory"]),
                 Class = ConvertClass(data["Class"]),
                 ImagePath = data["ImagePath"],
