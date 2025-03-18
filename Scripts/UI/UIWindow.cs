@@ -1,5 +1,7 @@
 using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
+using GGemCo.Scripts.Scenes;
+using GGemCo.Scripts.SystemMessage;
 using GGemCo.Scripts.UI.Icon;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
@@ -91,7 +93,7 @@ namespace GGemCo.Scripts.UI
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public GameObject GetIconByIndex(int index)
+        public UIIcon GetIconByIndex(int index)
         {
             if (icons.Length == 0 || icons[index] == null)
             {
@@ -99,14 +101,14 @@ namespace GGemCo.Scripts.UI
                 return null;
             }
         
-            return icons[index];
+            return icons[index].GetComponent<UIIcon>();
         }
         /// <summary>
         /// Uid 로 아이콘 가져오기
         /// </summary>
         /// <param name="iconUid"></param>
         /// <returns></returns>
-        public GameObject GetIconByUid(int iconUid)
+        public UIIcon GetIconByUid(int iconUid)
         {
             if (icons.Length == 0)
             {
@@ -121,7 +123,7 @@ namespace GGemCo.Scripts.UI
                 if (uiIcon == null) continue;
                 if (uiIcon.uid == iconUid)
                 {
-                    return icon;
+                    return uiIcon;
                 }
             }
 
@@ -153,27 +155,46 @@ namespace GGemCo.Scripts.UI
         /// 아이콘 붙여주기 
         /// </summary>
         /// <param name="slotIndex"></param>
-        /// <param name="icon"></param>
-        public void SetIcon(int slotIndex, GameObject icon)
+        /// <param name="iconUid"></param>
+        /// <param name="iconCount"></param>
+        public void SetIconCount(int slotIndex, int iconUid, int iconCount)
         {
-            GameObject slot = slots[slotIndex];
-            if (slot == null)
+            GameObject icon = icons[slotIndex];
+            if (icon == null)
             {
                 GcLogger.LogError("슬롯에 아이콘이 없습니다. slot index: " +slotIndex);
                 return;
             }
-            icon.transform.SetParent(slot.transform);
-            icon.transform.position = slot.transform.position;
             UIIcon uiIcon = icon.GetComponent<UIIcon>();
+            if (uiIcon == null)
+            {
+                GcLogger.LogError("슬롯에 UIIcon 이 없습니다. slot index: " +slotIndex);
+                return;
+            }
             uiIcon.window = this;
             uiIcon.windowUid = uid;
-            uiIcon.index = slotIndex;
-            uiIcon.slotIndex = slotIndex;
-            icons[slotIndex] = icon;
+            uiIcon.ChangeInfoByUid(iconUid, iconCount);
             
-            OnSetIcon(slotIndex, icon);
+            OnSetIcon(slotIndex, iconUid, iconCount);
         }
-        protected virtual void OnSetIcon(int slotIndex, GameObject icon)
+        /// <summary>
+        /// 아이콘 이동 후 슬롯별 uid, count 처리  
+        /// </summary>
+        /// <param name="result"></param>
+        public void SetIcons(ResultCommon result)
+        {
+            if (!result.IsSuccess())
+            {
+                GcLogger.LogError(result.Message);
+                SceneGame.Instance.systemMessageManager.ShowMessageWarning(result.Message);
+            }
+            if (result.ResultIcons == null || result.ResultIcons.Count <= 0) return;
+            foreach (var icon in result.ResultIcons)
+            {
+                SetIconCount(icon.Index, icon.ItemUid, icon.ItemCount);
+            }
+        }
+        protected virtual void OnSetIcon(int slotIndex, int iconUid, int iconCount)
         {
         }
         public virtual void OnClickIcon(UIIcon icon)

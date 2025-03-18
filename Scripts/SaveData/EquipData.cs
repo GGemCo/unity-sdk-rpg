@@ -22,22 +22,15 @@ namespace GGemCo.Scripts.SaveData
             UIWindowEquip uiWindowEquip = SceneGame.Instance.uIWindowManager
                 .GetUIWindowByUid<UIWindowEquip>(UIWindowManager.WindowUid.Equip);
 
-            if (uiWindowEquip != null)
-            {
-                uiWindowEquip.OnSetIconEquip += SetItemCount;
-                uiWindowEquip.OnDetachIconEquip += RemoveItemCount;
-            }
+            if (uiWindowEquip == null) return;
+            uiWindowEquip.OnSetIconEquip += SetItemCount;
+            uiWindowEquip.OnDetachIconEquip += RemoveItemCount;
         }
 
         protected override int GetMaxSlotCount()
         {
             return SceneGame.Instance.uIWindowManager
                 .GetUIWindowByUid<UIWindowEquip>(UIWindowManager.WindowUid.Equip)?.maxCountIcon ?? 0;
-        }
-
-        protected override void SaveItemCounts()
-        {
-            SceneGame.Instance.saveDataManager.StartSaveData();
         }
     }
 }

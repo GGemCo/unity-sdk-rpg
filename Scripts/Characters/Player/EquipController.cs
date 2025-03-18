@@ -24,11 +24,8 @@ namespace GGemCo.Scripts.Characters.Player
         {
             tableItem = TableLoaderManager.Instance.TableItem;
             player = GetComponent<Player>();
-            if (player != null)
-            {
-                OnPlayerEquiped += player.UpdateStatCache;
-                OnPlayerUnEquiped += player.UpdateStatCache;
-            }
+            OnPlayerEquiped += player.UpdateStatCache;
+            OnPlayerUnEquiped += player.UpdateStatCache;
         }
 
         private void Start()
@@ -49,11 +46,11 @@ namespace GGemCo.Scripts.Characters.Player
                 return true;
             }
             StruckTableItem item = tableItem.GetDataByUid(itemUid);
-            if (equippedItems.TryAdd(partIndex, item))
+            if (!equippedItems.TryAdd(partIndex, item))
             {
-                OnPlayerEquiped?.Invoke(equippedItems);
+                equippedItems[partIndex] = item;
             }
-
+            OnPlayerEquiped?.Invoke(equippedItems);
             return true;
         }
         /// <summary>
@@ -63,11 +60,8 @@ namespace GGemCo.Scripts.Characters.Player
         public bool UnEquipItem(int partIndex)
         {
             if (player == null) return false;
-            if (equippedItems.Remove(partIndex))
-            {
-                OnPlayerUnEquiped?.Invoke(equippedItems);
-            }
-
+            equippedItems.Remove(partIndex);
+            OnPlayerUnEquiped?.Invoke(equippedItems);
             return true;
         }
         /// <summary>

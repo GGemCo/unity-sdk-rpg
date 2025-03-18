@@ -1,5 +1,6 @@
 ﻿using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
+using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI.Icon;
@@ -20,12 +21,23 @@ namespace GGemCo.Scripts.UI.Window
         public event DelegateOnDetachIconEquip OnDetachIconEquip;
         
         private TableItem tableItem;
+        private InventoryData inventoryData;
+        private EquipData equipData;
         protected override void Awake()
         {
             uid = UIWindowManager.WindowUid.Equip;
             if (TableLoaderManager.Instance == null) return;
             tableItem = TableLoaderManager.Instance.TableItem;
             base.Awake();
+        }
+        protected override void Start()
+        {
+            base.Start();
+            if (SceneGame.Instance != null && SceneGame.Instance.saveDataManager != null)
+            {
+                equipData = SceneGame.Instance.saveDataManager.Equip;
+                inventoryData = SceneGame.Instance.saveDataManager.Inventory;
+            }
         }
         public override void OnShow(bool show)
         {
@@ -41,7 +53,6 @@ namespace GGemCo.Scripts.UI.Window
             if (AddressableSettingsLoader.Instance == null) return;
             if (amount <= 0) return;
             GameObject iconItem = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconItem);
-            GameObject slot = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabSlot);
             if (iconItem == null) return;
             for (int i = 0; i < amount; i++)
             {
@@ -65,7 +76,7 @@ namespace GGemCo.Scripts.UI.Window
         /// <summary>
         /// 저장되어있는 아이템 정보로 아이콘 셋팅하기
         /// </summary>
-        public void LoadIcons()
+        private void LoadIcons()
         {
             if (!gameObject.activeSelf) return;
             var datas = SceneGame.Instance.saveDataManager.Equip.GetAllItemCounts();
@@ -91,7 +102,6 @@ namespace GGemCo.Scripts.UI.Window
                 if (table == null || table.Uid <= 0) continue;
                 uiIcon.ChangeInfoByUid(table.Uid);
                 uiIcon.SetCount(itemCount);
-                OnSetIcon(index, icon);
             }
         }
         
@@ -122,20 +132,30 @@ namespace GGemCo.Scripts.UI.Window
         public override void OnEndDragInIcon(GameObject droppedIcon, GameObject targetIcon)
         {
             // GcLogger.Log("skill window. OnEndDragInIcon");
-            UIWindowManager uiWindowManager = SceneGame.Instance.uIWindowManager;
-
             UIIconItem droppedUIIcon = droppedIcon.GetComponent<UIIconItem>();
-            UIIconItem targetUIIcon = targetIcon.GetComponent<UIIconItem>();
-        
+            UIWindow droppedWindow = droppedUIIcon.window;
+            UIWindowManager.WindowUid droppedWindowUid = droppedUIIcon.windowUid;
             int dropIconSlotIndex = droppedUIIcon.slotIndex;
+            int dropIconUid = droppedUIIcon.uid;
+            int dropIconCount = droppedUIIcon.count;
+            if (dropIconUid <= 0)
+            {
+                GoBackToSlot(droppedIcon);
+                return;
+            }
             
+            UIIconItem targetUIIcon = targetIcon.GetComponent<UIIconItem>();
             // 드래그앤 드랍 한 곳에 아무것도 없을때 
             if (targetUIIcon == null)
             {
                 GoBackToSlot(droppedIcon);
                 return;
             }
+            UIWindow targetWindow = targetUIIcon.window;
+            UIWindowManager.WindowUid targetWindowUid = targetUIIcon.windowUid;
             int targetIconSlotIndex = targetUIIcon.slotIndex;
+            int targetIconUid = targetUIIcon.uid;
+            int targetIconCount = targetUIIcon.count;
 
             if (targetIconSlotIndex < maxCountIcon)
             {
@@ -144,55 +164,41 @@ namespace GGemCo.Scripts.UI.Window
                 if (droppedUIIcon.IsTypeEquip() && droppedUIIcon.IsEquipParts(targetIconSlotIndex))
                 {
                     // 장착된 아이템이 없을 때
-                    if (targetUIIcon.uid <= 0)
+                    if (targetIconUid <= 0)
                     {
-                        // 인벤토리에서 하나 빼고
-                        SceneGame.Instance.saveDataManager.Inventory.AddItemToSlot(droppedUIIcon.index, droppedUIIcon.uid, -1);
-                        // 장비창에 하나 넣기
-                        SceneGame.Instance.saveDataManager.Equip.AddItemToSlot(targetUIIcon.index, droppedUIIcon.uid, 1);
-                        LoadIcons();
-                        uiWindowInventory?.LoadIcons();
-                        GoBackToSlot(droppedIcon);
+                        var result = inventoryData.MinusItem(dropIconSlotIndex, dropIconUid, 1);
+                        droppedWindow.SetIcons(result);
+                        
+                        result = equipData.AddItem(targetIconSlotIndex, dropIconUid, 1);
+                        targetWindow.SetIcons(result);
                     }
                     else
                     {
-                        // 순서 중요
-                        int dropIndex = droppedUIIcon.index;
-                        int dropUid = droppedUIIcon.uid;
+                        var result = inventoryData.MinusItem(dropIconSlotIndex, dropIconUid, 1);
+                        droppedWindow.SetIcons(result);
                         
-                        int targetIndex = targetUIIcon.index;
-                        int targetUid = targetUIIcon.uid;
-                        // 인벤토리에서 하나 빼고
-                        SceneGame.Instance.saveDataManager.Inventory.AddItemToSlot(dropIndex, dropUid, -1);
-                        // 장비창에 있던것도 빼서 0 을 만듬
-                        SceneGame.Instance.saveDataManager.Equip.AddItemToSlot(targetIndex, targetUid, -1);
-                        // 장비창에 있던것은 인벤토리에 추가한다 
-                        SceneGame.Instance.saveDataManager.Inventory.AddItem(targetUid, 1);
-                        // 장비창에 하나 넣기
-                        SceneGame.Instance.saveDataManager.Equip.AddItemToSlot(targetIndex, dropUid, 1);
-                        LoadIcons();
-                        uiWindowInventory?.LoadIcons();
-                        GoBackToSlot(droppedIcon);
+                        result = equipData.MinusItem(targetIconSlotIndex, targetIconUid, 1);
+                        targetWindow.SetIcons(result);
+                        
+                        result = inventoryData.AddItem(targetIconUid, 1);
+                        droppedWindow.SetIcons(result);
+                        
+                        result = equipData.AddItem(targetIconSlotIndex, dropIconUid, 1);
+                        targetWindow.SetIcons(result);
                     }
                 }
                 else
                 {
                     SceneGame.Instance.systemMessageManager.ShowMessageWarning("해당 슬롯에는 착용할 수 없는 아이템 입니다.");
-                    GoBackToSlot(droppedIcon);
                 }
             }
-            // regist icon 에서 리스트로 드래그 앤 드랍 했을때 원래 자리로 되돌리기
-            else
-            {
-                GoBackToSlot(droppedIcon);
-            }
+            GoBackToSlot(droppedIcon);
         }
-        protected override void OnSetIcon(int slotIndex, GameObject icon)
+        protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount)
         {
-            base.OnSetIcon(slotIndex, icon);
-            UIIcon uiIcon = icon.GetComponent<UIIcon>();
+            base.OnSetIcon(slotIndex, iconUid, iconCount);
+            UIIcon uiIcon = GetIconByIndex(slotIndex);
             if (uiIcon == null) return;
-
             OnSetIconEquip?.Invoke(slotIndex, uiIcon.uid, uiIcon.count);
         }
         protected override void OnDetachIcon(int slotIndex)

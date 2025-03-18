@@ -2,6 +2,7 @@ using GGemCo.Scripts.Items;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI.Window;
+using GGemCo.Scripts.Utils;
 using UnityEngine.EventSystems;
 
 namespace GGemCo.Scripts.UI.Icon
@@ -34,9 +35,18 @@ namespace GGemCo.Scripts.UI.Icon
         /// <param name="remainCoolTime"></param>
         public override void ChangeInfoByUid(int iconUid, int iconCount = 0, int remainCoolTime = 0)
         {
-            base.ChangeInfoByUid(iconUid, remainCoolTime);
+            base.ChangeInfoByUid(iconUid, iconCount, remainCoolTime);
+            if (iconUid == 0 && iconCount == 0)
+            {
+                ClearIconInfos();
+                return;
+            }
             var info = tableItem.GetDataByUid(iconUid);
-            if (info == null || info.Uid <= 0) return;
+            if (info == null)
+            {
+                GcLogger.LogError("아이콘 테이블에 없는 아이템 입니다.");
+                return;
+            }
             uid = iconUid;
             struckTableItem = info;
             SetCount(iconCount);

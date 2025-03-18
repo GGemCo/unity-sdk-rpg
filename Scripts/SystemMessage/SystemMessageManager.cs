@@ -5,6 +5,20 @@ using UnityEngine;
 
 namespace GGemCo.Scripts.SystemMessage
 {
+    // 아이템 합치기, 나누기 결과 콜백 용
+    public class StruckResultIconControl
+    {
+        public int Index;
+        public int ItemUid;
+        public int ItemCount;
+
+        public StruckResultIconControl(int index, int itemUid, int itemCount)
+        {
+            Index = index;
+            ItemUid = itemUid;
+            ItemCount = itemCount;
+        }
+    }
     public class ResultCommon
     {
         public enum Type
@@ -14,11 +28,13 @@ namespace GGemCo.Scripts.SystemMessage
         }
         public Type Code;
         public string Message;
+        public List<StruckResultIconControl> ResultIcons;
 
-        public ResultCommon(Type type, string message = "")
+        public ResultCommon(Type type, string message = "", List<StruckResultIconControl> resultIcons = null)
         {
             Code = type;
             Message = message;
+            ResultIcons = resultIcons;
         }
         public bool IsSuccess() => Code == Type.Success;
     }
@@ -75,7 +91,7 @@ namespace GGemCo.Scripts.SystemMessage
         /// 디폴트 SystemMessage 만들기
         /// </summary>
         /// <returns></returns>
-        private SystemMessage GetDeafultSystemMessage()
+        private SystemMessage GetDefaultSystemMessage()
         {
             return new SystemMessage(type, duration, fadeInTime, fadeOutTime, textColor, fontSize);
         }
@@ -85,7 +101,7 @@ namespace GGemCo.Scripts.SystemMessage
         /// <param name="message"></param>
         public void ShowMessageWarning(string message)
         {
-            SystemMessage systemMessage = GetDeafultSystemMessage();
+            SystemMessage systemMessage = GetDefaultSystemMessage();
             systemMessage.Type = MessageType.Warning;
             systemMessage.TextColor = messageTypeColors[systemMessage.Type];
             ShowMessage(message, systemMessage);
@@ -93,7 +109,7 @@ namespace GGemCo.Scripts.SystemMessage
         /// <summary>
         /// 시스템 메시지를 표시하는 함수
         /// </summary>
-        public void ShowMessage(string message, SystemMessage systemMessage)
+        private void ShowMessage(string message, SystemMessage systemMessage)
         {
             if (messageCoroutine != null)
             {

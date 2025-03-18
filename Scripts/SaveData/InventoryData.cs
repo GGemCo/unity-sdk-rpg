@@ -34,11 +34,6 @@ namespace GGemCo.Scripts.SaveData
                 .GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid.Inventory)?.maxCountIcon ?? 0;
         }
 
-        protected override void SaveItemCounts()
-        {
-            SceneGame.Instance.saveDataManager.StartSaveData();
-        }
-        
         /// <summary>
         /// 같은 아이템 uid 끼리 합치기 
         /// </summary>
@@ -90,19 +85,19 @@ namespace GGemCo.Scripts.SaveData
             // 이동 가능한 개수 계산
             int moveAmount = Math.Min(fromItem.ItemCount, availableSpace);
 
+            List<StruckResultIconControl> controls = new List<StruckResultIconControl>();
             // 아이템 이동
-            toItem.ItemCount += moveAmount;
-            fromItem.ItemCount -= moveAmount;
+            int toItemCount = toItem.ItemCount + moveAmount;
+            controls.Add(new StruckResultIconControl(toIndex, toItem.ItemUid, toItemCount));
+            
+            int fromItemCount = fromItem.ItemCount - moveAmount;
 
             // fromIndex 슬롯이 비었으면 제거
-            if (fromItem.ItemCount <= 0)
-            {
-                // ItemCounts.Remove(fromIndex);
-                RemoveItemCount(fromIndex);
-            }
+            controls.Add(fromItemCount <= 0
+                ? new StruckResultIconControl(fromIndex, 0, 0)
+                : new StruckResultIconControl(fromIndex, fromItem.ItemUid, fromItemCount));
 
-            SaveItemCounts();
-            return new ResultCommon(ResultCommon.Type.Success, $"{moveAmount}개 아이템이 {fromIndex} → {toIndex}로 이동되었습니다.");
+            return new ResultCommon(ResultCommon.Type.Success, $"{moveAmount}개 아이템이 {fromIndex} → {toIndex}로 이동되었습니다.", controls);
         }
         /// <summary>
         /// 인벤토리에 있는 같은 아이템을 작은 인덱스부터 최대 중첩 개수까지 합친다.
