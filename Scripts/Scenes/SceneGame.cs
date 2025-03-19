@@ -90,7 +90,7 @@ namespace GGemCo.Scripts.Scenes
             damageTextManager = CreateManager<DamageTextManager>(managerContainer);
             
             itemManager = new ItemManager();
-            itemManager.Initialize();
+            itemManager.Initialize(this);
             CharacterManager = new CharacterManager();
             CharacterManager.Initialize();
         }

@@ -22,16 +22,13 @@ namespace GGemCo.Scripts.Characters.Player
 
         private void Awake()
         {
+            equippedItems.Clear();
             tableItem = TableLoaderManager.Instance.TableItem;
             player = GetComponent<Player>();
             OnPlayerEquiped += player.UpdateStatCache;
             OnPlayerUnEquiped += player.UpdateStatCache;
         }
 
-        private void Start()
-        {
-            equippedItems.Clear();
-        }
         /// <summary>
         /// 장비 착용
         /// </summary>

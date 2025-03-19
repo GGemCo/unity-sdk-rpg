@@ -7,7 +7,7 @@ using GGemCo.Scripts.UI.Window;
 namespace GGemCo.Scripts.SaveData
 {
     /// <summary>
-    /// 장비창 아이템 개수 관리
+    /// 세이브 데이터 - 장착 아이템 정보
     /// </summary>
     public class EquipData : ItemStorageData
     {
@@ -18,13 +18,6 @@ namespace GGemCo.Scripts.SaveData
             {
                 ItemCounts = new Dictionary<int, StructInventoryIcon>(saveDataContainer.EquipData.ItemCounts);
             }
-
-            UIWindowEquip uiWindowEquip = SceneGame.Instance.uIWindowManager
-                .GetUIWindowByUid<UIWindowEquip>(UIWindowManager.WindowUid.Equip);
-
-            if (uiWindowEquip == null) return;
-            uiWindowEquip.OnSetIconEquip += SetItemCount;
-            uiWindowEquip.OnDetachIconEquip += RemoveItemCount;
         }
 
         protected override int GetMaxSlotCount()

@@ -6,23 +6,18 @@ using UnityEngine;
 
 namespace GGemCo.Scripts.Core
 {
+    /// <summary>
+    /// 최종 수치 계산 값 관리 매니저
+    /// </summary>
     public class CalculateManager : MonoBehaviour
     {
-        private void Start()
-        {
-        }
-
-        protected long GetPlayerWeaponAtk()
-        {
-            return 0;
-        }
         /// <summary>
         /// 플레이어 공격력 구하기
         /// </summary>
         /// <returns></returns>
         public long GetPlayerTotalAtk()
         {
-            return (long)SceneGame.Instance.player.GetComponent<Player>().TotalAtk;
+            return SceneGame.Instance.player.GetComponent<Player>().TotalAtk.Value;
         }
         /// <summary>
         /// 몬스터 공격력 구하기
@@ -43,7 +38,7 @@ namespace GGemCo.Scripts.Core
                 return 0;
             }
 
-            return (long)info.StatAtk;
+            return info.StatAtk;
         }
     }
 }

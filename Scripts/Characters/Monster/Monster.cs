@@ -81,7 +81,7 @@ namespace GGemCo.Scripts.Characters.Monster
             // GcLogger.Log("InitializationStat uid: "+uid+" / info.uid: "+info.uid+" / StatMoveSpeed: "+info.statMoveSpeed);
             if (info.Uid <= 0) return;
             SetBaseInfos(info.StatAtk, info.StatDef, info.StatHp, 0, info.StatMoveSpeed, info.StatAttackSpeed);
-            CurrentHp = info.StatHp;
+            CurrentHp.OnNext(info.StatHp);
             float scale = info.Scale;
             SetScale(scale);
 

@@ -2,6 +2,7 @@
 using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
+using R3;
 using UnityEngine;
 
 namespace GGemCo.Scripts.Characters
@@ -97,8 +98,9 @@ namespace GGemCo.Scripts.Characters
         private CharacterSortingOrder sortingOrder;
         
         [Header("상태 및 스탯")]
-        // 현재 hp
-        protected long CurrentHp;
+        protected readonly BehaviorSubject<long> CurrentHp = new(0);
+        protected readonly BehaviorSubject<long> CurrentMp = new(0);
+        
         // 현재 상태
         protected CharacterStatus CurrentStatus;
         // 몬스터 죽은 후 맵에서 지우기까지에 시간
@@ -329,17 +331,17 @@ namespace GGemCo.Scripts.Characters
             }
             if (damage <= 0) return false;
 
-            CurrentHp -= damage;
+            long remainHp = CurrentHp.Value - damage; 
             // -1 이면 죽지 않는다
             if (BaseHp < 0)
             {
-                CurrentHp = 1;
+                remainHp = 1;
             }
 
             Vector3 damageTextPosition = transform.position + new Vector3(0, GetCharacterHeight() * Mathf.Abs(originalScaleX), 0);
             SceneGame.Instance.damageTextManager.ShowDamageText(damageTextPosition, damage, Color.red);
             
-            if (CurrentHp <= 0)
+            if (remainHp <= 0)
             {
                 CurrentStatus = CharacterStatus.Dead;
                 Destroy(this.gameObject, delayDestroyMonster);
@@ -350,6 +352,7 @@ namespace GGemCo.Scripts.Characters
             {
                 OnDamage(attacker);
             }
+            CurrentHp.OnNext(remainHp);
 
             return true;
         }

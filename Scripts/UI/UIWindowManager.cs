@@ -32,15 +32,12 @@ namespace GGemCo.Scripts.UI
         {
             if (AddressableSettingsLoader.Instance == null) return;
             prefabIconItem = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconItem);
-        }
-        private void Start()
-        {
-            InitializationShowDisable();
+            InitializationTableInfo();
         }
         /// <summary>
-        /// 초기화시 안보여야 하는 윈도우 처리 
+        /// 각 윈도우에 table 정보 연결하기
         /// </summary>
-        private void InitializationShowDisable()
+        private void InitializationTableInfo()
         {
             TableWindow tableWindow = TableLoaderManager.Instance.TableWindow;
             var tables = tableWindow.GetDatas();
@@ -49,11 +46,11 @@ namespace GGemCo.Scripts.UI
             {
                 int uid = table.Key;
                 if (uid == 0) continue;
-                var info = tableWindow.GetDataByUid(uid);
-                if (info == null || info.Uid <= 0 || info.DefaultActive) continue;
-                GameObject window = uiWindows[uid].gameObject;
+                StruckTableWindow info = tableWindow.GetDataByUid(uid);
+                if (info == null || info.Uid <= 0 || uiWindows[uid] == null) continue;
+                UIWindow window = uiWindows[uid].gameObject.GetComponent<UIWindow>();
                 if (window == null) continue;
-                window.SetActive(false);
+                window.SetTableWindow(info);
             }
         }
         /// <summary>

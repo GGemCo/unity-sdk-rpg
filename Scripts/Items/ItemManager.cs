@@ -7,7 +7,6 @@ using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI;
 using GGemCo.Scripts.UI.Window;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
@@ -31,6 +30,7 @@ namespace GGemCo.Scripts.Items
         private Coroutine reducePoolCoroutine;
         // 드랍되는 아이템 pool size 값을 원래 값으로 초기화 시간
         private readonly float poolReduceTime = 10f;
+        private SceneGame sceneGame;
         
         public enum MonsterDropRateType
         {
@@ -59,7 +59,7 @@ namespace GGemCo.Scripts.Items
         /// <summary>
         /// 초기화. Awake 단계에서 호출됩니다.
         /// </summary>
-        public void Initialize()
+        public void Initialize(SceneGame psceneGame)
         {
             poolSize = 1;
             poolDropItem.Clear();
@@ -69,6 +69,7 @@ namespace GGemCo.Scripts.Items
             dictionaryBySubCategory = tableItem.GetDictionaryBySubCategory();
             dropGroupDictionary = TableLoaderManager.Instance.TableItemDropGroup.GetDropGroups();
             monsterDropDictionary = TableLoaderManager.Instance.TableMonsterDropRate.GetMonsterDropDictionary();
+            sceneGame = psceneGame;
         }
         /// <summary>
         /// Addressable 에 등록된 damageText 를 불러와서 pool 을 만든다 
@@ -125,7 +126,7 @@ namespace GGemCo.Scripts.Items
             item.StartDrop();
             
             // 풀을 일정 시간이 지나면 정리하도록 코루틴 시작
-            reducePoolCoroutine ??= SceneGame.Instance.StartCoroutine(ReducePoolSize());
+            reducePoolCoroutine ??= sceneGame.StartCoroutine(ReducePoolSize());
         }
         /// <summary>
         /// 일정 시간이 지나면 풀 크기를 다시 poolSize 값으로 줄인다.
@@ -248,22 +249,15 @@ namespace GGemCo.Scripts.Items
         {
             Item item = dropItem.GetComponent<Item>();
             if (item ==null || item.itemUid <= 0) return;
-            var result = SceneGame.Instance.saveDataManager.Inventory.AddItem(item.itemUid, item.itemCount);
-            if (!result.IsSuccess())
-            {
-                GcLogger.LogError(result.Message);
-                SceneGame.Instance.systemMessageManager.ShowMessageWarning(result.Message);
-                return;
-            }
-            item.Reset();
-            // 인벤토리가 열려있으면 바로 업데이트 해주기 
-            var inventory =
-                SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
+            var result = sceneGame.saveDataManager.Inventory.AddItem(item.itemUid, item.itemCount);
+            var inventory = sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
                     .Inventory);
             if (inventory != null)
             {
-                inventory.LoadIcons();
+                inventory.SetIcons(result);
             }
+            
+            item.Reset();
         }
 
         public void AddPoolDropItem(Item item)

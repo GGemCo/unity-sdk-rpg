@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using GGemCo.Scripts.TableLoader;
+using R3;
 using UnityEngine;
 
 namespace GGemCo.Scripts.Characters
@@ -16,20 +17,28 @@ namespace GGemCo.Scripts.Characters
         protected int BaseHp { get; set; }
         private int BaseMp { get; set; }
         private int BaseMoveSpeed { get; set; }
-
         private int BaseAttackSpeed { get; set; }
         protected int BaseCriticalDamage { get; set; }
         protected int BaseCriticalProbability { get; set; }
         
+        // 내부 변수 (구독자에게 알리지 않고 값만 저장)
+        private long totalAtk;
+        private long totalDef;
+        private long totalHp;
+        private long totalMp;
+        private long totalMoveSpeed;
+        private long totalAttackSpeed;
+        private long totalCriticalDamage;
+        private long totalCriticalProbability;
         // 최종 적용된 스탯 (캐싱)
-        public long TotalAtk { get; private set; }
-        private long TotalDef { get; set; }
-        protected long TotalHp { get; private set; }
-        private long TotalMp { get; set; }
-        private long TotalMoveSpeed { get; set; }
-        private long TotalAttackSpeed { get; set; }
-        private long TotalCriticalDamage { get; set; }
-        private long TotalCriticalProbability { get; set; }
+        public readonly BehaviorSubject<long> TotalAtk = new(1);
+        public readonly BehaviorSubject<long> TotalDef = new(1);
+        public readonly BehaviorSubject<long> TotalHp = new(100);
+        public readonly BehaviorSubject<long> TotalMp = new(100);
+        public readonly BehaviorSubject<long> TotalMoveSpeed = new(100);
+        public readonly BehaviorSubject<long> TotalAttackSpeed = new(100);
+        public readonly BehaviorSubject<long> TotalCriticalDamage = new(100);
+        public readonly BehaviorSubject<long> TotalCriticalProbability = new(100);
        
         // 현재 활성화된 버프
         // protected readonly List<Buff> ActiveBuffs = new List<Buff>();
@@ -141,14 +150,15 @@ namespace GGemCo.Scripts.Characters
         private void RecalculateStats()
         {
             // 기본값 + 추가값 적용
-            TotalAtk = BaseAtk + GetTotalPlusValue("STAT_ATK") - GetTotalMinusValue("STAT_ATK");
-            TotalDef = BaseDef + GetTotalPlusValue("STAT_DEF") - GetTotalMinusValue("STAT_DEF");
-            TotalHp = BaseHp + GetTotalPlusValue("STAT_HP") - GetTotalMinusValue("STAT_HP");
-            TotalMp = BaseMp + GetTotalPlusValue("STAT_MP") - GetTotalMinusValue("STAT_MP");
-            TotalMoveSpeed = BaseMoveSpeed + GetTotalPlusValue("STAT_MOVE_SPEED") - GetTotalMinusValue("STAT_MOVE_SPEED");
-            TotalAttackSpeed = BaseAttackSpeed + GetTotalPlusValue("STAT_ATTACK_SPEED") - GetTotalMinusValue("STAT_ATTACK_SPEED");
-            TotalCriticalDamage = BaseCriticalDamage + GetTotalPlusValue("STAT_CRITIAL_DAMAGE") - GetTotalMinusValue("STAT_CRITIAL_DAMAGE");
-            TotalCriticalProbability = BaseCriticalProbability + GetTotalPlusValue("STAT_CRITIAL_PROBABILITY") - GetTotalMinusValue("STAT_CRITIAL_PROBABILITY");
+            // 내부 값만 변경 (OnNext 호출 X)
+            totalAtk = BaseAtk + GetTotalPlusValue("STAT_ATK") - GetTotalMinusValue("STAT_ATK");
+            totalDef = BaseDef + GetTotalPlusValue("STAT_DEF") - GetTotalMinusValue("STAT_DEF");
+            totalHp = BaseHp + GetTotalPlusValue("STAT_HP") - GetTotalMinusValue("STAT_HP");
+            totalMp = BaseMp + GetTotalPlusValue("STAT_MP") - GetTotalMinusValue("STAT_MP");
+            totalMoveSpeed = BaseMoveSpeed + GetTotalPlusValue("STAT_MOVE_SPEED") - GetTotalMinusValue("STAT_MOVE_SPEED");
+            totalAttackSpeed = BaseAttackSpeed + GetTotalPlusValue("STAT_ATTACK_SPEED") - GetTotalMinusValue("STAT_ATTACK_SPEED");
+            totalCriticalDamage = BaseCriticalDamage + GetTotalPlusValue("STAT_CRITIAL_DAMAGE") - GetTotalMinusValue("STAT_CRITIAL_DAMAGE");
+            totalCriticalProbability = BaseCriticalProbability + GetTotalPlusValue("STAT_CRITIAL_PROBABILITY") - GetTotalMinusValue("STAT_CRITIAL_PROBABILITY");
 
             // % 증가 및 감소 적용
             ApplyPercentageModifiers();
@@ -158,16 +168,31 @@ namespace GGemCo.Scripts.Characters
         /// </summary>
         private void ApplyPercentageModifiers()
         {
-            TotalAtk = (int)(TotalAtk * (1 + GetTotalIncreaseValue("STAT_ATK") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_ATK") / 100.0f));
-            TotalDef = (int)(TotalDef * (1 + GetTotalIncreaseValue("STAT_DEF") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_DEF") / 100.0f));
-            TotalHp = (int)(TotalHp * (1 + GetTotalIncreaseValue("STAT_HP") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_HP") / 100.0f));
-            TotalMp = (int)(TotalMp * (1 + GetTotalIncreaseValue("STAT_MP") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_MP") / 100.0f));
-            TotalMoveSpeed *= (long)((1 + GetTotalIncreaseValue("STAT_MOVE_SPEED") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_MOVE_SPEED") / 100.0f));
-            TotalAttackSpeed *= (long)((1 + GetTotalIncreaseValue("STAT_ATTACK_SPEED") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_ATTACK_SPEED") / 100.0f));
-            TotalCriticalDamage *= (long)((1 + GetTotalIncreaseValue("STAT_CRITIAL_DAMAGE") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_CRITIAL_DAMAGE") / 100.0f));
-            TotalCriticalProbability *= (long)((1 + GetTotalIncreaseValue("STAT_CRITIAL_PROBABILITY") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_CRITIAL_PROBABILITY") / 100.0f));
+            totalAtk = (long)(totalAtk * (1 + GetTotalIncreaseValue("STAT_ATK") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_ATK") / 100.0f));
+            totalDef = (long)(totalDef * (1 + GetTotalIncreaseValue("STAT_DEF") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_DEF") / 100.0f));
+            totalHp = (long)(totalHp * (1 + GetTotalIncreaseValue("STAT_HP") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_HP") / 100.0f));
+            totalMp = (long)(totalMp * (1 + GetTotalIncreaseValue("STAT_MP") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_MP") / 100.0f));
+            totalMoveSpeed = (long)(totalMoveSpeed * (1 + GetTotalIncreaseValue("STAT_MOVE_SPEED") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_MOVE_SPEED") / 100.0f));
+            totalAttackSpeed = (long)(totalAttackSpeed * (1 + GetTotalIncreaseValue("STAT_ATTACK_SPEED") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_ATTACK_SPEED") / 100.0f));
+            totalCriticalDamage = (long)(totalCriticalDamage * (1 + GetTotalIncreaseValue("STAT_CRITIAL_DAMAGE") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_CRITIAL_DAMAGE") / 100.0f));
+            totalCriticalProbability = (long)(totalCriticalProbability * (1 + GetTotalIncreaseValue("STAT_CRITIAL_PROBABILITY") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_CRITIAL_PROBABILITY") / 100.0f));
+
+            ApplyStatChanges();
         }
-        
+        /// <summary>
+        /// 최종 계산된 스탯을 한 번만 `OnNext`로 전달
+        /// </summary>
+        private void ApplyStatChanges()
+        {
+            TotalAtk.OnNext(totalAtk);
+            TotalDef.OnNext(totalDef);
+            TotalHp.OnNext(totalHp);
+            TotalMp.OnNext(totalMp);
+            TotalMoveSpeed.OnNext(totalMoveSpeed);
+            TotalAttackSpeed.OnNext(totalAttackSpeed);
+            TotalCriticalDamage.OnNext(totalCriticalDamage);
+            TotalCriticalProbability.OnNext(totalCriticalProbability);
+        }
         /// <summary>
         /// 스탯 조회 함수
         /// </summary>
@@ -180,11 +205,11 @@ namespace GGemCo.Scripts.Characters
         
         public float GetCurrentMoveSpeed()
         {
-            return TotalMoveSpeed / 100f;
+            return TotalMoveSpeed.Value / 100f;
         }
         public float GetCurrentAttackSpeed()
         {
-            return TotalAttackSpeed / 100f;
+            return TotalAttackSpeed.Value / 100f;
         }
     }
 }

@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace GGemCo.Scripts.SaveData
 {
+    /// <summary>
+    /// 세이브 데이터 - 플레이어 정보
+    /// </summary>
     public class PlayerData : DefaultData, ISaveData
     {
         private int maxPlayerLevel;
@@ -54,8 +57,6 @@ namespace GGemCo.Scripts.SaveData
         {
             return currentNeedExp.DistinctUntilChanged();
         }
-
-        public long CurrentNeedExp => currentNeedExp.Value;
 
         private TableMonster tableMonster;
         private TableExp tableExp;
@@ -148,6 +149,10 @@ namespace GGemCo.Scripts.SaveData
         private void UpdateRequiredExp(long value)
         {
             currentNeedExp.OnNext(value);
+        }
+        public long CurrentNeedExp()
+        {
+            return currentNeedExp.Value;
         }
     }
 }

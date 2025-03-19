@@ -2,6 +2,7 @@ using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.SystemMessage;
+using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI.Icon;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
@@ -36,6 +37,7 @@ namespace GGemCo.Scripts.UI
         public GridLayoutGroup containerIcon;
         
         private UIWindowFade uiWindowFade;
+        private StruckTableWindow struckTableWindow;
 
         protected virtual void Awake()
         {
@@ -87,6 +89,10 @@ namespace GGemCo.Scripts.UI
         }
         protected virtual void Start()
         {
+            if (struckTableWindow != null && !struckTableWindow.DefaultActive)
+            {
+                gameObject.SetActive(false);
+            }
         }
         /// <summary>
         /// index 로 아이콘 가져오기
@@ -283,6 +289,14 @@ namespace GGemCo.Scripts.UI
             droppedIcon.transform.SetParent(targetSlot.transform);
             droppedIcon.transform.position = icon.GetDragOriginalPosition();
             droppedIcon.transform.SetSiblingIndex(1);
+        }
+        /// <summary>
+        /// 각 윈도우에 table 정보 연결하기
+        /// </summary>
+        /// <param name="pstruckTableWindow"></param>
+        public void SetTableWindow(StruckTableWindow pstruckTableWindow)
+        {
+            struckTableWindow = pstruckTableWindow;
         }
     }
 }

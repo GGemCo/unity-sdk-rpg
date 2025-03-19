@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
@@ -11,6 +12,7 @@ using GGemCo.Scripts.UI;
 using GGemCo.Scripts.UI.Window;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
+using R3;
 
 namespace GGemCo.Scripts.Characters.Player
 {
@@ -26,8 +28,16 @@ namespace GGemCo.Scripts.Characters.Player
         private GGemCoSettings gGemCoSettings; 
         private EquipController equipController;
         private ControllerPlayer controllerPlayer;
-        private UIWindowEquip uiWindowEquip;
-        
+        private UIWindowHud uiWindowHud;
+
+        [Serializable]
+        private struct StatUIBinding
+        {
+            public UIWindowPlayerInfo.IndexPlayerInfo textUI;
+            public Func<Player, BehaviorSubject<long>> GetStat;
+            public string label;
+        }
+        private readonly List<StatUIBinding> statBindings = new();
         protected override void Awake()
         {
             base.Awake();
@@ -37,15 +47,17 @@ namespace GGemCo.Scripts.Characters.Player
         {
             base.Start();
             
-            // 장착하기
-            uiWindowEquip =
-                SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowEquip>(UIWindowManager.WindowUid.Equip);
-            if (uiWindowEquip != null)
-            {
-                uiWindowEquip.OnSetIconEquip += EquipItem;
-            }
+            uiWindowHud = SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowHud>(UIWindowManager.WindowUid.Hud);
+            
+            CurrentHp
+                .Subscribe(SetWindowHudSliderHp)
+                .AddTo(this);
+            CurrentMp
+                .Subscribe(SetWindowHudSliderMp)
+                .AddTo(this);
 
             LoadEquipItems();
+            InitializeStatBindings();
         }
         /// <summary>
         /// tag, sorting layer, layer 셋팅하기
@@ -81,14 +93,13 @@ namespace GGemCo.Scripts.Characters.Player
         protected override void InitializeByTable()
         {
             if (AddressableSettingsLoader.Instance == null) return;
-            {
-                GGemCoPlayerSettings playerSettings = AddressableSettingsLoader.Instance.playerSettings;
-                SetBaseInfos(playerSettings.statAtk, playerSettings.statDef, playerSettings.statHp, playerSettings.statMp, playerSettings.statMoveSpeed, playerSettings.statAttackSpeed);
-                CurrentHp = TotalHp;
-                currentMoveStep = playerSettings.statMoveStep;
-                originalScaleX = transform.localScale.x;
-                SetScale(playerSettings.startScale);
-            }
+            GGemCoPlayerSettings playerSettings = AddressableSettingsLoader.Instance.playerSettings;
+            SetBaseInfos(playerSettings.statAtk, playerSettings.statDef, playerSettings.statHp, playerSettings.statMp, playerSettings.statMoveSpeed, playerSettings.statAttackSpeed);
+            CurrentHp.OnNext(TotalHp.Value);
+            CurrentMp.OnNext(TotalMp.Value);
+            currentMoveStep = playerSettings.statMoveStep;
+            originalScaleX = transform.localScale.x;
+            SetScale(playerSettings.startScale);
         }
         /// <summary>
         /// 세이브 데이터에 있는 장착 아이템 정보 가져와서 장착 시키기
@@ -138,7 +149,7 @@ namespace GGemCo.Scripts.Characters.Player
         /// <param name="partIndex"></param>
         /// <param name="itemUid"></param>
         /// <param name="itemCount"></param>
-        private void EquipItem(int partIndex, int itemUid, int itemCount)
+        public void EquipItem(int partIndex, int itemUid, int itemCount)
         {
             bool result = equipController.EquipItem(partIndex, itemUid);
             if (!result) return;
@@ -247,6 +258,62 @@ namespace GGemCo.Scripts.Characters.Player
                         }
                     }
                 }
+            }
+        }
+        private void SetWindowHudSliderHp(long value)
+        {
+            if (uiWindowHud == null)
+            {
+                GcLogger.LogError("UIWindowHud 가 없습니다.");
+                return;
+            }
+            uiWindowHud.SetSliderHp(value, TotalHp.Value);
+        }
+        private void SetWindowHudSliderMp(long value)
+        {
+            if (uiWindowHud == null) 
+            {
+                GcLogger.LogError("UIWindowHud 가 없습니다.");
+                return;
+            }
+            uiWindowHud.SetSliderMp(value, TotalMp.Value);
+        }
+        /// <summary>
+        /// Player의 스탯과 UI를 매핑하여 리스트에 저장
+        /// </summary>
+        private void InitializeStatBindings()
+        {
+            statBindings.AddRange(new[]
+            {
+                new StatUIBinding { textUI = UIWindowPlayerInfo.IndexPlayerInfo.Atk, GetStat = p => p.TotalAtk, label = "공격력" },
+                new StatUIBinding { textUI = UIWindowPlayerInfo.IndexPlayerInfo.Def, GetStat = p => p.TotalDef, label = "방어력" },
+                new StatUIBinding { textUI = UIWindowPlayerInfo.IndexPlayerInfo.Hp, GetStat = p => p.TotalHp, label = "생명력" },
+                new StatUIBinding { textUI = UIWindowPlayerInfo.IndexPlayerInfo.Mp, GetStat = p => p.TotalMp, label = "마력" },
+                new StatUIBinding { textUI = UIWindowPlayerInfo.IndexPlayerInfo.MoveSpeed, GetStat = p => p.TotalMoveSpeed, label = "이동속도" },
+                new StatUIBinding { textUI = UIWindowPlayerInfo.IndexPlayerInfo.AttackSpeed, GetStat = p => p.TotalAttackSpeed, label = "공격속도" },
+                new StatUIBinding { textUI = UIWindowPlayerInfo.IndexPlayerInfo.CriticalDamage, GetStat = p => p.TotalCriticalDamage, label = "크리티컬 데미지" },
+                new StatUIBinding { textUI = UIWindowPlayerInfo.IndexPlayerInfo.CriticalProbability, GetStat = p => p.TotalCriticalProbability, label = "크리티컬 확률" }
+            });
+            foreach (var binding in statBindings)
+            {
+                binding.GetStat(this).DistinctUntilChanged()
+                    .Subscribe(value => UpdatePlayerInfoText(binding.textUI, binding.label, value))
+                    .AddTo(this);
+            }
+        }
+        /// <summary>
+        /// UIWindowPlayerInfo 에 text 업데이트 하기
+        /// </summary>
+        /// <param name="textUI"></param>
+        /// <param name="label"></param>
+        /// <param name="value"></param>
+        private void UpdatePlayerInfoText(UIWindowPlayerInfo.IndexPlayerInfo textUI, string label, long value)
+        {
+            UIWindowPlayerInfo uiWindowPlayerInfo =
+                SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowPlayerInfo>(UIWindowManager.WindowUid.PlayerInfo);
+            if (uiWindowPlayerInfo != null)
+            {
+                uiWindowPlayerInfo.UpdateText(textUI, label, value);
             }
         }
     }

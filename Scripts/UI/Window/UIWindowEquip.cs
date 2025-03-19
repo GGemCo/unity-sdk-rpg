@@ -1,4 +1,5 @@
 ﻿using GGemCo.Scripts.Addressable;
+using GGemCo.Scripts.Characters.Player;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.Scenes;
@@ -13,16 +14,12 @@ namespace GGemCo.Scripts.UI.Window
     {
         // 미리 만들어놓은 slot 이 있을 경우
         public GameObject[] preLoadSlots;
-        public UIWindowInventory uiWindowInventory;
-        
-        public delegate void DelegateOnSetIconEquip(int slotIndex, int itemUid, int itemCount);
-        public event DelegateOnSetIconEquip OnSetIconEquip;
-        public delegate void DelegateOnDetachIconEquip(int slotIndex);
-        public event DelegateOnDetachIconEquip OnDetachIconEquip;
         
         private TableItem tableItem;
         private InventoryData inventoryData;
         private EquipData equipData;
+        private SceneGame sceneGame;
+        
         protected override void Awake()
         {
             uid = UIWindowManager.WindowUid.Equip;
@@ -33,15 +30,16 @@ namespace GGemCo.Scripts.UI.Window
         protected override void Start()
         {
             base.Start();
-            if (SceneGame.Instance != null && SceneGame.Instance.saveDataManager != null)
+            sceneGame = SceneGame.Instance;
+            if (sceneGame != null && sceneGame.saveDataManager != null)
             {
-                equipData = SceneGame.Instance.saveDataManager.Equip;
-                inventoryData = SceneGame.Instance.saveDataManager.Inventory;
+                equipData = sceneGame.saveDataManager.Equip;
+                inventoryData = sceneGame.saveDataManager.Inventory;
             }
         }
         public override void OnShow(bool show)
         {
-            if (SceneGame.Instance == null || TableLoaderManager.Instance == null) return;
+            if (sceneGame == null || TableLoaderManager.Instance == null) return;
             if (!show) return;
             LoadIcons();
         }
@@ -79,7 +77,7 @@ namespace GGemCo.Scripts.UI.Window
         private void LoadIcons()
         {
             if (!gameObject.activeSelf) return;
-            var datas = SceneGame.Instance.saveDataManager.Equip.GetAllItemCounts();
+            var datas = sceneGame.saveDataManager.Equip.GetAllItemCounts();
             if (datas == null) return;
             foreach (var info in datas)
             {
@@ -189,7 +187,7 @@ namespace GGemCo.Scripts.UI.Window
                 }
                 else
                 {
-                    SceneGame.Instance.systemMessageManager.ShowMessageWarning("해당 슬롯에는 착용할 수 없는 아이템 입니다.");
+                    sceneGame.systemMessageManager.ShowMessageWarning("해당 슬롯에는 착용할 수 없는 아이템 입니다.");
                 }
             }
             GoBackToSlot(droppedIcon);
@@ -199,13 +197,9 @@ namespace GGemCo.Scripts.UI.Window
             base.OnSetIcon(slotIndex, iconUid, iconCount);
             UIIcon uiIcon = GetIconByIndex(slotIndex);
             if (uiIcon == null) return;
-            OnSetIconEquip?.Invoke(slotIndex, uiIcon.uid, uiIcon.count);
-        }
-        protected override void OnDetachIcon(int slotIndex)
-        {
-            base.OnDetachIcon(slotIndex);
-            
-            OnDetachIconEquip?.Invoke(slotIndex);
+         
+            sceneGame.player.GetComponent<Player>().EquipItem(slotIndex, iconUid, iconCount);
+            equipData.SetItemCount(slotIndex, iconUid, iconCount);
         }
     }
 }
