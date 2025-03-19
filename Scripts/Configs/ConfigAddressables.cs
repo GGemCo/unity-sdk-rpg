@@ -20,10 +20,10 @@ namespace GGemCo.Scripts.Configs
         
         public static readonly (string key, string path)[] AssetsToAdd =
         {
-            (KeySettings, "Assets/GGemCo/GGemCoSettings.asset"),
-            (KeyPlayerSettings, "Assets/GGemCo/GGemCoPlayerSettings.asset"),
-            (KeyMapSettings, "Assets/GGemCo/GGemCoMapSettings.asset"),
-            (KeySaveSettings, "Assets/GGemCo/GGemCoSaveSettings.asset"),
+            (KeySettings, "Assets/GGemCoSettings/GGemCoSettings.asset"),
+            (KeyPlayerSettings, "Assets/GGemCoSettings/GGemCoPlayerSettings.asset"),
+            (KeyMapSettings, "Assets/GGemCoSettings/GGemCoMapSettings.asset"),
+            (KeySaveSettings, "Assets/GGemCoSettings/GGemCoSaveSettings.asset"),
             (KeyTextFloatingDamage, "Assets/GGemCo/Prefabs/UI/TextDamage.prefab"),
             (KeyPrefabSlot, "Assets/GGemCo/Prefabs/UI/Slot.prefab"),
             (KeyPrefabIconItem, "Assets/GGemCo/Prefabs/UI/IconItem.prefab"),
