@@ -1,5 +1,6 @@
 ﻿using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.Scenes;
+using GGemCo.Scripts.Utils;
 using R3;
 using TMPro;
 using UnityEngine;
@@ -29,6 +30,11 @@ namespace GGemCo.Scripts.UI.UIText
 
         private void UpdateText(int newLevel)
         {
+            if (levelText == null)
+            {
+                GcLogger.LogError("TextMeshProUGUI 컴포넌트가 없습니다.");
+                return;
+            }
             levelText.text = $"Lv. {newLevel}";
         }
     }

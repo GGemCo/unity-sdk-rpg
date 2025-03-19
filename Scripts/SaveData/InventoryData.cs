@@ -10,7 +10,7 @@ using GGemCo.Scripts.UI.Window;
 namespace GGemCo.Scripts.SaveData
 {
     /// <summary>
-    /// 인벤토리 아이템 개수 관리
+    /// 세이브 데이터 - 인벤토리 아이템 정보
     /// </summary>
     public class InventoryData : ItemStorageData
     {

@@ -1,5 +1,6 @@
 ﻿using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.Scenes;
+using GGemCo.Scripts.Utils;
 using R3;
 using TMPro;
 using UnityEngine;
@@ -33,7 +34,12 @@ namespace GGemCo.Scripts.UI.UIText
         /// </summary>
         private void UpdateExpText()
         {
-            textExp.text = $"{playerData.CurrentExp}/{playerData.CurrentNeedExp}";
+            if (textExp == null)
+            {
+                GcLogger.LogError("TextMeshProUGUI 컴포넌트가 없습니다.");
+                return;
+            }
+            textExp.text = $"{playerData.CurrentExp}/{playerData.CurrentNeedExp()}";
         }
     }
 }

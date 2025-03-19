@@ -4,6 +4,9 @@ using GGemCo.Scripts.Utils;
 
 namespace GGemCo.Scripts.SaveData
 {
+    /// <summary>
+    /// 세이브 데이터 - 퀘스트 정보
+    /// </summary>
     public class QuestData : ISaveData
     {
         private Dictionary<int, bool> completedQuests = new Dictionary<int, bool>();

@@ -11,7 +11,6 @@ using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.Utils;
 using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Characters;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Events;
