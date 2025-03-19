@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GGemCo.Scripts.Items;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.SystemMessage;
 using GGemCo.Scripts.TableLoader;
@@ -105,58 +106,78 @@ namespace GGemCo.Scripts.SaveData
         public void MergeAllItems()
         {
             Dictionary<int, List<int>> itemSlotGroups = new Dictionary<int, List<int>>();
+            Dictionary<int, int> itemSubCategoryMap = new Dictionary<int, int>();
+            
+            // 1. 기존 아이템 데이터를 백업 (초기화 전에 저장)
+            var itemBackup = ItemCounts.ToDictionary(entry => entry.Key, entry => entry.Value);
 
-            // 1. 같은 아이템을 가진 슬롯 그룹화 (인덱스 순 정렬)
-            foreach (var pair in ItemCounts.OrderBy(p => p.Key))
-            {
-                int itemUid = pair.Value.ItemUid;
-                if (itemUid <= 0) continue; // 빈 슬롯 무시
-
-                if (!itemSlotGroups.ContainsKey(itemUid))
+            // 2. 아이템 정렬을 위해 SubCategory 정보 가져오기
+            var sortedItems = itemBackup
+                .Where(p => p.Value.ItemUid > 0) // 빈 슬롯 제외
+                .Select(p =>
                 {
-                    itemSlotGroups[itemUid] = new List<int>();
+                    var info = TableLoaderManager.Instance.TableItem.GetDataByUid(p.Value.ItemUid);
+                    return new
+                    {
+                        SlotIndex = p.Key,
+                        ItemUid = p.Value.ItemUid,
+                        ItemCount = p.Value.ItemCount,
+                        SubCategory = info.SubCategory == ItemConstants.SubCategory.None ? int.MaxValue : (int)info.SubCategory // SubCategory가 없으면 가장 뒤로 정렬
+                    };
+                })
+                .OrderBy(item => item.SubCategory)  // SubCategory 기준 정렬
+                .ThenBy(item => item.SlotIndex)     // 같은 SubCategory 내에서는 슬롯 인덱스 기준 정렬
+                .ToList();
+
+            // 3. 정렬된 아이템을 그룹화
+            foreach (var item in sortedItems)
+            {
+                if (!itemSlotGroups.ContainsKey(item.ItemUid))
+                {
+                    itemSlotGroups[item.ItemUid] = new List<int>();
+                    itemSubCategoryMap[item.ItemUid] = item.SubCategory;
                 }
-                itemSlotGroups[itemUid].Add(pair.Key);
+                itemSlotGroups[item.ItemUid].Add(item.SlotIndex);
             }
 
-            // 2. 각 아이템 그룹별 병합 진행
-            foreach (var group in itemSlotGroups)
+            // 4. 기존 데이터를 확실히 초기화
+            ItemCounts.Clear();
+
+            // 5. 각 아이템 그룹별 병합 후 새로운 정렬된 슬롯에 배치
+            int newSlotIndex = 0;
+
+            foreach (var group in itemSlotGroups.OrderBy(g => itemSubCategoryMap[g.Key])) // SubCategory 기준으로 병합 순서 결정
             {
                 int itemUid = group.Key;
                 List<int> slots = group.Value;
 
-                if (slots.Count < 2) continue; // 병합할 필요 없음
+                if (slots.Count < 1) continue;
 
                 // 아이템 정보 가져오기
                 var info = TableLoaderManager.Instance.TableItem.GetDataByUid(itemUid);
                 if (info == null || info.Uid <= 0) continue;
 
                 int maxOverlayCount = info.MaxOverlayCount; // 최대 중첩 개수
-                int totalItemCount = slots.Sum(slot => ItemCounts[slot].ItemCount); // 전체 개수
-        
-                // 3. 작은 인덱스부터 채우기
-                for (int i = 0; i < slots.Count; i++)
+
+                // 기존 백업 데이터에서 총 개수 가져오기
+                int totalItemCount = slots.Sum(slot => itemBackup.ContainsKey(slot) ? itemBackup[slot].ItemCount : 0);
+
+                // 6. 병합 후 새로운 슬롯에 재배치
+                while (totalItemCount > 0)
                 {
-                    int slot = slots[i];
-
-                    // 현재 슬롯에 넣을 개수
                     int addAmount = Math.Min(totalItemCount, maxOverlayCount);
-                    ItemCounts[slot].ItemCount = addAmount;
+                    ItemCounts[newSlotIndex] = new StructInventoryIcon(itemUid, addAmount);
                     totalItemCount -= addAmount;
-
-                    // 남은 개수가 없으면 이후 슬롯 제거
-                    if (totalItemCount <= 0)
-                    {
-                        for (int j = i + 1; j < slots.Count; j++)
-                        {
-                            RemoveItemCount(slots[j]);
-                        }
-                        break;
-                    }
+                    newSlotIndex++;
                 }
             }
 
+            // 7. 변경된 데이터 저장
             SaveItemCounts();
         }
+
+
+
+
     }
 }

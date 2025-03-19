@@ -86,15 +86,20 @@ namespace GGemCo.Scripts.UI.Window
             if (!gameObject.activeSelf) return;
             var datas = SceneGame.Instance.saveDataManager.Inventory.GetAllItemCounts();
             if (datas == null) return;
-            foreach (var info in datas)
+            for (int index = 0; index < maxCountIcon; index++)
             {
-                int index = info.Key;
                 if (index >= icons.Length) continue;
                 var icon = icons[index];
                 if (icon == null) continue;
                 UIIconItem uiIcon = icon.GetComponent<UIIconItem>();
                 if (uiIcon == null) continue;
-                StructInventoryIcon structInventoryIcon = info.Value;
+                if (!datas.ContainsKey(index))
+                {
+                    uiIcon.ClearIconInfos();
+                    continue;
+                }
+                var info = datas[index];
+                StructInventoryIcon structInventoryIcon = info;
                 int itemUid = structInventoryIcon.ItemUid;
                 int itemCount = structInventoryIcon.ItemCount;
                 if (itemUid <= 0 || itemCount <= 0)
