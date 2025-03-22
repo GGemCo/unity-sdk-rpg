@@ -44,10 +44,11 @@ namespace GGemCo.Scripts.Scenes
         public SystemMessageManager systemMessageManager;
         [Tooltip("카메라 매니저")]
         public CameraManager cameraManager;
+        [Tooltip("팝업 매니저")]
+        public PopupManager popupManager;
         [HideInInspector] public SaveDataManager saveDataManager;
         [HideInInspector] public CalculateManager calculateManager;
         [HideInInspector] public MapManager mapManager;
-        [HideInInspector] public PopupManager popupManager;
         [HideInInspector] public DamageTextManager damageTextManager;
         [HideInInspector] public ItemManager itemManager;
         [HideInInspector] public CharacterManager CharacterManager;
@@ -85,7 +86,6 @@ namespace GGemCo.Scripts.Scenes
 
             calculateManager = CreateManager<CalculateManager>(managerContainer);
             mapManager = CreateManager<MapManager>(managerContainer);
-            popupManager = CreateManager<PopupManager>(managerContainer);
             saveDataManager = CreateManager<SaveDataManager>(managerContainer);
             damageTextManager = CreateManager<DamageTextManager>(managerContainer);
             
