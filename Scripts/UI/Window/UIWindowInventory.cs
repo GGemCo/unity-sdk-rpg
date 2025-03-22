@@ -2,6 +2,7 @@
 using GGemCo.Scripts.Items;
 using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.Scenes;
+using GGemCo.Scripts.SystemMessage;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI.Icon;
 using UnityEngine;
@@ -31,6 +32,8 @@ namespace GGemCo.Scripts.UI.Window
         public UIWindowItemInfo uIWindowItemInfo;
         [Header("모든 아이템 합치기 버튼")]
         public Button buttonMergeAllItems;
+        [Header("아이템 나누기 버튼")]
+        public Button buttonSplitItem;
         
         private GameObject iconItem;
         private TableItem tableItem;
@@ -45,6 +48,7 @@ namespace GGemCo.Scripts.UI.Window
             if (TableLoaderManager.Instance == null) return;
             tableItem = TableLoaderManager.Instance.TableItem;
             buttonMergeAllItems?.onClick.AddListener(OnClickMergeAllItems);
+            buttonSplitItem?.onClick.AddListener(OnClickSplitItem);
             base.Awake();
         }
 
@@ -196,12 +200,13 @@ namespace GGemCo.Scripts.UI.Window
                             // 인벤토리에서 하나 빼고
                             var result = inventoryData.MinusItem(targetIconSlotIndex, targetIconUid, 1);
                             targetWindow.SetIcons(result);
+                            
                             // 장비창에 있던것도 빼서 0 을 만듬
                             result = equipData.MinusItem(dropIconSlotIndex, dropIconUid, 1);
                             droppedWindow.SetIcons(result);
                             
                             // 장비창에 있던것은 인벤토리에 추가한다 
-                            result = inventoryData.AddItem(dropIconUid, 1);
+                            result = inventoryData.AddItem(targetIconSlotIndex, dropIconUid, 1);
                             targetWindow.SetIcons(result);
                             // 장비창에 하나 넣기
                             result = equipData.AddItem(dropIconSlotIndex, targetIconUid, 1);
@@ -271,6 +276,54 @@ namespace GGemCo.Scripts.UI.Window
         {
             inventoryData.MergeAllItems();
             LoadIcons();
+        }
+        /// <summary>
+        /// 아이템 나누기
+        /// </summary>
+        private void OnClickSplitItem()
+        {            
+            var icon = GetSelectedIcon();
+            if (icon == null || icon.uid <= 0)
+            {
+                SceneGame.Instance.popupManager.ShowPopupError("나누기를 할 아이템을 선택해주세요.");
+                return;
+            }
+
+            if (icon.count <= 1)
+            {
+                SceneGame.Instance.popupManager.ShowPopupError("아이템 개수가 2개 이상일때만 나눌 수 있습니다.");
+                return;
+            }
+            // 팝업창 띄우기
+            var window =
+                SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowItemSplit>(UIWindowManager.WindowUid
+                    .ItemSplit);
+            if (window == null) return;
+            window.CopyIconCount(0, icon.slotIndex, icon.uid, icon.count);
+        }
+        /// <summary>
+        /// 아이콘 우클릭했을때 처리 
+        /// </summary>
+        /// <param name="icon"></param>
+        public override void OnRightClick(UIIcon icon)
+        {
+            if (icon == null) return;
+            // 장비일때
+            if (icon.IsEquipType())
+            {
+                var partSlotIndex = (int)icon.GetPartsType();
+                SceneGame.Instance.uIWindowManager.MoveIcon(uid, icon.index, UIWindowManager.WindowUid.Equip, 1, partSlotIndex);
+            }
+        }
+        /// <summary>
+        /// index 가 없을때는, 같은 uid 는 중첩 가능여부를 확인하고 합치고, 나머지는 추가
+        /// </summary>
+        /// <param name="iconUid"></param>
+        /// <param name="iconCount"></param>
+        public override void SetIconCount(int iconUid, int iconCount)
+        {
+            ResultCommon result = inventoryData.AddItem(iconUid, iconCount);
+            SetIcons(result);
         }
     }
 }

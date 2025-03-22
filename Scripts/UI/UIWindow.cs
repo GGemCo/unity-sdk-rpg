@@ -157,6 +157,33 @@ namespace GGemCo.Scripts.UI
         protected virtual void OnDetachIcon(int slotIndex)
         {
         }
+        
+        /// <summary>
+        /// 빈 슬롯 찾기
+        /// </summary>
+        private int FindEmptySlot()
+        {
+            for (int i = 0; i < maxCountIcon; i++)
+            {
+                var icon = icons[i];
+                if (icon == null) continue;
+                UIIcon uiIcon = icon.GetComponent<UIIcon>();
+                if (uiIcon == null) continue;
+                if (uiIcon.uid <= 0 || uiIcon.count <= 0)
+                    return i;
+            }
+            return -1;
+        }
+        public virtual void SetIconCount(int iconUid, int iconCount)
+        {
+            int emptySlot = FindEmptySlot();
+            if (emptySlot == -1)
+            {
+                SceneGame.Instance.popupManager.ShowPopupError("윈도우에 빈 공간이 없습니다.");
+                return;
+            }
+            SetIconCount(emptySlot, iconUid, iconCount);
+        }
         /// <summary>
         /// 아이콘 붙여주기 
         /// </summary>
@@ -175,6 +202,12 @@ namespace GGemCo.Scripts.UI
             if (uiIcon == null)
             {
                 GcLogger.LogError("슬롯에 UIIcon 이 없습니다. slot index: " +slotIndex);
+                return;
+            }
+
+            if (iconCount <= 0)
+            {
+                DetachIcon(slotIndex);
                 return;
             }
             uiIcon.window = this;
@@ -297,6 +330,33 @@ namespace GGemCo.Scripts.UI
         public void SetTableWindow(StruckTableWindow pstruckTableWindow)
         {
             struckTableWindow = pstruckTableWindow;
+        }
+
+        private UIIcon selectedIcon;
+        public void SetSelectedIcon(int index)
+        {
+            if (selectedIcon != null)
+            {
+                selectedIcon.SetSelected(false);
+            }
+            if (icons.Length <= 0) return;
+            var icon = icons[index];
+            if (icon == null) return;
+            selectedIcon = icon.GetComponent<UIIcon>();
+            selectedIcon.SetSelected(true);
+        }
+
+        protected UIIcon GetSelectedIcon()
+        {
+            return selectedIcon;
+        }
+        public virtual void OnRightClick(UIIcon icon)
+        {
+            
+        }
+        public virtual void CopyIconCount(int toIndex, int fromIndex, int fromItemUid, int fromItemCount)
+        {
+            
         }
     }
 }

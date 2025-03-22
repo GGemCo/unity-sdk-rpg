@@ -21,6 +21,7 @@ namespace GGemCo.Scripts.UI
             ItemInfo,
             Equip,
             PlayerInfo,
+            ItemSplit,
         }
         [Header("기본속성")]
         [Tooltip("윈도우 리스트")]
@@ -125,6 +126,39 @@ namespace GGemCo.Scripts.UI
             UIWindow uiWindow = GetUIWindowByUid<UIWindow>(windowUid);
             if (uiWindow == null) return false;
             return uiWindow.gameObject.activeSelf;
+        }
+
+        public void MoveIcon(WindowUid fromWindowUid, int fromIndex, WindowUid toWindowUid, int toCount, int toIndex = -1)
+        {
+            UIWindow fromWindow = GetUIWindowByUid<UIWindow>(fromWindowUid);
+            UIWindow toWindow = GetUIWindowByUid<UIWindow>(toWindowUid);
+            if (fromWindow == null || toWindow == null)
+            {
+                GcLogger.LogError("from window 또는 to window 값이 잘 못 되었습니다. from window:"+fromWindowUid+"/to window:"+toWindowUid);
+                return;
+            }
+            UIIcon fromIcon = fromWindow.GetIconByIndex(fromIndex);
+            if (fromIcon == null)
+            {
+                GcLogger.LogError("from Icon 또는 to Icon 값이 잘 못 되었습니다. from Index:"+fromIndex);
+                return;
+            }
+            int itemUid = fromIcon.uid;
+            fromWindow.SetIconCount(fromIndex, fromIcon.uid, fromIcon.count - toCount);
+            if (toIndex >= 0)
+            {
+                // 그 위치에 아이콘이 있으면 되돌려준다
+                var icon = toWindow.GetIconByIndex(toIndex);
+                if (icon != null && icon.uid > 0 && icon.count > 0)
+                {
+                    fromWindow.SetIconCount(icon.uid, icon.count);
+                }
+                toWindow.SetIconCount(toIndex, itemUid, toCount);
+            }
+            else
+            {
+                toWindow.SetIconCount(itemUid, toCount);    
+            }
         }
     }
 }

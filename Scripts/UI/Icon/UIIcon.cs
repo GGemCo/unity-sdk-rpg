@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using GGemCo.Scripts.Items;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +10,11 @@ namespace GGemCo.Scripts.UI.Icon
         [Header("오브젝트")]
         [Tooltip("개수를 표현할 텍스트")]
         public TextMeshProUGUI textCount;
+        [Tooltip("선택되었을때 보여줄 이미지")]
+        public Image imageSelected;
+
+        private bool isSelected;
+        
         // 윈도우 
         [HideInInspector] public UIWindow window;
         // 윈도우 고유번호
@@ -20,8 +26,8 @@ namespace GGemCo.Scripts.UI.Icon
         // 고유번호 (아이템일때는 아이템 고유번호)
         [HideInInspector] public int uid;
 
-        private IIcon.Type type;
-        private IIcon.Status status;
+        protected IIcon.Type IconType;
+        private IIcon.Status iconStatus;
 
         // 아이콘 이미지
         private Image imageIcon;
@@ -47,8 +53,9 @@ namespace GGemCo.Scripts.UI.Icon
             coolTimeHandler = gameObject.AddComponent<UICoolTimeHandler>();
             rectTransform = GetComponent<RectTransform>();
 
-            status = IIcon.Status.Normal;
-            type = IIcon.Type.None;
+            iconStatus = IIcon.Status.Normal;
+            IconType = IIcon.Type.None;
+            SetSelected(false);
         }
 
         protected virtual void Start()
@@ -57,6 +64,8 @@ namespace GGemCo.Scripts.UI.Icon
             {
                 SetIconLock(count <= 0);
             }
+            // 선택되었을때 보여줄 이미지 크기를 slot size 로 변경
+            imageSelected.rectTransform.sizeDelta = window.slotSize;
         }
 
         public void Initialize(UIWindow pwindow, UIWindowManager.WindowUid pwindowUid, int pindex, int pslotIndex, 
@@ -70,9 +79,15 @@ namespace GGemCo.Scripts.UI.Icon
             ChangeIconImageSize(iconSize, slotSize);
         }
 
-        public IIcon.Type GetIconType() => type;
+        public bool IsItem() => IconType == IIcon.Type.Item;
+
+        public virtual bool IsEquipType()
+        {
+            return false;
+        }
+        public IIcon.Type GetIconType() => IconType;
         public IIcon.Grade GetGrade() => grade;
-        public void SetStatus(IIcon.Status status) => this.status = status;
+        public void SetStatus(IIcon.Status status) => this.iconStatus = status;
 
         protected virtual bool UpdateInfo()
         {
@@ -179,6 +194,23 @@ namespace GGemCo.Scripts.UI.Icon
         public Vector3 GetDragOriginalPosition()
         {
             return dragHandler.GetOriginalPosition();
+        }
+        public void SetSelected(bool selected)
+        {
+            if (imageSelected == null) return;
+            isSelected = selected;
+            ShowSelected(selected);
+        }
+        public void ShowSelected(bool selected)
+        {
+            if (imageSelected == null) return;
+            // 선택된 아이콘이면 끄지 않는다.
+            if (isSelected && !selected) return;
+            imageSelected.gameObject.SetActive(selected);
+        }
+        public virtual ItemConstants.PartsType GetPartsType()
+        {
+            return ItemConstants.PartsType.None;
         }
     }
 }

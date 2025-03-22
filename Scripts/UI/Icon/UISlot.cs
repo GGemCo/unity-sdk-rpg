@@ -10,6 +10,13 @@ namespace GGemCo.Scripts.UI.Icon
 
         private RectTransform rectTransform;
 
+        /// <summary>
+        /// prefab 생성 후 호출되는 함수
+        /// </summary>
+        /// <param name="pwindow"></param>
+        /// <param name="pwindowUid"></param>
+        /// <param name="pindex"></param>
+        /// <param name="slotSize"></param>
         public void Initialize(UIWindow pwindow, UIWindowManager.WindowUid pwindowUid, int pindex, Vector2 slotSize)
         {
             window = pwindow;

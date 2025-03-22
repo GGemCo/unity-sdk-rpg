@@ -3,19 +3,21 @@ using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI.Window;
 using GGemCo.Scripts.Utils;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace GGemCo.Scripts.UI.Icon
 {
     public class UIIconItem : UIIcon, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
     {
-        UIWindowItemInfo uiWindowItemInfo;
+        private UIWindowItemInfo uiWindowItemInfo;
         private StruckTableItem struckTableItem;
         private TableItem tableItem;
         
         protected override void Awake()
         {
             base.Awake();
+            IconType = IIcon.Type.Item;
             struckTableItem = null;
             tableItem = TableLoaderManager.Instance.TableItem;
         }
@@ -63,17 +65,37 @@ namespace GGemCo.Scripts.UI.Icon
         {
             // GcLogger.Log("OnPointerEnter "+eventData);
             uiWindowItemInfo.SetItemUid(uid);
+            ShowSelected(true);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
             // GcLogger.Log("OnPointerExit "+eventData);
             uiWindowItemInfo.Show(false);
+            ShowSelected(false);
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            // uiWindowItemInfo.SetItemUid(uid);
+            if(eventData.button == PointerEventData.InputButton.Left)
+            {
+                Debug.Log("Mouse Click Button : Left");
+                if (!window) return;
+                window.SetSelectedIcon(index);
+            }
+            else if(eventData.button == PointerEventData.InputButton.Middle)
+            {
+                Debug.Log("Mouse Click Button : Middle");
+            }
+            else if(eventData.button == PointerEventData.InputButton.Right)
+            {
+                if (uid <= 0 || count <= 0) return;
+                Debug.Log("Mouse Click Button : Right");
+                window.OnRightClick(this);
+            }
+
+            Debug.Log("Mouse Position : " + eventData.position);
+            Debug.Log("Mouse Click Count : " + eventData.clickCount);
         }
         /// <summary>
         /// 아이콘 이미지 경로 가져오기 
@@ -105,6 +127,14 @@ namespace GGemCo.Scripts.UI.Icon
         /// 착용 부위 type 가져오기
         /// </summary>
         /// <returns></returns>
-        public ItemConstants.PartsType GetPartsType() => struckTableItem.PartsID;
+        public override ItemConstants.PartsType GetPartsType()
+        {
+            return struckTableItem.PartsID;
+        }
+        
+        public override bool IsEquipType()
+        {
+            return IconType == IIcon.Type.Item && struckTableItem.Type == ItemConstants.Type.Equip;
+        }
     }
 }

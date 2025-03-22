@@ -181,7 +181,7 @@ namespace GGemCo.Scripts.Characters.Player
         /// 장비 해제 하기
         /// </summary>
         /// <param name="partIndex"></param>
-        private void UnEquipItem(int partIndex)
+        public void UnEquipItem(int partIndex)
         {
             bool result = equipController.UnEquipItem(partIndex);
             if (!result) return;

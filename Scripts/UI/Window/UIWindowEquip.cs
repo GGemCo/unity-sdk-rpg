@@ -161,29 +161,20 @@ namespace GGemCo.Scripts.UI.Window
                 // 착용할 수 있는 부위인지 체크
                 if (droppedUIIcon.IsTypeEquip() && droppedUIIcon.IsEquipParts(targetIconSlotIndex))
                 {
-                    // 장착된 아이템이 없을 때
-                    if (targetIconUid <= 0)
-                    {
-                        var result = inventoryData.MinusItem(dropIconSlotIndex, dropIconUid, 1);
-                        droppedWindow.SetIcons(result);
+                    var result = inventoryData.MinusItem(dropIconSlotIndex, dropIconUid, 1);
+                    droppedWindow.SetIcons(result);
                         
-                        result = equipData.AddItem(targetIconSlotIndex, dropIconUid, 1);
-                        targetWindow.SetIcons(result);
-                    }
-                    else
+                    // 장착된 아이템이 있을 때
+                    if (targetIconUid > 0)
                     {
-                        var result = inventoryData.MinusItem(dropIconSlotIndex, dropIconUid, 1);
-                        droppedWindow.SetIcons(result);
-                        
                         result = equipData.MinusItem(targetIconSlotIndex, targetIconUid, 1);
                         targetWindow.SetIcons(result);
                         
-                        result = inventoryData.AddItem(targetIconUid, 1);
+                        result = inventoryData.AddItem(dropIconSlotIndex, targetIconUid, 1);
                         droppedWindow.SetIcons(result);
-                        
-                        result = equipData.AddItem(targetIconSlotIndex, dropIconUid, 1);
-                        targetWindow.SetIcons(result);
                     }
+                    result = equipData.AddItem(targetIconSlotIndex, dropIconUid, 1);
+                    targetWindow.SetIcons(result);
                 }
                 else
                 {
@@ -200,6 +191,25 @@ namespace GGemCo.Scripts.UI.Window
          
             sceneGame.player.GetComponent<Player>().EquipItem(slotIndex, iconUid, iconCount);
             equipData.SetItemCount(slotIndex, iconUid, iconCount);
+        }
+
+        protected override void OnDetachIcon(int slotIndex)
+        {
+            base.OnDetachIcon(slotIndex);
+            UIIcon uiIcon = GetIconByIndex(slotIndex);
+            if (uiIcon == null) return;
+         
+            sceneGame.player.GetComponent<Player>().UnEquipItem(slotIndex);
+            equipData.RemoveItemCount(slotIndex);
+        }
+        /// <summary>
+        /// 아이콘 우클릭했을때 처리 
+        /// </summary>
+        /// <param name="icon"></param>
+        public override void OnRightClick(UIIcon icon)
+        {
+            if (icon == null) return;
+            SceneGame.Instance.uIWindowManager.MoveIcon(UIWindowManager.WindowUid.Equip, icon.index, UIWindowManager.WindowUid.Inventory, 1);
         }
     }
 }

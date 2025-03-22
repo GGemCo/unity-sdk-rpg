@@ -154,7 +154,7 @@ namespace GGemCo.Scripts.SaveData
             if (ItemCounts.TryGetValue(slotIndex, out var item))
             {
                 int availableSpace = maxOverlayCount - item.ItemCount;
-                if (availableSpace > 0)
+                if ((item.ItemUid == itemUid || item.ItemUid == 0) && availableSpace > 0)
                 {
                     int addedAmount = Math.Min(remainingValue, availableSpace);
                     int count = item.ItemCount + addedAmount;
@@ -195,7 +195,7 @@ namespace GGemCo.Scripts.SaveData
         /// <summary>
         /// 빈 슬롯 찾기
         /// </summary>
-        private int FindEmptySlot()
+        public int FindEmptySlot()
         {
             for (int i = 0; i < MaxSlotCount; i++)
             {
