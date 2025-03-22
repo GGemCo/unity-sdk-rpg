@@ -37,11 +37,12 @@ namespace GGemCo.Editor.GGemCoTool.Test
             testCount = 10000;
 
             itemManager = new ItemManager();
-            tableMonster = TableLoaderManager.LoadMonsterTable();
+            TableLoaderManager tableLoaderManager = new TableLoaderManager();
+            tableMonster = tableLoaderManager.LoadMonsterTable();
             
-            tableItem = TableLoaderManager.LoadItemTable();
-            TableItemDropGroup tableItemDropGroup = TableLoaderManager.LoadItemDropGroupTable();
-            TableMonsterDropRate tableMonsterDropRate = TableLoaderManager.LoadMonsterDropRateTable();
+            tableItem = tableLoaderManager.LoadItemTable();
+            TableItemDropGroup tableItemDropGroup = tableLoaderManager.LoadItemDropGroupTable();
+            TableMonsterDropRate tableMonsterDropRate = tableLoaderManager.LoadMonsterDropRateTable();
             
             dictionaryByCategory = tableItem.GetDictionaryByCategory();
             dictionaryBySubCategory = tableItem.GetDictionaryBySubCategory();

@@ -20,7 +20,8 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
         private static MapTileCommon _defaultMap;
         private static GameObject _gridTileMap;
         private static GameObject _player;
-        
+
+        private TableLoaderManager tableLoaderManager;
         private static TableMap _tableMap;
         private static TableNpc _tableNpc;
         private static TableMonster _tableMonster;
@@ -68,7 +69,8 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
         {
             selectedNpcIndex = 0;
             selectedMonsterIndex = 0;
-            _tableMap = TableLoaderManager.LoadMapTable();
+            tableLoaderManager = new TableLoaderManager();
+            _tableMap = tableLoaderManager.LoadMapTable();
             
             // 타일맵을 추가할 grid
             _gridTileMap = GameObject.Find(ConfigTags.GetValue(ConfigTags.Keys.GridTileMap));
@@ -85,9 +87,9 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
 
             var defaultMap = GameObject.FindObjectOfType<DefaultMap>();
             
-            var tableNpc = TableLoaderManager.LoadNpcTable();
-            var tableMonster = TableLoaderManager.LoadMonsterTable();
-            var tableSpine = TableLoaderManager.LoadSpineTable();
+            var tableNpc = tableLoaderManager.LoadNpcTable();
+            var tableMonster = tableLoaderManager.LoadMonsterTable();
+            var tableSpine = tableLoaderManager.LoadSpineTable();
 
             npcExporter.Initialize(tableNpc, tableSpine, defaultMap);
             monsterExporter.Initialize(tableMonster, tableSpine, defaultMap);
@@ -235,9 +237,9 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
         /// <summary>
         /// npc 정보 불러오기
         /// </summary>
-        private static void LoadNpcInfoData()
+        private void LoadNpcInfoData()
         {
-            _tableNpc = TableLoaderManager.LoadNpcTable();
+            _tableNpc = tableLoaderManager.LoadNpcTable();
              
             Dictionary<int, Dictionary<string, string>> npcDictionary = _tableNpc.GetDatas();
              
@@ -253,9 +255,9 @@ namespace GGemCo.Editor.GGemCoTool.MapEditor
         /// <summary>
         ///  몬스터 정보 불러오기
         /// </summary>
-        private static void LoadMonsterInfoData()
+        private void LoadMonsterInfoData()
         {
-            _tableMonster = TableLoaderManager.LoadMonsterTable();
+            _tableMonster = tableLoaderManager.LoadMonsterTable();
              
             Dictionary<int, Dictionary<string, string>> monsterDictionary = _tableMonster.GetDatas();
              

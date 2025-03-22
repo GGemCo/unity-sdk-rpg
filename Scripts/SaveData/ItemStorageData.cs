@@ -14,6 +14,11 @@ namespace GGemCo.Scripts.SaveData
     {
         // public 으로 해야 json 으로 저장된다. 
         public Dictionary<int, StructInventoryIcon> ItemCounts = new();
+        // add 할때 남은 개수가 max overlay count 를 넘을때 마다 새로운 슬롯에 넣어야 한다.
+        // ItemStorageData 에서는 계산만 하고 실제 window 에서 SetIconCount 를 하기 때문에
+        // 임시로 저장할 배열이 필요한다.
+        // FindEmptySlot 에서 빈 공간을 찾을때 사용한다.
+        public Dictionary<int, StructInventoryIcon> TempItemCounts = new();
         private int maxSlotCount = 0;
 
         private int MaxSlotCount
@@ -106,10 +111,12 @@ namespace GGemCo.Scripts.SaveData
                 }
             }
 
+            TempItemCounts.Clear();
             // 2. 남은 개수를 새 슬롯에 추가
             while (remainingValue > 0)
             {
                 int emptyIndex = FindEmptySlot();
+                // todo emptyIndex 에 추가한 걸 FindEmptySlot 에 반영해야 한다 
                 if (emptyIndex == -1)
                 {
                     return new ResultCommon(ResultCommon.Type.Fail, "인벤토리에 공간이 부족합니다.");
@@ -117,6 +124,7 @@ namespace GGemCo.Scripts.SaveData
 
                 int addedAmount = Math.Min(remainingValue, maxOverlayCount);
                 controls.Add(new StruckResultIconControl(emptyIndex, itemUid, addedAmount));
+                TempItemCounts.TryAdd(emptyIndex, new StructInventoryIcon(itemUid, addedAmount));
                 remainingValue -= addedAmount;
             }
 
@@ -168,6 +176,8 @@ namespace GGemCo.Scripts.SaveData
                 controls.Add(new StruckResultIconControl(slotIndex, itemUid, itemCount));
                 remainingValue -= itemCount;
             }
+            
+            TempItemCounts.Clear();
             // 2. 남은 개수를 새 슬롯에 추가
             while (remainingValue > 0)
             {
@@ -179,6 +189,7 @@ namespace GGemCo.Scripts.SaveData
 
                 int addedAmount = Math.Min(remainingValue, maxOverlayCount);
                 controls.Add(new StruckResultIconControl(emptyIndex, itemUid, addedAmount));
+                TempItemCounts.TryAdd(emptyIndex, new StructInventoryIcon(itemUid, addedAmount));
                 remainingValue -= addedAmount;
             }
             return new ResultCommon(ResultCommon.Type.Success, "", controls);
@@ -200,7 +211,12 @@ namespace GGemCo.Scripts.SaveData
             for (int i = 0; i < MaxSlotCount; i++)
             {
                 if (!ItemCounts.ContainsKey(i) || ItemCounts[i].ItemUid <= 0 || ItemCounts[i].ItemCount <= 0)
-                    return i;
+                {
+                    if (!TempItemCounts.ContainsKey(i) || TempItemCounts[i].ItemUid <= 0 || TempItemCounts[i].ItemCount <= 0)
+                    {
+                        return i;
+                    }
+                }
             }
             return -1;
         }
@@ -218,6 +234,14 @@ namespace GGemCo.Scripts.SaveData
         protected void SaveItemCounts()
         {
             SceneGame.Instance.saveDataManager.StartSaveData();
+        }
+        /// <summary>
+        /// 모든 아이템 삭제
+        /// </summary>
+        public void RemoveAllItems()
+        {
+            ItemCounts.Clear();
+            TempItemCounts.Clear();
         }
     }
 }

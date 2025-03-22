@@ -6,10 +6,10 @@ using UnityEngine;
 
 namespace GGemCo.Editor.GGemCoTool.TableLoader
 {
-    public static class TableLoaderManager
+    public class TableLoaderManager
     {
         // 공통적인 로드 메서드로, 제네릭 타입과 파일명을 받아 로드
-        private static T LoadTable<T>(string fileName) where T : DefaultTable, new()
+        private T LoadTable<T>(string fileName) where T : DefaultTable, new()
         {
             T tableData = null;
             try
@@ -41,31 +41,31 @@ namespace GGemCo.Editor.GGemCoTool.TableLoader
             return tableData;
         }
 
-        public static TableMap LoadMapTable()
+        public TableMap LoadMapTable()
         {
             return LoadTable<TableMap>(ConfigTableFileName.Map);
         }
-        public static TableNpc LoadNpcTable()
+        public TableNpc LoadNpcTable()
         {
             return LoadTable<TableNpc>(ConfigTableFileName.Npc);
         }
-        public static TableMonster LoadMonsterTable()
+        public TableMonster LoadMonsterTable()
         {
             return LoadTable<TableMonster>(ConfigTableFileName.Monster);
         }
-        public static TableAnimation LoadSpineTable()
+        public TableAnimation LoadSpineTable()
         {
             return LoadTable<TableAnimation>(ConfigTableFileName.Animation);
         }
-        public static TableItem LoadItemTable()
+        public TableItem LoadItemTable()
         {
             return LoadTable<TableItem>(ConfigTableFileName.Item);
         }
-        public static TableItemDropGroup LoadItemDropGroupTable()
+        public TableItemDropGroup LoadItemDropGroupTable()
         {
             return LoadTable<TableItemDropGroup>(ConfigTableFileName.ItemDropGroup);
         }
-        public static TableMonsterDropRate LoadMonsterDropRateTable()
+        public TableMonsterDropRate LoadMonsterDropRateTable()
         {
             return LoadTable<TableMonsterDropRate>(ConfigTableFileName.MonsterDropRate);
         }
