@@ -1,4 +1,5 @@
 ﻿using System;
+using GGemCo.Scripts.Characters.Player;
 using GGemCo.Scripts.Items;
 using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.Scenes;
@@ -313,6 +314,54 @@ namespace GGemCo.Scripts.UI.Window
             {
                 var partSlotIndex = (int)icon.GetPartsType();
                 SceneGame.Instance.uIWindowManager.MoveIcon(uid, icon.index, UIWindowManager.WindowUid.Equip, 1, partSlotIndex);
+            }
+            // hp 물약일 때 
+            else if (icon.IsHpPotionType())
+            {
+                if (icon.uid <= 0 || icon.count <= 0)
+                {
+                    SceneGame.Instance.popupManager.ShowPopupError("사용할 수 있는 아이템 개수가 없습니다.");
+                    return;
+                }
+                if (SceneGame.Instance.player.GetComponent<Player>().IsMaxHp())
+                {
+                    SceneGame.Instance.systemMessageManager.ShowMessageWarning("현재 생명력이 가득하여 사용할 수 없습니다.");
+                    return;
+                }
+                int value = icon.GetStatusValue1();
+                SetIconCount(icon.index, icon.uid, icon.count - 1);
+                SceneGame.Instance.player.GetComponent<Player>().AddHp(value);
+            }
+            // mp 물약일 때 
+            else if (icon.IsMpPotionType())
+            {
+                if (icon.uid <= 0 || icon.count <= 0)
+                {
+                    SceneGame.Instance.popupManager.ShowPopupError("사용할 수 있는 아이템 개수가 없습니다.");
+                    return;
+                }
+                if (SceneGame.Instance.player.GetComponent<Player>().IsMaxMp())
+                {
+                    SceneGame.Instance.systemMessageManager.ShowMessageWarning("현재 마력이 가득하여 사용할 수 없습니다.");
+                    return;
+                }
+                SetIconCount(icon.index, icon.uid, icon.count - 1);
+                int value = icon.GetStatusValue1();
+                SceneGame.Instance.player.GetComponent<Player>().AddMp(value);
+            }
+            // 이동속도 물약일 때 
+            else if (icon.IsIncreaseMoveSpeedPotionType())
+            {
+                if (icon.uid <= 0 || icon.count <= 0)
+                {
+                    SceneGame.Instance.popupManager.ShowPopupError("사용할 수 있는 아이템 개수가 없습니다.");
+                    return;
+                }
+                if (SceneGame.Instance.player.GetComponent<Player>().IsMaxMp())
+                {
+                    SceneGame.Instance.systemMessageManager.ShowMessageWarning("현재 마력이 가득하여 사용할 수 없습니다.");
+                    return;
+                }
             }
         }
         /// <summary>

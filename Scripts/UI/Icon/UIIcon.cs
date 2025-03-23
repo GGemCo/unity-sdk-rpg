@@ -81,7 +81,43 @@ namespace GGemCo.Scripts.UI.Icon
 
         public bool IsItem() => IconType == IIcon.Type.Item;
 
+        /// <summary>
+        /// 장비 타입인지
+        /// </summary>
+        /// <returns></returns>
         public virtual bool IsEquipType()
+        {
+            return false;
+        }
+        /// <summary>
+        /// 물약 타입인지
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool IsPotionType()
+        {
+            return false;
+        }
+        /// <summary>
+        /// 생명력 물약인지
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool IsHpPotionType()
+        {
+            return false;
+        }
+        /// <summary>
+        /// 마력 물약인지
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool IsMpPotionType()
+        {
+            return false;
+        }
+        /// <summary>
+        /// 이동속도 증가 물약인지
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool IsIncreaseMoveSpeedPotionType()
         {
             return false;
         }
@@ -211,6 +247,14 @@ namespace GGemCo.Scripts.UI.Icon
         public virtual ItemConstants.PartsType GetPartsType()
         {
             return ItemConstants.PartsType.None;
+        }
+        /// <summary>
+        /// item 테이블에 StatusValue1 컬럼값 가져오기
+        /// </summary>
+        /// <returns></returns>
+        public virtual int GetStatusValue1()
+        {
+            return 0;
         }
     }
 }

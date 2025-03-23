@@ -79,23 +79,17 @@ namespace GGemCo.Scripts.UI.Icon
         {
             if(eventData.button == PointerEventData.InputButton.Left)
             {
-                Debug.Log("Mouse Click Button : Left");
                 if (!window) return;
                 window.SetSelectedIcon(index);
             }
             else if(eventData.button == PointerEventData.InputButton.Middle)
             {
-                Debug.Log("Mouse Click Button : Middle");
             }
             else if(eventData.button == PointerEventData.InputButton.Right)
             {
                 if (uid <= 0 || count <= 0) return;
-                Debug.Log("Mouse Click Button : Right");
                 window.OnRightClick(this);
             }
-
-            Debug.Log("Mouse Position : " + eventData.position);
-            Debug.Log("Mouse Click Count : " + eventData.clickCount);
         }
         /// <summary>
         /// 아이콘 이미지 경로 가져오기 
@@ -135,6 +129,29 @@ namespace GGemCo.Scripts.UI.Icon
         public override bool IsEquipType()
         {
             return IconType == IIcon.Type.Item && struckTableItem.Type == ItemConstants.Type.Equip;
+        }
+
+        public override bool IsPotionType()
+        {
+            return IconType == IIcon.Type.Item && struckTableItem.Type == ItemConstants.Type.Consumable &&
+                   struckTableItem.Category == ItemConstants.Category.Potion;
+        }
+
+        public override bool IsHpPotionType()
+        {
+            return IsPotionType() && struckTableItem.SubCategory == ItemConstants.SubCategory.RecoverHp;
+        }
+        public override bool IsMpPotionType()
+        {
+            return IsPotionType() && struckTableItem.SubCategory == ItemConstants.SubCategory.RecoverMp;
+        }
+        public override bool IsIncreaseMoveSpeedPotionType()
+        {
+            return IsPotionType() && struckTableItem.SubCategory == ItemConstants.SubCategory.IncreaseMoveSpeed;
+        }
+        public override int GetStatusValue1()
+        {
+            return struckTableItem.StatusValue1;
         }
     }
 }

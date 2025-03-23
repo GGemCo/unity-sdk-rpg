@@ -82,5 +82,13 @@ namespace GGemCo.Scripts.Items
             { "knife2", "knife" },
         };
 
+        public static readonly Dictionary<string, string> StatusSuffixFormats = new Dictionary<string, string>
+        {
+            { "_PLUS", "+{0}" },
+            { "_MINUS", "-{0}" },
+            { "_INCREASE", "+{0}%" },
+            { "_DECREASE", "-{0}%" }
+        };
+
     }
 }

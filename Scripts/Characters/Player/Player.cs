@@ -49,11 +49,18 @@ namespace GGemCo.Scripts.Characters.Player
             
             uiWindowHud = SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowHud>(UIWindowManager.WindowUid.Hud);
             
+            // TotalHp, Mp 가 바뀌어도 현재 값이 바뀌면 안된다.
+            TotalHp
+                .Subscribe(_ => SetWindowHudSliderHp(CurrentHp.Value))
+                .AddTo(this);
             CurrentHp
-                .Subscribe(SetWindowHudSliderHp)
+                .Subscribe(_ => SetWindowHudSliderHp(CurrentHp.Value))
+                .AddTo(this);
+            TotalMp
+                .Subscribe(_ => SetWindowHudSliderMp(CurrentMp.Value))
                 .AddTo(this);
             CurrentMp
-                .Subscribe(SetWindowHudSliderMp)
+                .Subscribe(_ => SetWindowHudSliderMp(CurrentMp.Value))
                 .AddTo(this);
 
             LoadEquipItems();
@@ -315,6 +322,48 @@ namespace GGemCo.Scripts.Characters.Player
             {
                 uiWindowPlayerInfo.UpdateText(textUI, label, value);
             }
+        }
+        /// <summary>
+        /// 현재 생명력이 최대치인지
+        /// </summary>
+        /// <returns></returns>
+        public bool IsMaxHp()
+        {
+            return CurrentHp.Value >= TotalHp.Value;
+        }
+        /// <summary>
+        /// 현재 생명력 더하기
+        /// </summary>
+        /// <param name="value"></param>
+        public void AddHp(int value)
+        {
+            long newVale = CurrentHp.Value + value;
+            if (newVale > TotalHp.Value)
+            {
+                newVale = TotalHp.Value;
+            }
+            CurrentHp.OnNext(newVale);
+        }
+        /// <summary>
+        /// 현재 마력이 최대치 인지
+        /// </summary>
+        /// <returns></returns>
+        public bool IsMaxMp()
+        {
+            return CurrentMp.Value >= TotalMp.Value;
+        }
+        /// <summary>
+        /// 현재 마력 더하기
+        /// </summary>
+        /// <param name="value"></param>
+        public void AddMp(int value)
+        {
+            long newVale = CurrentMp.Value + value;
+            if (newVale > TotalMp.Value)
+            {
+                newVale = TotalMp.Value;
+            }
+            CurrentMp.OnNext(newVale);
         }
     }
 }

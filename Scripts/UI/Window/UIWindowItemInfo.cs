@@ -1,4 +1,8 @@
-﻿using GGemCo.Scripts.TableLoader;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using GGemCo.Scripts.Items;
+using GGemCo.Scripts.TableLoader;
 using TMPro;
 using UnityEngine;
 
@@ -19,30 +23,50 @@ namespace GGemCo.Scripts.UI.Window
         
         [Header("메인옵션")]
         [Tooltip("옵션 이름")]
-        public TextMeshProUGUI textOption1;
-        // 옵션 값
-        private float valueOption1;
+        public TextMeshProUGUI textStatus1;
+        private float valueStatus1;
+        public TextMeshProUGUI textStatus2;
+        private float valueStatus2;
+        
+        [Header("서브옵션")]
+        public TextMeshProUGUI[] textOptions;
+        public float[] valueOptions;
+        
+        private Dictionary<ItemConstants.Category, Action> categoryUIHandlers;
         
         private StruckTableItem currentStruckTableItem;
+        private TableStatus tableStatus;
         
         protected override void Awake()
         {
             uid = UIWindowManager.WindowUid.ItemInfo;
             if (TableLoaderManager.Instance == null) return;
             tableItem = TableLoaderManager.Instance.TableItem;
+            tableStatus = TableLoaderManager.Instance.TableStatus;
             base.Awake();
+            InitializeCategoryUIHandlers();
+        }
+        private void InitializeCategoryUIHandlers()
+        {
+            categoryUIHandlers = new Dictionary<ItemConstants.Category, Action>
+            {
+                { ItemConstants.Category.Weapon, SetWeaponUI },
+                { ItemConstants.Category.Armor, SetArmorUI },
+                { ItemConstants.Category.Potion, SetPotionUI },
+            };
         }
 
         public void SetItemUid(int itemUid)
         {
             if (itemUid <= 0) return;
-            var info = tableItem.GetDataByUid(itemUid);
-            if (info == null || info.Uid <= 0) return;
-            currentStruckTableItem = info;
+            currentStruckTableItem = tableItem.GetDataByUid(itemUid);
+            if (currentStruckTableItem is not { Uid: > 0 }) return;
+            
             SetName();
             SetType();
             SetCategory();
-            SetOption();
+            SetStatusOptions();
+            SetCategoryUI();
             Show(true);
         }
         /// <summary>
@@ -61,6 +85,19 @@ namespace GGemCo.Scripts.UI.Window
             if (currentStruckTableItem == null) return;
             textType.text = $"타입: {currentStruckTableItem.Type}";
         }
+        
+        private void SetCategoryUI()
+        {
+            if (categoryUIHandlers.TryGetValue(currentStruckTableItem.Category, out var handler))
+            {
+                handler?.Invoke();
+            }
+            else
+            {
+                SetDefaultUI(); // 기본 UI 설정
+            }
+        }
+
         /// <summary>
         /// 카테고리, 서브 카테고리 설정하기
         /// </summary>
@@ -70,14 +107,83 @@ namespace GGemCo.Scripts.UI.Window
             textCategory.text = $"카테고리: {currentStruckTableItem.Category}";
             textSubCategory.text = $"서브카테고리: {currentStruckTableItem.SubCategory}";
         }
-        /// <summary>
-        /// 옵션 설정하기
-        /// </summary>
-        private void SetOption()
+        private void SetStatusOptions()
         {
-            if (currentStruckTableItem == null) return;
-            textOption1.text = $"{currentStruckTableItem.StatusID1}: {currentStruckTableItem.StatusValue1}";
-            valueOption1 = currentStruckTableItem.StatusValue1;
+            SetTextMeshPro(textStatus1, currentStruckTableItem.StatusID1, currentStruckTableItem.StatusValue1);
+            SetTextMeshPro(textStatus2, currentStruckTableItem.StatusID2, currentStruckTableItem.StatusValue2);
+
+            string[] optionTypes = 
+            {
+                currentStruckTableItem.OptionType1, 
+                currentStruckTableItem.OptionType2, 
+                currentStruckTableItem.OptionType3, 
+                currentStruckTableItem.OptionType4, 
+                currentStruckTableItem.OptionType5
+            };
+
+            float[] optionValues = 
+            {
+                currentStruckTableItem.OptionValue1, 
+                currentStruckTableItem.OptionValue2, 
+                currentStruckTableItem.OptionValue3, 
+                currentStruckTableItem.OptionValue4, 
+                currentStruckTableItem.OptionValue5
+            };
+
+            for (int i = 0; i < textOptions.Length; i++)
+            {
+                SetTextMeshPro(textOptions[i], optionTypes[i], optionValues[i]);
+                valueOptions[i] = optionValues[i];
+            }
+        }
+
+        private void SetTextMeshPro(TextMeshProUGUI textMesh, string statusId, float value)
+        {
+            string statusName = GetStatusName(statusId);
+            if (string.IsNullOrEmpty(statusName))
+            {
+                textMesh.gameObject.SetActive(false);
+                return;
+            }
+
+            string valueText = $"{value}";
+            foreach (var suffix in ItemConstants.StatusSuffixFormats.Keys)
+            {
+                if (statusId.EndsWith(suffix))
+                {
+                    valueText = string.Format(ItemConstants.StatusSuffixFormats[suffix], value);
+                    break; // 첫 번째로 매칭된 값만 적용
+                }
+            }
+
+            textMesh.gameObject.SetActive(true);
+            textMesh.text = $"{statusName}: {valueText}";
+        }
+
+        private string GetStatusName(string statusId)
+        {
+            if (string.IsNullOrEmpty(statusId)) return "";
+            string cleanedId = ItemConstants.StatusSuffixFormats.Aggregate(statusId, (current, suffix) => current.Replace(suffix.Key, ""));
+            var info = tableStatus.GetDataById(cleanedId);
+            return info?.Name ?? "";
+        }
+        // 카테고리별 UI 설정 함수
+        private void SetWeaponUI()
+        {
+        }
+
+        private void SetArmorUI()
+        {
+        }
+
+        private void SetPotionUI()
+        {
+            textStatus1.gameObject.SetActive(true);
+            textStatus1.text = $"회복량 : {currentStruckTableItem.StatusValue1}";
+        }
+
+        private void SetDefaultUI()
+        {
         }
     }
 }

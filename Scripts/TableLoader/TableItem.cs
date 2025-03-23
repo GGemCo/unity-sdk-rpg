@@ -20,8 +20,19 @@ namespace GGemCo.Scripts.TableLoader
         public int MaxOverlayCount;
         public string StatusID1;
         public int StatusValue1;
+        public string StatusID2;
+        public int StatusValue2;
+        
         public string OptionType1;
         public int OptionValue1;
+        public string OptionType2;
+        public int OptionValue2;
+        public string OptionType3;
+        public int OptionValue3;
+        public string OptionType4;
+        public int OptionValue4;
+        public string OptionType5;
+        public int OptionValue5;
     }
     /// <summary>
     /// 아이템 테이블
@@ -131,10 +142,22 @@ namespace GGemCo.Scripts.TableLoader
                 Class = ConvertClass(data["Class"]),
                 ImagePath = data["ImagePath"],
                 MaxOverlayCount = int.Parse(data["MaxOverlayCount"]),
+                
                 StatusID1 = data["StatusID1"],
                 StatusValue1 = int.Parse(data["StatusValue1"]),
+                StatusID2 = data["StatusID2"],
+                StatusValue2 = int.Parse(data["StatusValue2"]),
+                
                 OptionType1 = data["OptionType1"],
                 OptionValue1 = int.Parse(data["OptionValue1"]),
+                OptionType2 = data["OptionType2"],
+                OptionValue2 = int.Parse(data["OptionValue2"]),
+                OptionType3 = data["OptionType3"],
+                OptionValue3 = int.Parse(data["OptionValue3"]),
+                OptionType4 = data["OptionType4"],
+                OptionValue4 = int.Parse(data["OptionValue4"]),
+                OptionType5 = data["OptionType5"],
+                OptionValue5 = int.Parse(data["OptionValue5"]),
             };
         }
     }

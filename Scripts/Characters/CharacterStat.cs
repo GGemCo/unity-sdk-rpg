@@ -32,13 +32,13 @@ namespace GGemCo.Scripts.Characters
         private long totalCriticalProbability;
         // 최종 적용된 스탯 (캐싱)
         public readonly BehaviorSubject<long> TotalAtk = new(1);
-        public readonly BehaviorSubject<long> TotalDef = new(1);
-        public readonly BehaviorSubject<long> TotalHp = new(100);
-        public readonly BehaviorSubject<long> TotalMp = new(100);
-        public readonly BehaviorSubject<long> TotalMoveSpeed = new(100);
-        public readonly BehaviorSubject<long> TotalAttackSpeed = new(100);
-        public readonly BehaviorSubject<long> TotalCriticalDamage = new(100);
-        public readonly BehaviorSubject<long> TotalCriticalProbability = new(100);
+        protected readonly BehaviorSubject<long> TotalDef = new(1);
+        protected readonly BehaviorSubject<long> TotalHp = new(100);
+        protected readonly BehaviorSubject<long> TotalMp = new(100);
+        protected readonly BehaviorSubject<long> TotalMoveSpeed = new(100);
+        protected readonly BehaviorSubject<long> TotalAttackSpeed = new(100);
+        protected readonly BehaviorSubject<long> TotalCriticalDamage = new(100);
+        protected readonly BehaviorSubject<long> TotalCriticalProbability = new(100);
        
         // 현재 활성화된 버프
         // protected readonly List<Buff> ActiveBuffs = new List<Buff>();
@@ -88,7 +88,12 @@ namespace GGemCo.Scripts.Characters
             {
                 if (item == null) continue;
                 ApplyStatEffect(item.StatusID1, item.StatusValue1);
+                ApplyStatEffect(item.StatusID2, item.StatusValue2);
                 ApplyStatEffect(item.OptionType1, item.OptionValue1);
+                ApplyStatEffect(item.OptionType2, item.OptionValue2);
+                ApplyStatEffect(item.OptionType3, item.OptionValue3);
+                ApplyStatEffect(item.OptionType4, item.OptionValue4);
+                ApplyStatEffect(item.OptionType5, item.OptionValue5);
             }
 
             // 버프 효과 적용
@@ -203,8 +208,12 @@ namespace GGemCo.Scripts.Characters
         private float GetTotalIncreaseValue(string stat) => increaseValues.GetValueOrDefault(stat, 0);
         private float GetTotalDecreaseValue(string stat) => decreaseValues.GetValueOrDefault(stat, 0);
         
-        public float GetCurrentMoveSpeed()
+        public float GetCurrentMoveSpeed(bool isPercent = true)
         {
+            if (!isPercent)
+            {
+                return TotalMoveSpeed.Value;
+            }
             return TotalMoveSpeed.Value / 100f;
         }
         public float GetCurrentAttackSpeed()
