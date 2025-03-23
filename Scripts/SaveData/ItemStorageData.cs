@@ -21,7 +21,7 @@ namespace GGemCo.Scripts.SaveData
         public Dictionary<int, StructInventoryIcon> TempItemCounts = new();
         private int maxSlotCount = 0;
 
-        private int MaxSlotCount
+        protected int MaxSlotCount
         {
             get
             {
@@ -116,7 +116,6 @@ namespace GGemCo.Scripts.SaveData
             while (remainingValue > 0)
             {
                 int emptyIndex = FindEmptySlot();
-                // todo emptyIndex 에 추가한 걸 FindEmptySlot 에 반영해야 한다 
                 if (emptyIndex == -1)
                 {
                     return new ResultCommon(ResultCommon.Type.Fail, "인벤토리에 공간이 부족합니다.");

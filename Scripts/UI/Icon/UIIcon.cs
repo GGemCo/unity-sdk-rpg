@@ -65,6 +65,7 @@ namespace GGemCo.Scripts.UI.Icon
                 SetIconLock(count <= 0);
             }
             // 선택되었을때 보여줄 이미지 크기를 slot size 로 변경
+            if (imageSelected == null) return;
             imageSelected.rectTransform.sizeDelta = window.slotSize;
         }
 

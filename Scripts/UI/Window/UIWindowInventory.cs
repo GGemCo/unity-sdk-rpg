@@ -33,8 +33,8 @@ namespace GGemCo.Scripts.UI.Window
         public UIWindowItemInfo uIWindowItemInfo;
         [Header("모든 아이템 합치기 버튼")]
         public Button buttonMergeAllItems;
-        [Header("아이템 나누기 버튼")]
-        public Button buttonSplitItem;
+        // [Header("아이템 나누기 버튼")]
+        // public Button buttonSplitItem;
         
         private GameObject iconItem;
         private TableItem tableItem;
@@ -42,14 +42,14 @@ namespace GGemCo.Scripts.UI.Window
         private ItemManager itemManager;
         private InventoryData inventoryData;
         private EquipData equipData;
-        
+
         protected override void Awake()
         {
             uid = UIWindowManager.WindowUid.Inventory;
             if (TableLoaderManager.Instance == null) return;
             tableItem = TableLoaderManager.Instance.TableItem;
             buttonMergeAllItems?.onClick.AddListener(OnClickMergeAllItems);
-            buttonSplitItem?.onClick.AddListener(OnClickSplitItem);
+            // buttonSplitItem?.onClick.AddListener(OnClickSplitItem);
             base.Awake();
         }
 
@@ -282,7 +282,7 @@ namespace GGemCo.Scripts.UI.Window
         /// 아이템 나누기
         /// </summary>
         private void OnClickSplitItem()
-        {            
+        {
             var icon = GetSelectedIcon();
             if (icon == null || icon.uid <= 0)
             {
@@ -373,6 +373,34 @@ namespace GGemCo.Scripts.UI.Window
         {
             ResultCommon result = inventoryData.AddItem(iconUid, iconCount);
             SetIcons(result);
+        }
+        /// <summary>
+        /// 아이템 나누기 단축키 : shift + 좌클릭 적용 
+        /// </summary>
+        /// <param name="index"></param>
+        public override void SetSelectedIcon(int index)
+        {
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                UIIcon icon = GetIconByIndex(index);
+                if (icon == null || icon.uid <= 0)
+                {
+                    SceneGame.Instance.popupManager.ShowPopupError("나누기를 할 아이템을 선택해주세요.");
+                    return;
+                }
+
+                if (icon.count <= 1)
+                {
+                    SceneGame.Instance.popupManager.ShowPopupError("아이템 개수가 2개 이상일때만 나눌 수 있습니다.");
+                    return;
+                }
+                // 팝업창 띄우기
+                var window =
+                    SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowItemSplit>(UIWindowManager.WindowUid
+                        .ItemSplit);
+                if (window == null) return;
+                window.CopyIconCount(0, icon.slotIndex, icon.uid, icon.count);
+            }
         }
     }
 }

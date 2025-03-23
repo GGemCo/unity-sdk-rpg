@@ -91,7 +91,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textCount: {fileID: 2402048115968840856}
-  imageSelected: {fileID: 6355072447920736046}
+  imageSelected: {fileID: 0}
   window: {fileID: 0}
   windowUid: 0
   index: 0
@@ -117,7 +117,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5751910298132220177
 RectTransform:
   m_ObjectHideFlags: 0

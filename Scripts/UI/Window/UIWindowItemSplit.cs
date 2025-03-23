@@ -1,6 +1,7 @@
 ﻿using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
+using GGemCo.Scripts.SystemMessage;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI.Icon;
 using TMPro;
@@ -104,38 +105,13 @@ namespace GGemCo.Scripts.UI.Window
         /// </summary>
         private void OnClickConfirm()
         {
-            // 빈공 간 확인
-            int emptyCount = SceneGame.Instance.saveDataManager.Inventory.FindEmptySlot();
-            if (emptyCount < 0)
-            {
-                SceneGame.Instance.popupManager.ShowPopupError("인벤토리에 빈 공간이 없습니다.");
-                return;
-            }
-            if (itemUid <= 0)
-            {
-                SceneGame.Instance.popupManager.ShowPopupError("나누려고 하는 아이템 정보가 없습니다.");
-                return;
-            }
-            if (splitItemCount <= 0)
-            {
-                SceneGame.Instance.popupManager.ShowPopupError("나누려고 하는 아이템 개수가 잘 못되었습니다.");
-                return;
-            }
-
             var inventory =
                 SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
                     .Inventory);
             if (inventory == null) return;
-            int count = maxItemCount - splitItemCount;
-            if (count <= 0)
-            {
-                inventory.DetachIcon(splitItemIndex);
-            }
-            else {
-                inventory.SetIconCount(splitItemIndex, itemUid, count);
-            }
-            
-            inventory.SetIconCount(emptyCount, itemUid, splitItemCount);
+            // 빈공 간 확인
+            ResultCommon result = SceneGame.Instance.saveDataManager.Inventory.SplitItem(splitItemIndex, itemUid, maxItemCount, splitItemCount);
+            inventory.SetIcons(result);
             Show(false);
         }
 

@@ -175,9 +175,49 @@ namespace GGemCo.Scripts.SaveData
             // 7. 변경된 데이터 저장
             SaveItemCounts();
         }
+        /// <summary>
+        /// 아이템 나누기
+        /// </summary>
+        /// <param name="slotIndex">인벤토리에 있는 슬롯 index</param>
+        /// <param name="itemUid"></param>
+        /// <param name="itemCount">원래 가지고 있던 count</param>
+        /// <param name="splitItemCount">나누려고 하는 count</param>
+        public ResultCommon SplitItem(int slotIndex, int itemUid, int itemCount, int splitItemCount)
+        {
+            TempItemCounts.Clear();
+            int emptySlot = FindEmptySlot();
+            if (emptySlot < 0)
+            {
+                return new ResultCommon(ResultCommon.Type.Fail, "인벤토리에 빈 공간이 없습니다.");
+            }
+            if (itemUid <= 0)
+            {
+                return new ResultCommon(ResultCommon.Type.Fail, "나누려고 하는 아이템 정보가 없습니다.");
+            }
+            if (splitItemCount <= 0)
+            {
+                return new ResultCommon(ResultCommon.Type.Fail, "나누려고 하는 아이템 개수가 잘 못되었습니다.");
+            }
+            var info = TableLoaderManager.Instance.TableItem.GetDataByUid(itemUid);
+            if (info == null || info.Uid <= 0)
+            {
+                return new ResultCommon(ResultCommon.Type.Fail, "나누려고 하는 아이템 테이블 정보가 없습니다.");
+            }
 
-
-
+            List<StruckResultIconControl> controls = new List<StruckResultIconControl>();
+            int count = itemCount - splitItemCount;
+            if (count <= 0)
+            {
+                controls.Add(new StruckResultIconControl(slotIndex, 0, 0));
+            }
+            else {
+                controls.Add(new StruckResultIconControl(slotIndex, itemUid, count));
+            }
+            
+            controls.Add(new StruckResultIconControl(emptySlot, itemUid, splitItemCount));
+            
+            return new ResultCommon(ResultCommon.Type.Success, "", controls); 
+        }
 
     }
 }

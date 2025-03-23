@@ -333,7 +333,7 @@ namespace GGemCo.Scripts.UI
         }
 
         private UIIcon selectedIcon;
-        public void SetSelectedIcon(int index)
+        public virtual void SetSelectedIcon(int index)
         {
             if (selectedIcon != null)
             {
