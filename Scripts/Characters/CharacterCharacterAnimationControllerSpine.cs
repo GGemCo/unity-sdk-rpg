@@ -31,6 +31,7 @@ namespace GGemCo.Scripts.Characters
 
         public void PlayWaitAnimation()
         {
+            if (characterBase.IsStatusDead()) return;
             string idleAnim = characterBase.directionPrev.y != 0 
                 ? (characterBase.directionPrev.y > 0 ? ICharacterAnimationController.WaitBackwardAnim : ICharacterAnimationController.WaitForwardAnim) 
                 : ICharacterAnimationController.WaitForwardAnim;
@@ -40,6 +41,7 @@ namespace GGemCo.Scripts.Characters
 
         public void PlayRunAnimation()
         {
+            if (characterBase.IsStatusDead()) return;
             string moveAnim = characterBase.direction.y != 0 
                 ? (characterBase.direction.y > 0 ? ICharacterAnimationController.WalkBackwardAnim : ICharacterAnimationController.WalkForwardAnim) 
                 : ICharacterAnimationController.WalkForwardAnim;
@@ -88,6 +90,7 @@ namespace GGemCo.Scripts.Characters
             if (SkeletonAnimation == null) return;
             if (entry.Animation.Name == ICharacterAnimationController.AttackAnim)
             {
+                if (characterBase.IsStatusDead()) return;
                 characterBase.SetStatusIdle(); // 공격 상태 해제
                 PlayWaitAnimation();
             }
