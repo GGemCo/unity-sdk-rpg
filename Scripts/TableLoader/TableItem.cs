@@ -16,6 +16,8 @@ namespace GGemCo.Scripts.TableLoader
         public ItemConstants.SubCategory SubCategory;
         public ItemConstants.PartsType PartsID;
         public ItemConstants.Class Class;
+        public float Duration;
+        public float CoolTime;
         public string ImagePath;
         public int MaxOverlayCount;
         public string StatusID1;
@@ -142,6 +144,8 @@ namespace GGemCo.Scripts.TableLoader
                 Class = ConvertClass(data["Class"]),
                 ImagePath = data["ImagePath"],
                 MaxOverlayCount = int.Parse(data["MaxOverlayCount"]),
+                Duration = float.Parse(data["Duration"]),
+                CoolTime = float.Parse(data["CoolTime"]),
                 
                 StatusID1 = data["StatusID1"],
                 StatusValue1 = int.Parse(data["StatusValue1"]),
