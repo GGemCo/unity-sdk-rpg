@@ -88,6 +88,17 @@ namespace GGemCo.Scripts.UI.Icon
             else if(eventData.button == PointerEventData.InputButton.Right)
             {
                 if (uid <= 0 || count <= 0) return;
+                if (CoolTimeHandler != null && CoolTimeHandler.GetCurrentCoolTime() > 0)
+                {
+                    SceneGame.Instance.systemMessageManager.ShowMessageWarning("쿨타임 중에는 사용할 수 없습니다.");
+                    return;
+                }
+                float collTime = struckTableItem.CoolTime;
+                if (collTime > 0)
+                {
+                    CoolTimeHandler.SetCoolTime(collTime);
+                    CoolTimeHandler.PlayCoolTime();
+                }
                 window.OnRightClick(this);
             }
         }
@@ -149,9 +160,25 @@ namespace GGemCo.Scripts.UI.Icon
         {
             return IsPotionType() && struckTableItem.SubCategory == ItemConstants.SubCategory.IncreaseMoveSpeed;
         }
+        public override bool IsIncreaseAttackSpeedPotionType()
+        {
+            return IsPotionType() && struckTableItem.SubCategory == ItemConstants.SubCategory.IncreaseAttackSpeed;
+        }
         public override int GetStatusValue1()
         {
             return struckTableItem.StatusValue1;
+        }
+        public override string GetStatusId1()
+        {
+            return struckTableItem.StatusID1;
+        }
+        /// <summary>
+        /// item 테이블에 duration 컬럼값 가져오기
+        /// </summary>
+        /// <returns></returns>
+        public override float GetDuration()
+        {
+            return struckTableItem.Duration;
         }
     }
 }

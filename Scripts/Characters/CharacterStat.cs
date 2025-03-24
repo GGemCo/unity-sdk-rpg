@@ -18,44 +18,33 @@ namespace GGemCo.Scripts.Characters
         private int BaseMp { get; set; }
         private int BaseMoveSpeed { get; set; }
         private int BaseAttackSpeed { get; set; }
-        protected int BaseCriticalDamage { get; set; }
-        protected int BaseCriticalProbability { get; set; }
-        
-        // 내부 변수 (구독자에게 알리지 않고 값만 저장)
-        private long totalAtk;
-        private long totalDef;
-        private long totalHp;
-        private long totalMp;
-        private long totalMoveSpeed;
-        private long totalAttackSpeed;
-        private long totalCriticalDamage;
-        private long totalCriticalProbability;
+        private int BaseCriticalDamage { get; set; }
+        private int BaseCriticalProbability { get; set; }
+
+        private readonly Dictionary<string, int> flatModifiers = new();
+        private readonly Dictionary<string, float> percentModifiers = new();
+
+        private long totalAtk, totalDef, totalHp, totalMp, totalMoveSpeed, totalAttackSpeed, totalCriticalDamage, totalCriticalProbability;
         // 최종 적용된 스탯 (캐싱)
         public readonly BehaviorSubject<long> TotalAtk = new(1);
-        protected readonly BehaviorSubject<long> TotalDef = new(1);
-        protected readonly BehaviorSubject<long> TotalHp = new(100);
-        protected readonly BehaviorSubject<long> TotalMp = new(100);
-        protected readonly BehaviorSubject<long> TotalMoveSpeed = new(100);
-        protected readonly BehaviorSubject<long> TotalAttackSpeed = new(100);
-        protected readonly BehaviorSubject<long> TotalCriticalDamage = new(100);
-        protected readonly BehaviorSubject<long> TotalCriticalProbability = new(100);
-       
-        // 현재 활성화된 버프
-        // protected readonly List<Buff> ActiveBuffs = new List<Buff>();
-        
-        // 스탯 캐싱을 위한 Dictionary
-        private readonly Dictionary<string, int> plusValues = new Dictionary<string, int>();  // 고정 추가
-        private readonly Dictionary<string, int> minusValues = new Dictionary<string, int>(); // 고정 감소
-        private readonly Dictionary<string, float> increaseValues = new Dictionary<string, float>(); // % 증가
-        private readonly Dictionary<string, float> decreaseValues = new Dictionary<string, float>(); // % 감소
+        public readonly BehaviorSubject<long> TotalDef = new(1);
+        public readonly BehaviorSubject<long> TotalHp = new(100);
+        public readonly BehaviorSubject<long> TotalMp = new(100);
+        public readonly BehaviorSubject<long> TotalMoveSpeed = new(100);
+        public readonly BehaviorSubject<long> TotalAttackSpeed = new(100);
+        public readonly BehaviorSubject<long> TotalCriticalDamage = new(100);
+        public readonly BehaviorSubject<long> TotalCriticalProbability = new(100);
+
+        private CharacterBuffManager buffManager;
 
         protected virtual void Awake()
         {
+            buffManager = new CharacterBuffManager(this);
         }
-
         protected virtual void Start()
         {
         }
+
         /// <summary>
         /// 스크립터블 오브젝트에 설정된 base 값 셋팅 
         /// </summary>
@@ -65,7 +54,8 @@ namespace GGemCo.Scripts.Characters
         /// <param name="statMp"></param>
         /// <param name="statMoveSpeed"></param>
         /// <param name="statAttackSpeed"></param>
-        protected void SetBaseInfos(int statAtk, int statDef, int statHp, int statMp, int statMoveSpeed, int statAttackSpeed)
+        protected void SetBaseInfos(int statAtk, int statDef, int statHp, int statMp, int statMoveSpeed,
+            int statAttackSpeed)
         {
             BaseAtk = statAtk;
             BaseDef = statDef;
@@ -75,117 +65,124 @@ namespace GGemCo.Scripts.Characters
             BaseAttackSpeed = statAttackSpeed;
             RecalculateStats();
         }
-        // 값 업데이트
+
+        /// <summary>
+        /// 값 업데이트
+        /// </summary>
+        /// <param name="equippedItems"></param>
         public void UpdateStatCache(Dictionary<int, StruckTableItem> equippedItems)
         {
-            plusValues.Clear();
-            minusValues.Clear();
-            increaseValues.Clear();
-            decreaseValues.Clear();
+            flatModifiers.Clear();
+            percentModifiers.Clear();
 
+            Dictionary<string, float> modifiers = new Dictionary<string, float>();
             // 아이템 효과 적용
             foreach (var item in equippedItems.Select(items => items.Value))
             {
                 if (item == null) continue;
-                ApplyStatEffect(item.StatusID1, item.StatusValue1);
-                ApplyStatEffect(item.StatusID2, item.StatusValue2);
-                ApplyStatEffect(item.OptionType1, item.OptionValue1);
-                ApplyStatEffect(item.OptionType2, item.OptionValue2);
-                ApplyStatEffect(item.OptionType3, item.OptionValue3);
-                ApplyStatEffect(item.OptionType4, item.OptionValue4);
-                ApplyStatEffect(item.OptionType5, item.OptionValue5);
+                modifiers.TryAdd(item.StatusID1, item.StatusValue1);
+                modifiers.TryAdd(item.StatusID2, item.StatusValue2);
+                modifiers.TryAdd(item.OptionType1, item.OptionValue1);
+                modifiers.TryAdd(item.OptionType2, item.OptionValue2);
+                modifiers.TryAdd(item.OptionType3, item.OptionValue3);
+                modifiers.TryAdd(item.OptionType4, item.OptionValue4);
+                modifiers.TryAdd(item.OptionType5, item.OptionValue5);
             }
 
-            // 버프 효과 적용
-            // foreach (var buff in ActiveBuffs)
-            // {
-            //     ApplyStatEffect(buff.OptionType, buff.OptionValue);
-            // }
-
+            ApplyStatModifiers(modifiers);
             RecalculateStats();
         }
-        // // 버프 적용
-        // private void ApplyBuff(Buff buff, float duration)
-        // {
-        //     ActiveBuffs.Add(buff);
-        //     RecalculateStats();
-        //     // StartCoroutine(RemoveBuffAfterDuration(buff, duration));
-        // }
-        //
-        // // 버프 자동 제거
-        // private IEnumerator RemoveBuffAfterDuration(Buff buff, float duration)
-        // {
-        //     yield return new WaitForSeconds(duration);
-        //     ActiveBuffs.Remove(buff);
-        //     RecalculateStats();
-        // }
-        // 스탯을 적절한 Dictionary에 추가하는 함수
-        private void ApplyStatEffect(string statType, float value)
+        /// <summary>
+        /// 버프 적용하기
+        /// </summary>
+        /// <param name="buff"></param>
+        protected void ApplyBuff(StruckBuff buff) => buffManager.ApplyBuff(buff);
+        /// <summary>
+        /// 스탯 변경값 적용하기
+        /// </summary>
+        /// <param name="modifiers"></param>
+        public void ApplyStatModifiers(Dictionary<string, float> modifiers)
+        {
+            foreach (var kvp in modifiers)
+            {
+                ModifyStat(kvp.Key, kvp.Value, true);
+            }
+        }
+
+        public void RemoveStatModifiers(Dictionary<string, float> modifiers)
+        {
+            foreach (var kvp in modifiers)
+            {
+                ModifyStat(kvp.Key, kvp.Value, false);
+            }
+        }
+        /// <summary>
+        /// 접미사에 따라 적용할 값 배열에 넣기
+        /// </summary>
+        /// <param name="statType"></param>
+        /// <param name="value"></param>
+        /// <param name="isAdding"></param>
+        private void ModifyStat(string statType, float value, bool isAdding)
         {
             if (string.IsNullOrEmpty(statType)) return;
 
+            string baseStat = statType.Replace("_PLUS", "").Replace("_MINUS", "").Replace("_INCREASE", "").Replace("_DECREASE", "");
+
             if (statType.EndsWith("_PLUS"))
             {
-                string baseStat = statType.Replace("_PLUS", "");
-                plusValues.TryAdd(baseStat, 0);
-                plusValues[baseStat] += (int)value;
+                flatModifiers[baseStat] = flatModifiers.GetValueOrDefault(baseStat, 0) + (isAdding ? (int)value : -(int)value);
+                if (flatModifiers[baseStat] == 0) flatModifiers.Remove(baseStat);
             }
             else if (statType.EndsWith("_MINUS"))
             {
-                string baseStat = statType.Replace("_MINUS", "");
-                minusValues.TryAdd(baseStat, 0);
-                minusValues[baseStat] += (int)value;
+                flatModifiers[baseStat] = flatModifiers.GetValueOrDefault(baseStat, 0) - (isAdding ? (int)value : -(int)value);
+                if (flatModifiers[baseStat] == 0) flatModifiers.Remove(baseStat);
             }
             else if (statType.EndsWith("_INCREASE"))
             {
-                string baseStat = statType.Replace("_INCREASE", "");
-                increaseValues.TryAdd(baseStat, 0);
-                increaseValues[baseStat] += value;
+                percentModifiers[baseStat] = percentModifiers.GetValueOrDefault(baseStat, 0) + (isAdding ? value : -value);
+                if (Mathf.Approximately(percentModifiers[baseStat], 0)) percentModifiers.Remove(baseStat);
             }
             else if (statType.EndsWith("_DECREASE"))
             {
-                string baseStat = statType.Replace("_DECREASE", "");
-                decreaseValues.TryAdd(baseStat, 0);
-                decreaseValues[baseStat] += value;
+                percentModifiers[baseStat] = percentModifiers.GetValueOrDefault(baseStat, 0) - (isAdding ? value : -value);
+                if (Mathf.Approximately(percentModifiers[baseStat], 0)) percentModifiers.Remove(baseStat);
             }
         }
         /// <summary>
-        /// 최종 스탯 재계산
+        /// 스탯별 최종 계산하기
         /// </summary>
-        private void RecalculateStats()
+        /// <param name="statKey"></param>
+        /// <param name="baseValue"></param>
+        /// <returns></returns>
+        private long CalculateFinalStat(string statKey, int baseValue)
         {
-            // 기본값 + 추가값 적용
-            // 내부 값만 변경 (OnNext 호출 X)
-            totalAtk = BaseAtk + GetTotalPlusValue("STAT_ATK") - GetTotalMinusValue("STAT_ATK");
-            totalDef = BaseDef + GetTotalPlusValue("STAT_DEF") - GetTotalMinusValue("STAT_DEF");
-            totalHp = BaseHp + GetTotalPlusValue("STAT_HP") - GetTotalMinusValue("STAT_HP");
-            totalMp = BaseMp + GetTotalPlusValue("STAT_MP") - GetTotalMinusValue("STAT_MP");
-            totalMoveSpeed = BaseMoveSpeed + GetTotalPlusValue("STAT_MOVE_SPEED") - GetTotalMinusValue("STAT_MOVE_SPEED");
-            totalAttackSpeed = BaseAttackSpeed + GetTotalPlusValue("STAT_ATTACK_SPEED") - GetTotalMinusValue("STAT_ATTACK_SPEED");
-            totalCriticalDamage = BaseCriticalDamage + GetTotalPlusValue("STAT_CRITIAL_DAMAGE") - GetTotalMinusValue("STAT_CRITIAL_DAMAGE");
-            totalCriticalProbability = BaseCriticalProbability + GetTotalPlusValue("STAT_CRITIAL_PROBABILITY") - GetTotalMinusValue("STAT_CRITIAL_PROBABILITY");
+            int flatBonus = flatModifiers.GetValueOrDefault(statKey, 0);
+            float percentBonus = percentModifiers.GetValueOrDefault(statKey, 0);
 
-            // % 증가 및 감소 적용
-            ApplyPercentageModifiers();
+            float finalMultiplier = 1 + (percentBonus / 100f);
+            if (finalMultiplier < 0) finalMultiplier = 0; // 최소 0으로 제한
+
+            return (long)((baseValue + flatBonus) * finalMultiplier);
         }
         /// <summary>
-        /// % 증가 및 감소 적용
+        /// 최종 계산하기
         /// </summary>
-        private void ApplyPercentageModifiers()
+        public void RecalculateStats()
         {
-            totalAtk = (long)(totalAtk * (1 + GetTotalIncreaseValue("STAT_ATK") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_ATK") / 100.0f));
-            totalDef = (long)(totalDef * (1 + GetTotalIncreaseValue("STAT_DEF") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_DEF") / 100.0f));
-            totalHp = (long)(totalHp * (1 + GetTotalIncreaseValue("STAT_HP") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_HP") / 100.0f));
-            totalMp = (long)(totalMp * (1 + GetTotalIncreaseValue("STAT_MP") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_MP") / 100.0f));
-            totalMoveSpeed = (long)(totalMoveSpeed * (1 + GetTotalIncreaseValue("STAT_MOVE_SPEED") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_MOVE_SPEED") / 100.0f));
-            totalAttackSpeed = (long)(totalAttackSpeed * (1 + GetTotalIncreaseValue("STAT_ATTACK_SPEED") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_ATTACK_SPEED") / 100.0f));
-            totalCriticalDamage = (long)(totalCriticalDamage * (1 + GetTotalIncreaseValue("STAT_CRITIAL_DAMAGE") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_CRITIAL_DAMAGE") / 100.0f));
-            totalCriticalProbability = (long)(totalCriticalProbability * (1 + GetTotalIncreaseValue("STAT_CRITIAL_PROBABILITY") / 100.0f) * (1 - GetTotalDecreaseValue("STAT_CRITIAL_PROBABILITY") / 100.0f));
+            totalAtk = CalculateFinalStat("STAT_ATK", BaseAtk);
+            totalDef = CalculateFinalStat("STAT_DEF", BaseDef);
+            totalHp = CalculateFinalStat("STAT_HP", BaseHp);
+            totalMp = CalculateFinalStat("STAT_MP", BaseMp);
+            totalMoveSpeed = CalculateFinalStat("STAT_MOVE_SPEED", BaseMoveSpeed);
+            totalAttackSpeed = CalculateFinalStat("STAT_ATTACK_SPEED", BaseAttackSpeed);
+            totalCriticalDamage = CalculateFinalStat("STAT_CRITIAL_DAMAGE", BaseCriticalDamage);
+            totalCriticalProbability = CalculateFinalStat("STAT_CRITIAL_PROBABILITY", BaseCriticalProbability);
 
             ApplyStatChanges();
         }
         /// <summary>
-        /// 최종 계산된 스탯을 한 번만 `OnNext`로 전달
+        /// 변경한 스탯 r3 에 적용하기
         /// </summary>
         private void ApplyStatChanges()
         {
@@ -198,27 +195,8 @@ namespace GGemCo.Scripts.Characters
             TotalCriticalDamage.OnNext(totalCriticalDamage);
             TotalCriticalProbability.OnNext(totalCriticalProbability);
         }
-        /// <summary>
-        /// 스탯 조회 함수
-        /// </summary>
-        /// <param name="stat"></param>
-        /// <returns></returns>
-        private int GetTotalPlusValue(string stat) => plusValues.GetValueOrDefault(stat, 0);
-        private int GetTotalMinusValue(string stat) => minusValues.GetValueOrDefault(stat, 0);
-        private float GetTotalIncreaseValue(string stat) => increaseValues.GetValueOrDefault(stat, 0);
-        private float GetTotalDecreaseValue(string stat) => decreaseValues.GetValueOrDefault(stat, 0);
-        
-        public float GetCurrentMoveSpeed(bool isPercent = true)
-        {
-            if (!isPercent)
-            {
-                return TotalMoveSpeed.Value;
-            }
-            return TotalMoveSpeed.Value / 100f;
-        }
-        public float GetCurrentAttackSpeed()
-        {
-            return TotalAttackSpeed.Value / 100f;
-        }
+
+        public float GetCurrentMoveSpeed(bool isPercent = true) => isPercent ? TotalMoveSpeed.Value / 100f : TotalMoveSpeed.Value;
+        public float GetCurrentAttackSpeed() => TotalAttackSpeed.Value / 100f;
     }
 }

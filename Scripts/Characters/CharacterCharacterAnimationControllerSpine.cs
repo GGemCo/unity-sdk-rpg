@@ -124,5 +124,17 @@ namespace GGemCo.Scripts.Characters
 
             characterBase.SetIsStartFade(false);
         }
+        /// <summary>
+        /// track index 의 time scale 변경해주기
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="index"></param>
+        public void UpdateTimeScaleByTrackIndex(float value, int index = 0)
+        {
+            TrackEntry trackEntry = SkeletonAnimation.AnimationState.GetCurrent(index);
+            if (trackEntry == null) return;
+            trackEntry.TimeScale = value;
+        } 
+        
     }
 }

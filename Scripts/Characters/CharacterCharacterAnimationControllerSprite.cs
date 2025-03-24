@@ -59,5 +59,10 @@ namespace GGemCo.Scripts.Characters
         {
             yield break;
         }
+
+        public void UpdateTimeScaleByTrackIndex(float value, int index = 0)
+        {
+            
+        }
     }
 }

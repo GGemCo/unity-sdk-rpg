@@ -32,6 +32,7 @@ namespace GGemCo.Scripts.UI.Icon
             None,
             Item,
             Skill,
+            Buff,
         }
         public enum Status
         {

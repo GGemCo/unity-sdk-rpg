@@ -22,6 +22,7 @@ namespace GGemCo.Scripts.UI
             Equip,
             PlayerInfo,
             ItemSplit,
+            PlayerBuffInfo,
         }
         [Header("기본속성")]
         [Tooltip("윈도우 리스트")]

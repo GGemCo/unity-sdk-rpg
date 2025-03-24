@@ -21,7 +21,7 @@ namespace GGemCo.Scripts.UI.Icon
         private void Awake()
         {
             icon = GetComponent<UIIcon>();
-            coolTimeGauge = transform.Find("ImageCoolTimeGauge")?.GetComponent<Image>();
+            coolTimeGauge = icon.imageCoolTimeGauge;
 
             if (coolTimeGauge != null)
             {

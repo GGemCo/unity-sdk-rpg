@@ -10,8 +10,10 @@ namespace GGemCo.Scripts.UI.Icon
         [Header("오브젝트")]
         [Tooltip("개수를 표현할 텍스트")]
         public TextMeshProUGUI textCount;
+        [Tooltip("쿨타임 게이지")]
+        public Image imageCoolTimeGauge;
         [Tooltip("선택되었을때 보여줄 이미지")]
-        public Image imageSelected;
+        [HideInInspector] public Image imageSelected;
 
         private bool isSelected;
         
@@ -43,14 +45,14 @@ namespace GGemCo.Scripts.UI.Icon
         // 드래그 핸들러
         private UIDragHandler dragHandler;
         // 쿨타임 핸들러
-        private UICoolTimeHandler coolTimeHandler;
+        protected UICoolTimeHandler CoolTimeHandler;
         private RectTransform rectTransform;
 
         protected virtual void Awake()
         {
             imageIcon = GetComponent<Image>();
             dragHandler = gameObject.AddComponent<UIDragHandler>();
-            coolTimeHandler = gameObject.AddComponent<UICoolTimeHandler>();
+            CoolTimeHandler = gameObject.AddComponent<UICoolTimeHandler>();
             rectTransform = GetComponent<RectTransform>();
 
             iconStatus = IIcon.Status.Normal;
@@ -122,6 +124,14 @@ namespace GGemCo.Scripts.UI.Icon
         {
             return false;
         }
+        /// <summary>
+        /// 공격속도 증가 물약인지
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool IsIncreaseAttackSpeedPotionType()
+        {
+            return false;
+        }
         public IIcon.Type GetIconType() => IconType;
         public IIcon.Grade GetGrade() => grade;
         public void SetStatus(IIcon.Status status) => this.iconStatus = status;
@@ -139,7 +149,7 @@ namespace GGemCo.Scripts.UI.Icon
         /// <param name="remainCoolTime"></param>
         public virtual void ChangeInfoByUid(int iconUid, int iconCount = 0, int remainCoolTime = 0)
         {
-            coolTimeHandler?.SetRemainCoolTime(remainCoolTime);
+            CoolTimeHandler?.SetRemainCoolTime(remainCoolTime);
         }
         /// <summary>
         /// 개수 추가하기
@@ -173,7 +183,7 @@ namespace GGemCo.Scripts.UI.Icon
         /// </summary>
         public void ClearIconInfos()
         {
-            coolTimeHandler?.InitializeCoolTime();
+            CoolTimeHandler?.InitializeCoolTime();
             uid = 0;
             Sprite newSprite = Resources.Load<Sprite>($"Images/UI/blank");
             if (imageIcon != null)
@@ -254,6 +264,22 @@ namespace GGemCo.Scripts.UI.Icon
         /// </summary>
         /// <returns></returns>
         public virtual int GetStatusValue1()
+        {
+            return 0;
+        }
+        /// <summary>
+        /// item 테이블에 StatusID1 컬럼값 가져오기
+        /// </summary>
+        /// <returns></returns>
+        public virtual string GetStatusId1()
+        {
+            return "";
+        }
+        /// <summary>
+        /// item 테이블에 duration 컬럼값 가져오기
+        /// </summary>
+        /// <returns></returns>
+        public virtual float GetDuration()
         {
             return 0;
         }

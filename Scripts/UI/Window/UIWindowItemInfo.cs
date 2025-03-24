@@ -146,6 +146,13 @@ namespace GGemCo.Scripts.UI.Window
                 return;
             }
 
+            string valueText = GetValueText(statusId, value);
+            textMesh.gameObject.SetActive(true);
+            textMesh.text = $"{statusName}: {valueText}";
+        }
+
+        private string GetValueText(string statusId, float value)
+        {
             string valueText = $"{value}";
             foreach (var suffix in ItemConstants.StatusSuffixFormats.Keys)
             {
@@ -156,8 +163,7 @@ namespace GGemCo.Scripts.UI.Window
                 }
             }
 
-            textMesh.gameObject.SetActive(true);
-            textMesh.text = $"{statusName}: {valueText}";
+            return valueText;
         }
 
         private string GetStatusName(string statusId)
@@ -180,6 +186,13 @@ namespace GGemCo.Scripts.UI.Window
         {
             textStatus1.gameObject.SetActive(true);
             textStatus1.text = $"회복량 : {currentStruckTableItem.StatusValue1}";
+            if (currentStruckTableItem.SubCategory == ItemConstants.SubCategory.IncreaseMoveSpeed ||
+                currentStruckTableItem.SubCategory == ItemConstants.SubCategory.IncreaseAttackSpeed)
+            {
+                string statusName = GetStatusName(currentStruckTableItem.StatusID1);
+                string valueText = GetValueText(currentStruckTableItem.StatusID1, currentStruckTableItem.StatusValue1);
+                textStatus1.text = $"{statusName} : {valueText}";
+            }
         }
 
         private void SetDefaultUI()

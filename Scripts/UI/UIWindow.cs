@@ -19,7 +19,7 @@ namespace GGemCo.Scripts.UI
         // 공개(public) → 보호(protected) → 내부(internal) → 비공개(private) 
         // 상수(const), 정적(static) 필드 → 인스턴스 필드 → 속성(Properties) → 생성자(Constructors) → 메서드(Methods)
         // 윈도우 고유번호
-        public UIWindowManager.WindowUid uid;
+        [HideInInspector] public UIWindowManager.WindowUid uid;
         [Header("기본속성")] 
         [Tooltip("사용할 최대 아이콘 개수")]
         public int maxCountIcon;

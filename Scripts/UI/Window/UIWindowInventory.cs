@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using GGemCo.Scripts.Characters;
 using GGemCo.Scripts.Characters.Player;
 using GGemCo.Scripts.Items;
 using GGemCo.Scripts.SaveData;
@@ -349,19 +351,30 @@ namespace GGemCo.Scripts.UI.Window
                 int value = icon.GetStatusValue1();
                 SceneGame.Instance.player.GetComponent<Player>().AddMp(value);
             }
-            // 이동속도 물약일 때 
-            else if (icon.IsIncreaseMoveSpeedPotionType())
+            // 이동속도, 공격속도 물약일 때 
+            else if (icon.IsIncreaseMoveSpeedPotionType() || icon.IsIncreaseAttackSpeedPotionType())
             {
                 if (icon.uid <= 0 || icon.count <= 0)
                 {
                     SceneGame.Instance.popupManager.ShowPopupError("사용할 수 있는 아이템 개수가 없습니다.");
                     return;
                 }
-                if (SceneGame.Instance.player.GetComponent<Player>().IsMaxMp())
+
+                float duration = icon.GetDuration();
+                string statusId = icon.GetStatusId1();
+                int value1 = icon.GetStatusValue1();
+                Dictionary<string, float> buffs = new Dictionary<string, float>
                 {
-                    SceneGame.Instance.systemMessageManager.ShowMessageWarning("현재 마력이 가득하여 사용할 수 없습니다.");
-                    return;
-                }
+                    { statusId, value1 }
+                };
+                StruckBuff struckBuff = new StruckBuff(icon.uid, icon.name, duration, buffs);
+                
+                SceneGame.Instance.player.GetComponent<Player>().AddBuff(struckBuff);
+                UIWindowPlayerBuffInfo uiWindowPlayerBuffInfo =
+                    SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowPlayerBuffInfo>(UIWindowManager
+                        .WindowUid.PlayerBuffInfo);
+                if (uiWindowPlayerBuffInfo == null) return;
+                uiWindowPlayerBuffInfo.AddBuff(struckBuff);
             }
         }
         /// <summary>

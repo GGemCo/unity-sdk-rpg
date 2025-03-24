@@ -62,6 +62,9 @@ namespace GGemCo.Scripts.Characters.Player
             CurrentMp
                 .Subscribe(_ => SetWindowHudSliderMp(CurrentMp.Value))
                 .AddTo(this);
+            TotalMoveSpeed
+                .Subscribe(UpdateAnimationMoveTimeScale)
+                .AddTo(this);
 
             LoadEquipItems();
             InitializeStatBindings();
@@ -364,6 +367,24 @@ namespace GGemCo.Scripts.Characters.Player
                 newVale = TotalMp.Value;
             }
             CurrentMp.OnNext(newVale);
+        }
+        /// <summary>
+        /// 버프 추가하기
+        /// </summary>
+        /// <param name="struckBuff"></param>
+        public void AddBuff(StruckBuff struckBuff)
+        {
+            if (struckBuff == null) return;
+            ApplyBuff(struckBuff);
+        }
+        /// <summary>
+        /// total move speed 가 변경되었을때 wait 애니메이션의 time scale 도 변경해주기 위해서
+        /// track index = 0 의 time scale 을 변경해준다.
+        /// </summary>
+        /// <param name="value"></param>
+        private void UpdateAnimationMoveTimeScale(long value)
+        {
+            CharacterAnimationController.UpdateTimeScaleByTrackIndex(value/100f);
         }
     }
 }
