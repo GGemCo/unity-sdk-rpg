@@ -19,7 +19,7 @@ namespace GGemCo.Scripts.Scenes
     {
         public static SceneGame Instance { get; private set; }
 
-        private enum GameState { Begin, Combat, End, DirectionStart, DirectionEnd, QuestDialogueStart, QuestDialogueEnd }
+        public enum GameState { Begin, Combat, End, DirectionStart, DirectionEnd, QuestDialogueStart, QuestDialogueEnd }
         public enum GameSubState { Normal, BossChallenge, DialogueStart, DialogueEnd }
 
         private GameState State { get; set; }
@@ -36,6 +36,8 @@ namespace GGemCo.Scripts.Scenes
         public GameObject containerDropItemName;
         [Tooltip("워프로 맵 이동시 화면을 가려줄 검정화면")]
         public GameObject bgBlackForMapLoading;
+        [Tooltip("몬스터 Hp Bar 오브젝트가 들어갈 오브젝트 입니다.")]
+        public GameObject containerMonsterHpBar;
         
         [Header("매니저")]
         [Tooltip("윈도우 매니저")]
@@ -50,8 +52,8 @@ namespace GGemCo.Scripts.Scenes
         [HideInInspector] public CalculateManager calculateManager;
         [HideInInspector] public MapManager mapManager;
         [HideInInspector] public DamageTextManager damageTextManager;
-        [HideInInspector] public ItemManager itemManager;
-        [HideInInspector] public CharacterManager CharacterManager;
+        public ItemManager ItemManager;
+        public CharacterManager CharacterManager;
 
         private void Awake()
         {
@@ -89,8 +91,8 @@ namespace GGemCo.Scripts.Scenes
             saveDataManager = CreateManager<SaveDataManager>(managerContainer);
             damageTextManager = CreateManager<DamageTextManager>(managerContainer);
             
-            itemManager = new ItemManager();
-            itemManager.Initialize(this);
+            ItemManager = new ItemManager();
+            ItemManager.Initialize(this);
             CharacterManager = new CharacterManager();
             CharacterManager.Initialize();
         }
@@ -128,15 +130,34 @@ namespace GGemCo.Scripts.Scenes
                 case GameState.QuestDialogueEnd:
                 case GameState.Begin:
                 case GameState.Combat:
-                case GameState.End:
                 case GameState.DirectionStart:
                 case GameState.DirectionEnd:
                 default:
                     break;
+                case GameState.End:
+                    PopupMetadata popupMetadata = new PopupMetadata
+                    {
+                        PopupType = PopupManager.Type.NormalButtons,
+                        Title = "게임 종료",
+                        Message = "플레이어가 사망하였습니다.\n마을로 이동합니다.",
+                        MessageColor = Color.red,
+                        ShowCancelButton = false,
+                        OnConfirm = OnDeadPlayer,
+                        IsClosableByClick = false
+                    };
+                    popupManager.ShowPopup(popupMetadata);
+                    break;
             }
         }
+        /// <summary>
+        /// 플레이어가 죽었을 때 처리 
+        /// </summary>
+        private void OnDeadPlayer()
+        {
+            mapManager.LoadMapByPlayerDead();
+        }
 
-        private void SetState(GameState newState)
+        public void SetState(GameState newState)
         {
             State = newState;
             isStateDirty = true;

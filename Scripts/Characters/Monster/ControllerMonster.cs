@@ -26,12 +26,12 @@ namespace GGemCo.Scripts.Characters.Monster
         /// </summary>
         private void HandleInput()
         {
-            if (!TargetCharacter.isAggro || TargetCharacter.attackerTransform == null || TargetCharacter.IsStatusDead()) return;
+            if (!TargetCharacter.IsAggro() || TargetCharacter.attackerTransform == null || TargetCharacter.IsStatusDead()) return;
             TargetCharacter.direction = (TargetCharacter.attackerTransform.position - TargetCharacter.transform.position).normalized;
         }
         private void Update()
         {
-            if (TargetCharacter.isAggro)
+            if (TargetCharacter.IsAggro())
             {
                 if (SearchAttackerTarget())
                 {
@@ -79,7 +79,7 @@ namespace GGemCo.Scripts.Characters.Monster
 
             foreach (var hit in collider2Ds)
             {
-                if (hit.CompareTag(TargetCharacter.attackerTransform.tag) && hit.GetComponent<Player.Player>() != null)
+                if (hit.CompareTag(TargetCharacter.attackerTransform.tag) && hit.GetComponent<Player.Player>() != null && hit.GetComponent<Player.Player>().IsStatusDead() == false)
                 {
                     return true;
                 }
@@ -110,6 +110,13 @@ namespace GGemCo.Scripts.Characters.Monster
         /// </summary>
         protected override void Attack()
         {
+            // 공격자가 죽었을 때
+            if (TargetCharacter.IsAttackerStatusDead())
+            {
+                TargetCharacter.SetAttackerTarget(null);
+                Stop();
+                return;
+            }
             if (TargetCharacter.IsStatusAttack() || TargetCharacter.IsStatusDead()) return;
 
             // 공격자 방향 찾기
@@ -147,7 +154,7 @@ namespace GGemCo.Scripts.Characters.Monster
         {
             if (collision.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Player)))
             {
-                if (TargetCharacter.isAggro && TargetCharacter.attackerTransform != null)
+                if (TargetCharacter.IsAggro() && TargetCharacter.attackerTransform != null)
                 {
                     TargetCharacter.SetStatusAttack();
                 }

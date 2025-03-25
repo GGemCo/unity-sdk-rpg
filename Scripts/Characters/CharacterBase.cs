@@ -77,7 +77,9 @@ namespace GGemCo.Scripts.Characters
         // 현재 이동 스텝
         public float currentMoveStep;
         // 어그로
-        public bool isAggro;
+        private bool isAggro;
+        public int height;
+        public string characterName;
         
         [Header("캐릭터 방향 관련")]
         // 좌우 flip 여부
@@ -114,7 +116,8 @@ namespace GGemCo.Scripts.Characters
         protected override void Awake()
         {
             base.Awake();
-            isAggro = false;
+            SetAggro(false);
+            height = 0;
             SetStatusIdle();
             InitComponents();
             InitTagSortingLayer();
@@ -252,7 +255,13 @@ namespace GGemCo.Scripts.Characters
             isStartFade = true;
             gameObject.SetActive(true);
             StartCoroutine(FadeIn(ConfigCommon.CharacterFadeSec));
+            OnStartFadeIn();
         }
+
+        protected virtual void OnStartFadeIn()
+        {
+        }
+
         /// <summary>
         /// fade out 효과 시작. 맵 컬링시 사용
         /// </summary>
@@ -261,8 +270,13 @@ namespace GGemCo.Scripts.Characters
             if (isStartFade) return;
             isStartFade = true;
             StartCoroutine(FadeOut(ConfigCommon.CharacterFadeSec));
+            OnStartFadeOut();
         }
-        
+
+        protected virtual void OnStartFadeOut()
+        {
+        }
+
         private IEnumerator FadeIn(float duration)
         {
             yield return CharacterAnimationController.FadeEffect(duration, true);
@@ -365,9 +379,24 @@ namespace GGemCo.Scripts.Characters
         /// 공격한 오브젝트 설정하기 
         /// </summary>
         /// <param name="attacker"></param>
-        protected void SetAttackerTarget(Transform attacker)
+        public void SetAttackerTarget(Transform attacker)
         {
             attackerTransform = attacker;
+        }
+
+        public bool IsAttackerStatusDead()
+        {
+            if (attackerTransform == null || attackerTransform.GetComponent<CharacterBase>() == null) return false;
+            return attackerTransform.GetComponent<CharacterBase>().IsStatusDead();
+        }
+
+        public void SetAggro(bool set)
+        {
+            isAggro = set;
+        }
+        public bool IsAggro()
+        {
+            return isAggro;
         }
     }
 }

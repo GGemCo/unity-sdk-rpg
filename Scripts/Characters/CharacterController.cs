@@ -91,5 +91,15 @@ namespace GGemCo.Scripts.Characters
             TargetCharacter.SetStatusAttack();
             ICharacterAnimationController?.PlayAttackAnimation();
         }
+        /// <summary>
+        /// 모든 행동을 멈추고 wait 애니메이션 실행
+        /// </summary>
+        protected virtual void Stop()
+        {
+            TargetCharacter.SetAttackerTarget(null);
+            TargetCharacter.SetAggro(false);
+            TargetCharacter.SetStatusIdle();
+            ICharacterAnimationController?.PlayWaitAnimation();
+        }
     }
 }

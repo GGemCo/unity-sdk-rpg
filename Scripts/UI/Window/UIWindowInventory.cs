@@ -59,7 +59,7 @@ namespace GGemCo.Scripts.UI.Window
         {
             base.Start();
             mainCamera = SceneGame.Instance.mainCamera;
-            itemManager = SceneGame.Instance.itemManager;
+            itemManager = SceneGame.Instance.ItemManager;
             if (SceneGame.Instance != null && SceneGame.Instance.saveDataManager != null)
             {
                 inventoryData = SceneGame.Instance.saveDataManager.Inventory;

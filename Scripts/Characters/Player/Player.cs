@@ -143,7 +143,7 @@ namespace GGemCo.Scripts.Characters.Player
             // 드랍 아이템 일때
             else if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.DropItem)))
             {
-                SceneGame.Instance.itemManager.PlayerTaken(collision.gameObject);
+                SceneGame.Instance.ItemManager.PlayerTaken(collision.gameObject);
             }
         }
         protected void OnTriggerExit2D(Collider2D collision)
@@ -385,6 +385,14 @@ namespace GGemCo.Scripts.Characters.Player
         private void UpdateAnimationMoveTimeScale(long value)
         {
             CharacterAnimationController.UpdateTimeScaleByTrackIndex(value/100f);
+        }
+        /// <summary>
+        /// 플레이어 죽었을때 end 상태로 변경
+        /// </summary>
+        protected override void OnDead()
+        {
+            base.OnDead();
+            SceneGame.Instance.SetState(SceneGame.GameState.End);
         }
     }
 }

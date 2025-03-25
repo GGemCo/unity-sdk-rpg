@@ -14,9 +14,9 @@ namespace GGemCo.Scripts.Maps
         private TilemapRenderer tilemapRenderer;
 
         // 맵에 배치된 몬스터
-        private Dictionary<int, GameObject> monsters = new Dictionary<int, GameObject>();
+        private readonly Dictionary<int, GameObject> monsters = new Dictionary<int, GameObject>();
         // 맵에 배치된 npc
-        private Dictionary<int, GameObject> npcs = new Dictionary<int, GameObject>();
+        private readonly Dictionary<int, GameObject> npcs = new Dictionary<int, GameObject>();
 
         private Bounds cullingBounds; // 현재 컬링 범위를 저장할 변수
         private float mainCameraZ;
@@ -40,7 +40,6 @@ namespace GGemCo.Scripts.Maps
         public override void Initialize(int uid, string chapterName, MapConstants.Type type, MapConstants.SubType subType)
         {
             base.Initialize(uid, chapterName, type, subType);
-            var size = GetMapSize();
             gameObject.transform.position = new Vector3(0, 0, 0);
         }
         /// <summary>

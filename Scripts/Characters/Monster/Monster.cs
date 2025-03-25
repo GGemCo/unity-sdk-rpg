@@ -1,8 +1,12 @@
+using System;
+using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
+using GGemCo.Scripts.UI;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
+using R3;
 
 namespace GGemCo.Scripts.Characters.Monster
 {
@@ -31,9 +35,13 @@ namespace GGemCo.Scripts.Characters.Monster
             MonsterData = null;
             attackType = AttackType.PassiveDefense;
             
-            OnMonsterDead += SceneGame.Instance.itemManager.OnMonsterDead;
+            OnMonsterDead += SceneGame.Instance.ItemManager.OnMonsterDead;
             OnMonsterDead += SceneGame.Instance.saveDataManager.Player.AddExp;
             OnMonsterDead += SceneGame.Instance.mapManager.OnDeadMonster;
+            
+            CurrentHp
+                .Subscribe(SetSliderHp)
+                .AddTo(this);
         }
 
         /// <summary>
@@ -80,6 +88,7 @@ namespace GGemCo.Scripts.Characters.Monster
             var info = tableLoaderManager.TableMonster.GetDataByUid(uid);
             // GcLogger.Log("InitializationStat uid: "+uid+" / info.uid: "+info.uid+" / StatMoveSpeed: "+info.statMoveSpeed);
             if (info.Uid <= 0) return;
+            characterName = info.Name;
             SetBaseInfos(info.StatAtk, info.StatDef, info.StatHp, 0, info.StatMoveSpeed, info.StatAttackSpeed);
             CurrentHp.OnNext(info.StatHp);
             float scale = info.Scale;
@@ -94,17 +103,42 @@ namespace GGemCo.Scripts.Characters.Monster
                 {
                     capsule.size = struckTableAnimation.ColliderSize;
                 }
+                height = struckTableAnimation.Height;
             }
+
         }
+
+        private GameObject prefabSliderHpBar;
+        private Transform containerMonsterHpBar;
+        public GameObject sliderHpBar;
+        public void CreateHpBar()
+        {
+            if (SceneGame.Instance.containerMonsterHpBar == null)
+            {
+                GcLogger.LogError("SceneGame 에 containerMonsterHpBar 가 설정되지 않았습니다.");
+                return;
+            }
+            prefabSliderHpBar = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabSliderMonsterHp);
+            if (prefabSliderHpBar == null)
+            {
+                GcLogger.LogError($"Addressable group 에 {ConfigAddressables.KeyPrefabSliderMonsterHp} 가 없습니다.");
+                return;
+            }
+            containerMonsterHpBar = SceneGame.Instance.containerMonsterHpBar.transform;
+            sliderHpBar = Instantiate(prefabSliderHpBar, containerMonsterHpBar);
+            MonsterHpBar monsterHpBar = sliderHpBar.GetComponent<MonsterHpBar>();
+            monsterHpBar.Initialize(this);
+        }
+
         /// <summary>
         /// 데미지 받으면 어그로 on. 공격자 등록하기
         /// </summary>
         /// <param name="attacker"></param>
         protected override void OnDamage(GameObject attacker)
         {
-            if (isAggro == false)
+            if (IsAggro() == false)
             {
-                isAggro = true;
+                SetAggro(true);
             }
             SetAttackerTarget(attacker.transform);
         }
@@ -114,6 +148,10 @@ namespace GGemCo.Scripts.Characters.Monster
         protected override void OnDead()
         {
             base.OnDead();
+            if (sliderHpBar != null)
+            {
+                DestroyImmediate(sliderHpBar);
+            }
             controllerMonster.StopAttackCoroutine();
             OnMonsterDead?.Invoke(vid, uid, gameObject);
         }
@@ -129,9 +167,9 @@ namespace GGemCo.Scripts.Characters.Monster
                 
                 CurrentStatus = CharacterStatus.Idle;
                 // 선공
-                if (attackType == AttackType.AggroFirst && isAggro == false)
+                if (attackType == AttackType.AggroFirst && IsAggro() == false)
                 {
-                    isAggro = true;
+                    SetAggro(true);
                     SetAttackerTarget(collision.gameObject.transform);
                 }
             }
@@ -139,9 +177,13 @@ namespace GGemCo.Scripts.Characters.Monster
 
         protected void OnDestroy()
         {
-            OnMonsterDead -= SceneGame.Instance.itemManager.OnMonsterDead;
+            OnMonsterDead -= SceneGame.Instance.ItemManager.OnMonsterDead;
             OnMonsterDead -= SceneGame.Instance.saveDataManager.Player.AddExp;
             OnMonsterDead -= SceneGame.Instance.mapManager.OnDeadMonster;
+            if (sliderHpBar != null)
+            {
+                DestroyImmediate(sliderHpBar);
+            }
         }
         /// <summary>
         /// attack 이벤트 처리 
@@ -171,6 +213,27 @@ namespace GGemCo.Scripts.Characters.Monster
                     }
                 }
             }
+        }
+
+        public float GetHeight()
+        {
+            return height * Math.Abs(transform.localScale.x);
+        }
+
+        private void SetSliderHp(long value)
+        {
+            if (sliderHpBar == null) return;
+            sliderHpBar.GetComponent<MonsterHpBar>().SetValue(value);
+        }
+        protected override void OnStartFadeIn()
+        {
+            if (sliderHpBar == null) return;
+            sliderHpBar.GetComponent<MonsterHpBar>().StartFadeIn();
+        }
+        protected override void OnStartFadeOut()
+        {
+            if (sliderHpBar == null) return;
+            sliderHpBar.GetComponent<MonsterHpBar>().StartFadeOut();
         }
     }
 }

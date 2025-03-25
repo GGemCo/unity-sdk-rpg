@@ -67,7 +67,7 @@ namespace GGemCo.Scripts.Items
 
         private void Start()
         {
-            itemManager = SceneGame.Instance.itemManager;
+            itemManager = SceneGame.Instance.ItemManager;
         }
         /// <summary>
         /// 맵에 드랍하기 시작 

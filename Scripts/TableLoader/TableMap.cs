@@ -16,6 +16,7 @@ namespace GGemCo.Scripts.TableLoader
         public MapConstants.SubType Subtype;
         public string FolderName;
         public Vector2 PlayerSpawnPosition;
+        public int PlayerDeadSpawnUid;
         public int BgmUid;
     }
     /// <summary>
@@ -57,6 +58,7 @@ namespace GGemCo.Scripts.TableLoader
                 Subtype = ConvertTypeSub(data["Subtype"]),
                 FolderName = data["FolderName"],
                 PlayerSpawnPosition = ConvertPlayerSpawnPosition(data["PlayerSpawnPosition"]),
+                PlayerDeadSpawnUid = int.Parse(data["PlayerDeadSpawnUid"]),
                 BgmUid = 0,
             };
         }
