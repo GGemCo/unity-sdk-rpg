@@ -13,8 +13,7 @@ namespace GGemCo.Scripts.Popup
         public enum Type
         {
             None,
-            OnlyMessage, // 메시지만 있는 타입 
-            NormalButtons // 메시지, 확인, 취소 버튼 있는 타입
+            Default // 메시지, 확인, 취소 버튼 있는 타입
         }
         [SerializeField] private GameObject[] popupTypePrefabs;
         [SerializeField] private Transform canvasPopup; // 팝업이 들어갈 canvas
@@ -67,7 +66,7 @@ namespace GGemCo.Scripts.Popup
                 Message = string.Format(message, parameters),
                 ShowConfirmButton = true,
                 ShowCancelButton = false,
-                PopupType = Type.OnlyMessage
+                PopupType = Type.Default
             });
         }
         /// <summary>
@@ -82,7 +81,7 @@ namespace GGemCo.Scripts.Popup
                 Message = string.Format(message, parameters),
                 ShowConfirmButton = true,
                 ShowCancelButton = false,
-                PopupType = Type.OnlyMessage,
+                PopupType = Type.Default,
                 MessageColor = Color.yellow,
                 Title = "시스템 안내"
             });
@@ -99,7 +98,7 @@ namespace GGemCo.Scripts.Popup
                 Message = string.Format(message, parameters),
                 ShowConfirmButton = true,
                 ShowCancelButton = false,
-                PopupType = Type.OnlyMessage,
+                PopupType = Type.Default,
                 MessageColor = Color.red,
                 Title = "시스템 안내"
             });

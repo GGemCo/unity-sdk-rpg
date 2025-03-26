@@ -123,7 +123,7 @@ namespace GGemCo.Scripts.UI.WindowLoadSaveData
 
             PopupMetadata popupMetadata = new PopupMetadata
             {
-                PopupType = PopupManager.Type.OnlyMessage,
+                PopupType = PopupManager.Type.Default,
                 MessageColor = Color.red,
                 Title = "슬롯 삭제",
                 Message = "삭제한 데이터는 복구할 수 없습니다.\n정말로 삭제하시겠습니까?",

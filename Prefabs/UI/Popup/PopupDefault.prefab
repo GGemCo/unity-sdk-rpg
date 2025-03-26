@@ -452,7 +452,7 @@ GameObject:
   - component: {fileID: 4977205895040495017}
   - component: {fileID: 7468319872292026481}
   m_Layer: 5
-  m_Name: PopupOnlyMessage
+  m_Name: PopupDefault
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

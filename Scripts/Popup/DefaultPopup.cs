@@ -13,7 +13,7 @@ namespace GGemCo.Scripts.Popup
     public class PopupMetadata
     {
         // 타입
-        public PopupManager.Type PopupType = PopupManager.Type.OnlyMessage;
+        public PopupManager.Type PopupType = PopupManager.Type.Default;
         // 타이틀
         public string Title;
         // 메시지

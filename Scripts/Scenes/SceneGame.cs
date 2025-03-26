@@ -137,7 +137,7 @@ namespace GGemCo.Scripts.Scenes
                 case GameState.End:
                     PopupMetadata popupMetadata = new PopupMetadata
                     {
-                        PopupType = PopupManager.Type.NormalButtons,
+                        PopupType = PopupManager.Type.Default,
                         Title = "게임 종료",
                         Message = "플레이어가 사망하였습니다.\n마을로 이동합니다.",
                         MessageColor = Color.red,
