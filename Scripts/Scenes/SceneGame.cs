@@ -2,6 +2,7 @@
 using GGemCo.Scripts.Characters;
 using GGemCo.Scripts.Core;
 using GGemCo.Scripts.Items;
+using GGemCo.Scripts.keyboard;
 using GGemCo.Scripts.Maps;
 using GGemCo.Scripts.Popup;
 using GGemCo.Scripts.SaveData;
@@ -54,6 +55,7 @@ namespace GGemCo.Scripts.Scenes
         [HideInInspector] public DamageTextManager damageTextManager;
         public ItemManager ItemManager;
         public CharacterManager CharacterManager;
+        public KeyboardManager KeyboardManager;
 
         private void Awake()
         {
@@ -95,6 +97,8 @@ namespace GGemCo.Scripts.Scenes
             ItemManager.Initialize(this);
             CharacterManager = new CharacterManager();
             CharacterManager.Initialize();
+            KeyboardManager = new KeyboardManager();
+            KeyboardManager.Initialize(this);
         }
 
         private T CreateManager<T>(GameObject parent) where T : Component
@@ -171,5 +175,13 @@ namespace GGemCo.Scripts.Scenes
 
         public bool IsSubStateDialogueStart => SubState == GameSubState.DialogueStart;
         public bool IsStateDirectionStart => State == GameState.DirectionStart;
+
+        private void Update()
+        {
+            if (KeyboardManager != null)
+            {
+                KeyboardManager.Update();
+            }
+        }
     }
 }
