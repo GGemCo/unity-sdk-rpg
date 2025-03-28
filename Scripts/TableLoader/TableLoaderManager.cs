@@ -24,6 +24,7 @@ namespace GGemCo.Scripts.TableLoader
         public TableExp TableExp { get; private set; } = new TableExp();
         public TableWindow TableWindow { get; private set; } = new TableWindow();
         public TableStatus TableStatus { get; private set; } = new TableStatus();
+        public TableSkill TableSkill { get; private set; } = new TableSkill();
 
         protected void Awake()
         {
@@ -42,7 +43,7 @@ namespace GGemCo.Scripts.TableLoader
                 ConfigTableFileName.Config, ConfigTableFileName.Map, ConfigTableFileName.Monster,
                 ConfigTableFileName.Npc, ConfigTableFileName.Animation, ConfigTableFileName.Item,
                 ConfigTableFileName.MonsterDropRate, ConfigTableFileName.ItemDropGroup, ConfigTableFileName.Exp,
-                ConfigTableFileName.Window, ConfigTableFileName.Status
+                ConfigTableFileName.Window, ConfigTableFileName.Status, ConfigTableFileName.Skill
             };
         }
 
@@ -87,6 +88,9 @@ namespace GGemCo.Scripts.TableLoader
                                 break;
                             case ConfigTableFileName.Status:
                                 TableStatus.LoadData(content);
+                                break;
+                            case ConfigTableFileName.Skill:
+                                TableSkill.LoadData(content);
                                 break;
                         }
                     }

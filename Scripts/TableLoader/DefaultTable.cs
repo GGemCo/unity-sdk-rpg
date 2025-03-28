@@ -21,7 +21,7 @@ namespace GGemCo.Scripts.TableLoader
 
                 for (int j = 0; j < headers.Length; j++)
                 {
-                    data[headers[j].Trim()] = values[j].Trim().Replace(@"\n", "\n");
+                    data[headers[j].Trim()] = CheckNone(values[j].Trim().Replace(@"\n", "\n"));
                 }
 
                 int uid = int.Parse(values[0]);
@@ -38,7 +38,7 @@ namespace GGemCo.Scripts.TableLoader
 
         private string CheckNone(string value)
         {
-            return value == "None" ? "" : value;
+            return (value == "None" || value == "NONE") ? "" : value;
         }
         public Dictionary<int, Dictionary<string, string>> GetDatas() => table;
         protected Dictionary<string, string> GetData(int uid) => table.GetValueOrDefault(uid);
