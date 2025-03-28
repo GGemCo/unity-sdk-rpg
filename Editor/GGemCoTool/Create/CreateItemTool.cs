@@ -1,11 +1,8 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Editor.GGemCoTool.MapEditor;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Maps;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI;
-using GGemCo.Scripts.UI.Window;
+using GGemCo.Scripts.UI.Inventory;
 using UnityEditor;
 using UnityEngine;
 using TableLoaderManager = GGemCo.Editor.GGemCoTool.TableLoader.TableLoaderManager;
@@ -97,7 +94,6 @@ namespace GGemCo.Editor.GGemCoTool.Create
         /// </summary>
         private void LoadItemInfoData()
         {
-             
             itemNames = new List<string>();
             itemUids = new List<int>();
             // foreach 문을 사용하여 딕셔너리 내용을 출력

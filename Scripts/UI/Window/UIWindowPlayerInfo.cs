@@ -40,6 +40,7 @@ namespace GGemCo.Scripts.UI.Window
         
         protected override void Awake()
         {
+            // uid 를 먼저 지정해야 한다.
             uid = UIWindowManager.WindowUid.ItemInfo;
             if (TableLoaderManager.Instance == null) return;
             base.Awake();

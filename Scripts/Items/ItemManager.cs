@@ -6,7 +6,7 @@ using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI;
-using GGemCo.Scripts.UI.Window;
+using GGemCo.Scripts.UI.Inventory;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;

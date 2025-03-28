@@ -9,6 +9,8 @@ namespace GGemCo.Scripts.UI
         private CanvasGroup canvasGroup;
         private const float FadeDuration = 0.3f;
         private UIWindow uiWindow;
+        private Coroutine coroutineFadeIn;
+        private Coroutine coroutineFadeOut;
 
         private void Awake()
         {
@@ -18,8 +20,18 @@ namespace GGemCo.Scripts.UI
 
         private void StartFadeOut()
         {
+            if (coroutineFadeIn != null)
+            {
+                StopCoroutine(coroutineFadeIn);
+            }
+            if (coroutineFadeOut != null)
+            {
+                StopCoroutine(coroutineFadeOut);
+            }
+
+            if (!uiWindow.gameObject.activeSelf) return;
             // 패널 비활성화 시 페이드 아웃
-            StartCoroutine(FadeOut());
+            coroutineFadeOut = StartCoroutine(FadeOut());
         }
 
         private IEnumerator FadeIn()
@@ -64,8 +76,16 @@ namespace GGemCo.Scripts.UI
         {
             // 먼저 활성화 해야 fade in 이 작동함
             gameObject.SetActive(true);
+            if (coroutineFadeOut != null)
+            {
+                StopCoroutine(coroutineFadeOut);
+            }
+            if (coroutineFadeIn != null)
+            {
+                StopCoroutine(coroutineFadeIn);
+            }
             // 패널 활성화 시 페이드 인
-            StartCoroutine(FadeIn());
+            coroutineFadeIn = StartCoroutine(FadeIn());
         }
         /// <summary>
         /// window 닫기

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using GGemCo.Scripts.Characters;
 using GGemCo.Scripts.UI.Icon;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 
 namespace GGemCo.Scripts.UI.Window
@@ -16,9 +15,10 @@ namespace GGemCo.Scripts.UI.Window
         private List<GameObject> iconBuffs = new List<GameObject>();
         protected override void Awake()
         {
+            // uid 를 먼저 지정해야 한다.
+            uid = UIWindowManager.WindowUid.PlayerBuffInfo;
             base.Awake();
             iconBuffs.Clear();
-            uid = UIWindowManager.WindowUid.PlayerBuffInfo;
         }
         /// <summary>
         /// 버프 적용하기

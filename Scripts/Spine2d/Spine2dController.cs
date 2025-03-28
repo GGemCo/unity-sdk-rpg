@@ -70,6 +70,7 @@ namespace GGemCo.Scripts.Spine2d
 
         private void OnDestroy()
         {
+            if (SkeletonAnimation == null) return;
             SkeletonAnimation.AnimationState.Complete -= OnAnimationComplete;
             SkeletonAnimation.AnimationState.End -= OnAnimationEnd;
             SkeletonAnimation.AnimationState.Interrupt -= OnAnimationInterrupt;
