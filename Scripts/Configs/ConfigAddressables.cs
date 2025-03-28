@@ -17,6 +17,8 @@ namespace GGemCo.Scripts.Configs
         public const string KeyPrefabSlot = "GGemCo_PrefabSlot";
         // 아이콘 아이템 프리팹
         public const string KeyPrefabIconItem = "GGemCo_PrefabIconItem";
+        // 아이콘 스킬 프리팹
+        public const string KeyPrefabIconSkill = "GGemCo_PrefabIconSkill";
         // 몬스터 hp bar
         public const string KeyPrefabSliderMonsterHp = "GGemCo_PrefabSliderMonsterHp";
         
@@ -29,6 +31,7 @@ namespace GGemCo.Scripts.Configs
             (KeyTextFloatingDamage, "Assets/GGemCo/Prefabs/UI/TextDamage.prefab"),
             (KeyPrefabSlot, "Assets/GGemCo/Prefabs/UI/Icon/Slot.prefab"),
             (KeyPrefabIconItem, "Assets/GGemCo/Prefabs/UI/Icon/IconItem.prefab"),
+            (KeyPrefabIconSkill, "Assets/GGemCo/Prefabs/UI/Icon/IconSkill.prefab"),
             (KeyPrefabDropItem, "Assets/GGemCo/Prefabs/Item/DropItem.prefab"),
             (KeyPrefabSliderMonsterHp, "Assets/GGemCo/Prefabs/UI/SliderMonsterHp.prefab"),
         };
@@ -41,6 +44,7 @@ namespace GGemCo.Scripts.Configs
             { KeyTextFloatingDamage, LabelPreLoadGamePrefabs },
             { KeyPrefabSlot, LabelPreLoadGamePrefabs },
             { KeyPrefabIconItem, LabelPreLoadGamePrefabs },
+            { KeyPrefabIconSkill, LabelPreLoadGamePrefabs },
             { KeyPrefabDropItem, LabelPreLoadGamePrefabs },
             { KeyPrefabSliderMonsterHp, LabelPreLoadGamePrefabs },
         };
