@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace GGemCo.Scripts.UI.Icon
 {
+    /// <summary>
+    /// 아이콘 슬롯
+    /// </summary>
     public class UISlot : MonoBehaviour
     {
         private UIWindow window;
@@ -33,6 +36,11 @@ namespace GGemCo.Scripts.UI.Icon
         public void ChangeSlotImageSize(Vector2 size)
         {
             rectTransform.sizeDelta = size;
+        }
+
+        public void SetPosition(Vector3 position)
+        {
+            transform.localPosition = position;
         }
     }
 }

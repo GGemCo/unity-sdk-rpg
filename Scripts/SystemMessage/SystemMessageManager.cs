@@ -1,24 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using GGemCo.Scripts.SaveData;
 using TMPro;
 using UnityEngine;
 
 namespace GGemCo.Scripts.SystemMessage
 {
-    // 아이템 합치기, 나누기 결과 콜백 용
-    public class StruckResultIconControl
-    {
-        public int Index;
-        public int ItemUid;
-        public int ItemCount;
-
-        public StruckResultIconControl(int index, int itemUid, int itemCount)
-        {
-            Index = index;
-            ItemUid = itemUid;
-            ItemCount = itemCount;
-        }
-    }
     public class ResultCommon
     {
         public enum Type
@@ -28,9 +15,9 @@ namespace GGemCo.Scripts.SystemMessage
         }
         public Type Code;
         public string Message;
-        public List<StruckResultIconControl> ResultIcons;
+        public List<SaveDataIcon> ResultIcons;
 
-        public ResultCommon(Type type, string message = "", List<StruckResultIconControl> resultIcons = null)
+        public ResultCommon(Type type, string message = "", List<SaveDataIcon> resultIcons = null)
         {
             Code = type;
             Message = message;

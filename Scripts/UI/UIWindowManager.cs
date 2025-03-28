@@ -23,6 +23,9 @@ namespace GGemCo.Scripts.UI
             PlayerInfo,
             ItemSplit,
             PlayerBuffInfo,
+            QuickSlot,
+            Skill,
+            SkillInfo,
         }
         [Header("기본속성")]
         [Tooltip("윈도우 리스트")]
@@ -145,20 +148,33 @@ namespace GGemCo.Scripts.UI
                 return;
             }
             int itemUid = fromIcon.uid;
-            fromWindow.SetIconCount(fromIndex, fromIcon.uid, fromIcon.count - toCount);
+            fromWindow.SetIconCount(fromIndex, fromIcon.uid, fromIcon.GetCount() - toCount);
             if (toIndex >= 0)
             {
                 // 그 위치에 아이콘이 있으면 되돌려준다
                 var icon = toWindow.GetIconByIndex(toIndex);
-                if (icon != null && icon.uid > 0 && icon.count > 0)
+                if (icon != null && icon.uid > 0 && icon.GetCount() > 0)
                 {
-                    fromWindow.SetIconCount(icon.uid, icon.count);
+                    fromWindow.SetIconCount(icon.uid, icon.GetCount());
                 }
                 toWindow.SetIconCount(toIndex, itemUid, toCount);
             }
             else
             {
                 toWindow.SetIconCount(itemUid, toCount);    
+            }
+        }
+        /// <summary>
+        /// 모든 윈도우 닫기
+        /// </summary>
+        public void CloseAll()
+        {
+            foreach (var window in uiWindows)
+            {
+                if (window == null) continue;
+                if (window.GetDefaultActive()) continue;
+                if (!window.gameObject.activeSelf) continue;
+                window.Show(false);
             }
         }
     }

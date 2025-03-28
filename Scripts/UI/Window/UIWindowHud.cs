@@ -4,6 +4,9 @@ using UnityEngine.UI;
 
 namespace GGemCo.Scripts.UI.Window
 {
+    /// <summary>
+    /// 플레이어 정보 Hud
+    /// </summary>
     public class UIWindowHud : UIWindow
     {
         // exp 는 UITextPlayerExp 에서 처리한다.
@@ -15,6 +18,7 @@ namespace GGemCo.Scripts.UI.Window
         
         protected override void Awake()
         {
+            // uid 를 먼저 지정해야 한다.
             uid = UIWindowManager.WindowUid.Hud;
             base.Awake();
         }
@@ -25,6 +29,13 @@ namespace GGemCo.Scripts.UI.Window
         public void OnClickShowInventory()
         {
             SceneGame.Instance.uIWindowManager.ShowWindow(UIWindowManager.WindowUid.Inventory, true);
+        }
+        /// <summary>
+        /// 스킬 열기 
+        /// </summary>
+        public void OnClickShowSkill()
+        {
+            SceneGame.Instance.uIWindowManager.ShowWindow(UIWindowManager.WindowUid.Skill, true);
         }
         public void SetSliderHp(long currentValue, long totalHp)
         {

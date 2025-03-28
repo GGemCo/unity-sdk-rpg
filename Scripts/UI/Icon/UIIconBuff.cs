@@ -4,6 +4,9 @@ using GGemCo.Scripts.Utils;
 
 namespace GGemCo.Scripts.UI.Icon
 {
+    /// <summary>
+    /// 버프 아이콘
+    /// </summary>
     public class UIIconBuff : UIIcon
     {
         private StruckTableItem struckTableItem;
@@ -12,7 +15,7 @@ namespace GGemCo.Scripts.UI.Icon
         protected override void Awake()
         {
             base.Awake();
-            IconType = IIcon.Type.Buff;
+            IconType = IconConstants.Type.Buff;
             struckTableItem = null;
             tableItem = TableLoaderManager.Instance.TableItem;
         }
@@ -36,24 +39,21 @@ namespace GGemCo.Scripts.UI.Icon
         /// </summary>
         /// <param name="iconUid"></param>
         /// <param name="iconCount"></param>
+        /// <param name="iconLevel"></param>
+        /// <param name="iconIsLearn"></param>
         /// <param name="remainCoolTime"></param>
-        public override void ChangeInfoByUid(int iconUid, int iconCount = 0, int remainCoolTime = 0)
+        public override bool ChangeInfoByUid(int iconUid, int iconCount = 0, int iconLevel = 0, bool iconIsLearn = false, int remainCoolTime = 0)
         {
-            base.ChangeInfoByUid(iconUid, iconCount, remainCoolTime);
-            if (iconUid == 0 && iconCount == 0)
-            {
-                ClearIconInfos();
-                return;
-            }
+            if (!base.ChangeInfoByUid(iconUid, iconCount, iconLevel, iconIsLearn, remainCoolTime)) return false;
             var info = tableItem.GetDataByUid(iconUid);
             if (info == null)
             {
                 GcLogger.LogError("아이콘 테이블에 없는 아이템 입니다.");
-                return;
+                return false;
             }
-            uid = iconUid;
             struckTableItem = info;
             UpdateInfo();
+            return true;
         }
         protected override bool UpdateInfo()
         {

@@ -6,8 +6,11 @@ using GGemCo.Scripts.TableLoader;
 using TMPro;
 using UnityEngine;
 
-namespace GGemCo.Scripts.UI.Window
+namespace GGemCo.Scripts.UI.Inventory
 {
+    /// <summary>
+    /// 아이템 정보
+    /// </summary>
     public class UIWindowItemInfo : UIWindow
     {
         private TableItem tableItem;

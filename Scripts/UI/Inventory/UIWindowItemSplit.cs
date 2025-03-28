@@ -8,8 +8,11 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.UI.Window
+namespace GGemCo.Scripts.UI.Inventory
 {
+    /// <summary>
+    /// 인벤토리 아이템 나누기
+    /// </summary>
     public class UIWindowItemSplit : UIWindow
     {
         [Header("기본오브젝트")]
@@ -59,7 +62,6 @@ namespace GGemCo.Scripts.UI.Window
                 UISlot uiSlot = slotObject.GetComponent<UISlot>();
                 if (uiSlot == null) continue;
                 uiSlot.Initialize(this, uid, i, slotSize);
-
                 slots[i] = slotObject;
                 
                 GameObject icon = Instantiate(iconItem, slotObject.transform);
@@ -75,7 +77,7 @@ namespace GGemCo.Scripts.UI.Window
             splitItemIndex = fromIndex;
             SetIconCount(0, fromItemUid, fromItemCount);
         }
-        protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount)
+        protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
         {
             var info = TableLoaderManager.Instance.TableItem.GetDataByUid(iconUid);
             if (info == null) return;

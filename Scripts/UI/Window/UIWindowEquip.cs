@@ -10,6 +10,9 @@ using UnityEngine.EventSystems;
 
 namespace GGemCo.Scripts.UI.Window
 {
+    /// <summary>
+    /// 플레이어 장비
+    /// </summary>
     public class UIWindowEquip : UIWindow
     {
         // 미리 만들어놓은 slot 이 있을 경우
@@ -22,6 +25,7 @@ namespace GGemCo.Scripts.UI.Window
         
         protected override void Awake()
         {
+            // uid 를 먼저 지정해야 한다.
             uid = UIWindowManager.WindowUid.Equip;
             if (TableLoaderManager.Instance == null) return;
             tableItem = TableLoaderManager.Instance.TableItem;
@@ -60,7 +64,6 @@ namespace GGemCo.Scripts.UI.Window
                 UISlot uiSlot = slotObject.GetComponent<UISlot>();
                 if (uiSlot == null) continue;
                 uiSlot.Initialize(this, uid, i, slotSize);
-
                 slots[i] = slotObject;
                 
                 GameObject icon = Instantiate(iconItem, slotObject.transform);
@@ -87,9 +90,9 @@ namespace GGemCo.Scripts.UI.Window
                 if (icon == null) continue;
                 UIIconItem uiIcon = icon.GetComponent<UIIconItem>();
                 if (uiIcon == null) continue;
-                StructInventoryIcon structInventoryIcon = info.Value;
-                int itemUid = structInventoryIcon.ItemUid;
-                int itemCount = structInventoryIcon.ItemCount;
+                SaveDataIcon structInventoryIcon = info.Value;
+                int itemUid = structInventoryIcon.Uid;
+                int itemCount = structInventoryIcon.Count;
 
                 if (itemUid <= 0 || itemCount <= 0)
                 {
@@ -135,7 +138,7 @@ namespace GGemCo.Scripts.UI.Window
             UIWindowManager.WindowUid droppedWindowUid = droppedUIIcon.windowUid;
             int dropIconSlotIndex = droppedUIIcon.slotIndex;
             int dropIconUid = droppedUIIcon.uid;
-            int dropIconCount = droppedUIIcon.count;
+            int dropIconCount = droppedUIIcon.GetCount();
             if (dropIconUid <= 0)
             {
                 GoBackToSlot(droppedIcon);
@@ -153,7 +156,7 @@ namespace GGemCo.Scripts.UI.Window
             UIWindowManager.WindowUid targetWindowUid = targetUIIcon.windowUid;
             int targetIconSlotIndex = targetUIIcon.slotIndex;
             int targetIconUid = targetUIIcon.uid;
-            int targetIconCount = targetUIIcon.count;
+            int targetIconCount = targetUIIcon.GetCount();
 
             if (targetIconSlotIndex < maxCountIcon)
             {
@@ -183,9 +186,9 @@ namespace GGemCo.Scripts.UI.Window
             }
             GoBackToSlot(droppedIcon);
         }
-        protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount)
+        protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
         {
-            base.OnSetIcon(slotIndex, iconUid, iconCount);
+            base.OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
             UIIcon uiIcon = GetIconByIndex(slotIndex);
             if (uiIcon == null) return;
          

@@ -1,13 +1,15 @@
 using GGemCo.Scripts.Items;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI.Window;
+using GGemCo.Scripts.UI.Inventory;
 using GGemCo.Scripts.Utils;
-using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace GGemCo.Scripts.UI.Icon
 {
+    /// <summary>
+    /// 아이템 아이콘
+    /// </summary>
     public class UIIconItem : UIIcon, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
     {
         private UIWindowItemInfo uiWindowItemInfo;
@@ -17,7 +19,7 @@ namespace GGemCo.Scripts.UI.Icon
         protected override void Awake()
         {
             base.Awake();
-            IconType = IIcon.Type.Item;
+            IconType = IconConstants.Type.Item;
             struckTableItem = null;
             tableItem = TableLoaderManager.Instance.TableItem;
         }
@@ -34,25 +36,21 @@ namespace GGemCo.Scripts.UI.Icon
         /// </summary>
         /// <param name="iconUid"></param>
         /// <param name="iconCount"></param>
+        /// <param name="iconLevel"></param>
+        /// <param name="iconIsLearn"></param>
         /// <param name="remainCoolTime"></param>
-        public override void ChangeInfoByUid(int iconUid, int iconCount = 0, int remainCoolTime = 0)
+        public override bool ChangeInfoByUid(int iconUid, int iconCount = 0, int iconLevel = 0, bool iconIsLearn = false, int remainCoolTime = 0)
         {
-            base.ChangeInfoByUid(iconUid, iconCount, remainCoolTime);
-            if (iconUid == 0 && iconCount == 0)
-            {
-                ClearIconInfos();
-                return;
-            }
+            if (!base.ChangeInfoByUid(iconUid, iconCount, iconLevel, iconIsLearn, remainCoolTime)) return false;
             var info = tableItem.GetDataByUid(iconUid);
             if (info == null)
             {
                 GcLogger.LogError("아이콘 테이블에 없는 아이템 입니다.");
-                return;
+                return false;
             }
-            uid = iconUid;
             struckTableItem = info;
-            SetCount(iconCount);
             UpdateInfo();
+            return true;
         }
         protected override bool UpdateInfo()
         {
@@ -87,7 +85,7 @@ namespace GGemCo.Scripts.UI.Icon
             }
             else if(eventData.button == PointerEventData.InputButton.Right)
             {
-                if (uid <= 0 || count <= 0) return;
+                if (uid <= 0 || GetCount() <= 0) return;
                 if (CoolTimeHandler != null && CoolTimeHandler.GetCurrentCoolTime() > 0)
                 {
                     SceneGame.Instance.systemMessageManager.ShowMessageWarning("쿨타임 중에는 사용할 수 없습니다.");
@@ -109,7 +107,7 @@ namespace GGemCo.Scripts.UI.Icon
         protected override string GetIconImagePath()
         {
             if (struckTableItem == null) return null;
-            return $"Images/Icon/{struckTableItem.Type.ToString()}/{struckTableItem.Category.ToString()}/{struckTableItem.SubCategory.ToString()}/{struckTableItem.ImagePath}";
+            return $"Images/Icon/Item/{struckTableItem.Type.ToString()}/{struckTableItem.Category.ToString()}/{struckTableItem.SubCategory.ToString()}/{struckTableItem.ImagePath}";
         }
         /// <summary>
         /// 장착 가능한 타입 인지 체크 
@@ -139,12 +137,12 @@ namespace GGemCo.Scripts.UI.Icon
         
         public override bool IsEquipType()
         {
-            return IconType == IIcon.Type.Item && struckTableItem.Type == ItemConstants.Type.Equip;
+            return IconType == IconConstants.Type.Item && struckTableItem.Type == ItemConstants.Type.Equip;
         }
 
         public override bool IsPotionType()
         {
-            return IconType == IIcon.Type.Item && struckTableItem.Type == ItemConstants.Type.Consumable &&
+            return IconType == IconConstants.Type.Item && struckTableItem.Type == ItemConstants.Type.Consumable &&
                    struckTableItem.Category == ItemConstants.Category.Potion;
         }
 

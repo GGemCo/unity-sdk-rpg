@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 namespace GGemCo.Scripts.UI.Icon
 {
+    /// <summary>
+    /// 아이콘 공용
+    /// </summary>
     public class UIIcon : MonoBehaviour
     {
         [Header("오브젝트")]
@@ -28,15 +31,19 @@ namespace GGemCo.Scripts.UI.Icon
         // 고유번호 (아이템일때는 아이템 고유번호)
         [HideInInspector] public int uid;
 
-        protected IIcon.Type IconType;
-        private IIcon.Status iconStatus;
+        protected IconConstants.Type IconType;
+        private IconConstants.Status iconStatus;
 
         // 아이콘 이미지
-        private Image imageIcon;
+        protected Image ImageIcon;
         // 개수
-        [HideInInspector] public int count;
+        private int count;
+        // 레벨
+        private int level;
+        // 배웠는지
+        private bool isLearn;
         // 등급
-        private IIcon.Grade grade;
+        private IconConstants.Grade grade;
         // 등급 아이콘
         [HideInInspector] public Image imageGrade;
         // 잠금 아이콘
@@ -50,13 +57,22 @@ namespace GGemCo.Scripts.UI.Icon
 
         protected virtual void Awake()
         {
-            imageIcon = GetComponent<Image>();
+            uid = 0;
+            count = 0;
+            level = 0;
+            index = 0;
+            slotIndex = 0;
+            isLearn = false;
+            window = null;
+            windowUid = UIWindowManager.WindowUid.None;
+            iconStatus = IconConstants.Status.Normal;
+            IconType = IconConstants.Type.None;
+            
+            ImageIcon = GetComponent<Image>();
             dragHandler = gameObject.AddComponent<UIDragHandler>();
             CoolTimeHandler = gameObject.AddComponent<UICoolTimeHandler>();
             rectTransform = GetComponent<RectTransform>();
 
-            iconStatus = IIcon.Status.Normal;
-            IconType = IIcon.Type.None;
             SetSelected(false);
         }
 
@@ -82,7 +98,9 @@ namespace GGemCo.Scripts.UI.Icon
             ChangeIconImageSize(iconSize, slotSize);
         }
 
-        public bool IsItem() => IconType == IIcon.Type.Item;
+        public bool IsItem() => IconType == IconConstants.Type.Item;
+        public bool IsSkill() => IconType == IconConstants.Type.Skill;
+        public bool IsBuff() => IconType == IconConstants.Type.Buff;
 
         /// <summary>
         /// 장비 타입인지
@@ -132,9 +150,9 @@ namespace GGemCo.Scripts.UI.Icon
         {
             return false;
         }
-        public IIcon.Type GetIconType() => IconType;
-        public IIcon.Grade GetGrade() => grade;
-        public void SetStatus(IIcon.Status status) => this.iconStatus = status;
+        public IconConstants.Type GetIconType() => IconType;
+        public IconConstants.Grade GetGrade() => grade;
+        public void SetStatus(IconConstants.Status status) => this.iconStatus = status;
 
         protected virtual bool UpdateInfo()
         {
@@ -146,10 +164,22 @@ namespace GGemCo.Scripts.UI.Icon
         /// </summary>
         /// <param name="iconUid"></param>
         /// <param name="iconCount"></param>
+        /// <param name="iconLevel"></param>
+        /// <param name="iconIsLearn"></param>
         /// <param name="remainCoolTime"></param>
-        public virtual void ChangeInfoByUid(int iconUid, int iconCount = 0, int remainCoolTime = 0)
+        public virtual bool ChangeInfoByUid(int iconUid, int iconCount = 0, int iconLevel = 0, bool iconIsLearn = false, int remainCoolTime = 0)
         {
             CoolTimeHandler?.SetRemainCoolTime(remainCoolTime);
+            if (iconUid == 0 && iconCount == 0)
+            {
+                ClearIconInfos();
+                return false;
+            }
+            uid = iconUid;
+            SetCount(iconCount);
+            SetLevel(iconLevel);
+            SetIsLearn(iconIsLearn);
+            return true;
         }
         /// <summary>
         /// 개수 추가하기
@@ -181,14 +211,14 @@ namespace GGemCo.Scripts.UI.Icon
         /// <summary>
         /// 아이템 정보 지우기
         /// </summary>
-        public void ClearIconInfos()
+        public virtual void ClearIconInfos()
         {
             CoolTimeHandler?.InitializeCoolTime();
             uid = 0;
             Sprite newSprite = Resources.Load<Sprite>($"Images/UI/blank");
-            if (imageIcon != null)
+            if (ImageIcon != null)
             {
-                imageIcon.sprite = newSprite;
+                ImageIcon.sprite = newSprite;
             }
             if (imageGrade != null)
             {
@@ -207,20 +237,20 @@ namespace GGemCo.Scripts.UI.Icon
         /// <summary>
         /// 아이콘 이미지 업데이트 하기
         /// </summary>
-        protected void UpdateIconImage()
+        protected virtual void UpdateIconImage()
         {
-            if (imageIcon == null)
+            if (ImageIcon == null)
             {
-                imageIcon.sprite = null;
+                ImageIcon.sprite = null;
                 return;
             }
             string path = GetIconImagePath();
             if (path == null || path == "")
             {
-                imageIcon.sprite = null;
+                ImageIcon.sprite = null;
                 return;
             }
-            imageIcon.sprite = Resources.Load<Sprite>(path);
+            ImageIcon.sprite = Resources.Load<Sprite>(path);
         }
         /// <summary>
         /// 이미지 사이즈 변경하기
@@ -232,7 +262,7 @@ namespace GGemCo.Scripts.UI.Icon
         {
             rectTransform.sizeDelta = size;
             var diff = (slotSize.x - size.x)/2;
-            imageIcon.raycastPadding = new Vector4(-diff, -diff, -diff, -diff);
+            ImageIcon.raycastPadding = new Vector4(-diff, -diff, -diff, -diff);
         }
         /// <summary>
         /// 아이콘의 원래 위치 가져오기
@@ -283,5 +313,28 @@ namespace GGemCo.Scripts.UI.Icon
         {
             return 0;
         }
+
+        public void SetPosition(Vector3 position)
+        {
+            transform.localPosition = position;
+        }
+
+        public virtual bool CheckRequireLevel()
+        {
+            return false;
+        }
+
+        private void SetLevel(int value)
+        {
+            level = value;
+        }
+        public void SetIsLearn(bool value)
+        {
+            isLearn = value;
+        }
+        public int GetLevel() => level;
+        public int GetCount() => count;
+
+        public bool IsLearn() => isLearn;
     }
 }

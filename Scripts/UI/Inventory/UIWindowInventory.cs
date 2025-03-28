@@ -8,23 +8,16 @@ using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.SystemMessage;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI.Icon;
+using GGemCo.Scripts.UI.Window;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.UI.Window
+namespace GGemCo.Scripts.UI.Inventory
 {
-    public class StructInventoryIcon
-    {
-        public int ItemUid;
-        public int ItemCount;
-
-        public StructInventoryIcon(int uid, int count)
-        {
-            ItemUid = uid;
-            ItemCount = count;
-        }
-    }
+    /// <summary>
+    /// 인벤토리
+    /// </summary>
     public class UIWindowInventory : UIWindow
     {
         [Header("장비 윈도우")]
@@ -100,15 +93,15 @@ namespace GGemCo.Scripts.UI.Window
                 if (icon == null) continue;
                 UIIconItem uiIcon = icon.GetComponent<UIIconItem>();
                 if (uiIcon == null) continue;
-                if (!datas.ContainsKey(index))
+                if (!datas.TryGetValue(index, out var info))
                 {
                     uiIcon.ClearIconInfos();
                     continue;
                 }
-                var info = datas[index];
-                StructInventoryIcon structInventoryIcon = info;
-                int itemUid = structInventoryIcon.ItemUid;
-                int itemCount = structInventoryIcon.ItemCount;
+
+                SaveDataIcon structInventoryIcon = info;
+                int itemUid = structInventoryIcon.Uid;
+                int itemCount = structInventoryIcon.Count;
                 if (itemUid <= 0 || itemCount <= 0)
                 {
                     uiIcon.ClearIconInfos();
@@ -142,7 +135,7 @@ namespace GGemCo.Scripts.UI.Window
             UIIcon icon = droppedIcon.GetComponent<UIIcon>();
             
             // 맵에 드랍하기
-            itemManager.ShowDropItem(worldPosition, icon.uid, icon.count);
+            itemManager.ShowDropItem(worldPosition, icon.uid, icon.GetCount());
             // 윈도우에서 아이콘 정보 지워주기 
             icon.window.DetachIcon(icon.slotIndex);
             
@@ -161,7 +154,7 @@ namespace GGemCo.Scripts.UI.Window
             UIWindowManager.WindowUid droppedWindowUid = droppedUIIcon.windowUid;
             int dropIconSlotIndex = droppedUIIcon.slotIndex;
             int dropIconUid = droppedUIIcon.uid;
-            int dropIconCount = droppedUIIcon.count;
+            int dropIconCount = droppedUIIcon.GetCount();
             if (dropIconUid <= 0)
             {
                 GoBackToSlot(droppedIcon);
@@ -179,7 +172,7 @@ namespace GGemCo.Scripts.UI.Window
             UIWindowManager.WindowUid targetWindowUid = targetUIIcon.windowUid;
             int targetIconSlotIndex = targetUIIcon.slotIndex;
             int targetIconUid = targetUIIcon.uid;
-            int targetIconCount = targetUIIcon.count;
+            int targetIconCount = targetUIIcon.GetCount();
 
             // 다른 윈도우에서 인벤토리로 드래그 앤 드랍 했을 때 
             if (droppedWindowUid != targetWindowUid)
@@ -261,12 +254,12 @@ namespace GGemCo.Scripts.UI.Window
             }
             GoBackToSlot(droppedIcon);
         }
-        protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount)
+        protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
         {
-            base.OnSetIcon(slotIndex, iconUid, iconCount);
+            base.OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
             UIIcon uiIcon = GetIconByIndex(slotIndex);
             if (uiIcon == null) return;
-            inventoryData.SetItemCount(slotIndex, uiIcon.uid, uiIcon.count);
+            inventoryData.SetItemCount(slotIndex, uiIcon.uid, uiIcon.GetCount());
         }
         protected override void OnDetachIcon(int slotIndex)
         {
@@ -292,7 +285,7 @@ namespace GGemCo.Scripts.UI.Window
                 return;
             }
 
-            if (icon.count <= 1)
+            if (icon.GetCount() <= 1)
             {
                 SceneGame.Instance.popupManager.ShowPopupError("아이템 개수가 2개 이상일때만 나눌 수 있습니다.");
                 return;
@@ -302,7 +295,7 @@ namespace GGemCo.Scripts.UI.Window
                 SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowItemSplit>(UIWindowManager.WindowUid
                     .ItemSplit);
             if (window == null) return;
-            window.CopyIconCount(0, icon.slotIndex, icon.uid, icon.count);
+            window.CopyIconCount(0, icon.slotIndex, icon.uid, icon.GetCount());
         }
         /// <summary>
         /// 아이콘 우클릭했을때 처리 
@@ -320,7 +313,7 @@ namespace GGemCo.Scripts.UI.Window
             // hp 물약일 때 
             else if (icon.IsHpPotionType())
             {
-                if (icon.uid <= 0 || icon.count <= 0)
+                if (icon.uid <= 0 || icon.GetCount() <= 0)
                 {
                     SceneGame.Instance.popupManager.ShowPopupError("사용할 수 있는 아이템 개수가 없습니다.");
                     return;
@@ -331,13 +324,13 @@ namespace GGemCo.Scripts.UI.Window
                     return;
                 }
                 int value = icon.GetStatusValue1();
-                SetIconCount(icon.index, icon.uid, icon.count - 1);
+                SetIconCount(icon.index, icon.uid, icon.GetCount() - 1);
                 SceneGame.Instance.player.GetComponent<Player>().AddHp(value);
             }
             // mp 물약일 때 
             else if (icon.IsMpPotionType())
             {
-                if (icon.uid <= 0 || icon.count <= 0)
+                if (icon.uid <= 0 || icon.GetCount() <= 0)
                 {
                     SceneGame.Instance.popupManager.ShowPopupError("사용할 수 있는 아이템 개수가 없습니다.");
                     return;
@@ -347,14 +340,14 @@ namespace GGemCo.Scripts.UI.Window
                     SceneGame.Instance.systemMessageManager.ShowMessageWarning("현재 마력이 가득하여 사용할 수 없습니다.");
                     return;
                 }
-                SetIconCount(icon.index, icon.uid, icon.count - 1);
+                SetIconCount(icon.index, icon.uid, icon.GetCount() - 1);
                 int value = icon.GetStatusValue1();
                 SceneGame.Instance.player.GetComponent<Player>().AddMp(value);
             }
             // 이동속도, 공격속도 물약일 때 
             else if (icon.IsIncreaseMoveSpeedPotionType() || icon.IsIncreaseAttackSpeedPotionType())
             {
-                if (icon.uid <= 0 || icon.count <= 0)
+                if (icon.uid <= 0 || icon.GetCount() <= 0)
                 {
                     SceneGame.Instance.popupManager.ShowPopupError("사용할 수 있는 아이템 개수가 없습니다.");
                     return;
@@ -402,7 +395,7 @@ namespace GGemCo.Scripts.UI.Window
                     return;
                 }
 
-                if (icon.count <= 1)
+                if (icon.GetCount() <= 1)
                 {
                     SceneGame.Instance.popupManager.ShowPopupError("아이템 개수가 2개 이상일때만 나눌 수 있습니다.");
                     return;
@@ -412,7 +405,7 @@ namespace GGemCo.Scripts.UI.Window
                     SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowItemSplit>(UIWindowManager.WindowUid
                         .ItemSplit);
                 if (window == null) return;
-                window.CopyIconCount(0, icon.slotIndex, icon.uid, icon.count);
+                window.CopyIconCount(0, icon.slotIndex, icon.uid, icon.GetCount());
             }
         }
     }

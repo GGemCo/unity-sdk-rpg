@@ -154,5 +154,10 @@ namespace GGemCo.Scripts.SaveData
         {
             return currentNeedExp.Value;
         }
+
+        protected override int GetMaxSlotCount()
+        {
+            return 0;
+        }
     }
 }

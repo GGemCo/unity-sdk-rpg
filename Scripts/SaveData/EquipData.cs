@@ -16,7 +16,7 @@ namespace GGemCo.Scripts.SaveData
             ItemCounts.Clear();
             if (saveDataContainer?.EquipData != null)
             {
-                ItemCounts = new Dictionary<int, StructInventoryIcon>(saveDataContainer.EquipData.ItemCounts);
+                ItemCounts = new Dictionary<int, SaveDataIcon>(saveDataContainer.EquipData.ItemCounts);
             }
         }
 

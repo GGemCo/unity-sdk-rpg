@@ -9,6 +9,7 @@
             Item,
             Quest,
             Skill,
+            QuickSlot,
         }
     }
 }

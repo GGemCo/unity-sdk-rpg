@@ -21,6 +21,8 @@ namespace GGemCo.Scripts.UI
         // 윈도우 고유번호
         [HideInInspector] public UIWindowManager.WindowUid uid;
         [Header("기본속성")] 
+        [Tooltip("아이콘 타입")] 
+        public IconConstants.Type iconType;
         [Tooltip("사용할 최대 아이콘 개수")]
         public int maxCountIcon;
         [Tooltip("윈도우 On/Off 시 fade in/Out 효과 사용 여부")]
@@ -41,6 +43,7 @@ namespace GGemCo.Scripts.UI
 
         protected virtual void Awake()
         {
+            // 사용하지 않는 index 가 있을 수 있으므로 미리 만들어 두어야 건너 띄어도 문제가 없다.
             slots = new GameObject[maxCountIcon];
             icons = new GameObject[maxCountIcon];
             gameObject.AddComponent<CanvasGroup>();
@@ -49,7 +52,7 @@ namespace GGemCo.Scripts.UI
                 uiWindowFade = gameObject.AddComponent<UIWindowFade>();
             }
 
-            if (containerIcon != null && slotSize != Vector2.zero)
+            if (containerIcon != null && containerIcon.cellSize == Vector2.zero && slotSize != Vector2.zero)
             {
                 containerIcon.cellSize = new Vector2(slotSize.x, slotSize.y);
             }
@@ -68,7 +71,15 @@ namespace GGemCo.Scripts.UI
         {
             if (AddressableSettingsLoader.Instance == null || containerIcon == null) return;
             if (amount <= 0) return;
-            GameObject iconItem = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconItem);
+            GameObject iconItem;
+            if (iconType == IconConstants.Type.Skill)
+            {
+                iconItem = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconSkill);
+            }
+            else
+            {
+                iconItem = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconItem);
+            }
             GameObject slot = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabSlot);
             if (iconItem == null) return;
             for (int i = 0; i < amount; i++)
@@ -169,7 +180,7 @@ namespace GGemCo.Scripts.UI
                 if (icon == null) continue;
                 UIIcon uiIcon = icon.GetComponent<UIIcon>();
                 if (uiIcon == null) continue;
-                if (uiIcon.uid <= 0 || uiIcon.count <= 0)
+                if (uiIcon.uid <= 0 || uiIcon.GetCount() <= 0)
                     return i;
             }
             return -1;
@@ -190,7 +201,9 @@ namespace GGemCo.Scripts.UI
         /// <param name="slotIndex"></param>
         /// <param name="iconUid"></param>
         /// <param name="iconCount"></param>
-        public void SetIconCount(int slotIndex, int iconUid, int iconCount)
+        /// <param name="iconLevel"></param>
+        /// <param name="iconLearn"></param>
+        public void SetIconCount(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
         {
             GameObject icon = icons[slotIndex];
             if (icon == null)
@@ -212,9 +225,9 @@ namespace GGemCo.Scripts.UI
             }
             uiIcon.window = this;
             uiIcon.windowUid = uid;
-            uiIcon.ChangeInfoByUid(iconUid, iconCount);
+            uiIcon.ChangeInfoByUid(iconUid, iconCount, iconLevel, iconLearn);
             
-            OnSetIcon(slotIndex, iconUid, iconCount);
+            OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
         }
         /// <summary>
         /// 아이콘 이동 후 슬롯별 uid, count 처리  
@@ -230,10 +243,10 @@ namespace GGemCo.Scripts.UI
             if (result.ResultIcons == null || result.ResultIcons.Count <= 0) return;
             foreach (var icon in result.ResultIcons)
             {
-                SetIconCount(icon.Index, icon.ItemUid, icon.ItemCount);
+                SetIconCount(icon.SlotIndex, icon.Uid, icon.Count, icon.Level, icon.IsLearned);
             }
         }
-        protected virtual void OnSetIcon(int slotIndex, int iconUid, int iconCount)
+        protected virtual void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
         {
         }
         public virtual void OnClickIcon(UIIcon icon)
@@ -268,9 +281,9 @@ namespace GGemCo.Scripts.UI
         /// </summary>
         /// <param name="valueGrade"></param>
         /// <returns></returns>
-        public static string GetIconGradePath(IIcon.Grade valueGrade)
+        public static string GetIconGradePath(IconConstants.Grade valueGrade)
         {
-            return $"Images/UI/{IIcon.IconGradeImagePath[valueGrade]}";
+            return $"Images/UI/{IconConstants.IconGradeImagePath[valueGrade]}";
         }
         /// <summary>
         /// 윈도우 open/close
@@ -284,7 +297,7 @@ namespace GGemCo.Scripts.UI
                 OnShow(show);
                 return false;
             }
-            if (gameObject.activeSelf == show) return false;
+            // if (gameObject.activeSelf == show) return false;
             if (show)
             {
                 uiWindowFade.ShowPanel();
@@ -357,6 +370,11 @@ namespace GGemCo.Scripts.UI
         public virtual void CopyIconCount(int toIndex, int fromIndex, int fromItemUid, int fromItemCount)
         {
             
+        }
+
+        public bool GetDefaultActive()
+        {
+            return struckTableWindow.DefaultActive;
         }
     }
 }

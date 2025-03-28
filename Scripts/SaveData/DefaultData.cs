@@ -1,9 +1,56 @@
-﻿using UnityEngine;
+﻿using GGemCo.Scripts.Scenes;
+using UnityEngine;
 
 namespace GGemCo.Scripts.SaveData
 {
-    public class DefaultData
+    /// <summary>
+    /// 아이콘 저장 구조
+    /// </summary>
+    public class SaveDataIcon
     {
+        public int SlotIndex { get; private set; }
+        public int Uid { get; private set; }
+        public int Count { get; private set; }
+        public int Level { get; private set; }
+        public bool IsLearned { get; private set; }
+
+        public SaveDataIcon(int slotIndex, int uid, int count = 0, int level = 0, bool isLearned = false)
+        {
+            SlotIndex = slotIndex;
+            Uid = uid;
+            Count = count;
+            Level = level;
+            IsLearned = isLearned;
+        }
+
+        public void SetLevel(int level)
+        {
+            Level = level;
+        }
+    }
+
+    /// <summary>
+    /// 세이브 데이터 공용
+    /// </summary>
+    public abstract class DefaultData
+    {
+        private int maxSlotCount = 0;
+
+        protected int MaxSlotCount
+        {
+            get
+            {
+                if (maxSlotCount <= 0)
+                    maxSlotCount = GetMaxSlotCount();
+                return maxSlotCount;
+            }
+        }
+        protected abstract int GetMaxSlotCount();
+
+        protected void SaveDatas()
+        {
+            SceneGame.Instance.saveDataManager.StartSaveData();
+        }
         protected static void PlayerPrefsSave(string key, string value)
         {
             PlayerPrefs.SetString(key, value);
