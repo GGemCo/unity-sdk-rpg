@@ -56,8 +56,9 @@ namespace GGemCo.Scripts.Spine2d
             if (SkeletonAnimation == null)
             {
                 GcLogger.LogError("SkeletonAnimation component 가 없습니다.");
+                return;
             }
-            skeleton = SkeletonAnimation.skeleton;
+            skeleton = SkeletonAnimation.Skeleton;
             skeletonData = skeleton.Data;
             
             // 애니메이션 이벤트 리스너 등록
