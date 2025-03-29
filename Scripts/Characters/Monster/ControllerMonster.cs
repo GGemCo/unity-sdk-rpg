@@ -31,6 +31,8 @@ namespace GGemCo.Scripts.Characters.Monster
         }
         private void Update()
         {
+            if (TargetCharacter.IsStatusDead()) return;
+            
             if (TargetCharacter.IsAggro())
             {
                 if (SearchAttackerTarget())
@@ -154,9 +156,17 @@ namespace GGemCo.Scripts.Characters.Monster
         {
             if (collision.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Player)))
             {
+                if (TargetCharacter.IsStatusDead()) return;
+                
                 if (TargetCharacter.IsAggro() && TargetCharacter.attackerTransform != null)
                 {
                     TargetCharacter.SetStatusAttack();
+                }
+                // 선공
+                else if (TargetCharacter.GetAttackType() == CharacterBase.AttackType.AggroFirst && TargetCharacter.IsAggro() == false)
+                {
+                    TargetCharacter.SetAggro(true);
+                    TargetCharacter.SetAttackerTarget(collision.gameObject.transform);
                 }
             }
         }
@@ -169,7 +179,6 @@ namespace GGemCo.Scripts.Characters.Monster
             if (collision.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Player)))
             {
                 StopAttackCoroutine();
-                // TargetCharacter.SetStatusIdle();
             }
         }
         protected void OnSpineEventShake(Event @event) 

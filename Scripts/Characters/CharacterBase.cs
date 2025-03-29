@@ -2,6 +2,7 @@
 using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
+using GGemCo.Scripts.Skill;
 using R3;
 using UnityEngine;
 
@@ -66,6 +67,12 @@ namespace GGemCo.Scripts.Characters
             AlwaysOnBottom,
             Fixed
         }
+        public enum AttackType
+        {
+            None,
+            PassiveDefense, // 후공
+            AggroFirst // 선공
+        }
 
         [Header("캐릭터 정보")]
         // 캐릭터 타입
@@ -77,6 +84,7 @@ namespace GGemCo.Scripts.Characters
         // 현재 이동 스텝
         public float currentMoveStep;
         // 어그로
+        private AttackType attackType;
         private bool isAggro;
         public int height;
         public string characterName;
@@ -116,6 +124,7 @@ namespace GGemCo.Scripts.Characters
         protected override void Awake()
         {
             base.Awake();
+            SetAttackType(AttackType.None);
             SetAggro(false);
             height = 0;
             SetStatusIdle();
@@ -358,7 +367,7 @@ namespace GGemCo.Scripts.Characters
             if (remainHp <= 0)
             {
                 CurrentStatus = CharacterStatus.Dead;
-                Destroy(this.gameObject, delayDestroyMonster);
+                Destroy(gameObject, delayDestroyMonster);
 
                 OnDead();
             }
@@ -398,5 +407,15 @@ namespace GGemCo.Scripts.Characters
         {
             return isAggro;
         }
+        public AttackType GetAttackType()
+        {
+            return attackType;
+        }
+
+        private void SetAttackType(AttackType pattackType)
+        {
+            attackType = pattackType;
+        }
+
     }
 }

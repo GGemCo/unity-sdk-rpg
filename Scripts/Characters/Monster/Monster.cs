@@ -10,23 +10,24 @@ using R3;
 
 namespace GGemCo.Scripts.Characters.Monster
 {
-    public enum AttackType
-    {
-        PassiveDefense, // 후공
-        AggroFirst // 선공
-    }
     /// <summary>
     /// 몬스터 기본 클레스
     /// </summary>
     public class Monster : CharacterBase
     {
         // 몬스터 데이터
-        public MonsterData MonsterData;
+        [HideInInspector] public MonsterData MonsterData;
         // 선공/후공
         private AttackType attackType;
         public delegate void DelegateMonsterDead(int monsterVid, int monsterUid, GameObject monsterObject);
         public event DelegateMonsterDead OnMonsterDead;
+        
+        // 몬스터 행동 처리
         private ControllerMonster controllerMonster;
+        // 생명력 slier
+        [HideInInspector] public GameObject sliderHpBar;
+        private GameObject prefabSliderHpBar;
+        private Transform containerMonsterHpBar;
         
         // Start is called before the first frame update
         protected override void Awake()
@@ -107,10 +108,6 @@ namespace GGemCo.Scripts.Characters.Monster
             }
 
         }
-
-        private GameObject prefabSliderHpBar;
-        private Transform containerMonsterHpBar;
-        public GameObject sliderHpBar;
         public void CreateHpBar()
         {
             if (SceneGame.Instance.containerMonsterHpBar == null)
@@ -150,31 +147,11 @@ namespace GGemCo.Scripts.Characters.Monster
             base.OnDead();
             if (sliderHpBar != null)
             {
-                DestroyImmediate(sliderHpBar);
+                Destroy(sliderHpBar);
             }
             controllerMonster.StopAttackCoroutine();
             OnMonsterDead?.Invoke(vid, uid, gameObject);
         }
-        /// <summary>
-        /// 선공 몬스터 처리
-        /// </summary>
-        /// <param name="collision"></param>
-        void OnTriggerEnter2D(Collider2D collision)
-        {
-            if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Player)))
-            {
-                if (IsStatusDead()) return;
-                
-                CurrentStatus = CharacterStatus.Idle;
-                // 선공
-                if (attackType == AttackType.AggroFirst && IsAggro() == false)
-                {
-                    SetAggro(true);
-                    SetAttackerTarget(collision.gameObject.transform);
-                }
-            }
-        }
-
         protected void OnDestroy()
         {
             OnMonsterDead -= SceneGame.Instance.ItemManager.OnMonsterDead;
@@ -182,7 +159,7 @@ namespace GGemCo.Scripts.Characters.Monster
             OnMonsterDead -= SceneGame.Instance.mapManager.OnDeadMonster;
             if (sliderHpBar != null)
             {
-                DestroyImmediate(sliderHpBar);
+                Destroy(sliderHpBar);
             }
         }
         /// <summary>
