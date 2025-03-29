@@ -16,10 +16,14 @@ namespace GGemCo.Scripts.TableLoader
         public int Maxlevel;
         public int NeedPlayerLevel;
         public SkillConstants.Target Target;
+        public SkillConstants.TargetType TargetType;
         public string DamageStatusID;
         public int DamageValue;
+        public int DamageRange;
         public int Distance;
+        public float EffectMoveSpeed;
         public int NeedMp;
+        public float Duration;
         public float CoolTime;
         public string OptionID1;
         public int OptionValue1;
@@ -37,6 +41,7 @@ namespace GGemCo.Scripts.TableLoader
         private readonly Dictionary<int, Dictionary<int, StruckTableSkill>> skillsByLevel = new Dictionary<int, Dictionary<int, StruckTableSkill>>();
         
         private static readonly Dictionary<string, SkillConstants.Target> MapTarget;
+        private static readonly Dictionary<string, SkillConstants.TargetType> MapTargetType;
         static TableSkill()
         {
             MapTarget = new Dictionary<string, SkillConstants.Target>
@@ -44,8 +49,14 @@ namespace GGemCo.Scripts.TableLoader
                 { "Player", SkillConstants.Target.Player },
                 { "Monster", SkillConstants.Target.Monster },
             };
+            MapTargetType = new Dictionary<string, SkillConstants.TargetType>
+            {
+                { "Fixed", SkillConstants.TargetType.Fixed },
+                { "Range", SkillConstants.TargetType.Range },
+            };
         }
         private static SkillConstants.Target ConvertTarget(string type) => MapTarget.GetValueOrDefault(type, SkillConstants.Target.None);
+        private static SkillConstants.TargetType ConvertTargetType(string type) => MapTargetType.GetValueOrDefault(type, SkillConstants.TargetType.None);
 
         public Dictionary<int, StruckTableSkill> GetSkills()
         {
@@ -74,10 +85,14 @@ namespace GGemCo.Scripts.TableLoader
                 Maxlevel = int.Parse(data["Maxlevel"]),
                 NeedPlayerLevel = int.Parse(data["NeedPlayerLevel"]),
                 Target = ConvertTarget(data["Target"]),
+                TargetType = ConvertTargetType(data["TargetType"]),
                 DamageStatusID = data["DamageStatusID"],
                 DamageValue = int.Parse(data["DamageValue"]),
+                DamageRange = int.Parse(data["DamageRange"]),
                 Distance = int.Parse(data["Distance"]),
+                EffectMoveSpeed = float.Parse(data["EffectMoveSpeed"]),
                 NeedMp = int.Parse(data["NeedMp"]),
+                Duration = float.Parse(data["Duration"]),
                 CoolTime = float.Parse(data["CoolTime"]),
                 OptionID1 = data["OptionID1"],
                 OptionValue1 = int.Parse(data["OptionValue1"]),

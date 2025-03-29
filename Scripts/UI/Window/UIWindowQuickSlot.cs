@@ -19,6 +19,14 @@ namespace GGemCo.Scripts.UI.Window
     {
         public int Priority => 1;
         private QuickSlotData quickSlotData;
+
+        private Dictionary<KeyCode, int> indexByKeyCode = new Dictionary<KeyCode, int>
+        {
+            { KeyCode.Alpha1, 0 },
+            { KeyCode.Alpha2, 1 },
+            { KeyCode.Alpha3, 2 },
+            { KeyCode.Alpha4, 3 },
+        };
         
         protected override void Awake()
         {
@@ -74,26 +82,30 @@ namespace GGemCo.Scripts.UI.Window
         {
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                if (SceneGame.Instance.player == null)
-                {
-                    GcLogger.LogError("플레이어가 없습니다.");
-                    return false;
-                }
-                GcLogger.Log("UIWindowQuickSlot Key pressed Alpha1");
-                UIIcon icon = GetIconByIndex(0);
-                if (icon == null || icon.uid <= 0) return false;
-                if (!icon.IsSkill()) return false;
-                var info = TableLoaderManager.Instance.TableSkill.GetDataByUidLevel(icon.uid, icon.GetLevel());
-                if (info == null)
-                {
-                    GcLogger.LogError("스킬 테이블에 없는 스킬입니다. uid: " + icon.uid);
-                    return false;
-                }
-                SceneGame.Instance.player.GetComponent<Player>().UseSkill(icon.uid, icon.GetLevel());
+                OnKeyDownSkill(KeyCode.Alpha1);
+                return true;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                OnKeyDownSkill(KeyCode.Alpha2);
+                return true;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                OnKeyDownSkill(KeyCode.Alpha3);
+                return true;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                OnKeyDownSkill(KeyCode.Alpha4);
                 return true;
             }
 
             return false;
+        }
+
+        private void OnKeyDownSkill(KeyCode keyCode)
+        {
         }
         
         /// <summary>
@@ -131,6 +143,8 @@ namespace GGemCo.Scripts.UI.Window
             int dropIconSlotIndex = droppedUIIcon.slotIndex;
             int dropIconUid = droppedUIIcon.uid;
             int dropIconCount = droppedUIIcon.GetCount();
+            int dropIconLevel = droppedUIIcon.GetLevel();
+            bool dropIconIsLearn = droppedUIIcon.IsLearn();
             if (dropIconUid <= 0)
             {
                 GoBackToSlot(droppedIcon);
@@ -158,7 +172,7 @@ namespace GGemCo.Scripts.UI.Window
                     case UIWindowManager.WindowUid.Skill:
                         if (droppedUIIcon.CheckRequireLevel())
                         {
-                            targetWindow.SetIconCount(dropIconSlotIndex, dropIconUid, dropIconCount);
+                            targetWindow.SetIconCount(targetIconSlotIndex, dropIconUid, dropIconCount, dropIconLevel, dropIconIsLearn);
                         }
 
                         break;

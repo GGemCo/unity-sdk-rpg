@@ -142,19 +142,20 @@ namespace GGemCo.Scripts.UI.WindowSkill
                 if (icon == null) continue;
                 UIIconSkill uiIcon = icon.GetComponent<UIIconSkill>();
                 if (uiIcon == null) continue;
-                SaveDataIcon structSkillIcon = datas.GetValueOrDefault(index);
-                if (structSkillIcon == null) continue;
+                SaveDataIcon saveDataIcon = datas.GetValueOrDefault(index);
+                if (saveDataIcon == null) continue;
                 
-                int skillUid = structSkillIcon.Uid;
-                int skillCount = structSkillIcon.Count;
-                int skillLevel = structSkillIcon.Level;
+                int skillUid = saveDataIcon.Uid;
+                int skillCount = saveDataIcon.Count;
+                int skillLevel = saveDataIcon.Level;
+                bool skillIsLearned = saveDataIcon.IsLearned;
                 var info = TableLoaderManager.Instance.TableSkill.GetDataByUidLevel(skillUid, skillLevel);
                 if (info == null) continue;
-                uiIcon.ChangeInfoByUid(skillUid, skillCount, skillLevel);
+                uiIcon.ChangeInfoByUid(skillUid, skillCount, skillLevel, skillIsLearned);
                 UIElementSkill uiElementSkill = uiElementSkills[index];
                 if (uiElementSkill != null)
                 {
-                    uiElementSkill.UpdateInfos(info, structSkillIcon);
+                    uiElementSkill.UpdateInfos(info, saveDataIcon);
                 }
             }
         }

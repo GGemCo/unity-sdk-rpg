@@ -2,7 +2,6 @@
 using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI.Window;
 using GGemCo.Scripts.Utils;
 using TMPro;
 using UnityEngine;
@@ -107,8 +106,7 @@ namespace GGemCo.Scripts.UI.WindowSkill
             if (!result) return;
             // 다음 레벨 있는지 체크, 아니면 최대 레벨
             int nextLevel = struckTableSkill.Level + 1;
-            var info = TableLoaderManager.Instance.TableSkill.GetDataByUidLevel(struckTableSkill.Uid, nextLevel);
-            if (info == null)
+            if (nextLevel > struckTableSkill.Maxlevel)
             {
                 SceneGame.Instance.systemMessageManager.ShowMessageWarning("최대 레벨입니다.");
                 return;
