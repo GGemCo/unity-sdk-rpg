@@ -6,6 +6,7 @@ using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI.Icon;
+using GGemCo.Scripts.UI.WindowSkill;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -17,6 +18,7 @@ namespace GGemCo.Scripts.UI.Window
     /// </summary>
     public class UIWindowQuickSlot : UIWindow, IInputHandler
     {
+        public UIWindowSkill uiWindowSkill;
         public int Priority => 1;
         private QuickSlotData quickSlotData;
 
@@ -103,9 +105,37 @@ namespace GGemCo.Scripts.UI.Window
 
             return false;
         }
-
+        /// <summary>
+        /// 키보드로 스킬 사용하기
+        /// </summary>
+        /// <param name="keyCode"></param>
         private void OnKeyDownSkill(KeyCode keyCode)
         {
+            if (SceneGame.Instance.player == null)
+            {
+                GcLogger.LogError("플레이어가 없습니다.");
+                return ;
+            }
+            // GcLogger.Log("UIWindowQuickSlot Key pressed Alpha1");
+            UIIcon icon = GetIconByIndex(indexByKeyCode.GetValueOrDefault(keyCode));
+            if (icon == null || icon.uid <= 0) return;
+            if (!icon.IsSkill()) return;
+            var info = TableLoaderManager.Instance.TableSkill.GetDataByUidLevel(icon.uid, icon.GetLevel());
+            if (info == null)
+            {
+                GcLogger.LogError("스킬 테이블에 없는 스킬입니다. uid: " + icon.uid);
+                return;
+            }
+
+            if (SceneGame.Instance.player.GetComponent<Player>().CheckNeedMp(info.NeedMp) == false)
+            {
+                SceneGame.Instance.systemMessageManager.ShowMessageWarning("마력이 부족합니다.");
+                return;
+            }
+
+            if (!icon.PlayCoolTime(info.CoolTime)) return;
+            
+            SceneGame.Instance.player.GetComponent<Player>().UseSkill(icon.uid, icon.GetLevel());
         }
         
         /// <summary>
@@ -206,6 +236,14 @@ namespace GGemCo.Scripts.UI.Window
         public override void OnRightClick(UIIcon icon)
         {
             if (icon == null) return;
+            if (icon.CoolTimeHandler != null && icon.CoolTimeHandler.GetCurrentCoolTime() > 0)
+            {
+                SceneGame.Instance.systemMessageManager.ShowMessageWarning("쿨타임 중에는 사용할 수 없습니다.");
+                return;
+            }
+            // 스킬 창이 열려있을때는 해제 하기
+            if (!uiWindowSkill.IsOpen()) return;
+            DetachIcon(icon.slotIndex);
         }
         protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
         {

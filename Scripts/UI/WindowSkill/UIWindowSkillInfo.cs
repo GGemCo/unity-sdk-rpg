@@ -1,9 +1,9 @@
-﻿using System.Linq;
+﻿using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Items;
+using GGemCo.Scripts.Skill;
 using GGemCo.Scripts.TableLoader;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace GGemCo.Scripts.UI.WindowSkill
 {
@@ -15,30 +15,33 @@ namespace GGemCo.Scripts.UI.WindowSkill
         [Header("기본정보")] 
         [Tooltip("스킬 이름")]
         public TextMeshProUGUI textName;
+        [Tooltip("스킬 레벨")]
+        public TextMeshProUGUI textLevel;
         [Tooltip("필요 레벨")]
         public TextMeshProUGUI textNeedLevel;
         [Tooltip("스킬 타겟")]
         public TextMeshProUGUI textTarget;
-        [FormerlySerializedAs("textDamageStatusID")] [Tooltip("데미지 타입")]
-        public TextMeshProUGUI textDamageStatus;
+        [Tooltip("데미지 타입")]
+        public TextMeshProUGUI textDamageType;
+        [Tooltip("데미지 범위")]
+        public TextMeshProUGUI textDamageRange;
+        [Tooltip("사거리")]
+        public TextMeshProUGUI textDistance;
         [Tooltip("소모 Mp")]
         public TextMeshProUGUI textNeedMp;
+        [Tooltip("효과 지속시간(초)")]
+        public TextMeshProUGUI textDuration;
         [Tooltip("재사용 쿨타입(초)")]
         public TextMeshProUGUI textCoolTime;
-        						
-        [Header("옵션")]
-        [Tooltip("옵션 ID")]
-        public TextMeshProUGUI textOptionID1;
-        // [Tooltip("옵션 수치")]
-        // public TextMeshProUGUI textOptionValue1;
-        // [Tooltip("옵션 지속시간")]
-        // public TextMeshProUGUI textOptionDuration1;
-        // [Tooltip("옵션 확률")]
-        // public TextMeshProUGUI textOptionRate1;
+
+        [Header("어펙트")]
+        [Tooltip("어펙트 설명")]
+        public TextMeshProUGUI textAffect;
         
         private StruckTableSkill struckTableSkill;
         private TableStatus tableStatus;
         private TableSkill tableSkill;
+        private TableAffect tableAffect;
         
         protected override void Awake()
         {
@@ -46,6 +49,7 @@ namespace GGemCo.Scripts.UI.WindowSkill
             if (TableLoaderManager.Instance == null) return;
             tableSkill = TableLoaderManager.Instance.TableSkill;
             tableStatus = TableLoaderManager.Instance.TableStatus;
+            tableAffect = TableLoaderManager.Instance.TableAffect;
             base.Awake();
         }
         public void SetSkillUid(int skillUid, int skillLevel)
@@ -55,7 +59,7 @@ namespace GGemCo.Scripts.UI.WindowSkill
             if (struckTableSkill is not { Uid: > 0 }) return;
             
             SetBasicInfo();
-            SetOptionInfo();
+            SetAffectInfo();
             Show(true);
         }
         /// <summary>
@@ -65,29 +69,31 @@ namespace GGemCo.Scripts.UI.WindowSkill
         {
             if (struckTableSkill == null) return;
             textName.text = $"이름: {struckTableSkill.Name}";
+            textLevel.text = $"레벨: {struckTableSkill.Level}";
             textNeedLevel.text = $"필요레벨: {struckTableSkill.NeedPlayerLevel}";
             textTarget.text = $"타겟: {struckTableSkill.Target}";
-            if (struckTableSkill.DamageValue > 0)
-            {
-                textDamageStatus.gameObject.SetActive(true);
-                textDamageStatus.text =
-                    $"{GetStatusName(struckTableSkill.DamageStatusID)} : {GetValueText(struckTableSkill.DamageStatusID, struckTableSkill.DamageValue)}";
-            }
-            else
-            {
-                textDamageStatus.gameObject.SetActive(false);
-            }
+            textDamageType.text = $"{SkillConstants.NameByDamageType[struckTableSkill.DamageType]} : {struckTableSkill.DamageValue}";
+            textDamageType.gameObject.SetActive(struckTableSkill.DamageValue > 0);
 
             textNeedMp.text = $"소모Mp: {struckTableSkill.NeedMp}";
             textCoolTime.text = $"쿨타임: {struckTableSkill.CoolTime}";
+            textCoolTime.gameObject.SetActive(struckTableSkill.CoolTime > 0);
+            
+            textDamageRange.text = $"데미지범위: {struckTableSkill.DamageRange}";
+            textDamageRange.gameObject.SetActive(struckTableSkill.DamageRange > 0);
+            
+            textDistance.text = $"사거리: {struckTableSkill.Distance}";
+            textDistance.gameObject.SetActive(struckTableSkill.Distance > 0);
+            textDuration.text = $"효과지속시간: {struckTableSkill.Duration}";
+            textDuration.gameObject.SetActive(struckTableSkill.Duration > 0);
         }
 
-        private string GetValueText(string statusId, float value)
+        private string GetValueText(ConfigCommon.SuffixType suffixType, float value)
         {
             string valueText = $"{value}";
             foreach (var suffix in ItemConstants.StatusSuffixFormats.Keys)
             {
-                if (statusId.EndsWith(suffix))
+                if (suffixType == suffix)
                 {
                     valueText = string.Format(ItemConstants.StatusSuffixFormats[suffix], value);
                     break; // 첫 번째로 매칭된 값만 적용
@@ -100,22 +106,24 @@ namespace GGemCo.Scripts.UI.WindowSkill
         private string GetStatusName(string statusId)
         {
             if (string.IsNullOrEmpty(statusId)) return "";
-            string cleanedId = ItemConstants.StatusSuffixFormats.Aggregate(statusId, (current, suffix) => current.Replace(suffix.Key, ""));
-            var info = tableStatus.GetDataById(cleanedId);
+            // string cleanedId = ItemConstants.StatusSuffixFormats.Aggregate(statusId, (current, suffix) => current.Replace(suffix.Key, ""));
+            var info = tableStatus.GetDataById(statusId);
             return info?.Name ?? "";
         }
 
-        private void SetOptionInfo()
+        private void SetAffectInfo()
         {
-            if (struckTableSkill.OptionID1 == "")
+            if (struckTableSkill.AffectUid <= 0)
             {
-                textOptionID1.gameObject.SetActive(false);
+                textAffect.gameObject.SetActive(false);
                 return;
             }
-            textOptionID1.gameObject.SetActive(true);
+            var info = tableAffect.GetDataByUid(struckTableSkill.AffectUid);
+            if (info == null) return;
+            textAffect.gameObject.SetActive(true);
             string option =
-                $"{struckTableSkill.OptionRate1}% 확률로 {GetStatusName(struckTableSkill.OptionID1)} {GetValueText(struckTableSkill.OptionID1, struckTableSkill.OptionValue1)} 가 {struckTableSkill.OptionDuration1} 초 동안 발동합니다.";
-            textOptionID1.text = option;
+                $"{struckTableSkill.AffectRate}% 확률로 {GetStatusName(info.StatusID)} {GetValueText(info.StatusSuffix, info.Value)} 가 {info.Duration} 초 동안 발동합니다.";
+            textAffect.text = option;
         }
 
     }

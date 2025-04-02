@@ -10,17 +10,9 @@ namespace GGemCo.Scripts.Characters.Monster
     /// </summary>
     public class ControllerMonster : CharacterController
     {
-        private CapsuleCollider2D capsuleCollider;
         private Coroutine coroutineAttack;
-
         private const float DelayTimeAttack = 0f;
 
-        protected override void Awake()
-        {
-            base.Awake();
-            capsuleCollider = GetComponent<CapsuleCollider2D>();
-        }
-        
         /// <summary>
         /// 입력 처리 - 공격자 방향 계산
         /// </summary>
@@ -76,8 +68,8 @@ namespace GGemCo.Scripts.Characters.Monster
         {
             if (TargetCharacter.attackerTransform == null) return false;
             if (TargetCharacter.IsStatusAttack() || TargetCharacter.IsStatusDead()) return false;
-            Vector2 size = new Vector2(capsuleCollider.size.x * Mathf.Abs(transform.localScale.x), capsuleCollider.size.y * transform.localScale.y);
-            Collider2D[] collider2Ds = Physics2D.OverlapCapsuleAll(transform.position, size, capsuleCollider.direction, 0f);
+            Vector2 size = new Vector2(CapsuleColliderSize.x * Mathf.Abs(transform.localScale.x), CapsuleColliderSize.y * transform.localScale.y);
+            Collider2D[] collider2Ds = Physics2D.OverlapCapsuleAll(transform.position, size, CapsuleDirection2D, 0f);
 
             foreach (var hit in collider2Ds)
             {
@@ -160,7 +152,7 @@ namespace GGemCo.Scripts.Characters.Monster
                 
                 if (TargetCharacter.IsAggro() && TargetCharacter.attackerTransform != null)
                 {
-                    TargetCharacter.SetStatusAttack();
+                    Attack();
                 }
                 // 선공
                 else if (TargetCharacter.GetAttackType() == CharacterBase.AttackType.AggroFirst && TargetCharacter.IsAggro() == false)

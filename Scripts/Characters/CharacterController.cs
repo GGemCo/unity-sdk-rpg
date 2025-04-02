@@ -12,6 +12,8 @@ namespace GGemCo.Scripts.Characters
         private Vector2 maxBounds; // 타일맵의 최소/최대 경계
         private (float width, float height) mapSize;
         protected ICharacterAnimationController ICharacterAnimationController;
+        protected Vector2 CapsuleColliderSize;
+        protected CapsuleDirection2D CapsuleDirection2D;
 
         protected virtual void Awake()
         {
@@ -23,6 +25,13 @@ namespace GGemCo.Scripts.Characters
             minBounds = new Vector2(0f, 0f); // 좌측 하단 경계
             mapSize = SceneGame.Instance.mapManager.GetCurrentMapSize();
             ICharacterAnimationController = TargetCharacter.CharacterAnimationController;
+            // Awake 에서 캡슐 콜라이더를 추가하기 때문에 Start 에서 처리한다.
+            CapsuleColliderSize = Vector2.zero;
+            if (TargetCharacter != null && TargetCharacter.colliderCheckCharacter != null)
+            {
+                CapsuleColliderSize = TargetCharacter.colliderCheckCharacter.size;
+                CapsuleDirection2D = TargetCharacter.colliderCheckCharacter.direction;
+            }
         }
         protected void UpdateCheckMaxBounds()
         {

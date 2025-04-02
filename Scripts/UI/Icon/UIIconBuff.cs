@@ -1,5 +1,4 @@
-﻿using GGemCo.Scripts.Characters;
-using GGemCo.Scripts.TableLoader;
+﻿using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.Utils;
 
 namespace GGemCo.Scripts.UI.Icon
@@ -9,15 +8,12 @@ namespace GGemCo.Scripts.UI.Icon
     /// </summary>
     public class UIIconBuff : UIIcon
     {
-        private StruckTableItem struckTableItem;
-        private TableItem tableItem;
+        private StruckTableAffect struckTableAffect;
         
         protected override void Awake()
         {
             base.Awake();
             IconType = IconConstants.Type.Buff;
-            struckTableItem = null;
-            tableItem = TableLoaderManager.Instance.TableItem;
         }
 
         protected override void Start()
@@ -26,40 +22,24 @@ namespace GGemCo.Scripts.UI.Icon
             CoolTimeHandler.PlayCoolTime();
         }
 
-        public void Initialize(StruckBuff struckBuff)
+        public void Initialize(int affectUid)
         {
-            if (struckBuff == null) return;
-            float duration = struckBuff.Duration;
-            if (duration == 0) return;
-            CoolTimeHandler.SetCoolTime(duration);
-            ChangeInfoByUid(struckBuff.Uid);
-        }
-        /// <summary>
-        /// 다른 uid 로 변경하기
-        /// </summary>
-        /// <param name="iconUid"></param>
-        /// <param name="iconCount"></param>
-        /// <param name="iconLevel"></param>
-        /// <param name="iconIsLearn"></param>
-        /// <param name="remainCoolTime"></param>
-        public override bool ChangeInfoByUid(int iconUid, int iconCount = 0, int iconLevel = 0, bool iconIsLearn = false, int remainCoolTime = 0)
-        {
-            if (!base.ChangeInfoByUid(iconUid, iconCount, iconLevel, iconIsLearn, remainCoolTime)) return false;
-            var info = tableItem.GetDataByUid(iconUid);
+            if (affectUid <= 0) return;
+            var info = TableLoaderManager.Instance.TableAffect.GetDataByUid(affectUid);
             if (info == null)
             {
-                GcLogger.LogError("아이콘 테이블에 없는 아이템 입니다.");
-                return false;
+                GcLogger.LogError("affect 테이블에 없는 어펙트 입니다. affect Uid: "+affectUid);
+                return;
             }
-            struckTableItem = info;
-            UpdateInfo();
-            return true;
-        }
-        protected override bool UpdateInfo()
-        {
-            if (!base.UpdateInfo()) return false;
-            UpdateIconImage();
-            return true;
+
+            if (info.Duration <= 0)
+            {
+                GcLogger.LogWarning("지속 시간이 0 입니다.");
+            }
+
+            struckTableAffect = info;
+            CoolTimeHandler?.SetCoolTime(info.Duration);
+            ChangeInfoByUid(affectUid, 1);
         }
         /// <summary>
         /// 아이콘 이미지 경로 가져오기 
@@ -67,8 +47,8 @@ namespace GGemCo.Scripts.UI.Icon
         /// <returns></returns>
         protected override string GetIconImagePath()
         {
-            if (struckTableItem == null) return null;
-            return $"Images/Icon/{struckTableItem.Type.ToString()}/{struckTableItem.Category.ToString()}/{struckTableItem.SubCategory.ToString()}/{struckTableItem.ImagePath}";
+            if (struckTableAffect == null) return null;
+            return $"Images/Icon/Affect/Buff/{struckTableAffect.IconFileName}";
         }
     }
 }

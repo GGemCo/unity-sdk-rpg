@@ -11,24 +11,24 @@ namespace GGemCo.Scripts.TableLoader
     {
         public int Uid;
         public string Name;
-        public string ImagePath;
+        public string IconFileName;
         public int Level;
         public int Maxlevel;
         public int NeedPlayerLevel;
         public SkillConstants.Target Target;
         public SkillConstants.TargetType TargetType;
-        public string DamageStatusID;
+        public SkillConstants.DamageType DamageType;
         public int DamageValue;
         public int DamageRange;
         public int Distance;
+        public int EffectUid;
         public float EffectMoveSpeed;
         public int NeedMp;
+        public float TickTime;
         public float Duration;
         public float CoolTime;
-        public string OptionID1;
-        public int OptionValue1;
-        public float OptionDuration1;
-        public int OptionRate1;
+        public int AffectUid;
+        public int AffectRate;
     }
     /// <summary>
     /// 맵 테이블
@@ -42,6 +42,7 @@ namespace GGemCo.Scripts.TableLoader
         
         private static readonly Dictionary<string, SkillConstants.Target> MapTarget;
         private static readonly Dictionary<string, SkillConstants.TargetType> MapTargetType;
+        private static readonly Dictionary<string, SkillConstants.DamageType> MapDamageType;
         static TableSkill()
         {
             MapTarget = new Dictionary<string, SkillConstants.Target>
@@ -54,9 +55,17 @@ namespace GGemCo.Scripts.TableLoader
                 { "Fixed", SkillConstants.TargetType.Fixed },
                 { "Range", SkillConstants.TargetType.Range },
             };
+            MapDamageType = new Dictionary<string, SkillConstants.DamageType>
+            {
+                { "Physic", SkillConstants.DamageType.Physic },
+                { "Fire", SkillConstants.DamageType.Fire },
+                { "Cold", SkillConstants.DamageType.Cold },
+                { "Lightning", SkillConstants.DamageType.Lightning },
+            };
         }
         private static SkillConstants.Target ConvertTarget(string type) => MapTarget.GetValueOrDefault(type, SkillConstants.Target.None);
         private static SkillConstants.TargetType ConvertTargetType(string type) => MapTargetType.GetValueOrDefault(type, SkillConstants.TargetType.None);
+        private static SkillConstants.DamageType ConvertDamageType(string type) => MapDamageType.GetValueOrDefault(type, SkillConstants.DamageType.None);
 
         public Dictionary<int, StruckTableSkill> GetSkills()
         {
@@ -80,24 +89,24 @@ namespace GGemCo.Scripts.TableLoader
             {
                 Uid = int.Parse(data["Uid"]),
                 Name = data["Name"],
-                ImagePath = data["ImagePath"],
+                IconFileName = data["IconFileName"],
                 Level = int.Parse(data["Level"]),
                 Maxlevel = int.Parse(data["Maxlevel"]),
                 NeedPlayerLevel = int.Parse(data["NeedPlayerLevel"]),
                 Target = ConvertTarget(data["Target"]),
                 TargetType = ConvertTargetType(data["TargetType"]),
-                DamageStatusID = data["DamageStatusID"],
+                DamageType = ConvertDamageType(data["DamageType"]),
                 DamageValue = int.Parse(data["DamageValue"]),
                 DamageRange = int.Parse(data["DamageRange"]),
                 Distance = int.Parse(data["Distance"]),
+                EffectUid = int.Parse(data["EffectUid"]),
                 EffectMoveSpeed = float.Parse(data["EffectMoveSpeed"]),
                 NeedMp = int.Parse(data["NeedMp"]),
+                TickTime = float.Parse(data["TickTime"]),
                 Duration = float.Parse(data["Duration"]),
                 CoolTime = float.Parse(data["CoolTime"]),
-                OptionID1 = data["OptionID1"],
-                OptionValue1 = int.Parse(data["OptionValue1"]),
-                OptionDuration1 = float.Parse(data["OptionDuration1"]),
-                OptionRate1 = int.Parse(data["OptionRate1"]),
+                AffectUid = int.Parse(data["AffectUid"]),
+                AffectRate = int.Parse(data["AffectRate"]),
             };
             skillsByLevel[uid][level] = struckTableItemDropGroup;
             if (!skills.ContainsKey(uid))

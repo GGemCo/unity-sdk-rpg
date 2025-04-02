@@ -28,7 +28,9 @@ namespace GGemCo.Scripts.Characters
             // 스파인 height 값 구하고 character 에 넘겨주기
             characterBase.SetHeight(GetHeight());
         }
-
+        /// <summary>
+        /// wait 애니메이션 처리 
+        /// </summary>
         public void PlayWaitAnimation()
         {
             if (characterBase.IsStatusDead()) return;
@@ -38,7 +40,9 @@ namespace GGemCo.Scripts.Characters
             if (GetCurrentAnimation() == idleAnim) return;
             PlayAnimation(idleAnim,true, characterBase.GetCurrentMoveSpeed());
         }
-
+        /// <summary>
+        /// run 애니메이션 처리
+        /// </summary>
         public void PlayRunAnimation()
         {
             if (characterBase.IsStatusDead()) return;
@@ -48,34 +52,56 @@ namespace GGemCo.Scripts.Characters
             if (GetCurrentAnimation() == moveAnim) return;
             PlayAnimation(moveAnim, true, characterBase.GetCurrentMoveSpeed());
         }
+        /// <summary>
+        /// 스파인의 height 값을 구해서 가져오기
+        /// </summary>
+        /// <returns></returns>
         public float GetCharacterHeight()
         {
             return GetHeight();
         }
-
+        /// <summary>
+        /// 스파인의 width 값을 구해서 가져오기
+        /// </summary>
+        /// <returns></returns>
         public float GetCharacterWidth()
         {
             return GetWidth();
         }
-
+        /// <summary>
+        /// 스파인의 width, height 값을 구해서 가져오기
+        /// </summary>
+        /// <returns></returns>
         public Vector2 GetCharacterSize()
         {
             return GetSize();
         }
-
+        /// <summary>
+        /// 특정 슬롯에 이미지를 변경하기
+        /// </summary>
+        /// <param name="changeSlotImages"></param>
         public void ChangeCharacterImageInSlot(List<StruckChangeSlotImage> changeSlotImages)
         {
             ChangeImageInSlot(changeSlotImages);
         }
+        /// <summary>
+        /// 특정 슬롯에 이미지를 지우기
+        /// </summary>
+        /// <param name="changeSlotImages"></param>
         public void RemoveCharacterImageInSlot(List<StruckChangeSlotImage> changeSlotImages)
         {
             RemoveImageInSlot(changeSlotImages);
         }
-
+        /// <summary>
+        /// 공격 애니메이션 처리
+        /// </summary>
         public void PlayAttackAnimation()
         {
             PlayAnimation(ICharacterAnimationController.AttackAnim, false, characterBase.GetCurrentAttackSpeed());
         }
+        /// <summary>
+        /// 죽음 애니메이션 처리
+        /// </summary>
         public void PlayDeadAnimation()
         {
             PlayAnimation(ICharacterAnimationController.DeadAnim);
@@ -99,7 +125,10 @@ namespace GGemCo.Scripts.Characters
         {
         
         }
-
+        /// <summary>
+        /// 공격 모션에서 몬스터에 직접적인 공격이 가해지는 타이밍에 발생하는 이벤트
+        /// </summary>
+        /// <param name="eEvent"></param>
         protected override void OnSpineEventAttack(Event eEvent)
         {
             characterBase.OnEventAttack();
@@ -137,7 +166,23 @@ namespace GGemCo.Scripts.Characters
             TrackEntry trackEntry = SkeletonAnimation.AnimationState.GetCurrent(index);
             if (trackEntry == null) return;
             trackEntry.TimeScale = value;
-        } 
-        
+        }
+        /// <summary>
+        /// walk, run 애니메이션 time scale 변경하기
+        /// </summary>
+        /// <param name="value"></param>
+        public void UpdateTimeScaleMove(float value)
+        {
+            if (GetCurrentAnimation() != ICharacterAnimationController.WalkForwardAnim) return;
+            UpdateTimeScaleByTrackIndex(value);
+        }
+        /// <summary>
+        /// 색상 변경 하기
+        /// </summary>
+        /// <param name="color"></param>
+        public void SetCharacterColor(Color color)
+        {
+            SetColor(color);
+        }
     }
 }

@@ -86,7 +86,7 @@ namespace GGemCo.Scripts.UI.Icon
         protected override string GetIconImagePath()
         {
             if (struckSkill == null) return null;
-            return $"Images/Icon/Skill/{struckSkill.ImagePath}";
+            return $"Images/Icon/Skill/{struckSkill.IconFileName}";
         }
         public override bool CheckRequireLevel()
         {
@@ -118,23 +118,6 @@ namespace GGemCo.Scripts.UI.Icon
             else if(eventData.button == PointerEventData.InputButton.Right)
             {
                 if (uid <= 0 || GetCount() <= 0) return;
-                if (CoolTimeHandler != null && CoolTimeHandler.GetCurrentCoolTime() > 0)
-                {
-                    SceneGame.Instance.systemMessageManager.ShowMessageWarning("쿨타임 중에는 사용할 수 없습니다.");
-                    return;
-                }
-
-                if (!IsLearn())
-                {
-                    SceneGame.Instance.systemMessageManager.ShowMessageWarning("배운 후 사용할 수 있습니다.");
-                    return;
-                }
-                // float collTime = struckTableItem.CoolTime;
-                // if (collTime > 0)
-                // {
-                //     CoolTimeHandler.SetCoolTime(collTime);
-                //     CoolTimeHandler.PlayCoolTime();
-                // }
                 window.OnRightClick(this);
             }
         }

@@ -34,8 +34,13 @@ namespace GGemCo.Scripts.UI.Icon
             UpdateCoolTime();
         }
 
-        public bool PlayCoolTime()
+        public bool PlayCoolTime(float coolTime = 0)
         {
+            if (coolTime > 0)
+            {
+                SetCoolTime(coolTime);
+            }
+
             if (isPlayingCoolTime || coolTimeDuration <= 0) return false;
 
             isPlayingCoolTime = true;

@@ -23,7 +23,10 @@ namespace GGemCo.Scripts.UI.Window
             MoveSpeed,
             AttackSpeed,
             CriticalDamage,
-            CriticalProbability
+            CriticalProbability,
+            RegistFire,
+            RegistCold,
+            RegistLightning,
         }
         
         [Header("Text 오브젝트")]
@@ -33,6 +36,9 @@ namespace GGemCo.Scripts.UI.Window
         public TextMeshProUGUI textTotalMp;
         public TextMeshProUGUI textTotalMoveSpeed;
         public TextMeshProUGUI textTotalAttackSpeed;
+        public TextMeshProUGUI textTotalRegistFire;
+        public TextMeshProUGUI textTotalRegistCold;
+        public TextMeshProUGUI textTotalRegistLightning;
         [HideInInspector] public TextMeshProUGUI textTotalCriticalDamage;
         [HideInInspector] public TextMeshProUGUI textTotalCriticalProbability;
 
@@ -54,7 +60,10 @@ namespace GGemCo.Scripts.UI.Window
                 { IndexPlayerInfo.MoveSpeed, textTotalMoveSpeed },
                 { IndexPlayerInfo.AttackSpeed, textTotalAttackSpeed },
                 { IndexPlayerInfo.CriticalDamage, textTotalCriticalDamage },
-                { IndexPlayerInfo.CriticalProbability, textTotalCriticalProbability }
+                { IndexPlayerInfo.CriticalProbability, textTotalCriticalProbability },
+                { IndexPlayerInfo.RegistFire, textTotalRegistFire },
+                { IndexPlayerInfo.RegistCold, textTotalRegistCold},
+                { IndexPlayerInfo.RegistLightning, textTotalRegistLightning },
             };
         }
         public void UpdateText(IndexPlayerInfo index, string label, long value)

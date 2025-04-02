@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using GGemCo.Scripts.Characters;
 using GGemCo.Scripts.Characters.Player;
 using GGemCo.Scripts.Items;
+using GGemCo.Scripts.Popup;
 using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.SystemMessage;
@@ -37,6 +36,8 @@ namespace GGemCo.Scripts.UI.Inventory
         private ItemManager itemManager;
         private InventoryData inventoryData;
         private EquipData equipData;
+        private SceneGame sceneGame;
+        private PopupManager popupManager;
 
         protected override void Awake()
         {
@@ -51,12 +52,14 @@ namespace GGemCo.Scripts.UI.Inventory
         protected override void Start()
         {
             base.Start();
-            mainCamera = SceneGame.Instance.mainCamera;
-            itemManager = SceneGame.Instance.ItemManager;
-            if (SceneGame.Instance != null && SceneGame.Instance.saveDataManager != null)
+            sceneGame = SceneGame.Instance;
+            popupManager = sceneGame.popupManager;
+            mainCamera = sceneGame.mainCamera;
+            itemManager = sceneGame.ItemManager;
+            if (sceneGame != null && sceneGame.saveDataManager != null)
             {
-                inventoryData = SceneGame.Instance.saveDataManager.Inventory;
-                equipData = SceneGame.Instance.saveDataManager.Equip;
+                inventoryData = sceneGame.saveDataManager.Inventory;
+                equipData = sceneGame.saveDataManager.Equip;
             }
         }
 
@@ -69,7 +72,7 @@ namespace GGemCo.Scripts.UI.Inventory
         }
         public override void OnShow(bool show)
         {
-            if (SceneGame.Instance == null || TableLoaderManager.Instance == null) return;
+            if (sceneGame == null || TableLoaderManager.Instance == null) return;
             if (!show)
             {
                 uIWindowItemInfo?.Show(false);
@@ -84,7 +87,7 @@ namespace GGemCo.Scripts.UI.Inventory
         public void LoadIcons()
         {
             if (!gameObject.activeSelf) return;
-            var datas = SceneGame.Instance.saveDataManager.Inventory.GetAllItemCounts();
+            var datas = sceneGame.saveDataManager.Inventory.GetAllItemCounts();
             if (datas == null) return;
             for (int index = 0; index < maxCountIcon; index++)
             {
@@ -211,7 +214,7 @@ namespace GGemCo.Scripts.UI.Inventory
                         else
                         {
                             // 교체가 불가능하면 원래 자리로 되돌리기
-                            SceneGame.Instance.systemMessageManager.ShowMessageWarning("해당 부위에 장착할 수 없는 아이템입니다.");
+                            sceneGame.systemMessageManager.ShowMessageWarning("해당 부위에 장착할 수 없는 아이템입니다.");
                             GoBackToSlot(droppedIcon);
                         }
                         break;
@@ -281,18 +284,18 @@ namespace GGemCo.Scripts.UI.Inventory
             var icon = GetSelectedIcon();
             if (icon == null || icon.uid <= 0)
             {
-                SceneGame.Instance.popupManager.ShowPopupError("나누기를 할 아이템을 선택해주세요.");
+                popupManager.ShowPopupError("나누기를 할 아이템을 선택해주세요.");
                 return;
             }
 
             if (icon.GetCount() <= 1)
             {
-                SceneGame.Instance.popupManager.ShowPopupError("아이템 개수가 2개 이상일때만 나눌 수 있습니다.");
+                popupManager.ShowPopupError("아이템 개수가 2개 이상일때만 나눌 수 있습니다.");
                 return;
             }
             // 팝업창 띄우기
             var window =
-                SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowItemSplit>(UIWindowManager.WindowUid
+                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemSplit>(UIWindowManager.WindowUid
                     .ItemSplit);
             if (window == null) return;
             window.CopyIconCount(0, icon.slotIndex, icon.uid, icon.GetCount());
@@ -308,67 +311,52 @@ namespace GGemCo.Scripts.UI.Inventory
             if (icon.IsEquipType())
             {
                 var partSlotIndex = (int)icon.GetPartsType();
-                SceneGame.Instance.uIWindowManager.MoveIcon(uid, icon.index, UIWindowManager.WindowUid.Equip, 1, partSlotIndex);
+                sceneGame.uIWindowManager.MoveIcon(uid, icon.index, UIWindowManager.WindowUid.Equip, 1, partSlotIndex);
             }
-            // hp 물약일 때 
-            else if (icon.IsHpPotionType())
+            // 물약 일때
+            else if (icon.IsPotionType())
             {
-                if (icon.uid <= 0 || icon.GetCount() <= 0)
+                // hp 물약일 때 
+                if (icon.IsHpPotionType() || icon.IsMpPotionType())
                 {
-                    SceneGame.Instance.popupManager.ShowPopupError("사용할 수 있는 아이템 개수가 없습니다.");
-                    return;
-                }
-                if (SceneGame.Instance.player.GetComponent<Player>().IsMaxHp())
-                {
-                    SceneGame.Instance.systemMessageManager.ShowMessageWarning("현재 생명력이 가득하여 사용할 수 없습니다.");
-                    return;
-                }
-                int value = icon.GetStatusValue1();
-                SetIconCount(icon.index, icon.uid, icon.GetCount() - 1);
-                SceneGame.Instance.player.GetComponent<Player>().AddHp(value);
-            }
-            // mp 물약일 때 
-            else if (icon.IsMpPotionType())
-            {
-                if (icon.uid <= 0 || icon.GetCount() <= 0)
-                {
-                    SceneGame.Instance.popupManager.ShowPopupError("사용할 수 있는 아이템 개수가 없습니다.");
-                    return;
-                }
-                if (SceneGame.Instance.player.GetComponent<Player>().IsMaxMp())
-                {
-                    SceneGame.Instance.systemMessageManager.ShowMessageWarning("현재 마력이 가득하여 사용할 수 없습니다.");
-                    return;
-                }
-                SetIconCount(icon.index, icon.uid, icon.GetCount() - 1);
-                int value = icon.GetStatusValue1();
-                SceneGame.Instance.player.GetComponent<Player>().AddMp(value);
-            }
-            // 이동속도, 공격속도 물약일 때 
-            else if (icon.IsIncreaseMoveSpeedPotionType() || icon.IsIncreaseAttackSpeedPotionType())
-            {
-                if (icon.uid <= 0 || icon.GetCount() <= 0)
-                {
-                    SceneGame.Instance.popupManager.ShowPopupError("사용할 수 있는 아이템 개수가 없습니다.");
-                    return;
-                }
+                    if (icon.uid <= 0 || icon.GetCount() <= 0)
+                    {
+                        popupManager.ShowPopupError("사용할 수 있는 아이템 개수가 없습니다.");
+                        return;
+                    }
 
-                float duration = icon.GetDuration();
-                string statusId = icon.GetStatusId1();
-                int value1 = icon.GetStatusValue1();
-                Dictionary<string, float> buffs = new Dictionary<string, float>
-                {
-                    { statusId, value1 }
-                };
-                StruckBuff struckBuff = new StruckBuff(icon.uid, icon.name, duration, buffs);
-                
-                SceneGame.Instance.player.GetComponent<Player>().AddBuff(struckBuff);
-                UIWindowPlayerBuffInfo uiWindowPlayerBuffInfo =
-                    SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowPlayerBuffInfo>(UIWindowManager
-                        .WindowUid.PlayerBuffInfo);
-                if (uiWindowPlayerBuffInfo == null) return;
-                uiWindowPlayerBuffInfo.AddBuff(struckBuff);
+                    // mp 물약일 때 
+                    if (icon.IsMpPotionType())
+                    {
+                        if (sceneGame.player.GetComponent<Player>().IsMaxMp())
+                        {
+                            sceneGame.systemMessageManager.ShowMessageWarning("현재 마력이 가득하여 사용할 수 없습니다.");
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        if (sceneGame.player.GetComponent<Player>().IsMaxHp())
+                        {
+                            sceneGame.systemMessageManager.ShowMessageWarning("현재 생명력이 가득하여 사용할 수 없습니다.");
+                            return;
+                        }
+                    }
+                    var result = inventoryData.MinusItem(icon.slotIndex, icon.uid, 1);
+                    SetIcons(result);
+                    if (result is { Code: ResultCommon.Type.Success })
+                    {
+                        if (icon.IsMpPotionType())
+                            sceneGame.player.GetComponent<Player>().AddMp(icon.GetStatusValue1());
+                        else
+                            sceneGame.player.GetComponent<Player>().AddHp(icon.GetStatusValue1());
+                        
+                    }
+                }
+                // affect 가 있을 때 
+                icon.CheckStatusAffect();
             }
+
         }
         /// <summary>
         /// index 가 없을때는, 같은 uid 는 중첩 가능여부를 확인하고 합치고, 나머지는 추가
@@ -391,18 +379,18 @@ namespace GGemCo.Scripts.UI.Inventory
                 UIIcon icon = GetIconByIndex(index);
                 if (icon == null || icon.uid <= 0)
                 {
-                    SceneGame.Instance.popupManager.ShowPopupError("나누기를 할 아이템을 선택해주세요.");
+                    popupManager.ShowPopupError("나누기를 할 아이템을 선택해주세요.");
                     return;
                 }
 
                 if (icon.GetCount() <= 1)
                 {
-                    SceneGame.Instance.popupManager.ShowPopupError("아이템 개수가 2개 이상일때만 나눌 수 있습니다.");
+                    popupManager.ShowPopupError("아이템 개수가 2개 이상일때만 나눌 수 있습니다.");
                     return;
                 }
                 // 팝업창 띄우기
                 var window =
-                    SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowItemSplit>(UIWindowManager.WindowUid
+                    sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemSplit>(UIWindowManager.WindowUid
                         .ItemSplit);
                 if (window == null) return;
                 window.CopyIconCount(0, icon.slotIndex, icon.uid, icon.GetCount());

@@ -64,5 +64,14 @@ namespace GGemCo.Scripts.Characters
         {
             
         }
+
+        public void SetCharacterColor(Color red)
+        {
+        }
+
+        public void UpdateTimeScaleMove(float value)
+        {
+            
+        }
     }
 }

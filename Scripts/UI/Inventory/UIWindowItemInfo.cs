@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Items;
 using GGemCo.Scripts.TableLoader;
+using GGemCo.Scripts.Utils;
 using TMPro;
 using UnityEngine;
 
@@ -112,8 +113,8 @@ namespace GGemCo.Scripts.UI.Inventory
         }
         private void SetStatusOptions()
         {
-            SetTextMeshPro(textStatus1, currentStruckTableItem.StatusID1, currentStruckTableItem.StatusValue1);
-            SetTextMeshPro(textStatus2, currentStruckTableItem.StatusID2, currentStruckTableItem.StatusValue2);
+            SetTextMeshPro(textStatus1, currentStruckTableItem.StatusID1, currentStruckTableItem.StatusSuffix1, currentStruckTableItem.StatusValue1);
+            SetTextMeshPro(textStatus2, currentStruckTableItem.StatusID2, currentStruckTableItem.StatusSuffix2, currentStruckTableItem.StatusValue2);
 
             string[] optionTypes = 
             {
@@ -122,6 +123,15 @@ namespace GGemCo.Scripts.UI.Inventory
                 currentStruckTableItem.OptionType3, 
                 currentStruckTableItem.OptionType4, 
                 currentStruckTableItem.OptionType5
+            };
+            
+            ConfigCommon.SuffixType[] optionSuffixes = 
+            {
+                currentStruckTableItem.OptionSuffix1, 
+                currentStruckTableItem.OptionSuffix2, 
+                currentStruckTableItem.OptionSuffix3, 
+                currentStruckTableItem.OptionSuffix4, 
+                currentStruckTableItem.OptionSuffix5
             };
 
             float[] optionValues = 
@@ -135,31 +145,46 @@ namespace GGemCo.Scripts.UI.Inventory
 
             for (int i = 0; i < textOptions.Length; i++)
             {
-                SetTextMeshPro(textOptions[i], optionTypes[i], optionValues[i]);
+                SetTextMeshPro(textOptions[i], optionTypes[i], optionSuffixes[i], optionValues[i]);
                 valueOptions[i] = optionValues[i];
             }
         }
 
-        private void SetTextMeshPro(TextMeshProUGUI textMesh, string statusId, float value)
+        private void SetTextMeshPro(TextMeshProUGUI textMesh, string statusId, ConfigCommon.SuffixType suffixType, float value)
         {
-            string statusName = GetStatusName(statusId);
-            if (string.IsNullOrEmpty(statusName))
+            textMesh.gameObject.SetActive(false);
+            if (string.IsNullOrEmpty(statusId)) return;
+            if (statusId == ConfigCommon.StatusAffectId)
             {
-                textMesh.gameObject.SetActive(false);
-                return;
+                var info = TableLoaderManager.Instance.TableAffect.GetDataByUid((int)value);
+                if (info == null)
+                {
+                    GcLogger.LogError("어펙트 테이블에 없는 어펙트 입니다. affect Uid: "+value);
+                    return;
+                }
+                textMesh.gameObject.SetActive(true);
+                textMesh.text = $"{info.Duration} 초 동안 {GetStatusName(info.StatusID)} {GetValueText(info.StatusSuffix, info.Value)} 가 발동합니다.";
             }
+            else
+            {
+                string statusName = GetStatusName(statusId);
+                if (string.IsNullOrEmpty(statusName))
+                {
+                    return;
+                }
 
-            string valueText = GetValueText(statusId, value);
-            textMesh.gameObject.SetActive(true);
-            textMesh.text = $"{statusName}: {valueText}";
+                string valueText = GetValueText(suffixType, value);
+                textMesh.gameObject.SetActive(true);
+                textMesh.text = $"{statusName}: {valueText}";
+            }
         }
 
-        private string GetValueText(string statusId, float value)
+        private string GetValueText(ConfigCommon.SuffixType suffixType, float value)
         {
             string valueText = $"{value}";
             foreach (var suffix in ItemConstants.StatusSuffixFormats.Keys)
             {
-                if (statusId.EndsWith(suffix))
+                if (suffixType == suffix)
                 {
                     valueText = string.Format(ItemConstants.StatusSuffixFormats[suffix], value);
                     break; // 첫 번째로 매칭된 값만 적용
@@ -172,8 +197,8 @@ namespace GGemCo.Scripts.UI.Inventory
         private string GetStatusName(string statusId)
         {
             if (string.IsNullOrEmpty(statusId)) return "";
-            string cleanedId = ItemConstants.StatusSuffixFormats.Aggregate(statusId, (current, suffix) => current.Replace(suffix.Key, ""));
-            var info = tableStatus.GetDataById(cleanedId);
+            // string cleanedId = ItemConstants.StatusSuffixFormats.Aggregate(statusId, (current, suffix) => current.Replace(suffix.Key, ""));
+            var info = tableStatus.GetDataById(statusId);
             return info?.Name ?? "";
         }
         // 카테고리별 UI 설정 함수
@@ -187,15 +212,11 @@ namespace GGemCo.Scripts.UI.Inventory
 
         private void SetPotionUI()
         {
+            // statusID1 에 affect_uid 일 경우는 예외처리
+            if (currentStruckTableItem.StatusID1 == ConfigCommon.StatusAffectId) return;
+            
             textStatus1.gameObject.SetActive(true);
             textStatus1.text = $"회복량 : {currentStruckTableItem.StatusValue1}";
-            if (currentStruckTableItem.SubCategory == ItemConstants.SubCategory.IncreaseMoveSpeed ||
-                currentStruckTableItem.SubCategory == ItemConstants.SubCategory.IncreaseAttackSpeed)
-            {
-                string statusName = GetStatusName(currentStruckTableItem.StatusID1);
-                string valueText = GetValueText(currentStruckTableItem.StatusID1, currentStruckTableItem.StatusValue1);
-                textStatus1.text = $"{statusName} : {valueText}";
-            }
         }
 
         private void SetDefaultUI()

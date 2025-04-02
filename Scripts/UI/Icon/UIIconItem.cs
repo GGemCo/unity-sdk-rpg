@@ -1,3 +1,5 @@
+using GGemCo.Scripts.Characters.Player;
+using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Items;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
@@ -15,6 +17,11 @@ namespace GGemCo.Scripts.UI.Icon
         private UIWindowItemInfo uiWindowItemInfo;
         private StruckTableItem struckTableItem;
         private TableItem tableItem;
+        private Player player;
+
+        private readonly string[] optionTypes = new string[5];
+        private readonly ConfigCommon.SuffixType[] optionSuffixes = new ConfigCommon.SuffixType[5];
+        private readonly float[] optionValues = new float[5];
         
         protected override void Awake()
         {
@@ -49,6 +56,25 @@ namespace GGemCo.Scripts.UI.Icon
                 return false;
             }
             struckTableItem = info;
+
+            optionTypes[0] = struckTableItem.OptionType1; 
+            optionTypes[1] = struckTableItem.OptionType2; 
+            optionTypes[2] = struckTableItem.OptionType3; 
+            optionTypes[3] = struckTableItem.OptionType4; 
+            optionTypes[4] = struckTableItem.OptionType5;
+
+            optionSuffixes[0] = struckTableItem.OptionSuffix1;
+            optionSuffixes[1] = struckTableItem.OptionSuffix2;
+            optionSuffixes[2] = struckTableItem.OptionSuffix3; 
+            optionSuffixes[3] = struckTableItem.OptionSuffix4; 
+            optionSuffixes[4] = struckTableItem.OptionSuffix5;
+
+            optionValues[0] = struckTableItem.OptionValue1;
+            optionValues[1] = struckTableItem.OptionValue2;
+            optionValues[2] = struckTableItem.OptionValue3;
+            optionValues[3] = struckTableItem.OptionValue4;
+            optionValues[4] = struckTableItem.OptionValue5;
+            
             UpdateInfo();
             return true;
         }
@@ -86,17 +112,9 @@ namespace GGemCo.Scripts.UI.Icon
             else if(eventData.button == PointerEventData.InputButton.Right)
             {
                 if (uid <= 0 || GetCount() <= 0) return;
-                if (CoolTimeHandler != null && CoolTimeHandler.GetCurrentCoolTime() > 0)
-                {
-                    SceneGame.Instance.systemMessageManager.ShowMessageWarning("쿨타임 중에는 사용할 수 없습니다.");
-                    return;
-                }
-                float collTime = struckTableItem.CoolTime;
-                if (collTime > 0)
-                {
-                    CoolTimeHandler.SetCoolTime(collTime);
-                    CoolTimeHandler.PlayCoolTime();
-                }
+                float coolTime = struckTableItem.CoolTime;
+                if (coolTime <= 0) return;
+                if (!PlayCoolTime(coolTime)) return;
                 window.OnRightClick(this);
             }
         }
@@ -154,13 +172,13 @@ namespace GGemCo.Scripts.UI.Icon
         {
             return IsPotionType() && struckTableItem.SubCategory == ItemConstants.SubCategory.RecoverMp;
         }
-        public override bool IsIncreaseMoveSpeedPotionType()
+        /// <summary>
+        /// 어펙트 옵션이 있는지 
+        /// </summary>
+        /// <returns></returns>
+        public override bool IsAffectUid()
         {
-            return IsPotionType() && struckTableItem.SubCategory == ItemConstants.SubCategory.IncreaseMoveSpeed;
-        }
-        public override bool IsIncreaseAttackSpeedPotionType()
-        {
-            return IsPotionType() && struckTableItem.SubCategory == ItemConstants.SubCategory.IncreaseAttackSpeed;
+            return struckTableItem.StatusID1 == "AFFECT_UID";
         }
         public override int GetStatusValue1()
         {
@@ -170,13 +188,35 @@ namespace GGemCo.Scripts.UI.Icon
         {
             return struckTableItem.StatusID1;
         }
-        /// <summary>
-        /// item 테이블에 duration 컬럼값 가져오기
-        /// </summary>
-        /// <returns></returns>
-        public override float GetDuration()
+        public override ConfigCommon.SuffixType GetStatusSuffix1()
         {
-            return struckTableItem.Duration;
+            return struckTableItem.StatusSuffix1;
+        }
+        /// <summary>
+        /// status, option 에 affect 가 있는지 체크 후 어펙트 실행
+        /// </summary>
+        public override void CheckStatusAffect()
+        {
+            if (player == null)
+            {
+                player = SceneGame.Instance.player.GetComponent<Player>();
+            }
+            if (struckTableItem.StatusID1 == ConfigCommon.StatusAffectId)
+            {
+                player.AddAffect(struckTableItem.StatusValue1);
+            }
+            if (struckTableItem.StatusID2 == ConfigCommon.StatusAffectId)
+            {
+                player.AddAffect(struckTableItem.StatusValue2);
+            }
+
+            for (var i = 0; i < optionTypes.Length; i++)
+            {
+                var option = optionTypes[i];
+                if (option != ConfigCommon.StatusAffectId) continue;
+                var optionValue = (int)optionValues[i];
+                player.AddAffect(optionValue);
+            }
         }
     }
 }

@@ -60,9 +60,26 @@ namespace GGemCo.Scripts.Characters.Monster
         {
             // AddComponent 순서 중요
             base.InitComponents();
+            
+            // attack range
+            GameObject attackRange = new GameObject("AttackRange");
+            CharacterAttackRange characterAttackRange = attackRange.AddComponent<CharacterAttackRange>();
+            characterAttackRange.Initialize(this);
+            
             Vector2 offset = Vector2.zero;
             Vector2 size = new Vector2(0,0);
-            ComponentController.AddCapsuleCollider2D(gameObject,false, offset, size);
+            colliderCheckCharacter = ComponentController.AddCapsuleCollider2D(attackRange, true, offset, size);
+
+            // hit area
+            GameObject hitArea = new GameObject("HitArea");
+            CharacterHitArea characterHitArea = hitArea.AddComponent<CharacterHitArea>();
+            characterHitArea.Initialize(this);
+            
+            offset = new Vector2(-1.83622742f, 142.859879f);
+            size = new Vector2(109.506775f, 216.882843f);
+            colliderCheckHitArea = ComponentController.AddCapsuleCollider2D(hitArea, true, offset, size);
+            
+            // 순서 중요
             controllerMonster = gameObject.AddComponent<ControllerMonster>();
         }
         /// <summary>
@@ -86,27 +103,27 @@ namespace GGemCo.Scripts.Characters.Monster
             if (TableLoaderManager.Instance == null) return;
             if (uid <= 0) return;
             TableLoaderManager tableLoaderManager = TableLoaderManager.Instance;
+            // monster 테이블 정보 셋팅
             var info = tableLoaderManager.TableMonster.GetDataByUid(uid);
             // GcLogger.Log("InitializationStat uid: "+uid+" / info.uid: "+info.uid+" / StatMoveSpeed: "+info.statMoveSpeed);
             if (info.Uid <= 0) return;
             characterName = info.Name;
-            SetBaseInfos(info.StatAtk, info.StatDef, info.StatHp, 0, info.StatMoveSpeed, info.StatAttackSpeed);
+            SetBaseInfos(info.StatAtk, info.StatDef, info.StatHp, 0, info.StatMoveSpeed, info.StatAttackSpeed,
+                info.RegistFire, info.RegistCold, info.RegistLightning);
             CurrentHp.OnNext(info.StatHp);
-            float scale = info.Scale;
-            SetScale(scale);
+            SetScale(info.Scale);
 
+            // animation 테이블 정보 셋팅
             StruckTableAnimation struckTableAnimation = tableLoaderManager.TableAnimation.GetDataByUid(info.SpineUid);
             if (struckTableAnimation is { Uid: > 0 })
             {
                 currentMoveStep = struckTableAnimation.MoveStep;
-                CapsuleCollider2D capsule = GetComponent<CapsuleCollider2D>();
-                if (capsule != null)
+                if (colliderCheckCharacter != null)
                 {
-                    capsule.size = struckTableAnimation.ColliderSize;
+                    colliderCheckCharacter.size = new Vector2(struckTableAnimation.AttackRange, struckTableAnimation.AttackRange/2f);
                 }
                 height = struckTableAnimation.Height;
             }
-
         }
         public void CreateHpBar()
         {
@@ -172,10 +189,9 @@ namespace GGemCo.Scripts.Characters.Monster
             long totalDamage = SceneGame.Instance.calculateManager.GetMonsterTotalAtk(uid);
         
             // 캡슐 콜라이더 2D와 충돌 중인 모든 콜라이더를 검색
-            CapsuleCollider2D capsuleCollider2D = GetComponent<CapsuleCollider2D>();
-            Vector2 size = new Vector2(capsuleCollider2D.size.x * Mathf.Abs(transform.localScale.x), capsuleCollider2D.size.y * transform.localScale.y);
-            Vector2 point = (Vector2)transform.position + capsuleCollider2D.offset * transform.localScale;
-            Collider2D[] collider2Ds = Physics2D.OverlapCapsuleAll(point, size, capsuleCollider2D.direction, 0f);
+            Vector2 size = new Vector2(colliderCheckCharacter.size.x * Mathf.Abs(transform.localScale.x), colliderCheckCharacter.size.y * transform.localScale.y);
+            Vector2 point = (Vector2)transform.position + colliderCheckCharacter.offset * transform.localScale;
+            Collider2D[] collider2Ds = Physics2D.OverlapCapsuleAll(point, size, colliderCheckCharacter.direction, 0f);
 
             foreach (var hit in collider2Ds)
             {

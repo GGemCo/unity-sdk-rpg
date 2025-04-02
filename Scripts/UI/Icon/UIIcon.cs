@@ -1,4 +1,6 @@
-﻿using GGemCo.Scripts.Items;
+﻿using GGemCo.Scripts.Configs;
+using GGemCo.Scripts.Items;
+using GGemCo.Scripts.Scenes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -52,7 +54,7 @@ namespace GGemCo.Scripts.UI.Icon
         // 드래그 핸들러
         private UIDragHandler dragHandler;
         // 쿨타임 핸들러
-        protected UICoolTimeHandler CoolTimeHandler;
+        public UICoolTimeHandler CoolTimeHandler;
         private RectTransform rectTransform;
 
         protected virtual void Awake()
@@ -135,18 +137,10 @@ namespace GGemCo.Scripts.UI.Icon
             return false;
         }
         /// <summary>
-        /// 이동속도 증가 물약인지
+        /// 어펙트 옵션이 있는지 
         /// </summary>
         /// <returns></returns>
-        public virtual bool IsIncreaseMoveSpeedPotionType()
-        {
-            return false;
-        }
-        /// <summary>
-        /// 공격속도 증가 물약인지
-        /// </summary>
-        /// <returns></returns>
-        public virtual bool IsIncreaseAttackSpeedPotionType()
+        public virtual bool IsAffectUid()
         {
             return false;
         }
@@ -239,11 +233,7 @@ namespace GGemCo.Scripts.UI.Icon
         /// </summary>
         protected virtual void UpdateIconImage()
         {
-            if (ImageIcon == null)
-            {
-                ImageIcon.sprite = null;
-                return;
-            }
+            if (ImageIcon == null) return;
             string path = GetIconImagePath();
             if (path == null || path == "")
             {
@@ -336,5 +326,30 @@ namespace GGemCo.Scripts.UI.Icon
         public int GetCount() => count;
 
         public bool IsLearn() => isLearn;
+        public Sprite GetImageIconSprite() => ImageIcon.sprite;
+
+        public virtual ConfigCommon.SuffixType GetStatusSuffix1()
+        {
+            return ConfigCommon.SuffixType.None;
+        }
+
+        public virtual void CheckStatusAffect()
+        {
+        }
+        /// <summary>
+        /// 쿨타임 시작하기
+        /// </summary>
+        /// <param name="coolTime"></param>
+        /// <returns></returns>
+        public bool PlayCoolTime(float coolTime)
+        {
+            if (!(coolTime > 0)) return false;
+            if (CoolTimeHandler != null && CoolTimeHandler.GetCurrentCoolTime() > 0)
+            {
+                SceneGame.Instance.systemMessageManager.ShowMessageWarning("쿨타임 중에는 사용할 수 없습니다.");
+                return false;
+            }
+            return CoolTimeHandler.PlayCoolTime(coolTime);
+        }
     }
 }

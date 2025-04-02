@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
 
@@ -7,6 +8,20 @@ namespace GGemCo.Scripts.TableLoader
     public class DefaultTable
     {
         private readonly Dictionary<int, Dictionary<string, string>> table = new Dictionary<int, Dictionary<string, string>>();
+        private static readonly Dictionary<string, ConfigCommon.SuffixType> MapSuffix;
+
+        static DefaultTable()
+        {
+            MapSuffix = new Dictionary<string, ConfigCommon.SuffixType>
+            {
+                { "PLUS", ConfigCommon.SuffixType.Plus },
+                { "MINUS", ConfigCommon.SuffixType.Minus },
+                { "INCREASE", ConfigCommon.SuffixType.Increase },
+                { "DECREASE", ConfigCommon.SuffixType.Decrease },
+            };
+        }
+
+        protected static ConfigCommon.SuffixType ConvertSuffixType(string type) => MapSuffix.GetValueOrDefault(type, ConfigCommon.SuffixType.None);
 
         public virtual void LoadData(string content)
         {

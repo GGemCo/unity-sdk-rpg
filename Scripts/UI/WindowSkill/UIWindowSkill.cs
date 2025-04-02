@@ -224,6 +224,17 @@ namespace GGemCo.Scripts.UI.WindowSkill
         public override void OnRightClick(UIIcon icon)
         {
             if (icon == null) return;
+            
+            if (icon.CoolTimeHandler != null && icon.CoolTimeHandler.GetCurrentCoolTime() > 0)
+            {
+                SceneGame.Instance.systemMessageManager.ShowMessageWarning("쿨타임 중에는 바꿀 수 없습니다.");
+                return;
+            }
+            if (!icon.IsLearn())
+            {
+                SceneGame.Instance.systemMessageManager.ShowMessageWarning("배운 후 사용할 수 있습니다.");
+                return;
+            }
             if (!icon.CheckRequireLevel()) return;
             UIWindowQuickSlot uiWindowQuickSlot =
                 SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowQuickSlot>(UIWindowManager.WindowUid

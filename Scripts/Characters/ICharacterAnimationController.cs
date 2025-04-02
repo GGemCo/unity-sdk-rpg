@@ -36,5 +36,7 @@ namespace GGemCo.Scripts.Characters
         void RemoveCharacterImageInSlot(List<StruckChangeSlotImage> changeSlotImages);
         IEnumerator FadeEffect(float duration, bool fadeIn);
         void UpdateTimeScaleByTrackIndex(float value, int index = 0);
+        void SetCharacterColor(Color red);
+        void UpdateTimeScaleMove(float value);
     }
 }

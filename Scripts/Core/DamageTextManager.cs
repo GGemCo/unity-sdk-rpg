@@ -9,6 +9,15 @@ using Random = UnityEngine.Random;
 
 namespace GGemCo.Scripts.Core
 {
+    public class MetadataDamageText
+    {
+        public Vector3 WorldPosition;
+        public float Damage;
+        public Color Color;
+        // damage 숫자 대신 텍스트를 사용해야 할때
+        public string SpecialDamageText = "";
+        public int FontSize = 0;
+    }
     /// <summary>
     /// 데미지 텍스트 매니저
     /// </summary>
@@ -64,22 +73,29 @@ namespace GGemCo.Scripts.Core
         /// <summary>
         /// 데미지 텍스트 보여주기
         /// </summary>
-        /// <param name="worldPosition"></param>
-        /// <param name="damage"></param>
-        /// <param name="color"></param>
-        public void ShowDamageText(Vector3 worldPosition, float damage, Color color)
+        /// <param name="metadataDamageText"></param>
+        public void ShowDamageText(MetadataDamageText metadataDamageText)
         {
             if (textPool.Count == 0)
                 return;
 
             TextMeshProUGUI text = textPool.Dequeue();
-            text.text = $"{damage}";
-            text.color = color;
+            text.text = $"{metadataDamageText.Damage}";
+            if (!string.IsNullOrEmpty(metadataDamageText.SpecialDamageText))
+            {
+                text.text = metadataDamageText.SpecialDamageText;
+            }
+            text.color = metadataDamageText.Color;
+            text.fontSize = 24;
+            if (metadataDamageText.FontSize > 0)
+            {
+                text.fontSize = metadataDamageText.FontSize;
+            }
 
             // X 좌표를 -10 ~ +10 범위에서 랜덤 설정
-            worldPosition.x += Random.Range(-randomXRange, randomXRange);
+            metadataDamageText.WorldPosition.x += Random.Range(-randomXRange, randomXRange);
         
-            text.transform.position = worldPosition;
+            text.transform.position = metadataDamageText.WorldPosition;
             
             text.gameObject.SetActive(true);
 

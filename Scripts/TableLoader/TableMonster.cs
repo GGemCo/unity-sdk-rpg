@@ -16,6 +16,7 @@ namespace GGemCo.Scripts.TableLoader
         public string DefaultSkin;
         public float Scale;
         public CharacterBase.Grade Grade;
+        public int Level;
         public int StatHp;
         public int StatAtk;
         public int StatDef;
@@ -23,6 +24,9 @@ namespace GGemCo.Scripts.TableLoader
         public int StatAttackSpeed;
         public long RewardExp;
         public long RewardGold;
+        public int RegistFire;
+        public int RegistCold;
+        public int RegistLightning;
     }
     /// <summary>
     /// 몬스터 테이블
@@ -59,12 +63,16 @@ namespace GGemCo.Scripts.TableLoader
                 DefaultSkin = data["DefaultSkin"],
                 Scale = float.Parse(data["Scale"]),
                 Grade = ConvertGrade(data["Grade"]),
+                Level = int.Parse(data["Level"]),
                 StatHp = int.Parse(data["StatHp"]),
                 StatAtk = int.Parse(data["StatAtk"]),
                 StatDef = int.Parse(data["StatDef"]),
                 StatMoveSpeed = int.Parse(data["StatMoveSpeed"]),
                 StatAttackSpeed = int.Parse(data["StatAttackSpeed"]),
                 RewardExp = long.Parse(data["RewardExp"]),
+                RegistFire = int.Parse(data["RegistFire"]),
+                RegistCold = int.Parse(data["RegistCold"]),
+                RegistLightning = int.Parse(data["RegistLightning"]),
                 RewardGold = 0,
             };
         }

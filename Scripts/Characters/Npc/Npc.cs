@@ -1,5 +1,6 @@
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.TableLoader;
+using GGemCo.Scripts.Utils;
 using UnityEngine;
 
 namespace GGemCo.Scripts.Characters.Npc
@@ -17,6 +18,13 @@ namespace GGemCo.Scripts.Characters.Npc
             base.Awake();
             NpcData = null;
         }
+
+        protected override void Start()
+        {
+            base.Start();
+            CharacterAnimationController.SetCharacterColor(ColorHelper.HexToColor("#DAAADB"));
+        }
+
         /// <summary>
         /// tag, sorting layer, layer 셋팅하기
         /// </summary>
@@ -52,7 +60,11 @@ namespace GGemCo.Scripts.Characters.Npc
                 const int statMp = 0;
                 const int statMoveSpeed = 100;
                 const int statAttackSpeed = 0;
-                SetBaseInfos(statAtk, statDef, statHp, statMp, statMoveSpeed, statAttackSpeed);
+                const int statRegistFire = 0;
+                const int statRegistCold = 0;
+                const int statRegistLightning = 0;
+                SetBaseInfos(statAtk, statDef, statHp, statMp, statMoveSpeed, statAttackSpeed, statRegistFire,
+                    statRegistCold, statRegistLightning);
                 float scale = info.Scale;
                 SetScale(scale);
                 

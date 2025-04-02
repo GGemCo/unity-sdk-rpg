@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using GGemCo.Scripts.Affect;
+using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.TableLoader;
 using R3;
 using UnityEngine;
@@ -20,11 +22,24 @@ namespace GGemCo.Scripts.Characters
         private int BaseAttackSpeed { get; set; }
         private int BaseCriticalDamage { get; set; }
         private int BaseCriticalProbability { get; set; }
+        private int BaseRegistFire { get; set; }
+        private int BaseRegistCold { get; set; }
+        private int BaseRegistLightning { get; set; }
 
         private readonly Dictionary<string, int> flatModifiers = new();
         private readonly Dictionary<string, float> percentModifiers = new();
 
-        private long totalAtk, totalDef, totalHp, totalMp, totalMoveSpeed, totalAttackSpeed, totalCriticalDamage, totalCriticalProbability;
+        private long totalAtk,
+            totalDef,
+            totalHp,
+            totalMp,
+            totalMoveSpeed,
+            totalAttackSpeed,
+            totalCriticalDamage,
+            totalCriticalProbability,
+            totalRegistFire,
+            totalRegistCold,
+            totalRegistLightning;
         // 최종 적용된 스탯 (캐싱)
         public readonly BehaviorSubject<long> TotalAtk = new(1);
         public readonly BehaviorSubject<long> TotalDef = new(1);
@@ -34,12 +49,14 @@ namespace GGemCo.Scripts.Characters
         public readonly BehaviorSubject<long> TotalAttackSpeed = new(100);
         public readonly BehaviorSubject<long> TotalCriticalDamage = new(100);
         public readonly BehaviorSubject<long> TotalCriticalProbability = new(100);
+        public readonly BehaviorSubject<long> TotalRegistFire = new(100);
+        public readonly BehaviorSubject<long> TotalRegistCold = new(100);
+        public readonly BehaviorSubject<long> TotalRegistLightning = new(100);
 
-        private CharacterBuffManager buffManager;
+        protected AffectController AffectController;
 
         protected virtual void Awake()
         {
-            buffManager = new CharacterBuffManager(this);
         }
         protected virtual void Start()
         {
@@ -54,8 +71,11 @@ namespace GGemCo.Scripts.Characters
         /// <param name="statMp"></param>
         /// <param name="statMoveSpeed"></param>
         /// <param name="statAttackSpeed"></param>
+        /// <param name="statRegistFire"></param>
+        /// <param name="statRegistCold"></param>
+        /// <param name="statRegistLightning"></param>
         protected void SetBaseInfos(int statAtk, int statDef, int statHp, int statMp, int statMoveSpeed,
-            int statAttackSpeed)
+            int statAttackSpeed, int statRegistFire, int statRegistCold, int statRegistLightning)
         {
             BaseAtk = statAtk;
             BaseDef = statDef;
@@ -63,6 +83,9 @@ namespace GGemCo.Scripts.Characters
             BaseMp = statMp;
             BaseMoveSpeed = statMoveSpeed;
             BaseAttackSpeed = statAttackSpeed;
+            BaseRegistFire = statRegistFire;
+            BaseRegistCold = statRegistCold;
+            BaseRegistLightning = statRegistLightning;
             RecalculateStats();
         }
 
@@ -75,18 +98,18 @@ namespace GGemCo.Scripts.Characters
             flatModifiers.Clear();
             percentModifiers.Clear();
 
-            Dictionary<string, float> modifiers = new Dictionary<string, float>();
+            List<ConfigCommon.StruckStatus> modifiers = new List<ConfigCommon.StruckStatus>();
             // 아이템 효과 적용
             foreach (var item in equippedItems.Select(items => items.Value))
             {
                 if (item == null) continue;
-                modifiers.TryAdd(item.StatusID1, item.StatusValue1);
-                modifiers.TryAdd(item.StatusID2, item.StatusValue2);
-                modifiers.TryAdd(item.OptionType1, item.OptionValue1);
-                modifiers.TryAdd(item.OptionType2, item.OptionValue2);
-                modifiers.TryAdd(item.OptionType3, item.OptionValue3);
-                modifiers.TryAdd(item.OptionType4, item.OptionValue4);
-                modifiers.TryAdd(item.OptionType5, item.OptionValue5);
+                modifiers.Add(new ConfigCommon.StruckStatus(item.StatusID1, item.StatusSuffix1, item.StatusValue1));
+                modifiers.Add(new ConfigCommon.StruckStatus(item.StatusID2, item.StatusSuffix2, item.StatusValue2));
+                modifiers.Add(new ConfigCommon.StruckStatus(item.OptionType1, ConfigCommon.SuffixType.None, item.OptionValue1));
+                modifiers.Add(new ConfigCommon.StruckStatus(item.OptionType2, ConfigCommon.SuffixType.None, item.OptionValue2));
+                modifiers.Add(new ConfigCommon.StruckStatus(item.OptionType3, ConfigCommon.SuffixType.None, item.OptionValue3));
+                modifiers.Add(new ConfigCommon.StruckStatus(item.OptionType4, ConfigCommon.SuffixType.None, item.OptionValue4));
+                modifiers.Add(new ConfigCommon.StruckStatus(item.OptionType5, ConfigCommon.SuffixType.None, item.OptionValue5));
             }
 
             ApplyStatModifiers(modifiers);
@@ -95,58 +118,67 @@ namespace GGemCo.Scripts.Characters
         /// <summary>
         /// 버프 적용하기
         /// </summary>
-        /// <param name="buff"></param>
-        protected void ApplyBuff(StruckBuff buff) => buffManager.ApplyBuff(buff);
+        /// <param name="affectUid"></param>
+        protected void ApplyAffect(int affectUid) => AffectController.ApplyAffect(affectUid);
         /// <summary>
         /// 스탯 변경값 적용하기
         /// </summary>
         /// <param name="modifiers"></param>
-        public void ApplyStatModifiers(Dictionary<string, float> modifiers)
+        public void ApplyStatModifiers(List<ConfigCommon.StruckStatus> modifiers)
         {
             foreach (var kvp in modifiers)
             {
-                ModifyStat(kvp.Key, kvp.Value, true);
+                ModifyStat(kvp.ID, kvp, true);
             }
         }
 
-        public void RemoveStatModifiers(Dictionary<string, float> modifiers)
+        public void RemoveStatModifiers(List<ConfigCommon.StruckStatus> modifiers)
         {
             foreach (var kvp in modifiers)
             {
-                ModifyStat(kvp.Key, kvp.Value, false);
+                ModifyStat(kvp.ID, kvp, false);
             }
         }
         /// <summary>
         /// 접미사에 따라 적용할 값 배열에 넣기
         /// </summary>
         /// <param name="statType"></param>
-        /// <param name="value"></param>
+        /// <param name="struckStatus"></param>
         /// <param name="isAdding"></param>
-        private void ModifyStat(string statType, float value, bool isAdding)
+        private void ModifyStat(string statType, ConfigCommon.StruckStatus struckStatus, bool isAdding)
         {
             if (string.IsNullOrEmpty(statType)) return;
 
-            string baseStat = statType.Replace("_PLUS", "").Replace("_MINUS", "").Replace("_INCREASE", "").Replace("_DECREASE", "");
+            string baseStat = statType;
 
-            if (statType.EndsWith("_PLUS"))
+            float value = struckStatus.Value;
+            ConfigCommon.SuffixType suffixType = struckStatus.SuffixType;
+            switch (suffixType)
             {
-                flatModifiers[baseStat] = flatModifiers.GetValueOrDefault(baseStat, 0) + (isAdding ? (int)value : -(int)value);
-                if (flatModifiers[baseStat] == 0) flatModifiers.Remove(baseStat);
-            }
-            else if (statType.EndsWith("_MINUS"))
-            {
-                flatModifiers[baseStat] = flatModifiers.GetValueOrDefault(baseStat, 0) - (isAdding ? (int)value : -(int)value);
-                if (flatModifiers[baseStat] == 0) flatModifiers.Remove(baseStat);
-            }
-            else if (statType.EndsWith("_INCREASE"))
-            {
-                percentModifiers[baseStat] = percentModifiers.GetValueOrDefault(baseStat, 0) + (isAdding ? value : -value);
-                if (Mathf.Approximately(percentModifiers[baseStat], 0)) percentModifiers.Remove(baseStat);
-            }
-            else if (statType.EndsWith("_DECREASE"))
-            {
-                percentModifiers[baseStat] = percentModifiers.GetValueOrDefault(baseStat, 0) - (isAdding ? value : -value);
-                if (Mathf.Approximately(percentModifiers[baseStat], 0)) percentModifiers.Remove(baseStat);
+                case ConfigCommon.SuffixType.Plus:
+                {
+                    flatModifiers[baseStat] = flatModifiers.GetValueOrDefault(baseStat, 0) + (isAdding ? (int)value : -(int)value);
+                    if (flatModifiers[baseStat] == 0) flatModifiers.Remove(baseStat);
+                    break;
+                }
+                case ConfigCommon.SuffixType.Minus:
+                {
+                    flatModifiers[baseStat] = flatModifiers.GetValueOrDefault(baseStat, 0) - (isAdding ? (int)value : -(int)value);
+                    if (flatModifiers[baseStat] == 0) flatModifiers.Remove(baseStat);
+                    break;
+                }
+                case ConfigCommon.SuffixType.Increase:
+                {
+                    percentModifiers[baseStat] = percentModifiers.GetValueOrDefault(baseStat, 0) + (isAdding ? value : -value);
+                    if (Mathf.Approximately(percentModifiers[baseStat], 0)) percentModifiers.Remove(baseStat);
+                    break;
+                }
+                case ConfigCommon.SuffixType.Decrease:
+                {
+                    percentModifiers[baseStat] = percentModifiers.GetValueOrDefault(baseStat, 0) - (isAdding ? value : -value);
+                    if (Mathf.Approximately(percentModifiers[baseStat], 0)) percentModifiers.Remove(baseStat);
+                    break;
+                }
             }
         }
         /// <summary>
@@ -170,14 +202,17 @@ namespace GGemCo.Scripts.Characters
         /// </summary>
         public void RecalculateStats()
         {
-            totalAtk = CalculateFinalStat("STAT_ATK", BaseAtk);
-            totalDef = CalculateFinalStat("STAT_DEF", BaseDef);
-            totalHp = CalculateFinalStat("STAT_HP", BaseHp);
-            totalMp = CalculateFinalStat("STAT_MP", BaseMp);
-            totalMoveSpeed = CalculateFinalStat("STAT_MOVE_SPEED", BaseMoveSpeed);
-            totalAttackSpeed = CalculateFinalStat("STAT_ATTACK_SPEED", BaseAttackSpeed);
-            totalCriticalDamage = CalculateFinalStat("STAT_CRITIAL_DAMAGE", BaseCriticalDamage);
-            totalCriticalProbability = CalculateFinalStat("STAT_CRITIAL_PROBABILITY", BaseCriticalProbability);
+            totalAtk = CalculateFinalStat(ConfigCommon.StatusStatAtk, BaseAtk);
+            totalDef = CalculateFinalStat(ConfigCommon.StatusStatDef, BaseDef);
+            totalHp = CalculateFinalStat(ConfigCommon.StatusStatHp, BaseHp);
+            totalMp = CalculateFinalStat(ConfigCommon.StatusStatMp, BaseMp);
+            totalMoveSpeed = CalculateFinalStat(ConfigCommon.StatusStatMoveSpeed, BaseMoveSpeed);
+            totalAttackSpeed = CalculateFinalStat(ConfigCommon.StatusStatAttackSpeed, BaseAttackSpeed);
+            totalCriticalDamage = CalculateFinalStat(ConfigCommon.StatusStatCriticalDamage, BaseCriticalDamage);
+            totalCriticalProbability = CalculateFinalStat(ConfigCommon.StatusStatCriticalProbability, BaseCriticalProbability);
+            totalRegistFire = CalculateFinalStat(ConfigCommon.StatusStatResistanceFire, BaseRegistFire);
+            totalRegistCold = CalculateFinalStat(ConfigCommon.StatusStatResistanceCold, BaseRegistCold);
+            totalRegistLightning = CalculateFinalStat(ConfigCommon.StatusStatResistanceLightning, BaseRegistLightning);
 
             ApplyStatChanges();
         }
@@ -194,6 +229,9 @@ namespace GGemCo.Scripts.Characters
             TotalAttackSpeed.OnNext(totalAttackSpeed);
             TotalCriticalDamage.OnNext(totalCriticalDamage);
             TotalCriticalProbability.OnNext(totalCriticalProbability);
+            TotalRegistFire.OnNext(totalRegistFire);
+            TotalRegistCold.OnNext(totalRegistCold);
+            TotalRegistLightning.OnNext(totalRegistLightning);
         }
 
         public float GetCurrentMoveSpeed(bool isPercent = true) => isPercent ? TotalMoveSpeed.Value / 100f : TotalMoveSpeed.Value;

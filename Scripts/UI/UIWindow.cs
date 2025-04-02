@@ -376,5 +376,10 @@ namespace GGemCo.Scripts.UI
         {
             return struckTableWindow.DefaultActive;
         }
+
+        public bool IsOpen()
+        {
+            return gameObject.activeSelf;
+        }
     }
 }

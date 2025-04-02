@@ -32,7 +32,8 @@ namespace GGemCo.Scripts.TableLoader
         {
             return dictionaryByID.GetValueOrDefault(id);
         }
-        public StruckTableStatus GetDataByUid(int uid)
+
+        private StruckTableStatus GetDataByUid(int uid)
         {
             if (uid <= 0)
             {

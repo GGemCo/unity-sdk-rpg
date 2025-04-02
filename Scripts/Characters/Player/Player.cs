@@ -4,9 +4,11 @@ using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Items;
 using GGemCo.Scripts.Maps.Objects;
+using GGemCo.Scripts.SaveData;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.ScriptableSettings;
 using GGemCo.Scripts.Spine2d;
+using GGemCo.Scripts.SystemMessage;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI;
 using GGemCo.Scripts.UI.Window;
@@ -29,7 +31,8 @@ namespace GGemCo.Scripts.Characters.Player
         private EquipController equipController;
         private ControllerPlayer controllerPlayer;
         private UIWindowHud uiWindowHud;
-
+        private PlayerData playerData;
+            
         [Serializable]
         private struct StatUIBinding
         {
@@ -40,13 +43,15 @@ namespace GGemCo.Scripts.Characters.Player
         private readonly List<StatUIBinding> statBindings = new();
         protected override void Awake()
         {
+            // 먼저 선언한다.
+            IsUseSkill = true;
             base.Awake();
             isNpcNearby = false;
         }
         protected override void Start()
         {
             base.Start();
-            
+            playerData = SceneGame.Instance.saveDataManager.Player;
             uiWindowHud = SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowHud>(UIWindowManager.WindowUid.Hud);
             
             // TotalHp, Mp 가 바뀌어도 현재 값이 바뀌면 안된다.
@@ -61,9 +66,6 @@ namespace GGemCo.Scripts.Characters.Player
                 .AddTo(this);
             CurrentMp
                 .Subscribe(_ => SetWindowHudSliderMp(CurrentMp.Value))
-                .AddTo(this);
-            TotalMoveSpeed
-                .Subscribe(UpdateAnimationMoveTimeScale)
                 .AddTo(this);
 
             LoadEquipItems();
@@ -87,9 +89,27 @@ namespace GGemCo.Scripts.Characters.Player
             controllerPlayer = gameObject.AddComponent<ControllerPlayer>();
             equipController = gameObject.AddComponent<EquipController>();
             ComponentController.AddRigidbody2D(gameObject);
+            
+            GameObject attackRange = new GameObject("AttackRange");
+            CharacterAttackRange characterAttackRange = attackRange.AddComponent<CharacterAttackRange>();
+            characterAttackRange.Initialize(this);
+            
+            // 공격 범위 안에 몬스터 찾는 용도
+            // include layer : 타일맵 wall 제외하고 모두 포함
+            // exclude layer : 타일맵 wall
             Vector2 offset = Vector2.zero;
             Vector2 size = new Vector2(500, 250);
-            ComponentController.AddCapsuleCollider2D(gameObject, true, offset, size);
+            colliderCheckCharacter = ComponentController.AddCapsuleCollider2D(attackRange, true, offset, size);
+            
+            // hit area
+            GameObject hitArea = new GameObject("HitArea");
+            CharacterHitArea characterHitArea = hitArea.AddComponent<CharacterHitArea>();
+            characterHitArea.Initialize(this);
+            
+            
+            // 맵 object 충돌 체크용
+            // include layer : 타일맵 wall
+            // exclude layer : 타일맵 wall 제외하고 모두 포함
             offset = Vector2.zero;
             size = new Vector2(264,132);
             ComponentController.AddCapsuleCollider2D(gameObject, false, offset, size,
@@ -104,7 +124,9 @@ namespace GGemCo.Scripts.Characters.Player
         {
             if (AddressableSettingsLoader.Instance == null) return;
             GGemCoPlayerSettings playerSettings = AddressableSettingsLoader.Instance.playerSettings;
-            SetBaseInfos(playerSettings.statAtk, playerSettings.statDef, playerSettings.statHp, playerSettings.statMp, playerSettings.statMoveSpeed, playerSettings.statAttackSpeed);
+            SetBaseInfos(playerSettings.statAtk, playerSettings.statDef, playerSettings.statHp, playerSettings.statMp,
+                playerSettings.statMoveSpeed, playerSettings.statAttackSpeed, playerSettings.statRegistFire,
+                playerSettings.statRegistCold, playerSettings.statRegistLightning);
             CurrentHp.OnNext(TotalHp.Value);
             CurrentMp.OnNext(TotalMp.Value);
             currentMoveStep = playerSettings.statMoveStep;
@@ -116,13 +138,13 @@ namespace GGemCo.Scripts.Characters.Player
         /// </summary>
         private void LoadEquipItems()
         {
-            Dictionary<int, StructInventoryIcon> dictionary =
+            Dictionary<int, SaveDataIcon> dictionary =
                 SceneGame.Instance.saveDataManager.Equip.GetAllItemCounts();
             foreach (var info in dictionary)
             {
                 if (info.Value == null) continue;
-                int itemUid = info.Value.ItemUid;
-                int itemCount = info.Value.ItemCount;
+                int itemUid = info.Value.Uid;
+                int itemCount = info.Value.Count;
                 if (itemUid <= 0) continue;
                 EquipItem(info.Key, itemUid, itemCount);
             }
@@ -217,14 +239,14 @@ namespace GGemCo.Scripts.Characters.Player
         /// </summary>
         public override void OnEventAttack()
         {
+            if (IsStatusDead()) return;
             // GcLogger.Log(@event);
             long totalDamage = SceneGame.Instance.calculateManager.GetPlayerTotalAtk();
         
             // 캡슐 콜라이더 2D와 충돌 중인 모든 콜라이더를 검색
-            CapsuleCollider2D capsuleCollider = GetComponent<CapsuleCollider2D>();
-            Vector2 size = new Vector2(capsuleCollider.size.x * Mathf.Abs(transform.localScale.x), capsuleCollider.size.y * transform.localScale.y);
-            Vector2 point = (Vector2)transform.position + capsuleCollider.offset * transform.localScale;
-            Collider2D[] hitsCollider2D = Physics2D.OverlapCapsuleAll(point, size, capsuleCollider.direction, 0f);
+            Vector2 size = new Vector2(colliderCheckCharacter.size.x * Mathf.Abs(transform.localScale.x), colliderCheckCharacter.size.y * transform.localScale.y);
+            Vector2 point = (Vector2)transform.position + colliderCheckCharacter.offset * transform.localScale;
+            Collider2D[] hitsCollider2D = Physics2D.OverlapCapsuleAll(point, size, colliderCheckCharacter.direction, 0f);
 
             int countDamageMonster = 0;
             int maxDamageMonster = 10;
@@ -232,10 +254,11 @@ namespace GGemCo.Scripts.Characters.Player
             {
                 if (hit.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Monster)))
                 {
-                    Monster.Monster monster = hit.GetComponent<Monster.Monster>();
-                    if (monster != null)
+                    CharacterAttackRange characterAttackRange = hit.GetComponent<CharacterAttackRange>();
+                    if (characterAttackRange != null)
                     {
                         // GcLogger.Log("Player attacked the monster after animation!");
+                        CharacterBase monster = characterAttackRange.target;
                         // 몬스터와 마주보고 있으면 공격 
                         if (AreFacingEachOther(monster.transform))
                         {
@@ -302,7 +325,10 @@ namespace GGemCo.Scripts.Characters.Player
                 new StatUIBinding { textUI = UIWindowPlayerInfo.IndexPlayerInfo.MoveSpeed, GetStat = p => p.TotalMoveSpeed, label = "이동속도" },
                 new StatUIBinding { textUI = UIWindowPlayerInfo.IndexPlayerInfo.AttackSpeed, GetStat = p => p.TotalAttackSpeed, label = "공격속도" },
                 new StatUIBinding { textUI = UIWindowPlayerInfo.IndexPlayerInfo.CriticalDamage, GetStat = p => p.TotalCriticalDamage, label = "크리티컬 데미지" },
-                new StatUIBinding { textUI = UIWindowPlayerInfo.IndexPlayerInfo.CriticalProbability, GetStat = p => p.TotalCriticalProbability, label = "크리티컬 확률" }
+                new StatUIBinding { textUI = UIWindowPlayerInfo.IndexPlayerInfo.CriticalProbability, GetStat = p => p.TotalCriticalProbability, label = "크리티컬 확률" },
+                new StatUIBinding { textUI = UIWindowPlayerInfo.IndexPlayerInfo.RegistFire, GetStat = p => p.TotalRegistFire, label = "불 속성 저항" },
+                new StatUIBinding { textUI = UIWindowPlayerInfo.IndexPlayerInfo.RegistCold, GetStat = p => p.TotalRegistCold, label = "얼음 속성 저항" },
+                new StatUIBinding { textUI = UIWindowPlayerInfo.IndexPlayerInfo.RegistLightning, GetStat = p => p.TotalRegistLightning, label = "전기 속성 저항" },
             });
             foreach (var binding in statBindings)
             {
@@ -356,35 +382,12 @@ namespace GGemCo.Scripts.Characters.Player
             return CurrentMp.Value >= TotalMp.Value;
         }
         /// <summary>
-        /// 현재 마력 더하기
+        /// 현재 마력이 최대치 인지
         /// </summary>
-        /// <param name="value"></param>
-        public void AddMp(int value)
+        /// <returns></returns>
+        public bool CheckNeedMp(int needMp)
         {
-            long newVale = CurrentMp.Value + value;
-            if (newVale > TotalMp.Value)
-            {
-                newVale = TotalMp.Value;
-            }
-            CurrentMp.OnNext(newVale);
-        }
-        /// <summary>
-        /// 버프 추가하기
-        /// </summary>
-        /// <param name="struckBuff"></param>
-        public void AddBuff(StruckBuff struckBuff)
-        {
-            if (struckBuff == null) return;
-            ApplyBuff(struckBuff);
-        }
-        /// <summary>
-        /// total move speed 가 변경되었을때 wait 애니메이션의 time scale 도 변경해주기 위해서
-        /// track index = 0 의 time scale 을 변경해준다.
-        /// </summary>
-        /// <param name="value"></param>
-        private void UpdateAnimationMoveTimeScale(long value)
-        {
-            CharacterAnimationController.UpdateTimeScaleByTrackIndex(value/100f);
+            return CurrentMp.Value >= needMp;
         }
         /// <summary>
         /// 플레이어 죽었을때 end 상태로 변경
@@ -393,6 +396,46 @@ namespace GGemCo.Scripts.Characters.Player
         {
             base.OnDead();
             SceneGame.Instance.SetState(SceneGame.GameState.End);
+        }
+        
+        /// <summary>
+        /// 스킬 사용하기
+        /// </summary>
+        /// <param name="skillUid"></param>
+        /// <param name="skillLevel"></param>
+        public void UseSkill(int skillUid, int skillLevel)
+        {
+            SkillController.MakeSkill(skillUid, skillLevel);
+        }
+
+        public bool IsRequireLevel(int compareLevel)
+        {
+            bool result = playerData?.CurrentLevel >= compareLevel;
+            if (!result)
+            {
+                SceneGame.Instance.systemMessageManager.ShowMessageWarning($"플레이어 레벨이 부족합니다. 필요 레벨 : {compareLevel}");
+            }
+            return result;
+        }
+        /// <summary>
+        /// 어펙트 발동시 UIWindowPlayerBuffInfo 에 추가하기
+        /// </summary>
+        /// <param name="affectUid"></param>
+        protected override void OnAffect(int affectUid)
+        {
+            UIWindowPlayerBuffInfo uiWindowPlayerBuffInfo =
+                SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowPlayerBuffInfo>(UIWindowManager
+                    .WindowUid.PlayerBuffInfo);
+            if (uiWindowPlayerBuffInfo == null) return;
+            uiWindowPlayerBuffInfo.AddAffect(affectUid);
+        }
+        /// <summary>
+        /// localScale 이 적용된 캐릭터 크기 가져오기
+        /// </summary>
+        /// <returns></returns>
+        public override float GetHeightByScale()
+        {
+            return CharacterAnimationController.GetCharacterHeight() * Math.Abs(transform.localScale.x);
         }
     }
 }

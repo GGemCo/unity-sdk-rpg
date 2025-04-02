@@ -1,8 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using GGemCo.Scripts.Addressable;
+using GGemCo.Scripts.Affect;
 using GGemCo.Scripts.Configs;
+using GGemCo.Scripts.Core;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.Skill;
+using GGemCo.Scripts.TableLoader;
+using GGemCo.Scripts.UI;
+using GGemCo.Scripts.Utils;
 using R3;
 using UnityEngine;
 
@@ -86,7 +92,7 @@ namespace GGemCo.Scripts.Characters
         // 어그로
         private AttackType attackType;
         private bool isAggro;
-        public int height;
+        public float height;
         public string characterName;
         
         [Header("캐릭터 방향 관련")]
@@ -110,9 +116,13 @@ namespace GGemCo.Scripts.Characters
         [Header("상태 및 스탯")]
         protected readonly BehaviorSubject<long> CurrentHp = new(0);
         protected readonly BehaviorSubject<long> CurrentMp = new(0);
+
+        [Header("스킬")] 
+        protected bool IsUseSkill = false;
+        protected SkillController SkillController;
         
         // 현재 상태
-        protected CharacterStatus CurrentStatus;
+        private CharacterStatus currentStatus;
         // 몬스터 죽은 후 맵에서 지우기까지에 시간
         private float delayDestroyMonster;
         // fade in, out 효과 시작 여부. 맵에서 컬링 될때 사용
@@ -120,17 +130,30 @@ namespace GGemCo.Scripts.Characters
         private float characterHeight;
         // 공격한 GameObject 의 Transform
         public Transform attackerTransform;
+        // 캐릭터 간의 충돌 체크용
+        public CapsuleCollider2D colliderCheckCharacter;
+        // 캐릭터 hit area 체크용
+        public CapsuleCollider2D colliderCheckHitArea;
+        // 맵 height 값, sorting order 계산에 사용
+        private float mapSizeHeight;
         
         protected override void Awake()
         {
             base.Awake();
+            AffectController = new AffectController(this);
             SetAttackType(AttackType.None);
             SetAggro(false);
             height = 0;
             SetStatusIdle();
-            InitComponents();
+            // 태그 먼저 처리
             InitTagSortingLayer();
+            InitComponents();
             delayDestroyMonster = AddressableSettingsLoader.Instance.settings.delayDestroyMonster;
+            if (IsUseSkill)
+            {
+                SkillController = new SkillController();
+                SkillController.Initialize(this);
+            }
         }
         /// <summary>
         /// tag, sorting layer, layer 셋팅하기
@@ -157,6 +180,12 @@ namespace GGemCo.Scripts.Characters
             
             InitializeByTable();
             InitializeByRegenData();
+            
+            TotalMoveSpeed
+                .Subscribe(UpdateAnimationMoveTimeScale)
+                .AddTo(this);
+
+            mapSizeHeight = SceneGame.Instance.mapManager.GetCurrentMapSize().height;
         }
         /// <summary>
         /// 테이블에서 가져온 몬스터 정보 셋팅
@@ -213,11 +242,13 @@ namespace GGemCo.Scripts.Characters
         {
             if (sortingOrder == CharacterSortingOrder.Fixed) return;
 
-            int baseSortingOrder = sortingOrder switch
+            int baseSortingOrder = MathHelper.GetSortingOrder(mapSizeHeight, transform.position.y);
+            
+            baseSortingOrder = sortingOrder switch
             {
                 CharacterSortingOrder.AlwaysOnTop => SortingOrderTop,
                 CharacterSortingOrder.AlwaysOnBottom => SortingOrderBottom,
-                _ => -(int)(transform.position.y * 100)
+                _ => baseSortingOrder
             };
 
             characterRenderer.sortingOrder = baseSortingOrder;
@@ -236,15 +267,15 @@ namespace GGemCo.Scripts.Characters
         {
             transform.position = new Vector3(x, y, transform.position.z);
         }
-        public bool IsStatusDead() => CurrentStatus == CharacterStatus.Dead;
-        public bool IsStatusAttack() => CurrentStatus == CharacterStatus.Attack;
-        public bool IsStatusRun() => CurrentStatus == CharacterStatus.Run;
-        public bool IsStatusIdle() => CurrentStatus == CharacterStatus.Idle;
-        public bool IsStatusNone() => CurrentStatus == CharacterStatus.None;
+        public bool IsStatusDead() => currentStatus == CharacterStatus.Dead;
+        public bool IsStatusAttack() => currentStatus == CharacterStatus.Attack;
+        public bool IsStatusRun() => currentStatus == CharacterStatus.Run;
+        public bool IsStatusIdle() => currentStatus == CharacterStatus.Idle;
+        public bool IsStatusNone() => currentStatus == CharacterStatus.None;
 
-        public CharacterStatus GetCurrentStatus() => CurrentStatus;
+        public CharacterStatus GetCurrentStatus() => currentStatus;
         
-        private void SetStatus(CharacterStatus value) => CurrentStatus = value;
+        private void SetStatus(CharacterStatus value) => currentStatus = value;
         public void SetStatusDead() => SetStatus(CharacterStatus.Dead);
         public void SetStatusIdle() => SetStatus(CharacterStatus.Idle);
         public void SetStatusRun() => SetStatus(CharacterStatus.Run);
@@ -305,9 +336,9 @@ namespace GGemCo.Scripts.Characters
         {
             return characterHeight;
         }
-        public virtual void SetHeight(float height)
+        public virtual void SetHeight(float value)
         {
-            characterHeight = height;
+            characterHeight = value;
         }
         public virtual float GetCurrentMoveStep()
         {
@@ -339,13 +370,19 @@ namespace GGemCo.Scripts.Characters
         protected virtual void OnDead()
         {
             CharacterAnimationController.PlayDeadAnimation();
+            // 어펙트 모두 지우기
+            if (AffectController != null)
+            {
+                AffectController.RemoveAllAffects();
+            }
         }
         /// <summary>
         /// 내가 데미지 받았을때 처리 
         /// </summary>
         /// <param name="damage">받은 데미지</param>
         /// <param name="attacker">누가 때렸는지</param>
-        public bool TakeDamage(long damage, GameObject attacker)
+        /// <param name="damageType">속성 데미지 타입</param>
+        public bool TakeDamage(long damage, GameObject attacker, SkillConstants.DamageType damageType = SkillConstants.DamageType.None)
         {
             if (IsStatusDead())
             {
@@ -353,20 +390,66 @@ namespace GGemCo.Scripts.Characters
                 return false;
             }
             if (damage <= 0) return false;
+            
+            // 데미지 텍스트 색상 설정
+            Color damageTextColor = Color.white;
+            Vector3 damageTextPosition = transform.position + new Vector3(0, GetCharacterHeight() * Mathf.Abs(originalScaleX), 0);
+            // 속성 데미지일때, 저항값 처리
+            if (damageType != SkillConstants.DamageType.None)
+            {
+                if (damageType == SkillConstants.DamageType.Fire)
+                {
+                    damage = (long)(damage * ((100f - TotalRegistFire.Value) / 100f));
+                    damageTextColor = Color.red;
+                }
+                else if (damageType == SkillConstants.DamageType.Cold)
+                {
+                    damage = (long)(damage * ((100f - TotalRegistCold.Value) / 100f));
+                    damageTextColor = Color.blue;
+                }
+                else if (damageType == SkillConstants.DamageType.Lightning)
+                {
+                    damage = (long)(damage * ((100f - TotalRegistLightning.Value) / 100f));
+                    damageTextColor = Color.yellow;
+                }
 
-            long remainHp = CurrentHp.Value - damage; 
+                if (damage <= 0)
+                {
+                    MetadataDamageText metadataDamageText = new MetadataDamageText
+                    {
+                        Damage = damage,
+                        Color = Color.yellow,
+                        SpecialDamageText = "immune",
+                        WorldPosition = damageTextPosition,
+                        FontSize = 20
+                    };
+                    SceneGame.Instance.damageTextManager.ShowDamageText(metadataDamageText);
+                }
+            }
+            if (damage <= 0) return false;
+
+            long remainHp = CurrentHp.Value - damage;
             // -1 이면 죽지 않는다
             if (BaseHp < 0)
             {
                 remainHp = 1;
             }
 
-            Vector3 damageTextPosition = transform.position + new Vector3(0, GetCharacterHeight() * Mathf.Abs(originalScaleX), 0);
-            SceneGame.Instance.damageTextManager.ShowDamageText(damageTextPosition, damage, Color.red);
+            if (CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Player)))
+            {
+                damageTextColor = Color.red;
+            }
+            MetadataDamageText metadataDamageText2 = new MetadataDamageText
+            {
+                Damage = damage,
+                Color = damageTextColor,
+                WorldPosition = damageTextPosition
+            };
+            SceneGame.Instance.damageTextManager.ShowDamageText(metadataDamageText2);
             
             if (remainHp <= 0)
             {
-                CurrentStatus = CharacterStatus.Dead;
+                currentStatus = CharacterStatus.Dead;
                 Destroy(gameObject, delayDestroyMonster);
 
                 OnDead();
@@ -416,6 +499,61 @@ namespace GGemCo.Scripts.Characters
         {
             attackType = pattackType;
         }
+        /// <summary>
+        /// 어펙트 추가하기
+        /// </summary>
+        /// <param name="affectUid"></param>
+        public void AddAffect(int affectUid)
+        {
+            var info = TableLoaderManager.Instance.TableAffect.GetDataByUid(affectUid);
+            if (info == null)
+            {
+                GcLogger.LogError("affect 테이블에 없는 어펙트 입니다. affect Uid: "+affectUid);
+                return;
+            }
+            ApplyAffect(affectUid);
 
+            OnAffect(affectUid);
+        }
+
+        protected virtual void OnAffect(int affectUid)
+        {
+            
+        }
+        /// <summary>
+        /// localScale 이 적용된 캐릭터 크기 가져오기
+        /// </summary>
+        /// <returns></returns>
+        public virtual float GetHeightByScale()
+        {
+            return height * Math.Abs(transform.localScale.x);
+        }
+        /// <summary>
+        /// total move speed 가 변경되었을때 wait 애니메이션의 time scale 도 변경해주기 위해서
+        /// track index = 0 의 time scale 을 변경해준다.
+        /// </summary>
+        /// <param name="value"></param>
+        private void UpdateAnimationMoveTimeScale(long value)
+        {
+            CharacterAnimationController.UpdateTimeScaleMove(value/100f);
+        }
+        /// <summary>
+        /// 현재 마력 더하기
+        /// </summary>
+        /// <param name="value"></param>
+        public void AddMp(int value)
+        {
+            long newVale = CurrentMp.Value + value;
+            if (newVale > TotalMp.Value)
+            {
+                newVale = TotalMp.Value;
+            }
+
+            if (newVale < 0)
+            {
+                newVale = 0;
+            }
+            CurrentMp.OnNext(newVale);
+        }
     }
 }

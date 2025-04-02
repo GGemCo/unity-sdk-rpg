@@ -13,8 +13,9 @@ namespace GGemCo.Scripts.TableLoader
         public string PrefabPath;
         public GameObject Prefab;
         public float MoveStep;
-        public Vector2 ColliderSize;
-        public int Height;
+        public float Width;
+        public float Height;
+        public int AttackRange;
     }
     /// <summary>
     /// 애니메이션 테이블
@@ -39,8 +40,9 @@ namespace GGemCo.Scripts.TableLoader
                 PrefabPath = data["PrefabPath"],
                 Prefab = LoadPrefab(data["PrefabPath"]),
                 MoveStep = float.Parse(data["MoveStep"]),
-                ColliderSize = ConvertVector2(data["ColliderSize"]),
-                Height = int.Parse(data["Height"]),
+                AttackRange = int.Parse(data["AttackRange"]),
+                Width = float.Parse(data["Width"]),
+                Height = float.Parse(data["Height"]),
             };
         }
         public GameObject GetPrefab(int uid) {
