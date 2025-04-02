@@ -17,5 +17,7 @@
         public const string Window = "window";
         public const string Status = "status";
         public const string Skill = "skill";
+        public const string Affect = "affect";
+        public const string Effect = "effect";
     }
 }
