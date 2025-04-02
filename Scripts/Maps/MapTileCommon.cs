@@ -150,6 +150,36 @@ namespace GGemCo.Scripts.Maps
             if (myMonster == null) return null;
             return myMonster.MonsterData;
         }
+        /// <summary>
+        /// 플레이어 기준 range 안에서 가장 가까운 몬스터 찾기
+        /// </summary>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        public Monster GetNearByMonsterDistance(int range)
+        {
+            Monster closeMonster = null;
+            float closestDistance = float.MaxValue;
+            Vector3 playerPosition = SceneGame.Instance.player.transform.position;
+            foreach (var data in monsters)
+            {
+                GameObject monster = data.Value;
+                if (monster == null) continue;
+                Monster myMonster = monster.GetComponent<Monster>();
+                if (myMonster == null || myMonster.IsStatusDead()) continue;
+                
+                // 거리 계산
+                float distance = Vector2.Distance(playerPosition, monster.transform.position);
+                if (distance > range) continue;
+
+                // 가장 가까운 NPC 업데이트
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closeMonster = myMonster;
+                }
+            }
+            return closeMonster;
+        }
 #if UNITY_EDITOR
         /// <summary>
         /// 카메라 영역, 컬링 영역 시각화

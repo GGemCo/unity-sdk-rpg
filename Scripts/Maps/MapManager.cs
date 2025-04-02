@@ -7,6 +7,7 @@ using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.Utils;
 using GGemCo.Scripts.Addressable;
+using GGemCo.Scripts.Characters;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -476,6 +477,20 @@ namespace GGemCo.Scripts.Maps
             var info = tableLoaderManager.TableMap.GetDataByUid(currentMapUid);
             if (info == null) return;
             LoadMap(info.PlayerDeadSpawnUid);
+        }
+        /// <summary>
+        /// 플레이어 기준 range 안에서 가장 가까운 몬스터 찾기
+        /// </summary>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        public CharacterBase GetNearByMonsterDistance(int range)
+        {
+            return mapTileCommon?.GetNearByMonsterDistance(range);
+        }
+
+        public GameObject GetGridTileMap()
+        {
+            return gridTileMap;
         }
     }
 }
