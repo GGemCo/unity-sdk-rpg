@@ -15,6 +15,9 @@ namespace GGemCo.Scripts.ScriptableSettings
         [Header("애니메이션 스텝 당 이동거리(픽셀)")] public int statMoveStep;
         [Header("공격 속도(100->1)")] public int statAttackSpeed;
         [Header("이동 속도(100->1)")] public int statMoveSpeed;
+        [Header("불 속성 저항(100->1)")] public int statRegistFire;
+        [Header("얼음 속성 저항(100->1)")] public int statRegistCold;
+        [Header("전기 속성 저항(100->1)")] public int statRegistLightning;
         
         /// <summary>
         /// 기존 값이 비어있을 때만 기본값을 설정
@@ -34,6 +37,9 @@ namespace GGemCo.Scripts.ScriptableSettings
             statMp = 100;
             statMoveStep = 100;
             statMoveSpeed = 100;
+            statRegistFire = 0;
+            statRegistCold = 0;
+            statRegistLightning = 0;
         }
     }
 }
