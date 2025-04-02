@@ -5,6 +5,7 @@ using GGemCo.Scripts.Configs;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.TagName;
+using GGemCo.Scripts.Utils;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -38,6 +39,7 @@ namespace GGemCo.Scripts.Items
         private bool isBouncing; // 바운스 여부 체크
         private float bounceTime; // 바운스 지속 시간
         private float rotationDirection; // 랜덤 회전 방향
+        private float mapSizeHeight;
 
         [Tooltip("드랍 후 dropItemDestroyTimeSec 시간 후 destroy")]
         private Coroutine coroutineDropItemDestroy;
@@ -134,6 +136,8 @@ namespace GGemCo.Scripts.Items
 
             // 랜덤한 회전 방향 설정
             rotationDirection = Random.Range(-1f, 1f);
+
+            mapSizeHeight = SceneGame.Instance.mapManager.GetCurrentMapSize().height;
             
             isStart = true;
 
@@ -226,7 +230,7 @@ namespace GGemCo.Scripts.Items
             isBouncing = false;
             // 드랍된 후에는 캐릭터 layer 로 적용한다.
             itemRenderer.sortingLayerName = ConfigSortingLayer.GetValue(ConfigSortingLayer.Keys.Character);
-            itemRenderer.sortingOrder = -(int)(transform.position.y * 100);
+            itemRenderer.sortingOrder = MathHelper.GetSortingOrder(mapSizeHeight, transform.position.y);
             circleCollider2D.enabled = true;
 
             coroutineDropItemDestroy = StartCoroutine(CheckDestroyTime());

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GGemCo.Scripts.Configs;
 
 namespace GGemCo.Scripts.Items
 {
@@ -82,12 +83,12 @@ namespace GGemCo.Scripts.Items
             { "knife2", "knife" },
         };
 
-        public static readonly Dictionary<string, string> StatusSuffixFormats = new Dictionary<string, string>
+        public static readonly Dictionary<ConfigCommon.SuffixType, string> StatusSuffixFormats = new Dictionary<ConfigCommon.SuffixType, string>
         {
-            { "_PLUS", "+{0}" },
-            { "_MINUS", "-{0}" },
-            { "_INCREASE", "+{0}%" },
-            { "_DECREASE", "-{0}%" }
+            { ConfigCommon.SuffixType.Plus, "+{0}" },
+            { ConfigCommon.SuffixType.Minus, "-{0}" },
+            { ConfigCommon.SuffixType.Increase, "+{0}%" },
+            { ConfigCommon.SuffixType.Decrease, "-{0}%" }
         };
 
     }

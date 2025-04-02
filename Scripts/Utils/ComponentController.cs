@@ -18,6 +18,7 @@ namespace GGemCo.Scripts.Utils
             body.freezeRotation = true;
             return body;
         }
+
         /// <summary>
         /// CapsuleCollider2D 컴포넌트 추가하기
         /// </summary>
@@ -25,20 +26,24 @@ namespace GGemCo.Scripts.Utils
         /// <param name="isTrigger"></param>
         /// <param name="offset"></param>
         /// <param name="size"></param>
-        /// <param name="includeLayers">각 레이어 index 값의 비트 연산 값</param>
-        /// <param name="excludeLayers">각 레이어 index 값의 비트 연산 값</param>
-        public static CapsuleCollider2D AddCapsuleCollider2D(GameObject gameObject, bool isTrigger, Vector2 offset, Vector2 size, int includeLayers = 0, int excludeLayers = 0)
+        /// <param name="includeLayers">include layer index 값의 비트 연산 값</param>
+        /// <param name="excludeLayers">exclude layer index 값의 비트 연산 값</param>
+        /// <param name="dir"></param>
+        public static CapsuleCollider2D AddCapsuleCollider2D(GameObject gameObject, bool isTrigger, Vector2 offset,
+            Vector2 size, int includeLayers = 0, int excludeLayers = 0,
+            CapsuleDirection2D dir = CapsuleDirection2D.Horizontal)
         {
             CapsuleCollider2D capsuleCollider2D = gameObject.AddComponent<CapsuleCollider2D>();
             if (capsuleCollider2D == null) return null;
             capsuleCollider2D.isTrigger = isTrigger;
             capsuleCollider2D.includeLayers = includeLayers;
             capsuleCollider2D.excludeLayers = excludeLayers;
-            capsuleCollider2D.direction = CapsuleDirection2D.Horizontal;
+            capsuleCollider2D.direction = dir;
             capsuleCollider2D.offset = offset;
             capsuleCollider2D.size = size;
             return capsuleCollider2D;
         }
+
         /// <summary>
         /// BoxCollider2D 컴포넌트 추가하기
         /// </summary>
@@ -77,5 +82,17 @@ namespace GGemCo.Scripts.Utils
             tileMapCollider2D.offset = offset;
             return tileMapCollider2D;
         }
+        public static PolygonCollider2D AddPolygonCollider2D(GameObject gameObject, bool isTrigger, Vector2 offset, Vector2[] points, int includeLayers = 0, int excludeLayers = 0)
+        {
+            PolygonCollider2D polygonCollider2D = gameObject.AddComponent<PolygonCollider2D>();
+            if (polygonCollider2D == null) return null;
+            polygonCollider2D.isTrigger = isTrigger;
+            polygonCollider2D.includeLayers = includeLayers;
+            polygonCollider2D.excludeLayers = excludeLayers;
+            polygonCollider2D.offset = offset;
+            polygonCollider2D.points = points;
+            return polygonCollider2D;
+        }
+        
     }
 }

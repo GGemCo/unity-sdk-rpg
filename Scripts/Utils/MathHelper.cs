@@ -1,6 +1,8 @@
-﻿namespace GGemCo.Scripts.Utils
+﻿using UnityEngine;
+
+namespace GGemCo.Scripts.Utils
 {
-    public class MathHelper
+    public static class MathHelper
     {
         public static string FormatNumber(long number)
         {
@@ -48,6 +50,27 @@
             }
 
             return integerPart + "." + fractionalPart;
+        }
+        /// <summary>
+        /// y 위치 값으로 sorting order 구하기
+        /// </summary>
+        /// <param name="maxY">게임 월드에서 캐릭터가 있을 수 있는 y 좌표의 범위를 정의합니다.</param>
+        /// <param name="positionY"></param>
+        /// <returns></returns>
+        public static int GetSortingOrder(float maxY, float positionY)
+        {
+            float minY = 0;
+            
+            // SpriteRenderer의 정렬 순서 범위 설정
+            int minOrder = 1;
+            int maxOrder = 10000;
+    
+            // 현재 y 좌표를 0~1 범위로 정규화합니다.
+            // (maxY에서 minY로 갈수록 값이 커지도록 InverseLerp 사용)
+            float normalizedY = Mathf.InverseLerp(maxY, minY, positionY);
+
+            // 정규화된 값을 minOrder ~ maxOrder 범위에 맞게 매핑합니다.
+            return minOrder + Mathf.RoundToInt(normalizedY * (maxOrder - minOrder));
         }
     }
 }

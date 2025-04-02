@@ -223,6 +223,10 @@ namespace GGemCo.Scripts.Spine2d
             // Add the gun to your new custom skin.
             if (newAttachment != null) targetSkin.SetAttachment(slotIndex, attachmentName, newAttachment);
         }
+        /// <summary>
+        /// 슬롯 이미지 바꾸기
+        /// </summary>
+        /// <param name="changeImages"></param>
         protected void ChangeImageInSlot(List<StruckChangeSlotImage> changeImages)
         {
             string baseSkinName = "default";
@@ -261,6 +265,12 @@ namespace GGemCo.Scripts.Spine2d
             skeleton.SetSlotsToSetupPose();
             SkeletonAnimation.Update(0);
         }
+        /// <summary>
+        /// 클립 재생 시간 구하기
+        /// </summary>
+        /// <param name="animationName"></param>
+        /// <param name="isMilliseconds"></param>
+        /// <returns></returns>
         protected float GetAnimationDuration(string animationName, bool isMilliseconds = true)
         {
             var findAnimation = SkeletonAnimation.Skeleton.Data.FindAnimation(animationName);
@@ -294,6 +304,22 @@ namespace GGemCo.Scripts.Spine2d
         /// <param name="entry"></param>
         protected virtual void OnAnimationInterrupt(TrackEntry entry)
         {
+        }
+        /// <summary>
+        /// 색상 바꾸기
+        /// </summary>
+        /// <param name="color"></param>
+        protected void SetColor(Color color)
+        {
+            SkeletonAnimation.Skeleton.SetColor(color);
+        }
+        /// <summary>
+        /// hex code 로 색상 바꾸기
+        /// </summary>
+        /// <param name="colorHex"></param>
+        protected void SetColor(string colorHex)
+        {
+            SetColor(ColorHelper.HexToColor(colorHex));
         }
     }
 }

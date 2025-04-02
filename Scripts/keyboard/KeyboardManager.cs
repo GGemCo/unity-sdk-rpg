@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 
 namespace GGemCo.Scripts.keyboard
@@ -65,7 +64,7 @@ namespace GGemCo.Scripts.keyboard
 
         protected virtual void OnTriggerEscapeKeyDown()
         {
-            GcLogger.Log("OnTriggerEscapeKeyDown");
+            // GcLogger.Log("OnTriggerEscapeKeyDown");
             if (sceneGame.uIWindowManager == null) return;
             sceneGame.uIWindowManager.CloseAll();
         }
