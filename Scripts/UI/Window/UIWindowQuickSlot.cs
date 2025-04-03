@@ -41,6 +41,7 @@ namespace GGemCo.Scripts.UI.Window
         {
             base.Start();
             quickSlotData = SceneGame.Instance.saveDataManager.QuickSlot;
+            SceneGame.Instance.KeyboardManager.RegisterInputHandler(this);
             LoadIcons();
         }
         /// <summary>
@@ -68,12 +69,6 @@ namespace GGemCo.Scripts.UI.Window
                 uiIcon.ChangeInfoByUid(skillUid, skillCount, skillLevel);
             }
         }
-        protected void OnEnable()
-        {
-            if (SceneGame.Instance == null) return;
-            SceneGame.Instance.KeyboardManager.RegisterInputHandler(this);
-        }
-
         protected void OnDisable()
         {
             if (SceneGame.Instance == null) return;
