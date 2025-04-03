@@ -225,7 +225,8 @@ namespace GGemCo.Scripts.UI.WindowSkill
         {
             if (icon == null) return;
             
-            if (icon.CoolTimeHandler != null && icon.CoolTimeHandler.GetCurrentCoolTime() > 0)
+            float time = SceneGame.Instance.uIIconCoolTimeManager.GetCurrentCoolTime(uid, icon.uid);
+            if (time > 0)
             {
                 SceneGame.Instance.systemMessageManager.ShowMessageWarning("쿨타임 중에는 바꿀 수 없습니다.");
                 return;

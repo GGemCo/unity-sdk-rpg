@@ -3,8 +3,12 @@ using UnityEngine.UI;
 
 namespace GGemCo.Scripts.UI.Icon
 {
-    public class UICoolTimeHandler : MonoBehaviour
+    /// <summary>
+    /// 아이콘 쿨타임 관리
+    /// </summary>
+    public class UICoolTimeHandler
     {
+        private UIWindowManager.WindowUid windowUid;
         // 현재 쿨타임 시간
         private float currentCoolTime;
         // true : 시계 반대 방향으로 쿨타임이 표시된다. 
@@ -18,9 +22,10 @@ namespace GGemCo.Scripts.UI.Icon
 
         private UIIcon icon;
 
-        private void Awake()
+        public void Initialize(UIWindowManager.WindowUid pwindowUid, UIIcon picon)
         {
-            icon = GetComponent<UIIcon>();
+            windowUid = pwindowUid;
+            icon = picon;
             coolTimeGauge = icon.imageCoolTimeGauge;
 
             if (coolTimeGauge != null)
@@ -29,7 +34,7 @@ namespace GGemCo.Scripts.UI.Icon
             }
         }
 
-        private void Update()
+        public void Update()
         {
             UpdateCoolTime();
         }
@@ -61,7 +66,7 @@ namespace GGemCo.Scripts.UI.Icon
             currentCoolTime -= Time.deltaTime;
             if (currentCoolTime <= 0)
             {
-                EndCoolTime();
+                ResetCoolTime();
                 return;
             }
 
@@ -72,8 +77,7 @@ namespace GGemCo.Scripts.UI.Icon
                     : currentCoolTime / coolTimeDuration;
             }
         }
-
-        public void InitializeCoolTime()
+        public void ResetCoolTime()
         {
             isPlayingCoolTime = false;
             currentCoolTime = 0;
@@ -84,18 +88,7 @@ namespace GGemCo.Scripts.UI.Icon
             }
         }
 
-        private void EndCoolTime()
-        {
-            isPlayingCoolTime = false;
-            currentCoolTime = 0;
-
-            if (coolTimeGauge != null)
-            {
-                coolTimeGauge.gameObject.SetActive(false);
-            }
-        }
-
-        public void SetCoolTime(float time) => coolTimeDuration = time;
+        private void SetCoolTime(float time) => coolTimeDuration = time;
 
         public float GetCurrentCoolTime() => currentCoolTime;
 

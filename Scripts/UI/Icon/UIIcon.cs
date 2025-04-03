@@ -53,8 +53,7 @@ namespace GGemCo.Scripts.UI.Icon
             
         // 드래그 핸들러
         private UIDragHandler dragHandler;
-        // 쿨타임 핸들러
-        public UICoolTimeHandler CoolTimeHandler;
+        
         private RectTransform rectTransform;
 
         protected virtual void Awake()
@@ -72,9 +71,12 @@ namespace GGemCo.Scripts.UI.Icon
             
             ImageIcon = GetComponent<Image>();
             dragHandler = gameObject.AddComponent<UIDragHandler>();
-            CoolTimeHandler = gameObject.AddComponent<UICoolTimeHandler>();
             rectTransform = GetComponent<RectTransform>();
 
+            if (imageCoolTimeGauge != null)
+            {
+                imageCoolTimeGauge.gameObject.SetActive(false);
+            }
             SetSelected(false);
         }
 
@@ -163,7 +165,8 @@ namespace GGemCo.Scripts.UI.Icon
         /// <param name="remainCoolTime"></param>
         public virtual bool ChangeInfoByUid(int iconUid, int iconCount = 0, int iconLevel = 0, bool iconIsLearn = false, int remainCoolTime = 0)
         {
-            CoolTimeHandler?.SetRemainCoolTime(remainCoolTime);
+            SceneGame.Instance.uIIconCoolTimeManager.SetRemainCoolTime(windowUid, iconUid, remainCoolTime);
+            
             if (iconUid == 0 && iconCount == 0)
             {
                 ClearIconInfos();
@@ -207,7 +210,8 @@ namespace GGemCo.Scripts.UI.Icon
         /// </summary>
         public virtual void ClearIconInfos()
         {
-            CoolTimeHandler?.InitializeCoolTime();
+            SceneGame.Instance.uIIconCoolTimeManager.ResetCoolTime(windowUid, uid);
+            
             uid = 0;
             Sprite newSprite = Resources.Load<Sprite>($"Images/UI/blank");
             if (ImageIcon != null)
@@ -235,7 +239,7 @@ namespace GGemCo.Scripts.UI.Icon
         {
             if (ImageIcon == null) return;
             string path = GetIconImagePath();
-            if (path == null || path == "")
+            if (string.IsNullOrEmpty(path))
             {
                 ImageIcon.sprite = null;
                 return;
@@ -248,7 +252,7 @@ namespace GGemCo.Scripts.UI.Icon
         /// </summary>
         /// <param name="size"></param>
         /// <param name="slotSize"></param>
-        public void ChangeIconImageSize(Vector2 size, Vector2 slotSize)
+        private void ChangeIconImageSize(Vector2 size, Vector2 slotSize)
         {
             rectTransform.sizeDelta = size;
             var diff = (slotSize.x - size.x)/2;
@@ -268,7 +272,8 @@ namespace GGemCo.Scripts.UI.Icon
             isSelected = selected;
             ShowSelected(selected);
         }
-        public void ShowSelected(bool selected)
+
+        protected void ShowSelected(bool selected)
         {
             if (imageSelected == null) return;
             // 선택된 아이콘이면 끄지 않는다.
@@ -318,7 +323,8 @@ namespace GGemCo.Scripts.UI.Icon
         {
             level = value;
         }
-        public void SetIsLearn(bool value)
+
+        private void SetIsLearn(bool value)
         {
             isLearn = value;
         }
@@ -344,12 +350,14 @@ namespace GGemCo.Scripts.UI.Icon
         public bool PlayCoolTime(float coolTime)
         {
             if (!(coolTime > 0)) return false;
-            if (CoolTimeHandler != null && CoolTimeHandler.GetCurrentCoolTime() > 0)
+            float time = SceneGame.Instance.uIIconCoolTimeManager.GetCurrentCoolTime(windowUid, uid);
+            if (time > 0)
             {
                 SceneGame.Instance.systemMessageManager.ShowMessageWarning("쿨타임 중에는 사용할 수 없습니다.");
                 return false;
             }
-            return CoolTimeHandler.PlayCoolTime(coolTime);
+            
+            return SceneGame.Instance.uIIconCoolTimeManager.PlayCoolTime(windowUid, this, coolTime);
         }
     }
 }

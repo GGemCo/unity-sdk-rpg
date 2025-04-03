@@ -236,7 +236,9 @@ namespace GGemCo.Scripts.UI.Window
         public override void OnRightClick(UIIcon icon)
         {
             if (icon == null) return;
-            if (icon.CoolTimeHandler != null && icon.CoolTimeHandler.GetCurrentCoolTime() > 0)
+            
+            float time = SceneGame.Instance.uIIconCoolTimeManager.GetCurrentCoolTime(uid, icon.uid);
+            if (time > 0)
             {
                 SceneGame.Instance.systemMessageManager.ShowMessageWarning("쿨타임 중에는 사용할 수 없습니다.");
                 return;

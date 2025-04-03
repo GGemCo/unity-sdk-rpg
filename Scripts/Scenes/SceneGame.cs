@@ -53,6 +53,7 @@ namespace GGemCo.Scripts.Scenes
         [HideInInspector] public CalculateManager calculateManager;
         [HideInInspector] public MapManager mapManager;
         [HideInInspector] public DamageTextManager damageTextManager;
+        [HideInInspector] public UIIconCoolTimeManager uIIconCoolTimeManager;
         public ItemManager ItemManager;
         public CharacterManager CharacterManager;
         public KeyboardManager KeyboardManager;
@@ -92,6 +93,7 @@ namespace GGemCo.Scripts.Scenes
             mapManager = CreateManager<MapManager>(managerContainer);
             saveDataManager = CreateManager<SaveDataManager>(managerContainer);
             damageTextManager = CreateManager<DamageTextManager>(managerContainer);
+            uIIconCoolTimeManager = CreateManager<UIIconCoolTimeManager>(managerContainer);
             
             ItemManager = new ItemManager();
             ItemManager.Initialize(this);

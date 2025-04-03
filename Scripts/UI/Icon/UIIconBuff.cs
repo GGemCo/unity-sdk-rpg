@@ -1,4 +1,5 @@
-﻿using GGemCo.Scripts.TableLoader;
+﻿using GGemCo.Scripts.Scenes;
+using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.Utils;
 
 namespace GGemCo.Scripts.UI.Icon
@@ -13,15 +14,9 @@ namespace GGemCo.Scripts.UI.Icon
         protected override void Awake()
         {
             base.Awake();
+            windowUid = UIWindowManager.WindowUid.PlayerBuffInfo;
             IconType = IconConstants.Type.Buff;
         }
-
-        protected override void Start()
-        {
-            base.Start();
-            CoolTimeHandler.PlayCoolTime();
-        }
-
         public void Initialize(int affectUid)
         {
             if (affectUid <= 0) return;
@@ -32,14 +27,21 @@ namespace GGemCo.Scripts.UI.Icon
                 return;
             }
 
+            uid = affectUid;
+
             if (info.Duration <= 0)
             {
                 GcLogger.LogWarning("지속 시간이 0 입니다.");
             }
 
             struckTableAffect = info;
-            CoolTimeHandler?.SetCoolTime(info.Duration);
             ChangeInfoByUid(affectUid, 1);
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+            SceneGame.Instance.uIIconCoolTimeManager.PlayCoolTime(windowUid, this, struckTableAffect.Duration);
         }
         /// <summary>
         /// 아이콘 이미지 경로 가져오기 
