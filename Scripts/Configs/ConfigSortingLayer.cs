@@ -11,6 +11,8 @@
             MapTerrain,
             // 맵 오브젝트
             MapObject,
+            // 캐릭터 밑에
+            CharacterBottom,
             // 캐릭터
             Character,
             // 캐릭터 위에 
