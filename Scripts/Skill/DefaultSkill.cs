@@ -234,6 +234,7 @@ namespace GGemCo.Scripts.Skill
         }
         private IEnumerator DamageByTickTime()
         {
+            if (attacker == null) yield break;
             if (polyCollider2D == null) yield break;
             
             // 충돌 감지를 확실하게 하기 위해 한 프레임 대기
