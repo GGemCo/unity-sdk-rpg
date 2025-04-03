@@ -349,7 +349,6 @@ namespace GGemCo.Scripts.UI.Icon
         /// <returns></returns>
         public bool PlayCoolTime(float coolTime)
         {
-            if (!(coolTime > 0)) return false;
             float time = SceneGame.Instance.uIIconCoolTimeManager.GetCurrentCoolTime(windowUid, uid);
             if (time > 0)
             {

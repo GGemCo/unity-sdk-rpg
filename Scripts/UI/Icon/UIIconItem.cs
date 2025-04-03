@@ -113,8 +113,11 @@ namespace GGemCo.Scripts.UI.Icon
             {
                 if (uid <= 0 || GetCount() <= 0) return;
                 float coolTime = struckTableItem.CoolTime;
-                if (coolTime <= 0) return;
-                if (!PlayCoolTime(coolTime)) return;
+                if (coolTime > 0)
+                {
+                    if (!PlayCoolTime(coolTime)) return;
+                }
+
                 window.OnRightClick(this);
             }
         }
