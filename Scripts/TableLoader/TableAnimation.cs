@@ -16,6 +16,7 @@ namespace GGemCo.Scripts.TableLoader
         public float Width;
         public float Height;
         public int AttackRange;
+        public Vector2 HitAreaSize;
     }
     /// <summary>
     /// 애니메이션 테이블
@@ -43,6 +44,7 @@ namespace GGemCo.Scripts.TableLoader
                 AttackRange = int.Parse(data["AttackRange"]),
                 Width = float.Parse(data["Width"]),
                 Height = float.Parse(data["Height"]),
+                HitAreaSize = ConvertVector2(data["HitAreaSize"]),
             };
         }
         public GameObject GetPrefab(int uid) {

@@ -1,6 +1,4 @@
-﻿using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Utils;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace GGemCo.Scripts.Characters
 {

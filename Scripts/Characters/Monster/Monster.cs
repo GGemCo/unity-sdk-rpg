@@ -75,11 +75,9 @@ namespace GGemCo.Scripts.Characters.Monster
             CharacterHitArea characterHitArea = hitArea.AddComponent<CharacterHitArea>();
             characterHitArea.Initialize(this);
             
-            offset = new Vector2(-1.83622742f, 142.859879f);
-            size = new Vector2(109.506775f, 216.882843f);
-            colliderCheckHitArea = ComponentController.AddCapsuleCollider2D(hitArea, true, offset, size);
+            colliderCheckHitArea = ComponentController.AddCapsuleCollider2D(hitArea, true, offset, size, 0, 0, CapsuleDirection2D.Vertical);
             
-            // 순서 중요
+            // 순서 중요. ControllerMonster 에서 콜라이더를 사용
             controllerMonster = gameObject.AddComponent<ControllerMonster>();
         }
         /// <summary>
@@ -112,7 +110,7 @@ namespace GGemCo.Scripts.Characters.Monster
                 info.RegistFire, info.RegistCold, info.RegistLightning);
             CurrentHp.OnNext(info.StatHp);
             SetScale(info.Scale);
-
+            
             // animation 테이블 정보 셋팅
             StruckTableAnimation struckTableAnimation = tableLoaderManager.TableAnimation.GetDataByUid(info.SpineUid);
             if (struckTableAnimation is { Uid: > 0 })
@@ -121,6 +119,11 @@ namespace GGemCo.Scripts.Characters.Monster
                 if (colliderCheckCharacter != null)
                 {
                     colliderCheckCharacter.size = new Vector2(struckTableAnimation.AttackRange, struckTableAnimation.AttackRange/2f);
+                }
+                if (colliderCheckHitArea != null)
+                {
+                    colliderCheckHitArea.offset = new Vector2(0, struckTableAnimation.Height/2f);
+                    colliderCheckHitArea.size = struckTableAnimation.HitAreaSize;
                 }
                 height = struckTableAnimation.Height;
             }
