@@ -17,10 +17,9 @@ namespace GGemCo.Scripts.UI.WindowSkill
     /// </summary>
     public class UIWindowSkill : UIWindow
     {
-        [Header("Skill Element 를 담을 오브젝트")]
-        public GameObject containerElement;
-        [Header("스킬 정보 윈도우")]
+        [Tooltip("스킬 정보 윈도우")]
         public UIWindowSkillInfo uIWindowSkillInfo;
+        [Tooltip("스킬 element 프리팹")]
         public GameObject prefabUIElementSkill;
         
         private TableSkill tableSkill;
