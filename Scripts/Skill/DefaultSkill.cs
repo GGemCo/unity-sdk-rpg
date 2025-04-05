@@ -80,6 +80,7 @@ namespace GGemCo.Scripts.Skill
                 GameObject prefab = tableEffect.GetPrefab(struckTableSkill.EffectUid);
                 if (prefab == null) return;
 
+                // 범위 공격일 때, 타원형 콜라이더를 생성하고 충돌체크를 한다.
                 if (struckTableSkill.TargetType == SkillConstants.TargetType.Range && struckTableSkill.DamageRange > 0)
                 {
                     float effectSize = effectinfo.Width * prefab.transform.localScale.x; // 이펙트 크기 (고정)
@@ -139,6 +140,7 @@ namespace GGemCo.Scripts.Skill
                     }
                     transform.position = target.transform.position;
                 }
+                // 범위 공격이 아닐때, 이펙트 테이블에 있는 콜라이더 크기로 캡슐 콜라이더를 만들고 충돌 체크를 한다
                 else
                 {
                     arrowDefaultEffect = EffectManager.CreateEffect(struckTableSkill.EffectUid);
@@ -165,6 +167,7 @@ namespace GGemCo.Scripts.Skill
                     // 방향에 따라 rotation 처리 
                     arrowDefaultEffect.SetRotation(directionByTarget, direction);
 
+                    // 범위 공격이 아닐때, 이펙트 collider 로 충돌 체크를 한다
                     Vector2 size = new Vector2(effectinfo.ColliderSize.x * arrowDefaultEffect.transform.localScale.x, effectinfo.ColliderSize.y * arrowDefaultEffect.transform.localScale.y);
                     Vector2 offset = Vector2.zero;
                     capsuleCollider2D = ComponentController.AddCapsuleCollider2D(gameObject, true, offset, size);
@@ -228,6 +231,7 @@ namespace GGemCo.Scripts.Skill
             List<CharacterBase> characterBases = GetMonsterInCollider();
             foreach (var character in characterBases)
             {
+                if (struckTableSkill.AffectUid <= 0) continue;
                 character.AddAffect(struckTableSkill.AffectUid);
             }
             yield return null;
