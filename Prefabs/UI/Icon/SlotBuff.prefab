@@ -218,7 +218,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: a97ed1509e758c44784205c8208bdd07, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -248,6 +248,5 @@ MonoBehaviour:
   index: 0
   slotIndex: 0
   uid: 0
-  count: 0
   imageGrade: {fileID: 0}
   imageLock: {fileID: 0}

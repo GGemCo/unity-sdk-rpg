@@ -78,13 +78,6 @@ namespace GGemCo.Scripts.UI.Icon
             UpdateInfo();
             return true;
         }
-        protected override bool UpdateInfo()
-        {
-            if (!base.UpdateInfo()) return false;
-            UpdateIconImage();
-            return true;
-        }
-
         public void OnPointerEnter(PointerEventData eventData)
         {
             // GcLogger.Log("OnPointerEnter "+eventData);

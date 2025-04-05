@@ -27,6 +27,8 @@ namespace GGemCo.Scripts.UI.Icon
                 return;
             }
 
+            if (!ChangeInfoByUid(affectUid, 1)) return;
+
             uid = affectUid;
 
             if (info.Duration <= 0)
@@ -35,7 +37,7 @@ namespace GGemCo.Scripts.UI.Icon
             }
 
             struckTableAffect = info;
-            ChangeInfoByUid(affectUid, 1);
+            UpdateInfo();
         }
 
         protected override void Start()

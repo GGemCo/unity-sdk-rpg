@@ -73,12 +73,6 @@ namespace GGemCo.Scripts.UI.Icon
             }
             ImageIcon.sprite = Resources.Load<Sprite>(path);
         }
-        protected override bool UpdateInfo()
-        {
-            if (!base.UpdateInfo()) return false;
-            UpdateIconImage();
-            return true;
-        }
         /// <summary>
         /// 아이콘 이미지 경로 가져오기 
         /// </summary>

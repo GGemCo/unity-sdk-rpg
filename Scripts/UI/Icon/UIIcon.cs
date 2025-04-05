@@ -150,10 +150,10 @@ namespace GGemCo.Scripts.UI.Icon
         public IconConstants.Grade GetGrade() => grade;
         public void SetStatus(IconConstants.Status status) => this.iconStatus = status;
 
-        protected virtual bool UpdateInfo()
+        protected void UpdateInfo()
         {
-            if (uid <= 0) return false;
-            return true;
+            if (uid <= 0) return;
+            UpdateIconImage();
         }
         /// <summary>
         /// 다른 uid 로 변경하기
