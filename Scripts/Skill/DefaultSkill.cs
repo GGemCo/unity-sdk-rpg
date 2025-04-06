@@ -70,7 +70,12 @@ namespace GGemCo.Scripts.Skill
                 // 스킬 사용 거리 가져오기
                 // 사용 거리 안에 있는 몬스터 찾기
                 target = SceneGame.Instance.mapManager.GetNearByMonsterDistance(struckTableSkill.Distance);
-                if (target == null) return;
+            }
+
+            if (target == null)
+            {
+                SceneGame.Instance.systemMessageManager.ShowMessageWarning("타겟이 없습니다.");
+                return;
             }
             
             // 이펙트 처리
@@ -166,6 +171,8 @@ namespace GGemCo.Scripts.Skill
                     Vector2 directionByTarget = target.transform.position - transform.position;
                     // 방향에 따라 rotation 처리 
                     arrowDefaultEffect.SetRotation(directionByTarget, direction);
+                    // 이펙트가 destroy 되었을때 콜백
+                    arrowDefaultEffect.OnEffectDestroy += OnArrowEffectDestroy;
 
                     // 범위 공격이 아닐때, 이펙트 collider 로 충돌 체크를 한다
                     Vector2 size = new Vector2(effectinfo.ColliderSize.x * arrowDefaultEffect.transform.localScale.x, effectinfo.ColliderSize.y * arrowDefaultEffect.transform.localScale.y);
@@ -187,6 +194,9 @@ namespace GGemCo.Scripts.Skill
             {
                 StartCoroutine(AffectByTickTimeOnce());
             }
+            
+            // 스킬이 발사되면 마력 사용하기
+            attacker.MinusMp(struckTableSkill.NeedMp);
         }
 
         private List<CharacterBase> GetMonsterInCollider()
@@ -303,6 +313,11 @@ namespace GGemCo.Scripts.Skill
                 arrowDefaultEffect.SetEnd();
                 
             }
-        }  
+        }
+
+        private void OnArrowEffectDestroy()
+        {
+            Destroy(gameObject);
+        }
     }
 }

@@ -41,6 +41,9 @@ namespace GGemCo.Scripts.Effect
         private Coroutine coroutineTickTimeDamage;
         private StruckTableEffect struckTableEffect;
         
+        public delegate void DelegateEffectDestroy();
+        public event DelegateEffectDestroy OnEffectDestroy;
+        
         protected override void Awake()
         {
             base.Awake();
@@ -88,6 +91,7 @@ namespace GGemCo.Scripts.Effect
             if (entry.Animation.Name == CLIP_NAME_END)
             {
                 Destroy(gameObject);
+                OnEffectDestroy?.Invoke();
             }
         }
         /// <summary>

@@ -37,7 +37,6 @@ namespace GGemCo.Scripts.Skill
             GameObject skill = new GameObject("skill" + info.Uid);
             DefaultSkill defaultSkill = skill.AddComponent<DefaultSkill>();
             defaultSkill.Initialize(character, skillUid, skillLevel);
-            character.AddMp(-info.NeedMp);
         }
     }
 }

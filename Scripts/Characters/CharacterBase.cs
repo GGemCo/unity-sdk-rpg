@@ -548,7 +548,15 @@ namespace GGemCo.Scripts.Characters
             {
                 newVale = TotalMp.Value;
             }
-
+            CurrentMp.OnNext(newVale);
+        }
+        /// <summary>
+        /// 현재 마력 빼기
+        /// </summary>
+        /// <param name="value"></param>
+        public void MinusMp(int value)
+        {
+            long newVale = CurrentMp.Value - value;
             if (newVale < 0)
             {
                 newVale = 0;
