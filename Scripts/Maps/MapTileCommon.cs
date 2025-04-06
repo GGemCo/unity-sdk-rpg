@@ -165,7 +165,7 @@ namespace GGemCo.Scripts.Maps
                 GameObject monster = data.Value;
                 if (monster == null) continue;
                 Monster myMonster = monster.GetComponent<Monster>();
-                if (myMonster == null || myMonster.IsStatusDead()) continue;
+                if (myMonster == null || myMonster.IsStatusDead() || !myMonster.gameObject.activeSelf) continue;
                 
                 // 거리 계산
                 float distance = Vector2.Distance(playerPosition, monster.transform.position);
