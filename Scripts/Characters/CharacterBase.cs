@@ -563,5 +563,12 @@ namespace GGemCo.Scripts.Characters
             }
             CurrentMp.OnNext(newVale);
         }
+        /// <summary>
+        /// disable 되었을때 어펙트 효과 모두 지워주기
+        /// </summary>
+        private void OnDisable()
+        {
+            AffectController?.RemoveAllAffects();
+        }
     }
 }

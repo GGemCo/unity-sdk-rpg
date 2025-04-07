@@ -86,14 +86,19 @@ namespace GGemCo.Scripts.Affect
             if (activeBuffs.Count > 0)
             {
                 // 캐릭터에 적용되어 있던 어펙트를 먼저 지워준다.
-                List<ConfigCommon.StruckStatus> buffs = activeBuffs[affectUid];
-                character.RemoveStatModifiers(buffs);
+                character.RemoveStatModifiers(activeBuffs[affectUid]);
                 character.RecalculateStats();
                 activeBuffs[affectUid].Clear();
+                activeBuffs.Remove(affectUid);
             }
-            if (defaultEffects.Remove(affectUid, out var effect))
+
+            if (defaultEffects.Count > 0)
             {
-                Object.Destroy(effect.gameObject);
+                if (defaultEffects.Remove(affectUid, out var effect))
+                {
+                    if (effect == null) return;
+                    Object.Destroy(effect.gameObject);
+                }
             }
         }
         /// <summary>
@@ -115,7 +120,7 @@ namespace GGemCo.Scripts.Affect
             // 생성된 이펙트 지우기
             foreach (var info in defaultEffects)
             {
-                Object.Destroy(info.Value.gameObject);
+                info.Value.DestroyForce();
             }
             activeBuffs.Clear();
             defaultEffects.Clear();

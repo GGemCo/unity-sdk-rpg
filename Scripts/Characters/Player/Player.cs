@@ -297,7 +297,6 @@ namespace GGemCo.Scripts.Characters.Player
         {
             if (uiWindowHud == null)
             {
-                GcLogger.LogError("UIWindowHud 가 없습니다.");
                 return;
             }
             uiWindowHud.SetSliderHp(value, TotalHp.Value);
@@ -306,7 +305,6 @@ namespace GGemCo.Scripts.Characters.Player
         {
             if (uiWindowHud == null) 
             {
-                GcLogger.LogError("UIWindowHud 가 없습니다.");
                 return;
             }
             uiWindowHud.SetSliderMp(value, TotalMp.Value);

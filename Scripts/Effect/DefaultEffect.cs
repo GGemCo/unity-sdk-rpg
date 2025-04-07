@@ -78,10 +78,6 @@ namespace GGemCo.Scripts.Effect
             yield return new WaitForSeconds(f);
             PlayAnimation(CLIP_NAME_END);
         }
-
-        private void Update()
-        {
-        }
         /// <summary>
         /// 애니메이션이 끝나면 호출되는 콜백 함수
         /// </summary>
@@ -90,6 +86,7 @@ namespace GGemCo.Scripts.Effect
         {
             if (entry.Animation.Name == CLIP_NAME_END)
             {
+                StopAllCoroutines();
                 Destroy(gameObject);
                 OnEffectDestroy?.Invoke();
             }
@@ -103,7 +100,10 @@ namespace GGemCo.Scripts.Effect
         
             characterRenderer.sortingOrder = baseSortingOrder;
         }
-
+        /// <summary>
+        /// 지속 시간 설정
+        /// </summary>
+        /// <param name="f"></param>
         public void SetDuration(float f)
         {
             duration = f;
@@ -112,12 +112,19 @@ namespace GGemCo.Scripts.Effect
                 StartCoroutine(RemoveEffectDuration(duration));
             }
         }
-
+        /// <summary>
+        /// 방향 처리
+        /// </summary>
+        /// <param name="dirX"></param>
         public void SetDirection(float dirX)
         {
             transform.localScale = new Vector3(originalScaleX * dirX, transform.localScale.y, transform.localScale.z);
         }
-
+        /// <summary>
+        /// 회전 처리
+        /// </summary>
+        /// <param name="directionByTarget"></param>
+        /// <param name="vector2"></param>
         public void SetRotation(Vector2 directionByTarget, Vector2 vector2)
         {
             if (!struckTableEffect.NeedRotation) return;
@@ -132,10 +139,18 @@ namespace GGemCo.Scripts.Effect
             // Transform의 Z축 회전 적용
             transform.rotation = Quaternion.Euler(0, 0, angle);
         }
-
+        /// <summary>
+        /// 이펙트 end 애니메이션 처리
+        /// </summary>
         public void SetEnd()
         {
             PlayAnimation(CLIP_NAME_END);
+        }
+
+        public void DestroyForce()
+        {
+            StopAllCoroutines();
+            Destroy(gameObject);
         }
     }
 }
