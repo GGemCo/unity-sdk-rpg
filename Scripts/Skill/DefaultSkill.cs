@@ -31,46 +31,50 @@ namespace GGemCo.Scripts.Skill
         private CharacterBase attacker;
         // 스킬 적용 대상
         private CharacterBase target;
-        private float tickTime;
-        
-        private Coroutine coroutineDamageByTickTime;
-        private Coroutine coroutineDamageByTickTimeOnce;
-        private Coroutine coroutineRemoveEffectDuration;
+
         private PolygonCollider2D polyCollider2D;
         private CapsuleCollider2D capsuleCollider2D;
         private Vector3 direction;
         private DefaultEffect arrowDefaultEffect;
-        
+
         private StruckTableSkill struckTableSkill;
         private TableEffect tableEffect;
 
         public void Initialize(CharacterBase character, int skillUid, int skillLevel)
         {
-            struckTableSkill = TableLoaderManager.Instance.TableSkill.GetDataByUidLevel(skillUid, skillLevel);
             attacker = character;
+            struckTableSkill = TableLoaderManager.Instance.TableSkill.GetDataByUidLevel(skillUid, skillLevel);
             tableEffect = TableLoaderManager.Instance.TableEffect;
- 
+
             if (struckTableSkill.Duration > 0)
-            {
-                coroutineRemoveEffectDuration = StartCoroutine(RemoveEffectDuration(struckTableSkill.Duration));
-            }
+                StartCoroutine(RemoveEffectDuration(struckTableSkill.Duration));
+
             ComponentController.AddRigidbody2D(gameObject);
         }
+
         private void Start()
         {
-            target = SceneGame.Instance.player.GetComponent<CharacterBase>();
-            
-            // TargetType 이 Fixed 일때는 Target 에 적중했을때 발동
-            // Range 일 경우는 범위에 Target 이 있을때 발동
-            //      TickTime 이 있을 경우, 범위 안에 있는 Target 에게 TickTime 마다 데미지 적용 
-            // 스킬 target 별 처리 
+            if (!TryInitializeTarget()) return;
+
+            ApplyVisualEffect();
+            ApplyInitialAffect();
+            ApplySkillCost();
+
+            if (struckTableSkill.TargetType == SkillConstants.TargetType.Range)
+                StartCoroutine(AffectByTickTimeOnce());
+        }
+        /// <summary>
+        /// 타겟 지정하기
+        /// </summary>
+        /// <returns></returns>
+        private bool TryInitializeTarget()
+        {
             if (struckTableSkill.Target == SkillConstants.Target.Player)
             {
+                target = SceneGame.Instance.player.GetComponent<CharacterBase>();
             }
             else if (struckTableSkill.Target == SkillConstants.Target.Monster)
             {
-                // 스킬 사용 거리 가져오기
-                // 사용 거리 안에 있는 몬스터 찾기
                 target = SceneGame.Instance.mapManager.GetNearByMonsterDistance(struckTableSkill.Distance);
             }
 
@@ -78,278 +82,254 @@ namespace GGemCo.Scripts.Skill
             {
                 SceneGame.Instance.systemMessageManager.ShowMessageWarning("타겟이 없습니다.");
                 DestroySkill();
-                return;
+                return false;
             }
-            
-            // 이펙트 처리
-            if (struckTableSkill.EffectUid > 0)
-            {
-                var effectinfo = tableEffect.GetDataByUid(struckTableSkill.EffectUid);
-                GameObject prefab = tableEffect.GetPrefab(struckTableSkill.EffectUid);
-                if (prefab == null)
-                {
-                    GcLogger.LogError("이펙트 프리팹이 없습니다. effect Uid: "+struckTableSkill.EffectUid);
-                    DestroySkill();
-                    return;
-                }
 
-                // 범위 공격일 때, 타원형 콜라이더를 생성하고 충돌체크를 한다.
-                if (struckTableSkill.TargetType == SkillConstants.TargetType.Range && struckTableSkill.DamageRange > 0)
-                {
-                    float effectSize = effectinfo.Width * prefab.transform.localScale.x; // 이펙트 크기 (고정)
-                    float spawnRadius = struckTableSkill.DamageRange; // 이펙트 생성 반경
-                    
-                    // 타원형
-                    float radiusX = spawnRadius; // 가로 반경 (a)
-                    float radiusY = spawnRadius/2f; // 세로 반경 (b)
-                    float currentRadiusX = effectSize; // 현재 가로 반경
-                    float currentRadiusY = effectSize * (radiusY / radiusX); // 현재 세로 반경 (비율 유지)
-                    while (currentRadiusX <= radiusX)
-                    {
-                        int count = Mathf.RoundToInt((2 * Mathf.PI * currentRadiusX) / effectSize); // 해당 타원 둘레에 배치할 개수 계산
-                    
-                        for (int i = 0; i < count; i++)
-                        {
-                            float angle = (i / (float)count) * 360f; // 각도 계산
-                            float radian = angle * Mathf.Deg2Rad;
-                    
-                            // 타원 공식 적용
-                            float posX = Mathf.Cos(radian) * currentRadiusX;
-                            float posY = Mathf.Sin(radian) * currentRadiusY;
-                    
-                            posX = Random.Range(posX - 10, posX + 10);
-                            posY = Random.Range(posY - 10, posY + 10);
-                            
-                            Vector3 spawnPosition = target.transform.position + new Vector3(posX, posY, 0);
-
-                            DefaultEffect defaultEffect = EffectManager.CreateEffect(struckTableSkill.EffectUid);
-                            defaultEffect.SetDuration(struckTableSkill.Duration);
-                            defaultEffect.gameObject.transform.position = spawnPosition;
-                        }
-                    
-                        // 다음 타원 크기 증가
-                        currentRadiusX += effectSize;
-                        currentRadiusY += effectSize * (radiusY / radiusX);
-                    }
-                    
-                    // skill 오브젝트에 polygon 콜라이더 추가하기
-                    int vertexCount = 20; // 꼭짓점 개수 (값이 클수록 부드러움)
-                    Vector2[] points = new Vector2[vertexCount];
-                    float diffX = 10f;
-                    float diffY = 10f;
-                    for (int i = 0; i < vertexCount; i++)
-                    {
-                        float angle = (i / (float)vertexCount) * Mathf.PI * 2;
-                        float x = Mathf.Cos(angle) * (radiusX - diffX);
-                        float y = Mathf.Sin(angle) * (radiusY - diffY);
-                        points[i] = new Vector2(x, y);
-                    }
-                    Vector2 offset = Vector2.zero;
-                    polyCollider2D = ComponentController.AddPolygonCollider2D(gameObject, true, offset, points);
-                    
-                    if (struckTableSkill.DamageValue > 0 && struckTableSkill.TickTime > 0)
-                    {
-                        coroutineDamageByTickTime = StartCoroutine(DamageByTickTime());
-                    }
-                    transform.position = target.transform.position;
-                }
-                // 범위 공격이 아닐때, 이펙트 테이블에 있는 콜라이더 크기로 캡슐 콜라이더를 만들고 충돌 체크를 한다
-                else
-                {
-                    arrowDefaultEffect = EffectManager.CreateEffect(struckTableSkill.EffectUid);
-                    arrowDefaultEffect.gameObject.transform.SetParent(gameObject.transform);
-                    
-                    // 날아가지 않는 이펙트는 바로 타겟 위치로
-                    if (struckTableSkill.EffectMoveSpeed <= 0)
-                    {
-                        transform.position = target.transform.position;
-                    }
-                    else
-                    {
-                        transform.position = attacker.transform.position + new Vector3(0, attacker.GetHeightByScale() / 2f, 0);
-                    }
-                    
-                    // 방향 계산 (목표 지점 - 현재 위치)
-                    Vector3 targetPosition = target.transform.position + new Vector3(0, target.GetHeightByScale() / 2f, 0);
-                    direction = (targetPosition - transform.position).normalized;
-
-                    // 방향에 따라 이펙트 좌우 반전
-                    float dirX = GetScaleByDirection();
-                    arrowDefaultEffect.SetDirection(dirX);
-                    Vector2 directionByTarget = target.transform.position - transform.position;
-                    // 방향에 따라 rotation 처리 
-                    arrowDefaultEffect.SetRotation(directionByTarget, direction);
-                    // 이펙트가 destroy 되었을때 콜백
-                    arrowDefaultEffect.OnEffectDestroy += OnArrowEffectDestroy;
-
-                    // 범위 공격이 아닐때, 이펙트 collider 로 충돌 체크를 한다
-                    Vector2 size = new Vector2(effectinfo.ColliderSize.x * arrowDefaultEffect.transform.localScale.x, effectinfo.ColliderSize.y * arrowDefaultEffect.transform.localScale.y);
-                    Vector2 offset = Vector2.zero;
-                    capsuleCollider2D = ComponentController.AddCapsuleCollider2D(gameObject, true, offset, size);
-                }
-            }
-            
-            // 스킬 target type 별 처리 
-            if (struckTableSkill.TargetType == SkillConstants.TargetType.Fixed)
-            {
-                // 어펙트 처리
-                if (struckTableSkill.AffectUid > 0)
-                {
-                    target.AddAffect(struckTableSkill.AffectUid);
-                }
-            }
-            else if (struckTableSkill.TargetType == SkillConstants.TargetType.Range)
-            {
-                coroutineDamageByTickTimeOnce = StartCoroutine(AffectByTickTimeOnce());
-            }
-            
-            // 스킬이 발사되면 마력 사용하기
+            return true;
+        }
+        /// <summary>
+        /// 마력 사용하기
+        /// </summary>
+        private void ApplySkillCost()
+        {
             attacker.MinusMp(struckTableSkill.NeedMp);
         }
+        /// <summary>
+        /// 이펙트 표현하기
+        /// </summary>
+        private void ApplyVisualEffect()
+        {
+            if (struckTableSkill.EffectUid <= 0) return;
 
+            var effectInfo = tableEffect.GetDataByUid(struckTableSkill.EffectUid);
+            var effectPrefab = tableEffect.GetPrefab(struckTableSkill.EffectUid);
+            if (effectPrefab == null)
+            {
+                GcLogger.LogError($"이펙트 프리팹이 없습니다. effect Uid: {struckTableSkill.EffectUid}");
+                DestroySkill();
+                return;
+            }
+
+            if (struckTableSkill.TargetType == SkillConstants.TargetType.Range && struckTableSkill.DamageRange > 0)
+            {
+                SpawnRangeEffect(target.transform.position);
+            }
+            else
+            {
+                Vector3 from = attacker.transform.position + Vector3.up * attacker.GetHeightByScale() / 2f;
+                Vector3 to = target.transform.position + Vector3.up * target.GetHeightByScale() / 2f;
+                SpawnProjectileEffect(from, to);
+            }
+        }
+        /// <summary>
+        /// 범위 이펙트 표현하기
+        /// </summary>
+        /// <param name="targetPos"></param>
+        private void SpawnRangeEffect(Vector3 targetPos)
+        {
+            var effectInfo = tableEffect.GetDataByUid(struckTableSkill.EffectUid);
+            GameObject prefab = tableEffect.GetPrefab(struckTableSkill.EffectUid);
+
+            float effectSize = effectInfo.Width * prefab.transform.localScale.x;
+            float radiusX = struckTableSkill.DamageRange;
+            float radiusY = radiusX / 2f;
+
+            float currentRadiusX = effectSize;
+            float currentRadiusY = effectSize * (radiusY / radiusX);
+
+            while (currentRadiusX <= radiusX)
+            {
+                int count = Mathf.RoundToInt((2 * Mathf.PI * currentRadiusX) / effectSize);
+
+                for (int i = 0; i < count; i++)
+                {
+                    float angle = (i / (float)count) * 360f;
+                    float radian = angle * Mathf.Deg2Rad;
+
+                    float posX = Mathf.Cos(radian) * currentRadiusX + Random.Range(-10, 10);
+                    float posY = Mathf.Sin(radian) * currentRadiusY + Random.Range(-10, 10);
+
+                    Vector3 spawnPosition = targetPos + new Vector3(posX, posY, 0);
+
+                    var effect = EffectManager.CreateEffect(struckTableSkill.EffectUid);
+                    effect.SetDuration(struckTableSkill.Duration);
+                    effect.transform.position = spawnPosition;
+                }
+
+                currentRadiusX += effectSize;
+                currentRadiusY += effectSize * (radiusY / radiusX);
+            }
+
+            // 콜라이더 설정
+            polyCollider2D = ComponentController.AddPolygonCollider2D(gameObject, true, Vector2.zero, CreateEllipsePoints(radiusX - 10f, radiusY - 10f, 20));
+            if (struckTableSkill.DamageValue > 0 && struckTableSkill.TickTime > 0)
+                StartCoroutine(DamageByTickTime());
+
+            transform.position = targetPos;
+        }
+        /// <summary>
+        /// 프로젝타일 생성
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        private void SpawnProjectileEffect(Vector3 from, Vector3 to)
+        {
+            arrowDefaultEffect = EffectManager.CreateEffect(struckTableSkill.EffectUid);
+            arrowDefaultEffect.transform.SetParent(transform);
+
+            direction = (to - from).normalized;
+            transform.position = struckTableSkill.EffectMoveSpeed > 0 ? from : to;
+
+            float dirX = direction.x >= 0 ? -1 : 1;
+            arrowDefaultEffect.SetDirection(dirX);
+            arrowDefaultEffect.SetRotation(to - from, direction);
+            arrowDefaultEffect.OnEffectDestroy += OnArrowEffectDestroy;
+
+            var effectInfo = tableEffect.GetDataByUid(struckTableSkill.EffectUid);
+            Vector2 size = new Vector2(effectInfo.ColliderSize.x * arrowDefaultEffect.transform.localScale.x,
+                effectInfo.ColliderSize.y * arrowDefaultEffect.transform.localScale.y);
+            capsuleCollider2D = ComponentController.AddCapsuleCollider2D(gameObject, true, Vector2.zero, size);
+        }
+        /// <summary>
+        /// 어펙트 효과 적용하기
+        /// </summary>
+        private void ApplyInitialAffect()
+        {
+            if (struckTableSkill.TargetType == SkillConstants.TargetType.Fixed && struckTableSkill.AffectUid > 0)
+            {
+                target.AddAffect(struckTableSkill.AffectUid);
+            }
+        }
+        /// <summary>
+        /// 타원 충돌 체크 point 만들기
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="vertexCount"></param>
+        /// <returns></returns>
+        private Vector2[] CreateEllipsePoints(float a, float b, int vertexCount)
+        {
+            Vector2[] points = new Vector2[vertexCount];
+            for (int i = 0; i < vertexCount; i++)
+            {
+                float angle = (i / (float)vertexCount) * Mathf.PI * 2;
+                points[i] = new Vector2(Mathf.Cos(angle) * a, Mathf.Sin(angle) * b);
+            }
+            return points;
+        }
+        /// <summary>
+        /// 타원형 충돌 범위에 있는 몬스터 찾기
+        /// </summary>
+        /// <returns></returns>
         private List<CharacterBase> GetMonsterInCollider()
         {
-            List<CharacterBase> characterBases = new List<CharacterBase>();
-            if (polyCollider2D == null) return characterBases;
-            
-            ContactFilter2D filter = new ContactFilter2D();
-            filter.useTriggers = true; // 트리거도 감지하도록 설정
-            Collider2D[] results = new Collider2D[100]; // 최대 10개까지 충돌 감지 (필요시 증가 가능)
-            // int hitCount = polyCollider2D.OverlapCollider(filter, results);
-            int hitCount = Physics2D.OverlapCollider(polyCollider2D, filter, results);
+            List<CharacterBase> list = new List<CharacterBase>();
+            if (polyCollider2D == null) return list;
 
-            if (hitCount > 0)
+            ContactFilter2D filter = new ContactFilter2D { useTriggers = true };
+            Collider2D[] results = new Collider2D[100];
+            int count = Physics2D.OverlapCollider(polyCollider2D, filter, results);
+
+            for (int i = 0; i < count; i++)
             {
-                foreach (Collider2D col in results)
-                {
-                    if (col == null) continue;
-                
-                    // 몬스터 태그가 있는 오브젝트인지 확인
-                    if (col.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Monster)))
-                    {
-                        CharacterHitArea characterHitArea = col.GetComponent<CharacterHitArea>();
-                        if (characterHitArea != null)
-                        {
-                            characterBases.Add(characterHitArea.target);
-                        }
-                    }
-                }
+                CharacterHitArea area = results[i].GetComponent<CharacterHitArea>();
+                if (area && results[i].CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Monster)))
+                    list.Add(area.target);
             }
 
-            return characterBases;
-        } 
-
-        private IEnumerator AffectByTickTimeOnce()
-        {
-            if (polyCollider2D == null) yield break;
-            
-            // 충돌 감지를 확실하게 하기 위해 한 프레임 대기
-            yield return null; 
-            
-            List<CharacterBase> characterBases = GetMonsterInCollider();
-            foreach (var character in characterBases)
-            {
-                if (struckTableSkill.AffectUid <= 0) continue;
-                character.AddAffect(struckTableSkill.AffectUid);
-            }
-            yield return null;
+            return list;
         }
+        /// <summary>
+        /// tick time 마다 데미지 주기
+        /// </summary>
+        /// <returns></returns>
         private IEnumerator DamageByTickTime()
         {
-            if (attacker == null) yield break;
-            if (polyCollider2D == null) yield break;
-            
-            // 충돌 감지를 확실하게 하기 위해 한 프레임 대기
-            yield return null; 
-            
-            while (gameObject != null)
+            yield return null;
+            while (true)
             {
-                List<CharacterBase> characterBases = GetMonsterInCollider();
-                foreach (var character in characterBases)
+                foreach (var character in GetMonsterInCollider())
                 {
                     character.TakeDamage(struckTableSkill.DamageValue, attacker.gameObject, struckTableSkill.DamageType);
                 }
                 yield return new WaitForSeconds(struckTableSkill.TickTime);
             }
         }
-        private IEnumerator RemoveEffectDuration(float f)
+        /// <summary>
+        /// tick time 후 어펙트 적용하기
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerator AffectByTickTimeOnce()
         {
-            yield return new WaitForSeconds(f);
+            yield return null;
+            foreach (var character in GetMonsterInCollider())
+            {
+                if (struckTableSkill.AffectUid > 0)
+                    character.AddAffect(struckTableSkill.AffectUid);
+            }
+        }
+        /// <summary>
+        /// 스킬 duration 종료 후 처리 
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        private IEnumerator RemoveEffectDuration(float time)
+        {
+            yield return new WaitForSeconds(time);
             DestroySkill();
         }
+        /// <summary>
+        /// 타겟에 따른 skill 포지션 처리
+        /// </summary>
         private void Update()
         {
-            if (target == null) return;
+            if (target == null || struckTableSkill.EffectMoveSpeed <= 0) return;
+
             if (struckTableSkill.Target == SkillConstants.Target.Player &&
                 struckTableSkill.TargetType == SkillConstants.TargetType.Fixed)
             {
                 transform.position = attacker.transform.position;
-                return;
             }
-            if (struckTableSkill.EffectMoveSpeed <= 0) return;
-            
-            // 이펙트를 타겟 방향으로 이동
-            transform.position += direction * (struckTableSkill.EffectMoveSpeed * Time.deltaTime);
+            else
+            {
+                transform.position += direction * (struckTableSkill.EffectMoveSpeed * Time.deltaTime);
+            }
         }
- 
         /// <summary>
-        /// 방향에 따른 X 축 스케일 반환
+        /// 프로젝타일이 타겟과 충돌했는지 체크 
         /// </summary>
-        private int GetScaleByDirection()
-        {
-            return direction.x >= 0 ? -1 : 1;
-        }
+        /// <param name="collision"></param>
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Monster)))
+            if (!collision.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Monster))) return;
+            if (struckTableSkill.TickTime > 0) return;
+
+            CharacterHitArea area = collision.GetComponent<CharacterHitArea>();
+            if (area == null || area.target != target) return;
+
+            area.target.TakeDamage(struckTableSkill.DamageValue, attacker.gameObject, struckTableSkill.DamageType);
+
+            if (struckTableSkill.Duration <= 0)
             {
-                // tick time 이 있으면 코루틴에서 데미지 처리를 한다.
-                if (struckTableSkill.TickTime > 0) return;
-                
-                CharacterHitArea characterHitArea = collision.GetComponent<CharacterHitArea>();
-                if (characterHitArea == null || characterHitArea.target != target) return;
-                characterHitArea.target.TakeDamage(struckTableSkill.DamageValue, attacker.gameObject, struckTableSkill.DamageType);
-                
-                if (struckTableSkill.Duration > 0) return;
                 target = null;
-                if (arrowDefaultEffect == null) return;
-                arrowDefaultEffect.SetEnd();
-                
+                arrowDefaultEffect?.SetEnd();
             }
         }
         /// <summary>
-        /// 발사체가 충돌되어 end 애니메이션까지 한 후 처리
+        /// 발사체 이펙트가 타겟과 충돌 후 end 애니메이션을 하고 destroy 처리 
         /// </summary>
-        private void OnArrowEffectDestroy()
-        {
-            DestroySkill();
-        }
+        private void OnArrowEffectDestroy() => DestroySkill();
         /// <summary>
-        /// 스킬 오브젝트 Destroy 처리
+        /// 스킬 destroy 처리
         /// </summary>
         private void DestroySkill()
         {
-            if (coroutineDamageByTickTime != null)
-            {
-                StopCoroutine(coroutineDamageByTickTime);
-                coroutineDamageByTickTime = null;
-            }
-            if (coroutineDamageByTickTimeOnce != null)
-            {
-                StopCoroutine(coroutineDamageByTickTimeOnce);
-                coroutineDamageByTickTimeOnce = null;
-            }
-            if (coroutineRemoveEffectDuration != null)
-            {
-                StopCoroutine(coroutineRemoveEffectDuration);
-                coroutineRemoveEffectDuration = null;
-            }
-            Destroy(gameObject);
-            // 이펙트가 destroy 되었을때 콜백
+            StopAllCoroutines();
             if (arrowDefaultEffect != null)
             {
                 arrowDefaultEffect.OnEffectDestroy -= OnArrowEffectDestroy;
             }
+            Destroy(gameObject);
         }
     }
 }
