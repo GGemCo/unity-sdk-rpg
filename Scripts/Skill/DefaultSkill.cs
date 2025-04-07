@@ -34,6 +34,8 @@ namespace GGemCo.Scripts.Skill
         private float tickTime;
         
         private Coroutine coroutineDamageByTickTime;
+        private Coroutine coroutineDamageByTickTimeOnce;
+        private Coroutine coroutineRemoveEffectDuration;
         private PolygonCollider2D polyCollider2D;
         private CapsuleCollider2D capsuleCollider2D;
         private Vector3 direction;
@@ -50,7 +52,7 @@ namespace GGemCo.Scripts.Skill
  
             if (struckTableSkill.Duration > 0)
             {
-                StartCoroutine(RemoveEffectDuration(struckTableSkill.Duration));
+                coroutineRemoveEffectDuration = StartCoroutine(RemoveEffectDuration(struckTableSkill.Duration));
             }
             ComponentController.AddRigidbody2D(gameObject);
         }
@@ -75,6 +77,7 @@ namespace GGemCo.Scripts.Skill
             if (target == null)
             {
                 SceneGame.Instance.systemMessageManager.ShowMessageWarning("타겟이 없습니다.");
+                DestroySkill();
                 return;
             }
             
@@ -83,7 +86,12 @@ namespace GGemCo.Scripts.Skill
             {
                 var effectinfo = tableEffect.GetDataByUid(struckTableSkill.EffectUid);
                 GameObject prefab = tableEffect.GetPrefab(struckTableSkill.EffectUid);
-                if (prefab == null) return;
+                if (prefab == null)
+                {
+                    GcLogger.LogError("이펙트 프리팹이 없습니다. effect Uid: "+struckTableSkill.EffectUid);
+                    DestroySkill();
+                    return;
+                }
 
                 // 범위 공격일 때, 타원형 콜라이더를 생성하고 충돌체크를 한다.
                 if (struckTableSkill.TargetType == SkillConstants.TargetType.Range && struckTableSkill.DamageRange > 0)
@@ -192,7 +200,7 @@ namespace GGemCo.Scripts.Skill
             }
             else if (struckTableSkill.TargetType == SkillConstants.TargetType.Range)
             {
-                StartCoroutine(AffectByTickTimeOnce());
+                coroutineDamageByTickTimeOnce = StartCoroutine(AffectByTickTimeOnce());
             }
             
             // 스킬이 발사되면 마력 사용하기
@@ -267,12 +275,7 @@ namespace GGemCo.Scripts.Skill
         private IEnumerator RemoveEffectDuration(float f)
         {
             yield return new WaitForSeconds(f);
-            if (coroutineDamageByTickTime != null)
-            {
-                StopCoroutine(coroutineDamageByTickTime);
-                coroutineDamageByTickTime = null;
-            }
-            Destroy(gameObject);
+            DestroySkill();
         }
         private void Update()
         {
@@ -314,10 +317,39 @@ namespace GGemCo.Scripts.Skill
                 
             }
         }
-
+        /// <summary>
+        /// 발사체가 충돌되어 end 애니메이션까지 한 후 처리
+        /// </summary>
         private void OnArrowEffectDestroy()
         {
+            DestroySkill();
+        }
+        /// <summary>
+        /// 스킬 오브젝트 Destroy 처리
+        /// </summary>
+        private void DestroySkill()
+        {
+            if (coroutineDamageByTickTime != null)
+            {
+                StopCoroutine(coroutineDamageByTickTime);
+                coroutineDamageByTickTime = null;
+            }
+            if (coroutineDamageByTickTimeOnce != null)
+            {
+                StopCoroutine(coroutineDamageByTickTimeOnce);
+                coroutineDamageByTickTimeOnce = null;
+            }
+            if (coroutineRemoveEffectDuration != null)
+            {
+                StopCoroutine(coroutineRemoveEffectDuration);
+                coroutineRemoveEffectDuration = null;
+            }
             Destroy(gameObject);
+            // 이펙트가 destroy 되었을때 콜백
+            if (arrowDefaultEffect != null)
+            {
+                arrowDefaultEffect.OnEffectDestroy -= OnArrowEffectDestroy;
+            }
         }
     }
 }

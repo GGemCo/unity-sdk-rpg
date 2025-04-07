@@ -83,10 +83,14 @@ namespace GGemCo.Scripts.Affect
 
         private void RemoveAffect(int affectUid)
         {
-            // 캐릭터에 적용되어 있던 어펙트를 먼저 지워준다.
-            character.RemoveStatModifiers(activeBuffs[affectUid]);
-            character.RecalculateStats();
-            activeBuffs.Remove(affectUid);
+            if (activeBuffs.Count > 0)
+            {
+                // 캐릭터에 적용되어 있던 어펙트를 먼저 지워준다.
+                List<ConfigCommon.StruckStatus> buffs = activeBuffs[affectUid];
+                character.RemoveStatModifiers(buffs);
+                character.RecalculateStats();
+                activeBuffs[affectUid].Clear();
+            }
             if (defaultEffects.Remove(affectUid, out var effect))
             {
                 Object.Destroy(effect.gameObject);
@@ -97,6 +101,10 @@ namespace GGemCo.Scripts.Affect
         /// </summary>
         public void RemoveAllAffects()
         {
+            if (removeCoroutine != null)
+            {
+                character.StopCoroutine(removeCoroutine);
+            }
             // 모든 버프, 디버프 지우고 stat 갱신
             foreach (var info in activeBuffs)
             {
