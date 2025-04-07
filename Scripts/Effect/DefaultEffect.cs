@@ -152,5 +152,11 @@ namespace GGemCo.Scripts.Effect
             StopAllCoroutines();
             Destroy(gameObject);
         }
+
+        public void SetScale(float scale)
+        {
+            transform.localScale = new Vector2(scale, scale);
+            originalScaleX = transform.localScale.x;
+        }
     }
 }

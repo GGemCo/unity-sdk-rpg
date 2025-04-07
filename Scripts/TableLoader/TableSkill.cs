@@ -22,6 +22,7 @@ namespace GGemCo.Scripts.TableLoader
         public int DamageRange;
         public int Distance;
         public int EffectUid;
+        public float EffectScale;
         public float EffectMoveSpeed;
         public int NeedMp;
         public float TickTime;
@@ -100,6 +101,7 @@ namespace GGemCo.Scripts.TableLoader
                 DamageRange = int.Parse(data["DamageRange"]),
                 Distance = int.Parse(data["Distance"]),
                 EffectUid = int.Parse(data["EffectUid"]),
+                EffectScale = float.Parse(data["EffectScale"]),
                 EffectMoveSpeed = float.Parse(data["EffectMoveSpeed"]),
                 NeedMp = int.Parse(data["NeedMp"]),
                 TickTime = float.Parse(data["TickTime"]),

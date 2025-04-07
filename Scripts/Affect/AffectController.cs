@@ -66,10 +66,16 @@ namespace GGemCo.Scripts.Affect
             {
                 DefaultEffect defaultEffect = EffectManager.CreateEffect(info.EffectUid);
                 if (defaultEffect == null) return;
+                // SetParent 보다 먼저 scale 을 바꿔야 한다.
+                if (info.EffectScale > 0)
+                {
+                    defaultEffect.SetScale(info.EffectScale);
+                }
                 // 캐릭터 하위에 붙이기
                 defaultEffect.transform.SetParent(character.transform);
                 // 캐릭터 height 만큼 위치 조정
                 defaultEffect.transform.localPosition = new Vector3(0, character.height, 0);
+
                 defaultEffects.TryAdd(info.Uid, defaultEffect);
             }
         }

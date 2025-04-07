@@ -130,7 +130,8 @@ namespace GGemCo.Scripts.Skill
             var effectInfo = tableEffect.GetDataByUid(struckTableSkill.EffectUid);
             GameObject prefab = tableEffect.GetPrefab(struckTableSkill.EffectUid);
 
-            float effectSize = effectInfo.Width * prefab.transform.localScale.x;
+            float effectScale = struckTableSkill.EffectScale > 0 ? struckTableSkill.EffectScale : 1;
+            float effectSize = effectInfo.Width * effectScale;
             float radiusX = struckTableSkill.DamageRange;
             float radiusY = radiusX / 2f;
 
@@ -152,6 +153,7 @@ namespace GGemCo.Scripts.Skill
                     Vector3 spawnPosition = targetPos + new Vector3(posX, posY, 0);
 
                     var effect = EffectManager.CreateEffect(struckTableSkill.EffectUid);
+                    effect.SetScale(effectScale);
                     effect.SetDuration(struckTableSkill.Duration);
                     effect.transform.position = spawnPosition;
                 }
@@ -175,6 +177,11 @@ namespace GGemCo.Scripts.Skill
         private void SpawnProjectileEffect(Vector3 from, Vector3 to)
         {
             arrowDefaultEffect = EffectManager.CreateEffect(struckTableSkill.EffectUid);
+            // SetParent 보다 먼저 scale 을 바꿔야 한다.
+            if (struckTableSkill.EffectScale > 0)
+            {
+                arrowDefaultEffect.SetScale(struckTableSkill.EffectScale);
+            }
             arrowDefaultEffect.transform.SetParent(transform);
 
             direction = (to - from).normalized;

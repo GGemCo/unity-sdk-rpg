@@ -21,6 +21,7 @@ namespace GGemCo.Scripts.TableLoader
         public int Value;
         public float Duration;
         public int EffectUid;
+        public float EffectScale;
     }
     /// <summary>
     /// 맵 테이블
@@ -61,6 +62,7 @@ namespace GGemCo.Scripts.TableLoader
                 Value = int.Parse(data["Value"]),
                 Duration = float.Parse(data["Duration"]),
                 EffectUid = int.Parse(data["EffectUid"]),
+                EffectScale = float.Parse(data["EffectScale"]),
             };
         }
     }
