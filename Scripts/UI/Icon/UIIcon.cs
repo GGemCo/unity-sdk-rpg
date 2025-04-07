@@ -356,7 +356,7 @@ namespace GGemCo.Scripts.UI.Icon
                 return false;
             }
             
-            return SceneGame.Instance.uIIconCoolTimeManager.PlayCoolTime(windowUid, this, coolTime);
+            return SceneGame.Instance.uIIconCoolTimeManager.StartHandler(windowUid, this, coolTime);
         }
     }
 }

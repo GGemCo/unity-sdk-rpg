@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
+﻿using System.Collections.Generic;
 using GGemCo.Scripts.UI.Icon;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
@@ -19,9 +17,12 @@ namespace GGemCo.Scripts.UI
         {
             dictionaryCoolTime.TryAdd(windowUid, new Dictionary<int, UICoolTimeHandler>());
             var handler = new UICoolTimeHandler();
-            handler.Initialize(windowUid, icon);
-            if (handler.PlayCoolTime(coolTime) == false) return;
-            dictionaryCoolTime[windowUid].Add(icon.uid, handler);
+            handler.Initialize(icon);
+            if (handler.StartCoolTime(coolTime) == false) return;
+            if (!dictionaryCoolTime[windowUid].TryAdd(icon.uid, handler))
+            {
+                dictionaryCoolTime[windowUid][icon.uid] = handler;
+            }
         }
 
         private void Update()
@@ -30,7 +31,7 @@ namespace GGemCo.Scripts.UI
             {
                 foreach (var data in datas.Value)
                 {
-                    data.Value?.Update();
+                    data.Value?.UpdateCoolTime();
                 }
             }
         }
@@ -93,12 +94,13 @@ namespace GGemCo.Scripts.UI
         /// <param name="icon"></param>
         /// <param name="coolTime"></param>
         /// <returns></returns>
-        public bool PlayCoolTime(UIWindowManager.WindowUid windowUid, UIIcon icon, float coolTime)
+        public bool StartHandler(UIWindowManager.WindowUid windowUid, UIIcon icon, float coolTime)
         {
             var handler = GetCoolTimeHandler(windowUid, icon.uid);
+            // 기존 handle 가 있으면 cool time 만 업데이트 
             if (handler != null)
             {
-                return handler.PlayCoolTime(coolTime);
+                return handler.ReStartCoolTime(coolTime, icon);
             }
             AddCoolTime(windowUid, icon, coolTime);
             return true;

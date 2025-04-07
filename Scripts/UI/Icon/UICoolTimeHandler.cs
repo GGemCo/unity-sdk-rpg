@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 
 namespace GGemCo.Scripts.UI.Icon
 {
@@ -8,7 +7,6 @@ namespace GGemCo.Scripts.UI.Icon
     /// </summary>
     public class UICoolTimeHandler
     {
-        private UIWindowManager.WindowUid windowUid;
         // 현재 쿨타임 시간
         private float currentCoolTime;
         // true : 시계 반대 방향으로 쿨타임이 표시된다. 
@@ -17,29 +15,26 @@ namespace GGemCo.Scripts.UI.Icon
         private bool isPlayingCoolTime;
         // 쿨타임 시간 (초)
         private float coolTimeDuration;
-        // 쿨타임 게이지 이미지
-        private Image coolTimeGauge;
 
         private UIIcon icon;
 
-        public void Initialize(UIWindowManager.WindowUid pwindowUid, UIIcon picon)
+        public void Initialize(UIIcon picon)
         {
-            windowUid = pwindowUid;
             icon = picon;
-            coolTimeGauge = icon.imageCoolTimeGauge;
 
-            if (coolTimeGauge != null)
+            if (icon.imageCoolTimeGauge != null)
             {
-                coolTimeGauge.gameObject.SetActive(false);
+                icon.imageCoolTimeGauge.gameObject.SetActive(false);
             }
         }
 
-        public void Update()
+        public bool ReStartCoolTime(float coolTime, UIIcon picon)
         {
-            UpdateCoolTime();
+            ResetCoolTime();
+            icon = picon;
+            return StartCoolTime(coolTime);
         }
-
-        public bool PlayCoolTime(float coolTime = 0)
+        public bool StartCoolTime(float coolTime = 0)
         {
             if (coolTime > 0)
             {
@@ -51,15 +46,15 @@ namespace GGemCo.Scripts.UI.Icon
             isPlayingCoolTime = true;
             currentCoolTime = coolTimeDuration;
 
-            if (coolTimeGauge != null)
+            if (icon.imageCoolTimeGauge != null)
             {
-                coolTimeGauge.fillAmount = isReverseFillAmount ? 0 : 1;
-                coolTimeGauge.gameObject.SetActive(true);
+                icon.imageCoolTimeGauge.fillAmount = isReverseFillAmount ? 0 : 1;
+                icon.imageCoolTimeGauge.gameObject.SetActive(true);
             }
             return true;
         }
 
-        private void UpdateCoolTime()
+        public void UpdateCoolTime()
         {
             if (!isPlayingCoolTime) return;
 
@@ -70,9 +65,9 @@ namespace GGemCo.Scripts.UI.Icon
                 return;
             }
 
-            if (coolTimeGauge != null)
+            if (icon.imageCoolTimeGauge != null)
             {
-                coolTimeGauge.fillAmount = isReverseFillAmount
+                icon.imageCoolTimeGauge.fillAmount = isReverseFillAmount
                     ? 1 - currentCoolTime / coolTimeDuration
                     : currentCoolTime / coolTimeDuration;
             }
@@ -82,9 +77,9 @@ namespace GGemCo.Scripts.UI.Icon
             isPlayingCoolTime = false;
             currentCoolTime = 0;
 
-            if (coolTimeGauge != null)
+            if (icon.imageCoolTimeGauge != null)
             {
-                coolTimeGauge.gameObject.SetActive(false);
+                icon.imageCoolTimeGauge.gameObject.SetActive(false);
             }
         }
 
@@ -99,9 +94,9 @@ namespace GGemCo.Scripts.UI.Icon
             isPlayingCoolTime = true;
             currentCoolTime = remainCoolTime;
 
-            if (coolTimeGauge != null)
+            if (icon.imageCoolTimeGauge != null)
             {
-                coolTimeGauge.gameObject.SetActive(true);
+                icon.imageCoolTimeGauge.gameObject.SetActive(true);
             }
         }
     }

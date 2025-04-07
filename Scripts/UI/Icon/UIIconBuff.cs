@@ -43,7 +43,7 @@ namespace GGemCo.Scripts.UI.Icon
         protected override void Start()
         {
             base.Start();
-            SceneGame.Instance.uIIconCoolTimeManager.PlayCoolTime(windowUid, this, struckTableAffect.Duration);
+            SceneGame.Instance.uIIconCoolTimeManager.StartHandler(windowUid, this, struckTableAffect.Duration);
         }
         /// <summary>
         /// 아이콘 이미지 경로 가져오기 
@@ -53,6 +53,20 @@ namespace GGemCo.Scripts.UI.Icon
         {
             if (struckTableAffect == null) return null;
             return $"Images/Icon/Affect/Buff/{struckTableAffect.IconFileName}";
+        }
+        /// <summary>
+        /// 같은 affect uid 일 경우 duration 만 업데이트 한다
+        /// </summary>
+        public void ReStartCoolTime()
+        {
+            SceneGame.Instance.uIIconCoolTimeManager.StartHandler(windowUid, this, struckTableAffect.Duration);
+        }
+        /// <summary>
+        /// 쿨타임 삭제하기
+        /// </summary>
+        public void RemoveCoolTime()
+        {
+            SceneGame.Instance.uIIconCoolTimeManager.ResetCoolTime(windowUid, uid);
         }
     }
 }

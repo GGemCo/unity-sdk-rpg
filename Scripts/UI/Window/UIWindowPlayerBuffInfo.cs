@@ -12,20 +12,21 @@ namespace GGemCo.Scripts.UI.Window
     /// </summary>
     public class UIWindowPlayerBuffInfo : UIWindow
     {
-        public GameObject prefabIconBuff;
-        private Dictionary<int, GameObject> iconBuffs = new Dictionary<int, GameObject>();
+        public GameObject prefabSlotBuff;
+        private Dictionary<int, GameObject> slotBuffs = new Dictionary<int, GameObject>();
+        
         protected override void Awake()
         {
             // uid 를 먼저 지정해야 한다.
             uid = UIWindowManager.WindowUid.PlayerBuffInfo;
             base.Awake();
-            iconBuffs.Clear();
+            slotBuffs.Clear();
         }
         /// <summary>
         /// 버프 적용하기
         /// </summary>
         /// <param name="affectUid"></param>
-        public void AddAffect(int affectUid)
+        public void AddAffectIcon(int affectUid)
         {
             var info = TableLoaderManager.Instance.TableAffect.GetDataByUid(affectUid);
             if (info == null)
@@ -33,35 +34,38 @@ namespace GGemCo.Scripts.UI.Window
                 GcLogger.LogError("affect 테이블에 없는 어펙트 입니다. affect Uid: "+affectUid);
                 return;
             }
+            GameObject slotBuff;
+            StopAllCoroutines();
             // 적용되어 있는 버프면, duration 초기화 하기
-            if (iconBuffs.ContainsKey(affectUid))
+            if (slotBuffs.ContainsKey(affectUid))
             {
-                var icon = iconBuffs.GetValueOrDefault(affectUid);
-                if (icon != null)
-                {
-                    Destroy(icon);
-                }
-                iconBuffs.Remove(affectUid);
+                slotBuff = slotBuffs.GetValueOrDefault(affectUid);
+                slotBuff.GetComponentInChildren<UIIconBuff>()?.ReStartCoolTime();
             }
-            // GcLogger.Log("RemoveBuffAfterDuration " + struckBuff.Uid + "/"+struckBuff.Name+"/"+struckBuff.Duration);
-            GameObject iconBuff = Instantiate(prefabIconBuff, containerIcon.transform);
-            iconBuff.GetComponentInChildren<UIIconBuff>()?.Initialize(affectUid);
-            iconBuffs.Add(affectUid, iconBuff);
-            StartCoroutine(RemoveBuffAfterDuration(affectUid, info.Duration, iconBuff));
+            else
+            {
+                // GcLogger.Log("RemoveBuffAfterDuration " + struckBuff.Uid + "/"+struckBuff.Name+"/"+struckBuff.Duration);
+                slotBuff = Instantiate(prefabSlotBuff, containerIcon.transform);
+                slotBuff.GetComponentInChildren<UIIconBuff>()?.Initialize(affectUid);
+                slotBuffs.Add(affectUid, slotBuff);
+            }
+            StartCoroutine(RemoveBuffAfterDuration(affectUid, info.Duration, slotBuff));
         }
         /// <summary>
         /// 버프 제거 하기
         /// </summary>
         /// <param name="affectUid"></param>
         /// <param name="duration"></param>
-        /// <param name="iconBuff"></param>
+        /// <param name="slotBuff"></param>
         /// <returns></returns>
-        private IEnumerator RemoveBuffAfterDuration(int affectUid, float duration, GameObject iconBuff)
+        private IEnumerator RemoveBuffAfterDuration(int affectUid, float duration, GameObject slotBuff)
         {
             // GcLogger.Log("RemoveBuffAfterDuration " + struckBuff.Uid + "/"+struckBuff.Name+"/"+struckBuff.Duration);
             yield return new WaitForSeconds(duration);
-            iconBuffs.Remove(affectUid);
-            Destroy(iconBuff);
+            slotBuff.GetComponentInChildren<UIIconBuff>()?.RemoveCoolTime();
+            
+            slotBuffs.Remove(affectUid);
+            Destroy(slotBuff);
         }
     }
 }

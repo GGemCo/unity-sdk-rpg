@@ -425,7 +425,7 @@ namespace GGemCo.Scripts.Characters.Player
                 SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowPlayerBuffInfo>(UIWindowManager
                     .WindowUid.PlayerBuffInfo);
             if (uiWindowPlayerBuffInfo == null) return;
-            uiWindowPlayerBuffInfo.AddAffect(affectUid);
+            uiWindowPlayerBuffInfo.AddAffectIcon(affectUid);
         }
         /// <summary>
         /// localScale 이 적용된 캐릭터 크기 가져오기
