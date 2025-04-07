@@ -193,7 +193,7 @@ namespace GGemCo.Scripts.UI.Icon
             count = value;
             if (textCount != null)
             {
-                textCount.text = count <= 0 ? "" : count.ToString();
+                textCount.text = count <= 1 ? "" : count.ToString();
             }
         }
         /// <summary>
