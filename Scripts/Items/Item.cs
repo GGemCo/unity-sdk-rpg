@@ -90,7 +90,17 @@ namespace GGemCo.Scripts.Items
             timeElapsed = 0f;
             isBouncing = false;
             transform.localScale = Vector3.one;
-            spriteRenderer.sprite = Resources.Load<Sprite>($"Images/Item/{info.Type.ToString()}/{info.Category.ToString()}/{info.SubCategory.ToString()}/{info.ImagePath}");
+            string path =
+                $"Images/Item/{info.Type.ToString()}/{info.Category.ToString()}/{info.SubCategory.ToString()}/{info.ImagePath}";
+            if (info.Category == ItemConstants.Category.None && info.SubCategory == ItemConstants.SubCategory.None)
+            {
+                path = $"Images/Item/{info.Type.ToString()}/{info.ImagePath}";
+            }
+            else if (info.SubCategory == ItemConstants.SubCategory.None)
+            {
+                path = $"Images/Item/{info.Type.ToString()}/{info.Category.ToString()}/{info.ImagePath}";
+            }
+            spriteRenderer.sprite = Resources.Load<Sprite>(path);
 
             // 특정 반경 내에서 랜덤한 위치 선택 (X, Y 축 모두 분산)
             int maxAttempts = 10; // 겹치지 않도록 최대 시도 횟수

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using GGemCo.Scripts.Items;
+using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.SystemMessage;
 using GGemCo.Scripts.TableLoader;
 
@@ -75,47 +77,59 @@ namespace GGemCo.Scripts.SaveData
                 return new ResultCommon(ResultCommon.Type.Fail, $"아이템 정보가 없습니다. itemUid: {itemUid}");
             }
 
-            int maxOverlayCount = info.MaxOverlayCount;
-            int remainingValue = itemCount;
-
-            List<SaveDataIcon> controls = new List<SaveDataIcon>();
-            // 1. 기존 중첩 가능한 아이템 채우기
-            foreach (var structInventoryIcon in ItemCounts)
+            // 재화 별도 처리 
+            if (info.Type == ItemConstants.Type.Currency)
             {
-                var slotIndex = structInventoryIcon.Key;
-                var item = structInventoryIcon.Value;
-                if (item.Uid != itemUid) continue;
-                int availableSpace = maxOverlayCount - item.Count;
-                if (availableSpace > 0)
+                return SceneGame.Instance.saveDataManager.Player.AddCurrency(itemUid, itemCount);
+            }
+            else
+            {
+                int maxOverlayCount = info.MaxOverlayCount;
+                if (maxOverlayCount <= 0)
                 {
-                    int addedAmount = Math.Min(remainingValue, availableSpace);
-                    int count = item.Count + addedAmount;
-                    
-                    controls.Add(new SaveDataIcon(slotIndex, itemUid, count));
-                    
+                    return new ResultCommon(ResultCommon.Type.Fail, "최대 중첩 개수가 0 입니다. itemUid: {itemUid}");
+                }
+                int remainingValue = itemCount;
+
+                List<SaveDataIcon> controls = new List<SaveDataIcon>();
+                // 1. 기존 중첩 가능한 아이템 채우기
+                foreach (var structInventoryIcon in ItemCounts)
+                {
+                    var slotIndex = structInventoryIcon.Key;
+                    var item = structInventoryIcon.Value;
+                    if (item.Uid != itemUid) continue;
+                    int availableSpace = maxOverlayCount - item.Count;
+                    if (availableSpace > 0)
+                    {
+                        int addedAmount = Math.Min(remainingValue, availableSpace);
+                        int count = item.Count + addedAmount;
+                        
+                        controls.Add(new SaveDataIcon(slotIndex, itemUid, count));
+                        
+                        remainingValue -= addedAmount;
+                        if (remainingValue <= 0) break;
+                    }
+                }
+
+                TempItemCounts.Clear();
+                // 2. 남은 개수를 새 슬롯에 추가
+                while (remainingValue > 0)
+                {
+                    int emptyIndex = FindEmptySlot();
+                    if (emptyIndex == -1)
+                    {
+                        return new ResultCommon(ResultCommon.Type.Fail, "인벤토리에 공간이 부족합니다.");
+                    }
+
+                    int addedAmount = Math.Min(remainingValue, maxOverlayCount);
+                    controls.Add(new SaveDataIcon(emptyIndex, itemUid, addedAmount));
+                    TempItemCounts.TryAdd(emptyIndex, new SaveDataIcon(emptyIndex, itemUid, addedAmount));
                     remainingValue -= addedAmount;
-                    if (remainingValue <= 0) break;
-                }
-            }
-
-            TempItemCounts.Clear();
-            // 2. 남은 개수를 새 슬롯에 추가
-            while (remainingValue > 0)
-            {
-                int emptyIndex = FindEmptySlot();
-                if (emptyIndex == -1)
-                {
-                    return new ResultCommon(ResultCommon.Type.Fail, "인벤토리에 공간이 부족합니다.");
                 }
 
-                int addedAmount = Math.Min(remainingValue, maxOverlayCount);
-                controls.Add(new SaveDataIcon(emptyIndex, itemUid, addedAmount));
-                TempItemCounts.TryAdd(emptyIndex, new SaveDataIcon(emptyIndex, itemUid, addedAmount));
-                remainingValue -= addedAmount;
+                SaveDatas();
+                return new ResultCommon(ResultCommon.Type.Success, "", controls);
             }
-
-            SaveDatas();
-            return new ResultCommon(ResultCommon.Type.Success, "", controls);
         }
         /// <summary>
         /// 특정 슬롯에 아이템 개수 추가

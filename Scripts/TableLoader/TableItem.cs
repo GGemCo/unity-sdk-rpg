@@ -60,12 +60,15 @@ namespace GGemCo.Scripts.TableLoader
             {
                 { "Equip", ItemConstants.Type.Equip },
                 { "Consumable", ItemConstants.Type.Consumable },
+                { "Currency", ItemConstants.Type.Currency },
             };
             MapCategory = new Dictionary<string, ItemConstants.Category>
             {
                 { "Weapon", ItemConstants.Category.Weapon },
                 { "Armor", ItemConstants.Category.Armor },
                 { "Potion", ItemConstants.Category.Potion },
+                { "Gold", ItemConstants.Category.Gold },
+                { "Silver", ItemConstants.Category.Silver },
             };
             MapSubCategory = new Dictionary<string, ItemConstants.SubCategory>
             {
@@ -90,8 +93,8 @@ namespace GGemCo.Scripts.TableLoader
             };
         }
         private static ItemConstants.Type ConvertType(string type) => MapType.GetValueOrDefault(type, ItemConstants.Type.None);
-        private static ItemConstants.Category ConvertCategory(string type) => MapCategory.GetValueOrDefault(type, ItemConstants.Category.None);
-        private static ItemConstants.SubCategory ConvertSubCategory(string type) => MapSubCategory.GetValueOrDefault(type, ItemConstants.SubCategory.None);
+        public static ItemConstants.Category ConvertCategory(string type) => MapCategory.GetValueOrDefault(type, ItemConstants.Category.None);
+        public static ItemConstants.SubCategory ConvertSubCategory(string type) => MapSubCategory.GetValueOrDefault(type, ItemConstants.SubCategory.None);
         private static ItemConstants.Class ConvertClass(string type) => MapClass.GetValueOrDefault(type, ItemConstants.Class.None);
         private static ItemConstants.PartsType ConvertPartsID(string type) => MapPartsID.GetValueOrDefault(type, ItemConstants.PartsType.None);
         

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using GGemCo.Scripts.Addressable;
 using GGemCo.Scripts.Configs;
+using GGemCo.Scripts.Currency;
 using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI;
@@ -115,7 +116,7 @@ namespace GGemCo.Scripts.Items
         /// <param name="worldPosition"></param>
         /// <param name="itemUid"></param>
         /// <param name="itemCount"></param>
-        public void ShowDropItem(Vector3 worldPosition, int itemUid, int itemCount)
+        public void MakeDropItem(Vector3 worldPosition, int itemUid, int itemCount)
         {
             var info = tableItem.GetDataByUid(itemUid);
             if (info == null) return;
@@ -214,7 +215,21 @@ namespace GGemCo.Scripts.Items
         {
             int itemUid = GetDropItem(monsterUid);
             if (itemUid <= 0) return;
-            ShowDropItem(monsterObject.transform.position, itemUid, 1);
+            MakeDropItem(monsterObject.transform.position, itemUid, 1);
+            MakeDropGold(monsterUid, monsterObject);
+        }
+        /// <summary>
+        /// 골드 드랍 처리
+        /// </summary>
+        /// <param name="monsterUid"></param>
+        /// <param name="monsterObject"></param>
+        private void MakeDropGold(int monsterUid, GameObject monsterObject)
+        {
+            var info = TableLoaderManager.Instance.TableMonster.GetDataByUid(monsterUid);
+            if (info != null && info.RewardGold > 0)
+            {
+                MakeDropItem(monsterObject.transform.position, CurrencyConstants.ItemUidGold, info.RewardGold);
+            }
         }
         /// <summary>
         /// Item Drop Group 테이블에서 Type 별로 찾아보기 

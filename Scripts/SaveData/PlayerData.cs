@@ -1,5 +1,7 @@
 ﻿using GGemCo.Scripts.Addressable;
+using GGemCo.Scripts.Items;
 using GGemCo.Scripts.Scenes;
+using GGemCo.Scripts.SystemMessage;
 using GGemCo.Scripts.TableLoader;
 using R3;
 using UnityEngine;
@@ -19,6 +21,8 @@ namespace GGemCo.Scripts.SaveData
         private readonly BehaviorSubject<int> currentLevel = new(1);
         private readonly BehaviorSubject<long> currentExp = new(0);
         private readonly BehaviorSubject<long> currentNeedExp = new(0);
+        private readonly BehaviorSubject<long> currentGold = new(0);
+        private readonly BehaviorSubject<long> currentSilver = new(0);
         
         public int CurrentMapUid
         {
@@ -36,6 +40,16 @@ namespace GGemCo.Scripts.SaveData
         {
             get => currentExp.Value;
             set => currentExp.OnNext(value);
+        }
+        public long CurrentGold
+        {
+            get => currentGold.Value;
+            set => currentGold.OnNext(value);
+        }
+        public long CurrentSilver
+        {
+            get => currentSilver.Value;
+            set => currentSilver.OnNext(value);
         }
         // json 에 포함되지 않도록 함수화 
         public Observable<int> OnCurrentLevelChanged()
@@ -56,6 +70,14 @@ namespace GGemCo.Scripts.SaveData
         public Observable<long> OnCurrentNeedExpChanged()
         {
             return currentNeedExp.DistinctUntilChanged();
+        }
+        public Observable<long> OnCurrentGoldChanged()
+        {
+            return currentGold.DistinctUntilChanged();
+        }
+        public Observable<long> OnCurrentDiaChanged()
+        {
+            return currentSilver.DistinctUntilChanged();
         }
 
         private TableMonster tableMonster;
@@ -90,7 +112,7 @@ namespace GGemCo.Scripts.SaveData
         private void InitializeSubscriptions()
         {
             currentLevel.DistinctUntilChanged()
-                .CombineLatest(currentMapUid, currentExp, (_, _, _) => Unit.Default)
+                .CombineLatest(currentMapUid, currentExp, currentGold, currentSilver, (_, _, _, _, _) => Unit.Default)
                 .Subscribe(_ => SavePlayerData())
                 .AddTo(disposables);
         }
@@ -113,6 +135,8 @@ namespace GGemCo.Scripts.SaveData
                 CurrentMapUid = saveDataContainer.PlayerData.CurrentMapUid;
                 CurrentLevel = saveDataContainer.PlayerData.CurrentLevel;
                 CurrentExp = saveDataContainer.PlayerData.CurrentExp;
+                CurrentGold = saveDataContainer.PlayerData.CurrentGold;
+                CurrentSilver = saveDataContainer.PlayerData.CurrentSilver;
             }
 
             // 필요 경험치 업데이트
@@ -158,6 +182,32 @@ namespace GGemCo.Scripts.SaveData
         protected override int GetMaxSlotCount()
         {
             return 0;
+        }
+
+        public ResultCommon AddCurrency(int itemUid, int itemCount)
+        {
+            var info = tableLoaderManager.TableItem.GetDataByUid(itemUid);
+            if (info == null)
+            {
+                return new ResultCommon(ResultCommon.Type.Fail, $"아이템 정보가 없습니다. itemUid: {itemUid}");
+            }
+
+            switch (info.Category)
+            {
+                case ItemConstants.Category.Gold:
+                    CurrentGold += itemCount;
+                    return new ResultCommon(ResultCommon.Type.Success);
+                case ItemConstants.Category.Silver:
+                    CurrentSilver += itemCount;
+                    return new ResultCommon(ResultCommon.Type.Success);
+                case ItemConstants.Category.None:
+                case ItemConstants.Category.Weapon:
+                case ItemConstants.Category.Armor:
+                case ItemConstants.Category.Potion:
+                default:
+                    break;
+            }
+            return new ResultCommon(ResultCommon.Type.Fail, $"아이템 정보가 없습니다. itemUid: {itemUid}");
         }
     }
 }
