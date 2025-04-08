@@ -94,6 +94,7 @@ namespace GGemCo.Scripts.UI.WindowSkill
                 uiIcon.Initialize(this, uid, index, index, iconSize, slotSize);
                 // count, 레벨 1로 초기화
                 uiIcon.ChangeInfoByUid(skillUid, 1, 1);
+                uiIcon.SetRaycastTarget(false);
                 
                 icons[index] = icon;
                 index++;

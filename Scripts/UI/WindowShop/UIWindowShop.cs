@@ -120,6 +120,8 @@ namespace GGemCo.Scripts.UI.WindowShop
                 uiIcon.Initialize(this, uid, index, index, iconSize, slotSize);
                 // count  1로 초기화
                 uiIcon.ChangeInfoByUid(info.ItemUid, 1);
+                // element 에서 마우스 이벤트 처리
+                uiIcon.SetRaycastTarget(false);
                 
                 icons[index] = icon;
                 index++;

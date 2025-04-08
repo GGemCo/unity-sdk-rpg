@@ -8,6 +8,7 @@ using GGemCo.Scripts.SystemMessage;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI.Icon;
 using GGemCo.Scripts.UI.Window;
+using GGemCo.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -395,6 +396,23 @@ namespace GGemCo.Scripts.UI.Inventory
                 if (window == null) return;
                 window.CopyIconCount(0, icon.slotIndex, icon.uid, icon.GetCount());
             }
+        }
+
+        /// <summary>
+        /// 아이템 정보 보기
+        /// </summary>
+        /// <param name="icon"></param>
+        public override void ShowItemInfo(UIIcon icon)
+        {
+            uIWindowItemInfo.SetItemUid(icon.uid);
+            RectTransform itemInfoRect = uIWindowItemInfo.GetComponent<RectTransform>();
+            itemInfoRect.pivot = new Vector2(1f, 1f);
+            uIWindowItemInfo.transform.position =
+                new Vector3(icon.transform.position.x - containerIcon.cellSize.x / 2f,
+                    icon.transform.position.y + containerIcon.cellSize.y / 2f, 0);
+
+            // 화면 밖 체크 & 보정
+            MathHelper.ClampToScreen(itemInfoRect);
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using GGemCo.Scripts.Characters.Player;
-using GGemCo.Scripts.SaveData;
-using GGemCo.Scripts.Scenes;
+﻿using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.UI.Inventory;
 using GGemCo.Scripts.Utils;
@@ -95,6 +93,13 @@ namespace GGemCo.Scripts.UI.WindowShop
         public void OnPointerEnter(PointerEventData eventData)
         {
             uiWindowItemInfo.SetItemUid(struckTableShop.ItemUid);
+            RectTransform itemInfoRect = uiWindowItemInfo.GetComponent<RectTransform>();
+            itemInfoRect.pivot = new Vector2(0, 1f);
+            uiWindowItemInfo.transform.position =
+                new Vector3(transform.position.x + uiWindowShop.containerIcon.cellSize.x / 2f,
+                    transform.position.y + uiWindowShop.containerIcon.cellSize.y / 2f, 0);
+            // 화면 밖 체크 & 보정
+            MathHelper.ClampToScreen(itemInfoRect);
         }
 
         public void OnPointerExit(PointerEventData eventData)

@@ -72,5 +72,37 @@ namespace GGemCo.Scripts.Utils
             // 정규화된 값을 minOrder ~ maxOrder 범위에 맞게 매핑합니다.
             return minOrder + Mathf.RoundToInt(normalizedY * (maxOrder - minOrder));
         }
+        /// <summary>
+        /// Panel 이 화면 밖으로 벗어날 경우 보정하기
+        /// </summary>
+        /// <param name="rectTransform"></param>
+        public static void ClampToScreen(RectTransform rectTransform)
+        {
+            Vector3[] corners = new Vector3[4];
+            rectTransform.GetWorldCorners(corners);
+
+            float screenWidth = Screen.width;
+            float screenHeight = Screen.height;
+
+            Vector3 pos = rectTransform.position;
+
+            // 좌측
+            if (corners[0].x < 0)
+                pos.x += -corners[0].x;
+
+            // 우측
+            if (corners[2].x > screenWidth)
+                pos.x -= corners[2].x - screenWidth;
+
+            // 아래
+            if (corners[0].y < 0)
+                pos.y += -corners[0].y;
+
+            // 위
+            if (corners[1].y > screenHeight)
+                pos.y -= corners[1].y - screenHeight;
+
+            rectTransform.position = pos;
+        }
     }
 }

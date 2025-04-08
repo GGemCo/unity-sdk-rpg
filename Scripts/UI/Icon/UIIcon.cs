@@ -358,5 +358,14 @@ namespace GGemCo.Scripts.UI.Icon
             
             return SceneGame.Instance.uIIconCoolTimeManager.StartHandler(windowUid, this, coolTime);
         }
+        /// <summary>
+        /// Raycast Target 설정
+        /// </summary>
+        /// <param name="set"></param>
+        public void SetRaycastTarget(bool set)
+        {
+            if (ImageIcon == null) return;
+            ImageIcon.raycastTarget = set;
+        }
     }
 }

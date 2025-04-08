@@ -381,5 +381,9 @@ namespace GGemCo.Scripts.UI
         {
             return gameObject.activeSelf;
         }
+
+        public virtual void ShowItemInfo(UIIcon icon)
+        {
+        }
     }
 }

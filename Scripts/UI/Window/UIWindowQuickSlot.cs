@@ -10,6 +10,7 @@ using GGemCo.Scripts.UI.WindowSkill;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace GGemCo.Scripts.UI.Window
 {
@@ -18,6 +19,7 @@ namespace GGemCo.Scripts.UI.Window
     /// </summary>
     public class UIWindowQuickSlot : UIWindow, IInputHandler
     {
+        public Image[] iconHotKey;
         public UIWindowSkill uiWindowSkill;
         public int Priority => 1;
         private QuickSlotData quickSlotData;
@@ -67,6 +69,10 @@ namespace GGemCo.Scripts.UI.Window
                 int skillCount = structSkillIcon.Count;
                 int skillLevel = structSkillIcon.Level;
                 uiIcon.ChangeInfoByUid(skillUid, skillCount, skillLevel);
+                
+                // 단축키 이미지 위치 설정
+                iconHotKey[index].transform.SetParent(slots[index].transform);
+                iconHotKey[index].transform.localPosition = new Vector3(-slotSize.x/2f, slotSize.y/2f, 0);
             }
         }
         protected void OnDisable()

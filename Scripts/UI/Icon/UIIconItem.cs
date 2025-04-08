@@ -81,7 +81,7 @@ namespace GGemCo.Scripts.UI.Icon
         public void OnPointerEnter(PointerEventData eventData)
         {
             // GcLogger.Log("OnPointerEnter "+eventData);
-            uiWindowItemInfo.SetItemUid(uid);
+            window.ShowItemInfo(this);
             ShowSelected(true);
         }
 
