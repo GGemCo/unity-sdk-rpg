@@ -16,6 +16,8 @@ namespace GGemCo.Scripts.TableLoader
         public float Scale;
         public CharacterBase.Grade Grade;
         public float StatMoveSpeed;
+        public int InteractionUid;
+        public string ImageThumbnailPath;
     }
     /// <summary>
     /// Npc 테이블
@@ -53,6 +55,8 @@ namespace GGemCo.Scripts.TableLoader
                 Scale = float.Parse(data["Scale"]),
                 Grade = ConvertGrade(data["Grade"]),
                 StatMoveSpeed = float.Parse(data["StatMoveSpeed"]),
+                InteractionUid = int.Parse(data["InteractionUid"]),
+                ImageThumbnailPath = data["ImageThumbnailPath"],
             };
         }
     }

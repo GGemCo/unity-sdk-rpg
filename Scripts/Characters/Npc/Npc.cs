@@ -1,4 +1,5 @@
 using GGemCo.Scripts.Configs;
+using GGemCo.Scripts.Scenes;
 using GGemCo.Scripts.TableLoader;
 using GGemCo.Scripts.Utils;
 using UnityEngine;
@@ -39,7 +40,19 @@ namespace GGemCo.Scripts.Characters.Npc
         protected override void InitComponents()
         {
             base.InitComponents();
+            ComponentController.AddRigidbody2D(gameObject);
+            
+            // attack range
+            GameObject attackRange = new GameObject("AttackRange");
+            CharacterAttackRange characterAttackRange = attackRange.AddComponent<CharacterAttackRange>();
+            characterAttackRange.Initialize(this);
+            
+            Vector2 offset = Vector2.zero;
+            Vector2 size = new Vector2(0,0);
+            colliderCheckCharacter = ComponentController.AddCapsuleCollider2D(attackRange, true, offset, size);
+            
             gameObject.AddComponent<ControllerNpc>();
+            
         }
         /// <summary>
         /// 테이블에서 가져온 npc 정보 셋팅
@@ -72,6 +85,10 @@ namespace GGemCo.Scripts.Characters.Npc
                 if (struckTableAnimation is { Uid: > 0 })
                 {
                     currentMoveStep = struckTableAnimation.MoveStep;
+                    if (colliderCheckCharacter != null)
+                    {
+                        colliderCheckCharacter.size = new Vector2(struckTableAnimation.AttackRange, struckTableAnimation.AttackRange/2f);
+                    }
                 }
             }
         }
@@ -87,16 +104,22 @@ namespace GGemCo.Scripts.Characters.Npc
             directionPrev = new Vector3(NpcData.Flip?1:-1, 0, 0);
             SetFlip(NpcData.Flip);
         }
-        void OnTriggerEnter2D(Collider2D collision)
+        
+        protected void OnTriggerEnter2D(Collider2D collision)
         {
             if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Player)))
             {
+                SceneGame.Instance.InteractionManager.SetInfo(this);
             }
         }
-        void OnTriggerExit2D(Collider2D collision)
+
+        protected void OnTriggerExit2D(Collider2D collision)
         {
+            if (!Application.isPlaying || !this.enabled || !gameObject.activeInHierarchy) return;
+            
             if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Player)))
             {
+                SceneGame.Instance.InteractionManager.EndInteraction();
             }
         }
     }

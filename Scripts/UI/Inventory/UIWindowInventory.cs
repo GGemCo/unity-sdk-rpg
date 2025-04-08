@@ -138,7 +138,7 @@ namespace GGemCo.Scripts.UI.Inventory
             UIIcon icon = droppedIcon.GetComponent<UIIcon>();
             
             // 맵에 드랍하기
-            itemManager.ShowDropItem(worldPosition, icon.uid, icon.GetCount());
+            itemManager.MakeDropItem(worldPosition, icon.uid, icon.GetCount());
             // 윈도우에서 아이콘 정보 지워주기 
             icon.window.DetachIcon(icon.slotIndex);
             

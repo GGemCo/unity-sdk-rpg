@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using GGemCo.Scripts.Characters;
 using GGemCo.Scripts.Core;
+using GGemCo.Scripts.Interaction;
 using GGemCo.Scripts.Items;
 using GGemCo.Scripts.keyboard;
 using GGemCo.Scripts.Maps;
@@ -57,6 +58,7 @@ namespace GGemCo.Scripts.Scenes
         public ItemManager ItemManager;
         public CharacterManager CharacterManager;
         public KeyboardManager KeyboardManager;
+        public InteractionManager InteractionManager;
 
         private void Awake()
         {
@@ -101,6 +103,8 @@ namespace GGemCo.Scripts.Scenes
             CharacterManager.Initialize();
             KeyboardManager = new KeyboardManager();
             KeyboardManager.Initialize(this);
+            InteractionManager = new InteractionManager();
+            InteractionManager.Initialize(this);
         }
 
         private T CreateManager<T>(GameObject parent) where T : Component

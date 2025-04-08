@@ -56,7 +56,15 @@ namespace GGemCo.Scripts.TableLoader
             return (value == "None" || value == "NONE") ? "" : value;
         }
         public Dictionary<int, Dictionary<string, string>> GetDatas() => table;
-        protected Dictionary<string, string> GetData(int uid) => table.GetValueOrDefault(uid);
+        protected Dictionary<string, string> GetData(int uid)
+        {
+            Dictionary<string, string> data = table.GetValueOrDefault(uid);
+            if (data == null)
+            {
+                GcLogger.LogError($"테이블에 정보가 없습니다. uid: {uid}");
+            }
+            return data;
+        }
         protected string GetDataColumn(int uid, string columnName)
         {
             table.TryGetValue(uid, out var data);

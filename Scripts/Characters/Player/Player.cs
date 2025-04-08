@@ -151,13 +151,8 @@ namespace GGemCo.Scripts.Characters.Player
         }
         protected void OnTriggerEnter2D(Collider2D collision)
         {
-            // npc 일때
-            if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Npc)))
-            {
-                isNpcNearby = true;
-            }
             // 워프 일때
-            else if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.MapObjectWarp)))
+            if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.MapObjectWarp)))
             {
                 ObjectWarp objectWarp = collision.gameObject.GetComponent<ObjectWarp>();
                 SceneGame.Instance.mapManager.LoadMapByWarp(objectWarp);
@@ -166,13 +161,6 @@ namespace GGemCo.Scripts.Characters.Player
             else if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.DropItem)))
             {
                 SceneGame.Instance.ItemManager.PlayerTaken(collision.gameObject);
-            }
-        }
-        protected void OnTriggerExit2D(Collider2D collision)
-        {
-            if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Npc)))
-            {
-                isNpcNearby = false;
             }
         }
         /// <summary>
