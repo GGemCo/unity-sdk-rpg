@@ -28,12 +28,12 @@ namespace GGemCo.Scripts.Configs
             (KeyPlayerSettings, "Assets/GGemCoSettings/GGemCoPlayerSettings.asset"),
             (KeyMapSettings, "Assets/GGemCoSettings/GGemCoMapSettings.asset"),
             (KeySaveSettings, "Assets/GGemCoSettings/GGemCoSaveSettings.asset"),
-            (KeyTextFloatingDamage, "Assets/GGemCo/Prefabs/UI/TextDamage.prefab"),
-            (KeyPrefabSlot, "Assets/GGemCo/Prefabs/UI/Icon/Slot.prefab"),
-            (KeyPrefabIconItem, "Assets/GGemCo/Prefabs/UI/Icon/IconItem.prefab"),
-            (KeyPrefabIconSkill, "Assets/GGemCo/Prefabs/UI/Icon/IconSkill.prefab"),
-            (KeyPrefabDropItem, "Assets/GGemCo/Prefabs/Item/DropItem.prefab"),
-            (KeyPrefabSliderMonsterHp, "Assets/GGemCo/Prefabs/UI/SliderMonsterHp.prefab"),
+            (KeyTextFloatingDamage, "Assets/Data/Prefabs/UI/TextDamage.prefab"),
+            (KeyPrefabSlot, "Assets/Data/Prefabs/UI/Icon/Slot.prefab"),
+            (KeyPrefabIconItem, "Assets/Data/Prefabs/UI/Icon/IconItem.prefab"),
+            (KeyPrefabIconSkill, "Assets/Data/Prefabs/UI/Icon/IconSkill.prefab"),
+            (KeyPrefabDropItem, "Assets/Data/Prefabs/Item/DropItem.prefab"),
+            (KeyPrefabSliderMonsterHp, "Assets/Data/Prefabs/UI/SliderMonsterHp.prefab"),
         };
         
         // 게임 에서 사용하는 미리 로드해야하는 프리팹
