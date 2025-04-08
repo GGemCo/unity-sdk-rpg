@@ -23,7 +23,7 @@ namespace GGemCo.Scripts.TableLoader
         public int StatMoveSpeed;
         public int StatAttackSpeed;
         public long RewardExp;
-        public long RewardGold;
+        public int RewardGold;
         public int RegistFire;
         public int RegistCold;
         public int RegistLightning;
@@ -73,7 +73,7 @@ namespace GGemCo.Scripts.TableLoader
                 RegistFire = int.Parse(data["RegistFire"]),
                 RegistCold = int.Parse(data["RegistCold"]),
                 RegistLightning = int.Parse(data["RegistLightning"]),
-                RewardGold = 0,
+                RewardGold = int.Parse(data["RewardGold"]),
             };
         }
         
