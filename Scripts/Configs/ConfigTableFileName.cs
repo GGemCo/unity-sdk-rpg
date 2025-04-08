@@ -19,5 +19,7 @@
         public const string Skill = "skill";
         public const string Affect = "affect";
         public const string Effect = "effect";
+        public const string Interaction = "interaction";
+        public const string Shop = "shop";
     }
 }
