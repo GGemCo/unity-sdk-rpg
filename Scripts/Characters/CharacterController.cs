@@ -68,6 +68,7 @@ namespace GGemCo.Scripts
         /// </summary>
         protected virtual bool Run()
         {
+            if (TargetCharacter.IsStatusDontMove()) return false;
             if (TargetCharacter.IsStatusAttack()) return false;
             if (TargetCharacter.IsStatusDead()) return false;
             

@@ -260,6 +260,7 @@ namespace GGemCo.Scripts
         }
         public bool IsStatusDead() => currentStatus == CharacterStatus.Dead;
         public bool IsStatusAttack() => currentStatus == CharacterStatus.Attack;
+        public bool IsStatusDontMove() => currentStatus == CharacterStatus.DontMove;
         public bool IsStatusRun() => currentStatus == CharacterStatus.Run;
         public bool IsStatusIdle() => currentStatus == CharacterStatus.Idle;
         public bool IsStatusNone() => currentStatus == CharacterStatus.None;
@@ -271,6 +272,7 @@ namespace GGemCo.Scripts
         public void SetStatusIdle() => SetStatus(CharacterStatus.Idle);
         public void SetStatusRun() => SetStatus(CharacterStatus.Run);
         public void SetStatusAttack() => SetStatus(CharacterStatus.Attack);
+        public void SetStatusDontMove() => SetStatus(CharacterStatus.DontMove);
 
         public void SetScale(float scale)
         {

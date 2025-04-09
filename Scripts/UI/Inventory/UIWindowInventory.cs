@@ -18,8 +18,6 @@ namespace GGemCo.Scripts
         public UIWindowItemInfo uIWindowItemInfo;
         [Header("모든 아이템 합치기 버튼")]
         public Button buttonMergeAllItems;
-        // [Header("아이템 나누기 버튼")]
-        // public Button buttonSplitItem;
         
         private GameObject iconItem;
         private TableItem tableItem;
@@ -36,7 +34,6 @@ namespace GGemCo.Scripts
             if (TableLoaderManager.Instance == null) return;
             tableItem = TableLoaderManager.Instance.TableItem;
             buttonMergeAllItems?.onClick.AddListener(OnClickMergeAllItems);
-            // buttonSplitItem?.onClick.AddListener(OnClickSplitItem);
             base.Awake();
         }
 
@@ -266,30 +263,6 @@ namespace GGemCo.Scripts
         {
             inventoryData.MergeAllItems();
             LoadIcons();
-        }
-        /// <summary>
-        /// 아이템 나누기
-        /// </summary>
-        private void OnClickSplitItem()
-        {
-            var icon = GetSelectedIcon();
-            if (icon == null || icon.uid <= 0)
-            {
-                popupManager.ShowPopupError("나누기를 할 아이템을 선택해주세요.");
-                return;
-            }
-
-            if (icon.GetCount() <= 1)
-            {
-                popupManager.ShowPopupError("아이템 개수가 2개 이상일때만 나눌 수 있습니다.");
-                return;
-            }
-            // 팝업창 띄우기
-            var window =
-                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemSplit>(UIWindowManager.WindowUid
-                    .ItemSplit);
-            if (window == null) return;
-            window.CopyIconCount(0, icon.slotIndex, icon.uid, icon.GetCount());
         }
         /// <summary>
         /// 아이콘 우클릭했을때 처리 

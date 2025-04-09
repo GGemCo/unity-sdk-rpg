@@ -33,6 +33,7 @@ namespace GGemCo.Scripts
         private int splitItemIndex;
         protected override void Awake()
         {
+            uid = UIWindowManager.WindowUid.ItemSplit;
             base.Awake();
             buttonConfirm.onClick.AddListener(OnClickConfirm);
             buttonCancel.onClick.AddListener(OnClickCancel);
@@ -66,6 +67,13 @@ namespace GGemCo.Scripts
             }
             // GcLogger.Log($"풀 확장: {amount}개 아이템 추가 (총 {poolDropItem.Count}개)");
         }
+        /// <summary>
+        /// 나누기할 아이템 설정하기
+        /// </summary>
+        /// <param name="toIndex"></param>
+        /// <param name="fromIndex"></param>
+        /// <param name="fromItemUid"></param>
+        /// <param name="fromItemCount"></param>
         public override void CopyIconCount(int toIndex, int fromIndex, int fromItemUid, int fromItemCount)
         {
             splitItemIndex = fromIndex;
@@ -92,7 +100,7 @@ namespace GGemCo.Scripts
             if (splitItemCount == 0)
             {
                 splitItemCount = 1;
-                sliderSplit.value = splitItemCount / maxItemCount;
+                sliderSplit.value = (float)splitItemCount / maxItemCount;
             }
             textItemCount.text = $"{splitItemCount} / {maxItemCount}";
         }
