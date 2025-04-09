@@ -286,6 +286,7 @@ namespace GGemCo.Scripts
         {
             if (uiWindowFade == null)
             {
+                if (gameObject == null) return false;
                 gameObject.SetActive(show);
                 OnShow(show);
                 return false;
