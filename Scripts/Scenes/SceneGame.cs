@@ -178,5 +178,43 @@ namespace GGemCo.Scripts
                 KeyboardManager.Update();
             }
         }
+        /// <summary>
+        /// 아이템 구매하기
+        /// </summary>
+        /// <param name="itemUid"></param>
+        /// <param name="currencyType"></param>
+        /// <param name="price"></param>
+        /// <param name="itemCount"></param>
+        public void BuyItem(int itemUid, CurrencyConstants.Type currencyType, int price, int itemCount = 1)
+        {
+            int totalPrice = price * itemCount;
+            // 가지고 있는 재화가 충분하지 체크
+            var checkNeedCurrency = saveDataManager.Player.CheckNeedCurrency(currencyType, totalPrice);
+            if (checkNeedCurrency.Code == ResultCommon.Type.Fail)
+            {
+                systemMessageManager.ShowMessageWarning(checkNeedCurrency.Message);
+                return;
+            }
+            // 재화 빼주기
+            var minusCurrency = saveDataManager.Player.MinusCurrency(currencyType, totalPrice);
+            if (minusCurrency.Code == ResultCommon.Type.Fail)
+            {
+                systemMessageManager.ShowMessageWarning(minusCurrency.Message);
+                return;
+            }
+            // 인벤토리에 아이템 넣을 수 있는지 체크
+            var addItem = saveDataManager.Inventory.AddItem(itemUid, itemCount);
+            if (addItem.Code == ResultCommon.Type.Fail)
+            {
+                systemMessageManager.ShowMessageWarning(addItem.Message);
+                return;
+            }
+            var inventory = uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
+                .Inventory);
+            if (inventory != null)
+            {
+                inventory.SetIcons(addItem);
+            }
+        }
     }
 }

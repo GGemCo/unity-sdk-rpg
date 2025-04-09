@@ -8,7 +8,7 @@ namespace GGemCo.Scripts
     /// <summary>
     /// 스킬 리스트 element
     /// </summary>
-    public class UIElementShop : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler 
+    public class UIElementShop : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         public Vector3 iconPosition;
         public TextMeshProUGUI textName;
@@ -16,10 +16,10 @@ namespace GGemCo.Scripts
         public Button buttonBuy;
         
         private UIWindowShop uiWindowShop;
-        private UIWindowItemInfo uiWindowItemInfo;
         private StruckTableShop struckTableShop;
         private TableItem tableItem;
         private PlayerData playerData;
+        private int slotIndex;
         
         /// <summary>
         /// 초기화
@@ -31,15 +31,13 @@ namespace GGemCo.Scripts
         {
             playerData = SceneGame.Instance.saveDataManager.Player;
             struckTableShop = pstruckTableShop;
+            slotIndex = pslotIndex;
             if (buttonBuy != null)
             {
                 buttonBuy.onClick.AddListener(OnClickBuy);
             }
 
             uiWindowShop = puiWindowShop;
-            uiWindowItemInfo =
-                SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowItemInfo>(
-                    UIWindowManager.WindowUid.ItemInfo);
             tableItem = TableLoaderManager.Instance.TableItem;
             
             UpdateInfos(pstruckTableShop);
@@ -76,45 +74,37 @@ namespace GGemCo.Scripts
                 // 골드가 충분하지 체크
             if (struckTableShop.MaxBuyCount > 1)
             {
+                // 구매할 수 있는 최대 수량으로 등록
+                int count = (int)playerData.GetPossibleBuyCount(struckTableShop.CurrencyType, struckTableShop.CurrencyValue);
+                if (count <= 0)
+                {
+                    SceneGame.Instance.systemMessageManager.ShowWarningCurrency(struckTableShop.CurrencyType);
+                    return;
+                }
+                var info = tableItem.GetDataByUid(struckTableShop.ItemUid);
+                if (info != null && count > info.MaxOverlayCount)
+                {
+                    count = info.MaxOverlayCount;
+                }
                 
+                uiWindowShop.uIWindowItemBuy?.CopyIconCount(0, slotIndex, struckTableShop.ItemUid, count);
+                uiWindowShop.uIWindowItemBuy?.SetPriceInfo(struckTableShop);
             }
             // 한번에 하나만 살 수 있는지
                 // 골드가 충분하지 체크
             else
             {
-                var checkNeedCurrency = playerData.CheckNeedCurrency(struckTableShop.CurrencyType, struckTableShop.CurrencyValue);
-                if (checkNeedCurrency.Code == ResultCommon.Type.Fail)
-                {
-                    SceneGame.Instance.systemMessageManager.ShowMessageWarning(checkNeedCurrency.Message);
-                    return;
-                }
-                var addItem = SceneGame.Instance.saveDataManager.Inventory.AddItem(struckTableShop.ItemUid, 1);
-                if (addItem.Code == ResultCommon.Type.Fail)
-                {
-                    SceneGame.Instance.systemMessageManager.ShowMessageWarning(addItem.Message);
-                    return;
-                }
-                var minusCurrency = playerData.MinusCurrency(struckTableShop.CurrencyType, struckTableShop.CurrencyValue);
-                if (minusCurrency.Code == ResultCommon.Type.Fail)
-                {
-                    SceneGame.Instance.systemMessageManager.ShowMessageWarning(minusCurrency.Message);
-                    return;
-                }
-                var inventory = SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
-                    .Inventory);
-                if (inventory != null)
-                {
-                    inventory.SetIcons(addItem);
-                }
+                SceneGame.Instance.BuyItem(struckTableShop.ItemUid, struckTableShop.CurrencyType,
+                    struckTableShop.CurrencyValue);
             }
         }
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            uiWindowItemInfo.SetItemUid(struckTableShop.ItemUid);
-            RectTransform itemInfoRect = uiWindowItemInfo.GetComponent<RectTransform>();
+            uiWindowShop.uIWindowItemInfo.SetItemUid(struckTableShop.ItemUid);
+            RectTransform itemInfoRect = uiWindowShop.uIWindowItemInfo.GetComponent<RectTransform>();
             itemInfoRect.pivot = new Vector2(0, 1f);
-            uiWindowItemInfo.transform.position =
+            uiWindowShop.uIWindowItemInfo.transform.position =
                 new Vector3(transform.position.x + uiWindowShop.containerIcon.cellSize.x / 2f,
                     transform.position.y + uiWindowShop.containerIcon.cellSize.y / 2f, 0);
             // 화면 밖 체크 & 보정
@@ -123,13 +113,9 @@ namespace GGemCo.Scripts
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            uiWindowItemInfo.Show(false);
+            uiWindowShop.uIWindowItemInfo.Show(false);
         }
 
-        public void OnPointerClick(PointerEventData eventData)
-        {
-            OnClickBuy();
-        }
         public Vector3 GetIconPosition() => iconPosition;
     }
 }

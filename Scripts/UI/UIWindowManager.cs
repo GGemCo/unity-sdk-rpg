@@ -24,7 +24,8 @@ namespace GGemCo.Scripts
             Skill,
             SkillInfo,
             Dialogue,
-            Shop
+            Shop,
+            ItemBuy
         }
         [Header("기본속성")]
         [Tooltip("윈도우 리스트")]

@@ -135,5 +135,20 @@ namespace GGemCo.Scripts
             }
             canvasGroup.alpha = endAlpha;
         }
+        /// <summary>
+        /// 재화 부족할때 보여주는 메시지
+        /// </summary>
+        /// <param name="currencyType"></param>
+        public void ShowWarningCurrency(CurrencyConstants.Type currencyType)
+        {
+            if (currencyType == CurrencyConstants.Type.Gold)
+            {
+                ShowMessageWarning("골드가 부족합니다.");
+            }
+            else if (currencyType == CurrencyConstants.Type.Silver)
+            {
+                ShowMessageWarning("실버가 부족합니다.");
+            }
+        }
     }
 }

@@ -70,7 +70,7 @@ namespace GGemCo.Scripts
         {
             return currentGold.DistinctUntilChanged();
         }
-        public Observable<long> OnCurrentDiaChanged()
+        public Observable<long> OnCurrentSilverChanged()
         {
             return currentSilver.DistinctUntilChanged();
         }
@@ -178,7 +178,12 @@ namespace GGemCo.Scripts
         {
             return 0;
         }
-
+        /// <summary>
+        /// 재화 추가하기
+        /// </summary>
+        /// <param name="currencyType"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public ResultCommon AddCurrency(CurrencyConstants.Type currencyType, int value)
         {
             switch (currencyType)
@@ -195,19 +200,34 @@ namespace GGemCo.Scripts
             }
             return new ResultCommon(ResultCommon.Type.Fail, $"재화 타입 정보가 없습니다. currencyType: {currencyType}");
         }
-
-        public ResultCommon CheckNeedCurrency(CurrencyConstants.Type currencyType, int currencyValue)
+        /// <summary>
+        /// 가지고 있는 재화가 충분하지 체크하기
+        /// </summary>
+        /// <param name="currencyType"></param>
+        /// <param name="currencyValue"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public ResultCommon CheckNeedCurrency(CurrencyConstants.Type currencyType, int currencyValue, int count = 1)
         {
             if (currencyType == CurrencyConstants.Type.None)
                 return new ResultCommon(ResultCommon.Type.Fail, $"재화 정보가 없습니다. currencyType: {currencyType}");
             string currency = CurrencyConstants.GetNameByCurrencyType(currencyType);
-            if (currencyType == CurrencyConstants.Type.Gold && CurrentGold >= currencyValue)
+            if (currencyType == CurrencyConstants.Type.Gold && CurrentGold >= currencyValue * count)
+            {
+                return new ResultCommon(ResultCommon.Type.Success);
+            }
+            if (currencyType == CurrencyConstants.Type.Silver && CurrentSilver >= currencyValue * count)
             {
                 return new ResultCommon(ResultCommon.Type.Success);
             }
             return new ResultCommon(ResultCommon.Type.Fail, $"{currency} 가 부족합니다.");
         }
-
+        /// <summary>
+        /// 재화 빼기
+        /// </summary>
+        /// <param name="currencyType"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public ResultCommon MinusCurrency(CurrencyConstants.Type currencyType, int value)
         {
             switch (currencyType)
@@ -231,6 +251,30 @@ namespace GGemCo.Scripts
                     break;
             }
             return new ResultCommon(ResultCommon.Type.Fail, $"재화 타입 정보가 없습니다. currencyType: {currencyType}");
+        }
+        /// <summary>
+        /// 가지고 있는 재화로 몇개 까지 구매할 수 있는지 
+        /// </summary>
+        /// <param name="currencyType"></param>
+        /// <param name="currencyValue"></param>
+        public long GetPossibleBuyCount(CurrencyConstants.Type currencyType, int currencyValue)
+        {
+            if (currencyType == CurrencyConstants.Type.None)
+            {
+                GcLogger.LogError($"재화 정보가 없습니다. currencyType: {currencyType}");
+                return 0;
+            }
+
+            long buyCount = 0;
+            if (currencyType == CurrencyConstants.Type.Gold)
+            {
+                buyCount = CurrentGold / currencyValue;
+            }
+            else if (currencyType == CurrencyConstants.Type.Silver)
+            {
+                buyCount = CurrentSilver / currencyValue;
+            }
+            return buyCount;
         }
     }
 }
