@@ -228,7 +228,7 @@ namespace GGemCo.Scripts
         /// <param name="currencyType"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public ResultCommon MinusCurrency(CurrencyConstants.Type currencyType, int value)
+        public ResultCommon MinusCurrency(CurrencyConstants.Type currencyType, long value)
         {
             switch (currencyType)
             {

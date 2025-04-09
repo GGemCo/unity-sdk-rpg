@@ -61,6 +61,36 @@ namespace GGemCo.Editor
             {
                 RemoveAllInventoryItem();
             }
+            GUILayout.Space(20);
+
+            if (GUILayout.Button("골드 삭제"))
+            {
+                RemoveCurrency(CurrencyConstants.Type.Gold);
+            }
+            GUILayout.Space(20);
+
+            if (GUILayout.Button("실버 삭제"))
+            {
+                RemoveCurrency(CurrencyConstants.Type.Silver);
+            }
+        }
+
+        private void RemoveCurrency(CurrencyConstants.Type type)
+        {
+            if (SceneGame.Instance == null)
+            {
+                EditorUtility.DisplayDialog(Title, "게임을 실행해주세요.", "OK");
+                return;
+            }
+
+            if (type == CurrencyConstants.Type.Gold)
+            {
+                SceneGame.Instance.saveDataManager.Player.MinusCurrency(type, SceneGame.Instance.saveDataManager.Player.CurrentGold);
+            }
+            else if (type == CurrencyConstants.Type.Silver)
+            {
+                SceneGame.Instance.saveDataManager.Player.MinusCurrency(type, SceneGame.Instance.saveDataManager.Player.CurrentSilver);
+            }
         }
 
         private void AddCurrency(CurrencyConstants.Type type)
