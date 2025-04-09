@@ -11,6 +11,8 @@ namespace GGemCo.Editor
         private TableItem tableItem;
         private int selectedItemIndex;
         private int makeItemCount;
+        private int makeGoldCount;
+        private int makeSilverCount;
         private List<string> itemNames;
         private List<int> itemUids;
         private Dictionary<int, Dictionary<string, string>> itemDictionary;
@@ -38,6 +40,20 @@ namespace GGemCo.Editor
             {
                 AddItem();
             }
+            GUILayout.Space(20);
+
+            makeGoldCount = EditorGUILayout.IntField("추가할 골드", makeGoldCount);
+            if (GUILayout.Button("인벤토리에 골드 추가"))
+            {
+                AddCurrency(CurrencyConstants.Type.Gold);
+            }
+            GUILayout.Space(20);
+
+            makeSilverCount = EditorGUILayout.IntField("추가할 실버", makeSilverCount);
+            if (GUILayout.Button("인벤토리에 실버 추가"))
+            {
+                AddCurrency(CurrencyConstants.Type.Silver);
+            }
             
             GUILayout.Space(20);
 
@@ -45,6 +61,35 @@ namespace GGemCo.Editor
             {
                 RemoveAllInventoryItem();
             }
+        }
+
+        private void AddCurrency(CurrencyConstants.Type type)
+        {
+            if (SceneGame.Instance == null)
+            {
+                EditorUtility.DisplayDialog(Title, "게임을 실행해주세요.", "OK");
+                return;
+            }
+
+            if (type == CurrencyConstants.Type.Gold)
+            {
+                if (makeGoldCount <= 0)
+                {
+                    EditorUtility.DisplayDialog(Title, "골드 수량을 입력해주세요.", "OK");
+                    return;
+                }
+                SceneGame.Instance.saveDataManager.Inventory.AddItem(CurrencyConstants.ItemUidGold, makeGoldCount);
+            }
+            else if (type == CurrencyConstants.Type.Silver)
+            {
+                if (makeSilverCount <= 0)
+                {
+                    EditorUtility.DisplayDialog(Title, "실버 수량을 입력해주세요.", "OK");
+                    return;
+                }
+                SceneGame.Instance.saveDataManager.Inventory.AddItem(CurrencyConstants.ItemUidSilver, makeSilverCount);
+            }
+
         }
 
         private void RemoveAllInventoryItem()
