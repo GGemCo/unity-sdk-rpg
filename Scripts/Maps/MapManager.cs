@@ -293,6 +293,8 @@ namespace GGemCo.Scripts
             // 현재 씬에 있는 모든 몬스터 오브젝트를 삭제
             DestroyByTag(ConfigTags.GetValue(ConfigTags.Keys.Monster));
             DestroyByTag(ConfigTags.GetValue(ConfigTags.Keys.Npc));
+            // 드랍 아이템 지우기
+            DestroyByTag(ConfigTags.GetValue(ConfigTags.Keys.DropItem));
 
             DestroyOthers();
             // 잠시 대기하여 오브젝트가 완전히 삭제되도록 보장
