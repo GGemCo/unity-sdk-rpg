@@ -34,20 +34,23 @@ namespace GGemCo.Scripts
              {
                  case Type.Player:
                      Player player = characterObj.AddComponent<Player>();
+                     player.type = Type.Player;
                      break;
                  case Type.Monster:
                      Monster monster = characterObj.AddComponent<Monster>();
+                     monster.type = Type.Monster;
                      break;
                  case Type.Npc:
                      Npc npc = characterObj.AddComponent<Npc>();
+                     npc.type = Type.Npc;
                      break;
              }
 #if GGEMCO_USE_SPINE
              CharacterCharacterAnimationControllerSpine characterCharacterAnimationControllerSpine = characterObj.AddComponent<CharacterCharacterAnimationControllerSpine>();
              ICharacterAnimationController iCharacterAnimationController = characterCharacterAnimationControllerSpine.GetComponent<ICharacterAnimationController>();
 #else
-             SpriteAnimator spriteAnimator = characterObj.AddComponent<SpriteAnimator>();
-
+             CharacterAnimationControllerSprite characterAnimationControllerSprite = characterObj.AddComponent<CharacterAnimationControllerSprite>();
+             ICharacterAnimationController iCharacterAnimationController = characterAnimationControllerSprite.GetComponent<ICharacterAnimationController>();
 #endif
              characterObj.GetComponent<CharacterBase>().CharacterAnimationController = iCharacterAnimationController;
              characters.Add(characterObj);

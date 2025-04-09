@@ -7,7 +7,7 @@ namespace GGemCo.Scripts
     /// <summary>
     /// 캐릭터 유니티 애니메이션 처리
     /// </summary>
-    public class CharacterCharacterAnimationControllerSprite : MonoBehaviour, ICharacterAnimationController
+    public class CharacterAnimationControllerSprite : MonoBehaviour, ICharacterAnimationController
     {
         public void PlayWaitAnimation()
         {

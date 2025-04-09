@@ -7,6 +7,7 @@ using Event = Spine.Event;
 
 namespace GGemCo.Scripts
 {
+#if GGEMCO_USE_SPINE
     /// <summary>
     /// 캐릭터 스파인 애니메이션 처리
     /// </summary>
@@ -184,4 +185,5 @@ namespace GGemCo.Scripts
             SetColor(color);
         }
     }
+#endif
 }

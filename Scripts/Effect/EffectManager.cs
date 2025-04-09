@@ -16,6 +16,13 @@ namespace GGemCo.Scripts
             if (prefab == null) return null;
             GameObject effect = Object.Instantiate(prefab);
             DefaultEffect defaultEffect = effect.AddComponent<DefaultEffect>();
+#if GGEMCO_USE_SPINE
+            EffectAnimationControllerSpine effectAnimationControllerSpine = effect.AddComponent<EffectAnimationControllerSpine>();
+            defaultEffect.EffectAnimationController = effectAnimationControllerSpine;
+#else
+            EffectAnimationControllerSprite effectAnimationControllerSprite = effect.AddComponent<EffectAnimationControllerSprite>();
+            defaultEffect.EffectAnimationController = effectAnimationControllerSprite;
+#endif
             defaultEffect.Initialize(info);
             // defaultEffect.Initialize();
             return defaultEffect;

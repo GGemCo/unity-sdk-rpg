@@ -1,4 +1,3 @@
-#if GGEMCO_USE_SPINE
 using System.Collections.Generic;
 using Spine;
 using Spine.Unity;
@@ -36,6 +35,7 @@ namespace GGemCo.Scripts
             TimeScale = timeScale;
         }
     }
+#if GGEMCO_USE_SPINE
     /// <summary>
     /// 스파인 컨트롤러
     /// </summary>
@@ -321,5 +321,5 @@ namespace GGemCo.Scripts
             SetColor(ColorHelper.HexToColor(colorHex));
         }
     }
-}
 #endif
+}

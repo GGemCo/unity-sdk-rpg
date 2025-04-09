@@ -198,9 +198,21 @@ namespace GGemCo.Scripts
         private void InitializeByAnimationTable()
         {
             if (uid <= 0) return;
-            var info = TableLoaderManager.Instance.TableNpc.GetDataByUid(uid);
-            if (info == null) return;
-            StruckTableAnimation struckTableAnimation = TableLoaderManager.Instance.TableAnimation.GetDataByUid(info.SpineUid);
+            int animationUid = 0;
+            if (type == CharacterManager.Type.Npc)
+            {
+                var info = TableLoaderManager.Instance.TableNpc.GetDataByUid(uid);
+                if (info == null) return;
+                animationUid = info.SpineUid;
+            }
+            else if (type == CharacterManager.Type.Monster)
+            {
+                var info = TableLoaderManager.Instance.TableMonster.GetDataByUid(uid);
+                if (info == null) return;
+                animationUid = info.SpineUid;
+            }
+            if (animationUid <= 0) return;
+            StruckTableAnimation struckTableAnimation = TableLoaderManager.Instance.TableAnimation.GetDataByUid(animationUid);
             if (struckTableAnimation is not { Uid: > 0 }) return;
             currentMoveStep = struckTableAnimation.MoveStep;
             if (colliderCheckCharacter != null)

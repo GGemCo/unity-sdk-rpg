@@ -8,8 +8,10 @@ namespace GGemCo.Scripts
     /// <summary>
     /// 디폴트 이펙트
     /// </summary>
-    public class DefaultEffect : Spine2dController
+    public class DefaultEffect : MonoBehaviour
     {
+        public IEffectAnimationController EffectAnimationController;
+        
         // 이펙트 시작 애니 클립 이름
         private const string CLIP_NAME_START = "start";
         // 루프 되는 클립 이름
@@ -39,9 +41,8 @@ namespace GGemCo.Scripts
         public delegate void DelegateEffectDestroy();
         public event DelegateEffectDestroy OnEffectDestroy;
         
-        protected override void Awake()
+        protected void Awake()
         {
-            base.Awake();
             originalScaleX = transform.localScale.x;
             if (characterRenderer == null)
             {
@@ -49,16 +50,15 @@ namespace GGemCo.Scripts
             }
         }
 
-        protected override void Start()
+        protected void Start()
         {
-            base.Start();
             List<StruckAddAnimation> addAnimations = new List<StruckAddAnimation>
                 { new (CLIP_NAME_PLAY, true, 0, 1f) };
-            PlayAnimation(CLIP_NAME_START, false, 1, addAnimations);
+            EffectAnimationController.PlayEffectAnimation(CLIP_NAME_START, false, 1, addAnimations);
 
             if (struckTableEffect.Color != "")
             {
-                SetColor($"#{struckTableEffect.Color}");
+                EffectAnimationController.SetEffectColor($"#{struckTableEffect.Color}");
             }
             mapSizeHeight = SceneGame.Instance.mapManager.GetCurrentMapSize().height;
             UpdateSortingOrder();
@@ -71,13 +71,13 @@ namespace GGemCo.Scripts
         private IEnumerator RemoveEffectDuration(float f)
         {
             yield return new WaitForSeconds(f);
-            PlayAnimation(CLIP_NAME_END);
+            EffectAnimationController.PlayEffectAnimation(CLIP_NAME_END);
         }
         /// <summary>
         /// 애니메이션이 끝나면 호출되는 콜백 함수
         /// </summary>
         /// <param name="entry"></param>
-        protected override void OnAnimationComplete(TrackEntry entry)
+        protected void OnAnimationComplete(TrackEntry entry)
         {
             if (entry.Animation.Name == CLIP_NAME_END)
             {
@@ -139,7 +139,7 @@ namespace GGemCo.Scripts
         /// </summary>
         public void SetEnd()
         {
-            PlayAnimation(CLIP_NAME_END);
+            EffectAnimationController.PlayEffectAnimation(CLIP_NAME_END);
         }
 
         public void DestroyForce()
