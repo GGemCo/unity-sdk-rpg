@@ -1,11 +1,10 @@
 using System.Collections;
-using GGemCo.Scripts.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.Popup
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 팝업 메타 데이터

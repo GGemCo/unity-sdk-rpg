@@ -1,14 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using GGemCo.Scripts.Characters;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.Spine2d;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
 using Spine;
 using UnityEngine;
 
-namespace GGemCo.Scripts.Effect
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 디폴트 이펙트

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GGemCo.Scripts.Configs
+namespace GGemCo.Scripts
 {
     public static class ConfigAddressables
     {

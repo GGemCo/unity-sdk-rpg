@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GGemCo.Scripts.ScriptableSettings
+namespace GGemCo.Scripts
 {
     [CreateAssetMenu(fileName = "GGemCoPlayerSettings", menuName = "GGemCo/Settings/GGemCoPlayerSettings", order = 2)]
     public class GGemCoPlayerSettings :ScriptableObject

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GGemCo.Scripts.ScriptableSettings
+namespace GGemCo.Scripts
 {
     [CreateAssetMenu(fileName = "GGemCoMapSettings", menuName = "GGemCo/Settings/GGemCoMapSettings", order = 3)]
     public class GGemCoMapSettings : ScriptableObject

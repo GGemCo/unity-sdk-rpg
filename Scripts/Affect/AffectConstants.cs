@@ -1,4 +1,4 @@
-﻿namespace GGemCo.Scripts.Affect
+﻿namespace GGemCo.Scripts
 {
     public static class AffectConstants
     {

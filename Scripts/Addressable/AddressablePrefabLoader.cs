@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-namespace GGemCo.Scripts.Addressable
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// Addressables 의 프리팹 로드 

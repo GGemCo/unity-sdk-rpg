@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 
-namespace GGemCo.Scripts.Core
+namespace GGemCo.Scripts
 {
     public class SoundManager : MonoBehaviour
     {

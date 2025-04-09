@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GGemCo.Scripts.Scenes
+namespace GGemCo.Scripts
 {
     public class DefaultScene : MonoBehaviour
     {

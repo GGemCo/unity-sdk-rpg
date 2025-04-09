@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace GGemCo.Scripts.Utils
+namespace GGemCo.Scripts
 {
     public class CoroutineHelper : MonoBehaviour
     {

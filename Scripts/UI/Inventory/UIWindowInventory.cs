@@ -1,19 +1,9 @@
 ﻿using System;
-using GGemCo.Scripts.Characters.Player;
-using GGemCo.Scripts.Items;
-using GGemCo.Scripts.Popup;
-using GGemCo.Scripts.SaveData;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.SystemMessage;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI.Icon;
-using GGemCo.Scripts.UI.Window;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.UI.Inventory
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 인벤토리

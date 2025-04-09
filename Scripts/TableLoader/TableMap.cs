@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.Maps;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 
-namespace GGemCo.Scripts.TableLoader
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 맵 테이블 Structure

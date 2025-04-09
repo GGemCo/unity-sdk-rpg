@@ -1,11 +1,8 @@
-﻿using GGemCo.Scripts.SaveData;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.Utils;
-using R3;
+﻿using R3;
 using TMPro;
 using UnityEngine;
 
-namespace GGemCo.Scripts.UI.UIText
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// EXP 데이터 변경 시 UI 업데이트

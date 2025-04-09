@@ -1,8 +1,7 @@
-﻿using GGemCo.Scripts.Configs;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace GGemCo.Scripts.Maps.Objects
+namespace GGemCo.Scripts
 {
     [ExecuteInEditMode]  // 에디터 모드에서도 생명주기 함수 실행
     public class DefaultMapObject : MonoBehaviour

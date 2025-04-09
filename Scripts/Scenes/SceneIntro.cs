@@ -1,16 +1,7 @@
-﻿using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Core;
-using GGemCo.Scripts.Popup;
-using GGemCo.Scripts.SaveData;
-using GGemCo.Scripts.ScriptableSettings;
-using GGemCo.Scripts.UI.WindowLoadSaveData;
-using GGemCo.Scripts.Utils;
-using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.Scenes
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 인트로 씬

@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GGemCo.Scripts.Scenes;
 using UnityEngine;
 
-namespace GGemCo.Scripts.keyboard
+namespace GGemCo.Scripts
 {
     public class KeyboardManager
     {

@@ -1,9 +1,8 @@
-﻿using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.ScriptableSettings;
+﻿using GGemCo.Scripts;
 using UnityEditor;
 using UnityEngine;
 
-namespace GGemCo.Editor.GGemCoTool.DefaultSetting
+namespace GGemCo.Editor
 {
     [CustomEditor(typeof(GGemCoSettings))]
     public class SettingGGemCoInspector : UnityEditor.Editor

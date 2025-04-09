@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using GGemCo.Scripts.Items;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.SystemMessage;
-using GGemCo.Scripts.TableLoader;
 
-namespace GGemCo.Scripts.SaveData
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 장비 및 인벤토리 데이터를 관리하는 공통 클래스
@@ -80,7 +76,16 @@ namespace GGemCo.Scripts.SaveData
             // 재화 별도 처리 
             if (info.Type == ItemConstants.Type.Currency)
             {
-                return SceneGame.Instance.saveDataManager.Player.AddCurrency(itemUid, itemCount);
+                CurrencyConstants.Type currencyType = CurrencyConstants.Type.None;
+                if (info.Category == ItemConstants.Category.Gold)
+                {
+                    currencyType = CurrencyConstants.Type.Gold;
+                }
+                else if (info.Category == ItemConstants.Category.Silver)
+                {
+                    currencyType = CurrencyConstants.Type.Silver;
+                }
+                return SceneGame.Instance.saveDataManager.Player.AddCurrency(currencyType, itemCount);
             }
             else
             {

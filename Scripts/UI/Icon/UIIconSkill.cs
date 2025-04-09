@@ -1,13 +1,7 @@
-﻿using GGemCo.Scripts.Characters.Player;
-using GGemCo.Scripts.SaveData;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI.WindowSkill;
-using GGemCo.Scripts.Utils;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace GGemCo.Scripts.UI.Icon
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 스킬 아이콘

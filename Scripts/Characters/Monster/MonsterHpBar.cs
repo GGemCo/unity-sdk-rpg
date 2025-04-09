@@ -1,12 +1,9 @@
 ﻿using System.Collections;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.Characters.Monster
+namespace GGemCo.Scripts
 {
     public class MonsterHpBar : MonoBehaviour
     {

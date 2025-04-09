@@ -1,9 +1,8 @@
-﻿using GGemCo.Scripts.TableLoader;
-using TMPro;
+﻿using TMPro;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GGemCo.Scripts.UI.Window
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 플레이어 stat 정보 보여주는 윈도우

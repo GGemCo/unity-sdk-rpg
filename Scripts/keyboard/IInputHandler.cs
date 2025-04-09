@@ -1,4 +1,4 @@
-﻿namespace GGemCo.Scripts.keyboard
+﻿namespace GGemCo.Scripts
 {
     public interface IInputHandler
     {

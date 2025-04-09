@@ -1,16 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Core;
-using GGemCo.Scripts.Popup;
-using GGemCo.Scripts.SaveData;
-using GGemCo.Scripts.ScriptableSettings;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.UI.WindowLoadSaveData
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 세이브 데이터 불러오기 Window

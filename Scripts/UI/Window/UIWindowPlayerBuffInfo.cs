@@ -1,11 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI.Icon;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 
-namespace GGemCo.Scripts.UI.Window
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 플레이어 버프 관리

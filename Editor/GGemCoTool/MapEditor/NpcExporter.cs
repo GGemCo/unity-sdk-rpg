@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using GGemCo.Scripts.Characters;
-using GGemCo.Scripts.Characters.Npc;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Maps;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
+using GGemCo.Scripts;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace GGemCo.Editor.GGemCoTool.MapEditor
+namespace GGemCo.Editor
 {
     /// <summary>
     /// 맵 배치툴 > Npc 배치, 내보내기

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GGemCo.Scripts.SystemMessage
+namespace GGemCo.Scripts
 {
     public class SystemMessage
     {

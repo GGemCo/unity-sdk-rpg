@@ -1,4 +1,4 @@
-﻿namespace GGemCo.Scripts.Configs
+﻿namespace GGemCo.Scripts
 {
     public static class ConfigDefine
     {

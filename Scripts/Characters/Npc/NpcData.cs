@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GGemCo.Scripts.Characters.Npc
+namespace GGemCo.Scripts
 {
     public class NpcData
     {

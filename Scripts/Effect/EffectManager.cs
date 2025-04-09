@@ -1,8 +1,6 @@
-﻿using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace GGemCo.Scripts.Effect
+namespace GGemCo.Scripts
 {
     public abstract class EffectManager
     {

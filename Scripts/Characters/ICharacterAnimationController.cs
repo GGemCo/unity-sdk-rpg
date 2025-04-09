@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using GGemCo.Scripts.Spine2d;
 using UnityEngine;
 
-namespace GGemCo.Scripts.Characters
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 애니메이션 관리

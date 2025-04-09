@@ -1,10 +1,8 @@
 ﻿using System.Collections;
 using System.IO;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 
-namespace GGemCo.Scripts.SaveData
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 게임 데이터 저장시 만드는 썸네일 매니저

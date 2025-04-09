@@ -1,8 +1,6 @@
-﻿using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Utils;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace GGemCo.Scripts.Maps.Objects
+namespace GGemCo.Scripts
 {
     public class ObjectWarp : DefaultMapObject
     {

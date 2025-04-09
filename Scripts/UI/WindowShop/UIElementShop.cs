@@ -1,13 +1,9 @@
-﻿using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI.Inventory;
-using GGemCo.Scripts.Utils;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.UI.WindowShop
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 스킬 리스트 element
@@ -23,7 +19,7 @@ namespace GGemCo.Scripts.UI.WindowShop
         private UIWindowItemInfo uiWindowItemInfo;
         private StruckTableShop struckTableShop;
         private TableItem tableItem;
-        private int slotIndex;
+        private PlayerData playerData;
         
         /// <summary>
         /// 초기화
@@ -33,7 +29,7 @@ namespace GGemCo.Scripts.UI.WindowShop
         /// <param name="pstruckTableShop"></param>
         public void Initialize(UIWindowShop puiWindowShop, int pslotIndex, StruckTableShop pstruckTableShop)
         {
-            slotIndex = pslotIndex;
+            playerData = SceneGame.Instance.saveDataManager.Player;
             struckTableShop = pstruckTableShop;
             if (buttonBuy != null)
             {
@@ -86,7 +82,30 @@ namespace GGemCo.Scripts.UI.WindowShop
                 // 골드가 충분하지 체크
             else
             {
-                
+                var checkNeedCurrency = playerData.CheckNeedCurrency(struckTableShop.CurrencyType, struckTableShop.CurrencyValue);
+                if (checkNeedCurrency.Code == ResultCommon.Type.Fail)
+                {
+                    SceneGame.Instance.systemMessageManager.ShowMessageWarning(checkNeedCurrency.Message);
+                    return;
+                }
+                var addItem = SceneGame.Instance.saveDataManager.Inventory.AddItem(struckTableShop.ItemUid, 1);
+                if (addItem.Code == ResultCommon.Type.Fail)
+                {
+                    SceneGame.Instance.systemMessageManager.ShowMessageWarning(addItem.Message);
+                    return;
+                }
+                var minusCurrency = playerData.MinusCurrency(struckTableShop.CurrencyType, struckTableShop.CurrencyValue);
+                if (minusCurrency.Code == ResultCommon.Type.Fail)
+                {
+                    SceneGame.Instance.systemMessageManager.ShowMessageWarning(minusCurrency.Message);
+                    return;
+                }
+                var inventory = SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
+                    .Inventory);
+                if (inventory != null)
+                {
+                    inventory.SetIcons(addItem);
+                }
             }
         }
 

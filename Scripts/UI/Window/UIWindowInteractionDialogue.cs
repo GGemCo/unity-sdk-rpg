@@ -1,14 +1,9 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.Interaction;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI.WindowShop;
-using GGemCo.Scripts.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.UI.Window
+namespace GGemCo.Scripts
 {
     public class UIWindowInteractionDialogue : UIWindow
     {

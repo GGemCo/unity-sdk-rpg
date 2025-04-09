@@ -1,14 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using GGemCo.Scripts.Characters;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Effect;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 
-namespace GGemCo.Scripts.Skill
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 스킬 컨트롤러에서 생성한 스킬

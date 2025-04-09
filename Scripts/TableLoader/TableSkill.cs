@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.Skill;
-using GGemCo.Scripts.Utils;
 
-namespace GGemCo.Scripts.TableLoader
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 맵 테이블 Structure

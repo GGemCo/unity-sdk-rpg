@@ -1,18 +1,7 @@
 ﻿using System.Collections;
-using GGemCo.Scripts.Characters;
-using GGemCo.Scripts.Core;
-using GGemCo.Scripts.Interaction;
-using GGemCo.Scripts.Items;
-using GGemCo.Scripts.keyboard;
-using GGemCo.Scripts.Maps;
-using GGemCo.Scripts.Popup;
-using GGemCo.Scripts.SaveData;
-using GGemCo.Scripts.SystemMessage;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI;
 using UnityEngine;
 
-namespace GGemCo.Scripts.Scenes
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 게임 씬 관리 클래스

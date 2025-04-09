@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GGemCo.Scripts.UI
+namespace GGemCo.Scripts
 {
     public class UIBackgroundScroll : MonoBehaviour
     {

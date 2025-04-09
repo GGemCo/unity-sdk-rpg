@@ -1,4 +1,4 @@
-﻿namespace GGemCo.Scripts.SaveData
+﻿namespace GGemCo.Scripts
 {
     public static class SaveDataConstants
     {

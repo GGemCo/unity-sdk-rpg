@@ -1,14 +1,8 @@
 using System;
-using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 using R3;
 
-namespace GGemCo.Scripts.Characters.Monster
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 몬스터 기본 클레스
@@ -200,7 +194,7 @@ namespace GGemCo.Scripts.Characters.Monster
             {
                 if (hit.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Player)))
                 {
-                    Player.Player player = hit.GetComponent<Player.Player>();
+                    Player player = hit.GetComponent<Player>();
                     if (player != null)
                     {
                         // GcLogger.Log("Player attacked the monster after animation!");

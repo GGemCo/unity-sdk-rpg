@@ -1,12 +1,7 @@
-﻿using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Items;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.SystemMessage;
-using GGemCo.Scripts.TableLoader;
-using R3;
+﻿using R3;
 using UnityEngine;
 
-namespace GGemCo.Scripts.SaveData
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 세이브 데이터 - 플레이어 정보
@@ -184,30 +179,58 @@ namespace GGemCo.Scripts.SaveData
             return 0;
         }
 
-        public ResultCommon AddCurrency(int itemUid, int itemCount)
+        public ResultCommon AddCurrency(CurrencyConstants.Type currencyType, int value)
         {
-            var info = tableLoaderManager.TableItem.GetDataByUid(itemUid);
-            if (info == null)
+            switch (currencyType)
             {
-                return new ResultCommon(ResultCommon.Type.Fail, $"아이템 정보가 없습니다. itemUid: {itemUid}");
-            }
-
-            switch (info.Category)
-            {
-                case ItemConstants.Category.Gold:
-                    CurrentGold += itemCount;
+                case CurrencyConstants.Type.Gold:
+                    CurrentGold += value;
                     return new ResultCommon(ResultCommon.Type.Success);
-                case ItemConstants.Category.Silver:
-                    CurrentSilver += itemCount;
+                case CurrencyConstants.Type.Silver:
+                    CurrentSilver += value;
                     return new ResultCommon(ResultCommon.Type.Success);
-                case ItemConstants.Category.None:
-                case ItemConstants.Category.Weapon:
-                case ItemConstants.Category.Armor:
-                case ItemConstants.Category.Potion:
+                case CurrencyConstants.Type.None:
                 default:
                     break;
             }
-            return new ResultCommon(ResultCommon.Type.Fail, $"아이템 정보가 없습니다. itemUid: {itemUid}");
+            return new ResultCommon(ResultCommon.Type.Fail, $"재화 타입 정보가 없습니다. currencyType: {currencyType}");
+        }
+
+        public ResultCommon CheckNeedCurrency(CurrencyConstants.Type currencyType, int currencyValue)
+        {
+            if (currencyType == CurrencyConstants.Type.None)
+                return new ResultCommon(ResultCommon.Type.Fail, $"재화 정보가 없습니다. currencyType: {currencyType}");
+            string currency = CurrencyConstants.GetNameByCurrencyType(currencyType);
+            if (currencyType == CurrencyConstants.Type.Gold && CurrentGold >= currencyValue)
+            {
+                return new ResultCommon(ResultCommon.Type.Success);
+            }
+            return new ResultCommon(ResultCommon.Type.Fail, $"{currency} 가 부족합니다.");
+        }
+
+        public ResultCommon MinusCurrency(CurrencyConstants.Type currencyType, int value)
+        {
+            switch (currencyType)
+            {
+                case CurrencyConstants.Type.Gold:
+                    if (CurrentGold < value)
+                    {
+                        return new ResultCommon(ResultCommon.Type.Fail, "골드가 부족합니다.");
+                    }
+                    CurrentGold -= value;
+                    return new ResultCommon(ResultCommon.Type.Success);
+                case CurrencyConstants.Type.Silver:
+                    if (CurrentSilver < value)
+                    {
+                        return new ResultCommon(ResultCommon.Type.Fail, "실버가 부족합니다.");
+                    }
+                    CurrentSilver -= value;
+                    return new ResultCommon(ResultCommon.Type.Success);
+                case CurrencyConstants.Type.None:
+                default:
+                    break;
+            }
+            return new ResultCommon(ResultCommon.Type.Fail, $"재화 타입 정보가 없습니다. currencyType: {currencyType}");
         }
     }
 }

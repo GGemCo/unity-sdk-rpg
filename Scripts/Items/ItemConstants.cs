@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.Configs;
 
-namespace GGemCo.Scripts.Items
+namespace GGemCo.Scripts
 {
     public static class ItemConstants
     {

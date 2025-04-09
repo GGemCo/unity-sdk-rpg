@@ -1,13 +1,10 @@
 ﻿#if UNITY_EDITOR
 using System.Collections.Generic;
-using GGemCo.Editor.GGemCoTool.Utils;
-using GGemCo.Scripts.Items;
-using GGemCo.Scripts.TableLoader;
+using GGemCo.Scripts;
 using UnityEditor;
 using UnityEngine;
-using TableLoaderManager = GGemCo.Editor.GGemCoTool.TableLoader.TableLoaderManager;
 
-namespace GGemCo.Editor.GGemCoTool.Test
+namespace GGemCo.Editor
 {
     public class TestDropItemRate : EditorWindow
     {

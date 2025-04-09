@@ -1,9 +1,7 @@
 ﻿using System;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 
-namespace GGemCo.Scripts.Characters
+namespace GGemCo.Scripts
 {
     public class CharacterController : MonoBehaviour
     {

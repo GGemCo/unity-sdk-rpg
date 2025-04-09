@@ -1,7 +1,6 @@
-﻿using GGemCo.Scripts.Utils;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace GGemCo.Scripts.TableLoader
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 맵 테이블 Structure

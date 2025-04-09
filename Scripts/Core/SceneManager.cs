@@ -1,4 +1,4 @@
-﻿namespace GGemCo.Scripts.Core
+﻿namespace GGemCo.Scripts
 {
     public abstract class SceneManager
     {

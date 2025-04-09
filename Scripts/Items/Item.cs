@@ -1,15 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.TagName;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace GGemCo.Scripts.Items
+namespace GGemCo.Scripts
 {
     public class Item : MonoBehaviour
     {

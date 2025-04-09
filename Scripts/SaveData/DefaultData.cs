@@ -1,7 +1,6 @@
-﻿using GGemCo.Scripts.Scenes;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace GGemCo.Scripts.SaveData
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 아이콘 저장 구조

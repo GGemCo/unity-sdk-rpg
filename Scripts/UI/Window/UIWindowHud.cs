@@ -1,8 +1,7 @@
-﻿using GGemCo.Scripts.Scenes;
-using TMPro;
+﻿using TMPro;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.UI.Window
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 플레이어 정보 Hud

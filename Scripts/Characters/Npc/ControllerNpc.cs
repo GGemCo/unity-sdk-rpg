@@ -1,7 +1,6 @@
-﻿using GGemCo.Scripts.Scenes;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace GGemCo.Scripts.Characters.Npc
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// Npc 움직임 처리

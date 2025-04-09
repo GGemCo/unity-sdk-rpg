@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace GGemCo.Scripts.SaveData
+namespace GGemCo.Scripts
 {
     public class SlotMetaInfo
     {

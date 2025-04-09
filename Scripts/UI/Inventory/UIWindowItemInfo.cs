@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Items;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
 using TMPro;
 using UnityEngine;
 
-namespace GGemCo.Scripts.UI.Inventory
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 아이템 정보

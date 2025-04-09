@@ -1,10 +1,8 @@
-﻿using GGemCo.Editor.GGemCoTool.Utils;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.ScriptableSettings;
+﻿using GGemCo.Scripts;
 using UnityEditor;
 using UnityEngine;
 
-namespace GGemCo.Editor.GGemCoTool.DefaultSetting
+namespace GGemCo.Editor
 {
     public class SettingGGemCo
     {

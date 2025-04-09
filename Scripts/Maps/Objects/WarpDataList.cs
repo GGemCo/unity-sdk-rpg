@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GGemCo.Scripts.Maps.Objects
+namespace GGemCo.Scripts
 {
     [System.Serializable]
     public class WarpDataList

@@ -2,9 +2,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using GGemCo.Scripts.Core;
+using GGemCo.Scripts;
 
-namespace GGemCo.Editor.GGemCoTool
+namespace GGemCo.Editor
 {
     /// <summary>
     /// PlayerPrefs 데이터 관리 툴

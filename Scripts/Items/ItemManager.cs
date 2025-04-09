@@ -1,18 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Currency;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI;
-using GGemCo.Scripts.UI.Inventory;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
-namespace GGemCo.Scripts.Items
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 몬스터 사냥 후 드랍되는 아이템 관리 매니저

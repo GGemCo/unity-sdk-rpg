@@ -1,4 +1,4 @@
-﻿namespace GGemCo.Scripts.Maps
+﻿namespace GGemCo.Scripts
 {
     public static class MapConstants
     {

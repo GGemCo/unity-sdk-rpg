@@ -1,12 +1,10 @@
 #if GGEMCO_USE_SPINE
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.Utils;
 using Spine;
 using Spine.Unity;
 using UnityEngine;
 using Event = Spine.Event;
 
-namespace GGemCo.Scripts.Spine2d
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 스파인 컨트롤러

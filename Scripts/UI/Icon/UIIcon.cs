@@ -1,11 +1,8 @@
-﻿using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Items;
-using GGemCo.Scripts.Scenes;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.UI.Icon
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 아이콘 공용

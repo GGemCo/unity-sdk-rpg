@@ -1,13 +1,9 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI;
-using GGemCo.Scripts.UI.Inventory;
+using GGemCo.Scripts;
 using UnityEditor;
 using UnityEngine;
-using TableLoaderManager = GGemCo.Editor.GGemCoTool.TableLoader.TableLoaderManager;
 
-namespace GGemCo.Editor.GGemCoTool.Create
+namespace GGemCo.Editor
 {
     public class CreateItemTool : EditorWindow
     {

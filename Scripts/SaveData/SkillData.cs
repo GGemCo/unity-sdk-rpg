@@ -1,11 +1,6 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.SystemMessage;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI;
-using GGemCo.Scripts.UI.WindowSkill;
 
-namespace GGemCo.Scripts.SaveData
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 스킬 UI 에 스킬별 레벨 정보 저장

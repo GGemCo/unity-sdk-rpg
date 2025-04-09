@@ -1,4 +1,4 @@
-namespace GGemCo.Scripts.Utils
+namespace GGemCo.Scripts
 {
     public static class Easing
     {

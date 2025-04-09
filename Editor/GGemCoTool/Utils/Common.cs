@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace GGemCo.Editor.GGemCoTool.Utils
+namespace GGemCo.Editor
 {
     public abstract class Common
     {

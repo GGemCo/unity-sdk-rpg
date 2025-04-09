@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 
-namespace GGemCo.Scripts.Popup
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 팝업창 매니저

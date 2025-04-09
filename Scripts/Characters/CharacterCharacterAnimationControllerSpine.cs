@@ -1,12 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using GGemCo.Scripts.Spine2d;
 using Spine;
 using Spine.Unity;
 using UnityEngine;
 using Event = Spine.Event;
 
-namespace GGemCo.Scripts.Characters
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 캐릭터 스파인 애니메이션 처리

@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.Interaction;
-using GGemCo.Scripts.Utils;
 
-namespace GGemCo.Scripts.TableLoader
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// Interaction 테이블 Structure

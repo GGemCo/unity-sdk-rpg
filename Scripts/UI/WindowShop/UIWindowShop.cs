@@ -1,15 +1,8 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI.Icon;
-using GGemCo.Scripts.UI.Inventory;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace GGemCo.Scripts.UI.WindowShop
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 플레이어 스킬
@@ -18,6 +11,8 @@ namespace GGemCo.Scripts.UI.WindowShop
     {
         [Tooltip("아이템 정보 윈도우")]
         public UIWindowItemInfo uIWindowItemInfo;
+        [Tooltip("인벤토리 윈도우")]
+        public UIWindowInventory uIWindowInventory;
         [Tooltip("샵 element 프리팹")]
         public GameObject prefabUIElementShop;
         
@@ -142,15 +137,15 @@ namespace GGemCo.Scripts.UI.WindowShop
             slot.transform.localPosition = position;
         }
 
-        public override void OnShow(bool show)
+        public override bool Show(bool show)
         {
-            if (SceneGame.Instance == null || TableLoaderManager.Instance == null) return;
+            if (!base.Show(show)) return false;
+            uIWindowInventory?.Show(show);
             if (!show)
             {
                 uIWindowItemInfo?.Show(false);
-                return;
             }
-            // LoadIcons();
+            return true;
         }
 
         /// <summary>
@@ -246,18 +241,5 @@ namespace GGemCo.Scripts.UI.WindowShop
         {
             
         }
-        // protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
-        // {
-        //     base.OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
-        //     UIIcon uiIcon = GetIconByIndex(slotIndex);
-        //     if (uiIcon == null) return;
-        //     skillData.SetSkill(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
-        //     UIElementShop uiElementSkill = uiElementShops[slotIndex];
-        //     if (uiElementSkill != null)
-        //     {
-        //         UIIconItem uiIconSkill = uiIcon.GetComponent<UIIconItem>();
-        //         uiElementSkill.UpdateInfos(uiIconSkill.GetTableInfo(), uiIconSkill.GetSaveDataInfo());
-        //     }
-        // }
     }
 }

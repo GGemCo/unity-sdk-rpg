@@ -1,11 +1,9 @@
 ﻿using System.Collections;
 using System.IO;
-using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Core;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace GGemCo.Scripts.SaveData
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 세이브 데이터 json 파일 로드

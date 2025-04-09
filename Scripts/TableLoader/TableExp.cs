@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace GGemCo.Scripts.TableLoader
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 경험치 테이블 

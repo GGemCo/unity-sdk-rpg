@@ -1,10 +1,6 @@
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 
-namespace GGemCo.Scripts.Characters.Npc
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// Npc 기본 클레스

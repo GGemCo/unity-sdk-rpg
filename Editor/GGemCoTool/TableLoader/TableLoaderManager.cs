@@ -1,10 +1,8 @@
 ﻿using System;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
+using GGemCo.Scripts;
 using UnityEngine;
 
-namespace GGemCo.Editor.GGemCoTool.TableLoader
+namespace GGemCo.Editor
 {
     public class TableLoaderManager
     {

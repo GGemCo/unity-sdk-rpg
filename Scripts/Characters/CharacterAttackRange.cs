@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GGemCo.Scripts.Characters
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 캐릭터 공격 거리 관리

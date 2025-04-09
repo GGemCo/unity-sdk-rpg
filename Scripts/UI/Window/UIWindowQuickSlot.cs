@@ -1,18 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using GGemCo.Scripts.Characters.Player;
-using GGemCo.Scripts.keyboard;
-using GGemCo.Scripts.SaveData;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI.Icon;
-using GGemCo.Scripts.UI.WindowSkill;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.UI.Window
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 퀵슬롯

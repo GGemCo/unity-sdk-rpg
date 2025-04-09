@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GGemCo.Scripts.UI
+namespace GGemCo.Scripts
 {
     public static class DisposableExtensions
     {

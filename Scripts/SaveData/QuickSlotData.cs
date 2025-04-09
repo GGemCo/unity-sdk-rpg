@@ -1,12 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.SystemMessage;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI;
-using GGemCo.Scripts.UI.Window;
 
-namespace GGemCo.Scripts.SaveData
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 퀵슬롯에 들어간 스킬 정보 관리

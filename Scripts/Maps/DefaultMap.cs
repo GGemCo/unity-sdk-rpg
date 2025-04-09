@@ -1,9 +1,7 @@
-using GGemCo.Scripts.Characters.Npc;
-using GGemCo.Scripts.Configs;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace GGemCo.Scripts.Maps
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 맵

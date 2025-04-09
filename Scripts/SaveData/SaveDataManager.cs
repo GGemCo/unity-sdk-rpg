@@ -1,13 +1,8 @@
 using System.IO;
-using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Core;
-using GGemCo.Scripts.ScriptableSettings;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace GGemCo.Scripts.SaveData
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 저장할 데이터 컨테이너 클래스

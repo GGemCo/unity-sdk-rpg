@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.UI.Icon;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 
-namespace GGemCo.Scripts.UI
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// UI 아이콘 쿨타임 관리

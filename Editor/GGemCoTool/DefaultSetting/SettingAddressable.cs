@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Editor.GGemCoTool.Utils;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Utils;
+using GGemCo.Scripts;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
 
-namespace GGemCo.Editor.GGemCoTool.DefaultSetting
+namespace GGemCo.Editor
 {
     /// <summary>
     /// Addressable 추가하기 툴

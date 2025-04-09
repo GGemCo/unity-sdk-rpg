@@ -1,8 +1,4 @@
-﻿using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
-
-namespace GGemCo.Scripts.UI.Icon
+﻿namespace GGemCo.Scripts
 {
     /// <summary>
     /// 버프 아이콘

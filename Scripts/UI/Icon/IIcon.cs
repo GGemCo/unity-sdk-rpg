@@ -1,5 +1,5 @@
 ﻿
-namespace GGemCo.Scripts.UI.Icon
+namespace GGemCo.Scripts
 {
     public class Icon
     {

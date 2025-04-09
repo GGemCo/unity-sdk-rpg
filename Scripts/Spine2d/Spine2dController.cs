@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using Spine;
 using Spine.Unity;
-using GGemCo.Scripts.Utils;
 using Spine.Unity.AttachmentTools;
 using UnityEngine;
 using Event = Spine.Event;
 
-namespace GGemCo.Scripts.Spine2d
+namespace GGemCo.Scripts
 {
      public class StruckChangeSlotImage
      {

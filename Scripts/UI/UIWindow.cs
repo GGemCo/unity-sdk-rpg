@@ -1,15 +1,8 @@
-using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.SystemMessage;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI.Icon;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.UI
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 윈도우 

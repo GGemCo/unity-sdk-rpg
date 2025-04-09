@@ -1,18 +1,9 @@
 ﻿using System;
 using System.Collections;
-using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Affect;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Core;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.Skill;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI;
-using GGemCo.Scripts.Utils;
 using R3;
 using UnityEngine;
 
-namespace GGemCo.Scripts.Characters
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 캐릭터 공용 

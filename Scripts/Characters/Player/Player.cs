@@ -1,22 +1,9 @@
 using System;
 using System.Collections.Generic;
-using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Items;
-using GGemCo.Scripts.Maps.Objects;
-using GGemCo.Scripts.SaveData;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.ScriptableSettings;
-using GGemCo.Scripts.Spine2d;
-using GGemCo.Scripts.SystemMessage;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI;
-using GGemCo.Scripts.UI.Window;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 using R3;
 
-namespace GGemCo.Scripts.Characters.Player
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 플레이어 

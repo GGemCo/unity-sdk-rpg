@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GGemCo.Scripts.UI.Icon
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 아이콘 정보

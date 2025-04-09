@@ -1,4 +1,4 @@
-﻿namespace GGemCo.Scripts.Configs
+﻿namespace GGemCo.Scripts
 {
     /// <summary>
     /// Sorting Layer 에 사용되는 Config 값

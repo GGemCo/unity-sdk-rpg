@@ -1,12 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GGemCo.Scripts.Affect;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.TableLoader;
 using R3;
 using UnityEngine;
 
-namespace GGemCo.Scripts.Characters
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 캐릭터 스탯 관리

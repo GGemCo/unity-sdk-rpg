@@ -2,7 +2,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
-namespace GGemCo.Scripts.UI
+namespace GGemCo.Scripts
 {
     public class UIFloatingText : MonoBehaviour
     {

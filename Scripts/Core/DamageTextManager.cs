@@ -1,13 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
-using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Configs;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
-namespace GGemCo.Scripts.Core
+namespace GGemCo.Scripts
 {
     public class MetadataDamageText
     {

@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.UI
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// Toogle 버튼의 이름을 Uid 으로 사용한다 

@@ -1,16 +1,8 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.SaveData;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI.Icon;
-using GGemCo.Scripts.UI.Window;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace GGemCo.Scripts.UI.WindowSkill
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 플레이어 스킬

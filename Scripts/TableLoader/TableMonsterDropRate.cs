@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.Items;
-using GGemCo.Scripts.Utils;
 
-namespace GGemCo.Scripts.TableLoader
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 아이템 드랍 확률 테이블 Structure

@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace GGemCo.Scripts.UI
+namespace GGemCo.Scripts
 {
     public class UITextFadeInOut : MonoBehaviour
     {

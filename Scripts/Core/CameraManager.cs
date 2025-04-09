@@ -1,10 +1,8 @@
 using System.Collections;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Scenes;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace GGemCo.Scripts.Core
+namespace GGemCo.Scripts
 {
     public class CameraManager : MonoBehaviour
     {

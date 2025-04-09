@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
 
-namespace GGemCo.Scripts.SaveData
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 세이브 데이터 - 퀘스트 정보

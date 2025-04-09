@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GGemCo.Scripts.Configs
+namespace GGemCo.Scripts
 {
     public abstract class DefaultConfig<T> where T : Enum
     {

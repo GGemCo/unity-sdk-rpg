@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Maps;
-using GGemCo.Scripts.Maps.Objects;
-using GGemCo.Scripts.Utils;
+using GGemCo.Scripts;
 using Newtonsoft.Json;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace GGemCo.Editor.GGemCoTool.MapEditor
+namespace GGemCo.Editor
 {
     public class WarpExporter
     {

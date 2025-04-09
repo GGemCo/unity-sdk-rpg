@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GGemCo.Scripts.Maps.Objects
+namespace GGemCo.Scripts
 {
     public class WarpData
     {

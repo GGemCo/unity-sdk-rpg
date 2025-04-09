@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.ScriptableSettings;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-namespace GGemCo.Scripts.Addressable
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// GGemCo Settings 불러오기

@@ -1,9 +1,7 @@
-﻿using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Utils;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace GGemCo.Scripts.Maps.Objects
+namespace GGemCo.Scripts
 {
     public class ObjectWall : DefaultMapObject
     {

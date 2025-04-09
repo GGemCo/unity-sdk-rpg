@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.Currency;
-using GGemCo.Scripts.Utils;
 
-namespace GGemCo.Scripts.TableLoader
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// Shop 테이블 Structure

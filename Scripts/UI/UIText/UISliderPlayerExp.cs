@@ -1,11 +1,8 @@
-﻿using GGemCo.Scripts.SaveData;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.Utils;
-using R3;
+﻿using R3;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.UI.UIText
+namespace GGemCo.Scripts
 {
     public class UISliderPlayerExp : MonoBehaviour
     {

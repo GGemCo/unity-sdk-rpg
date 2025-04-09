@@ -1,11 +1,7 @@
-﻿using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Items;
-using GGemCo.Scripts.Skill;
-using GGemCo.Scripts.TableLoader;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 
-namespace GGemCo.Scripts.UI.WindowSkill
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 플레이어 스킬 정보

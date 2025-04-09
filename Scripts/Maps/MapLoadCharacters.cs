@@ -1,20 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Characters.Monster;
-using GGemCo.Scripts.Characters.Npc;
-using GGemCo.Scripts.Characters.Player;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Maps.Objects;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace GGemCo.Scripts.Maps
+namespace GGemCo.Scripts
 {
     public class MapLoadCharacters
     {

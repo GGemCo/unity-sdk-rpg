@@ -1,14 +1,9 @@
-﻿using GGemCo.Scripts.Characters.Player;
-using GGemCo.Scripts.SaveData;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.UI.WindowSkill
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 스킬 리스트 element

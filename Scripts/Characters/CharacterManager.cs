@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace GGemCo.Scripts.Characters
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 캐릭터 관리 매니저
@@ -33,13 +33,13 @@ namespace GGemCo.Scripts.Characters
              switch (characterType)
              {
                  case Type.Player:
-                     Player.Player player = characterObj.AddComponent<Player.Player>();
+                     Player player = characterObj.AddComponent<Player>();
                      break;
                  case Type.Monster:
-                     Monster.Monster monster = characterObj.AddComponent<Monster.Monster>();
+                     Monster monster = characterObj.AddComponent<Monster>();
                      break;
                  case Type.Npc:
-                     Npc.Npc npc = characterObj.AddComponent<Npc.Npc>();
+                     Npc npc = characterObj.AddComponent<Npc>();
                      break;
              }
 #if GGEMCO_USE_SPINE

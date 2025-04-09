@@ -3,7 +3,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace GGemCo.Editor.GGemCoTool
+namespace GGemCo.Editor
 {
     /// <summary>
     /// PlayerPrefs 데이터 관리 툴

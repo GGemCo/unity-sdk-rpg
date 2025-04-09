@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using UnityEngine;
 
-namespace GGemCo.Scripts.ScriptableSettings
+namespace GGemCo.Scripts
 {
     [CreateAssetMenu(fileName = "GGemCoSaveSettings", menuName = "GGemCo/Settings/GGemCoSaveSettings", order = 4)]
     public class GGemCoSaveSettings: ScriptableObject

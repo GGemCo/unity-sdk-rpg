@@ -1,14 +1,7 @@
-﻿using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Characters.Player;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.SaveData;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI.Icon;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace GGemCo.Scripts.UI.Window
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 플레이어 장비

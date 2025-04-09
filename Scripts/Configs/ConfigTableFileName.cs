@@ -1,4 +1,4 @@
-﻿namespace GGemCo.Scripts.Configs
+﻿namespace GGemCo.Scripts
 {
     /// <summary>
     /// 데이터 테이블의 txt 파일 이름 관리

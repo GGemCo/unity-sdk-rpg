@@ -1,14 +1,8 @@
-﻿using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.SystemMessage;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI.Icon;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.UI.Inventory
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 인벤토리 아이템 나누기

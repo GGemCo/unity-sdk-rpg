@@ -1,8 +1,7 @@
 using System.Collections;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 
-namespace GGemCo.Scripts.UI
+namespace GGemCo.Scripts
 {
     public class UIWindowFade : MonoBehaviour
     {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GGemCo.Scripts.Characters.Player
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 플레이어 움직임 처리

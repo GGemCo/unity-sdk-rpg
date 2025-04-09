@@ -1,11 +1,8 @@
-using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI.Icon;
-using GGemCo.Scripts.Utils;
+using System;
+using System.Linq;
 using UnityEngine;
 
-namespace GGemCo.Scripts.UI
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 윈도우 관리 매니저
@@ -49,15 +46,21 @@ namespace GGemCo.Scripts.UI
             TableWindow tableWindow = TableLoaderManager.Instance.TableWindow;
             var tables = tableWindow.GetDatas();
             if (tables == null) return;
-            foreach (var table in tables)
+            // datas를 Ordering 컬럼 기준으로 정렬된 새로운 Dictionary 만들기
+            var orderedDatas = tables
+                .OrderBy(kv => int.Parse(kv.Value["Ordering"])) // Ordering 값 기준으로 정렬
+                .ToDictionary(kv => kv.Key, kv => kv.Value);
+
+            foreach (var table in orderedDatas)
             {
                 int uid = table.Key;
                 if (uid == 0) continue;
                 StruckTableWindow info = tableWindow.GetDataByUid(uid);
-                if (info == null || info.Uid <= 0 || uiWindows[uid] == null) continue;
+                if (info == null || info.Uid <= 0) continue;
                 UIWindow window = uiWindows[uid].gameObject.GetComponent<UIWindow>();
                 if (window == null) continue;
                 window.SetTableWindow(info);
+                window.transform.SetSiblingIndex(info.Ordering);
             }
         }
         /// <summary>
@@ -178,6 +181,42 @@ namespace GGemCo.Scripts.UI
                 if (!window.gameObject.activeSelf) continue;
                 window.Show(false);
             }
+        }
+        /// <summary>
+        /// UIWindow 스크립트 추가하기
+        /// </summary>
+        /// <param name="className"></param>
+        /// <returns></returns>
+        private UIWindow AddUIComponent(string className)
+        {
+            if (className == "") return null;
+            GameObject go = GameObject.Find(className);
+            if (go == null)
+            {
+                GcLogger.LogError($"{className} 게임 오브젝트를 찾지 못 했습니다.");
+                return null;
+            }
+
+            // 문자열 → Type
+            Type type = Type.GetType($"GGemCo.Scripts.{className}");
+            if (type == null)
+            {
+                GcLogger.LogError($"{className} 스크립트를 찾지 못 했습니다. 네임스페이스 설정을 확인해주세요.");
+                return null;
+            }
+
+            // AddComponent(Type)
+            if (go.GetComponent(type) == null)
+            {
+                // go.AddComponent(type);
+                GcLogger.LogError($"{className} 컴포넌트가 없습니다.");
+                return null;
+            }
+            else
+            {
+                // GcLogger.Log($"{className} already has component {className}");
+            }
+            return go.GetComponent<UIWindow>();
         }
     }
 }

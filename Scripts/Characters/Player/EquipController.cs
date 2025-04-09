@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.TableLoader;
 using UnityEngine;
 
-namespace GGemCo.Scripts.Characters.Player
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 장비 착용, 해제 관리

@@ -1,13 +1,6 @@
-using GGemCo.Scripts.Characters.Player;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Items;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI.Inventory;
-using GGemCo.Scripts.Utils;
 using UnityEngine.EventSystems;
 
-namespace GGemCo.Scripts.UI.Icon
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 아이템 아이콘

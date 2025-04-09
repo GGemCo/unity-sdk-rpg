@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GGemCo.Scripts.Characters.Monster
+namespace GGemCo.Scripts
 {
     public class MonsterColliderHit : MonoBehaviour
     {

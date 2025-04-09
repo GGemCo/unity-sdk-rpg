@@ -1,9 +1,7 @@
-﻿using GGemCo.Scripts.Items;
-using GGemCo.Scripts.TableLoader;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 
-namespace GGemCo.Scripts.TagName
+namespace GGemCo.Scripts
 {
     public class TagNameItem : MonoBehaviour
     {

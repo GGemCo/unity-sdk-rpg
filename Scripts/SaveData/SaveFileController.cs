@@ -1,8 +1,7 @@
 ﻿using System.IO;
-using GGemCo.Scripts.Utils;
 using Newtonsoft.Json;
 
-namespace GGemCo.Scripts.SaveData
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 세이브 데이터 파일 관리

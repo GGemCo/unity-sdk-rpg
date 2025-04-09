@@ -1,18 +1,10 @@
 using System;
 using System.Collections;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Maps.Objects;
-using GGemCo.Scripts.SaveData;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
-using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Characters;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.Maps
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 맵 매니저

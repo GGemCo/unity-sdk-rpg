@@ -1,10 +1,6 @@
-﻿using GGemCo.Scripts.Characters.Player;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace GGemCo.Scripts.Core
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 최종 수치 계산 값 관리 매니저

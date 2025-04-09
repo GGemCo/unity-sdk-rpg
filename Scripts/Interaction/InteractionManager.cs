@@ -1,11 +1,5 @@
-﻿using GGemCo.Scripts.Characters;
-using GGemCo.Scripts.Scenes;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.UI;
-using GGemCo.Scripts.UI.Window;
-using GGemCo.Scripts.Utils;
-
-namespace GGemCo.Scripts.Interaction
+﻿
+namespace GGemCo.Scripts
 {
     public class InteractionManager
     {

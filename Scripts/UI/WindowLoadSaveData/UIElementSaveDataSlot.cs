@@ -1,10 +1,9 @@
 ﻿using System.IO;
-using GGemCo.Scripts.SaveData;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GGemCo.Scripts.UI.WindowLoadSaveData
+namespace GGemCo.Scripts
 {
     public class UIElementSaveDataSlot : MonoBehaviour
     {

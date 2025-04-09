@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace GGemCo.Scripts.Utils
+namespace GGemCo.Scripts
 {
     public abstract class ComponentController
     {

@@ -1,14 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GGemCo.Scripts.Addressable;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.SaveData;
-using GGemCo.Scripts.TableLoader;
 using TMPro;
 using UnityEngine;
 
-namespace GGemCo.Scripts.Core
+namespace GGemCo.Scripts
 {
     public class GameLoaderManager : MonoBehaviour
     {

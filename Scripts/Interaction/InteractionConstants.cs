@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GGemCo.Scripts.Interaction
+namespace GGemCo.Scripts
 {
     public abstract class InteractionConstants
     {

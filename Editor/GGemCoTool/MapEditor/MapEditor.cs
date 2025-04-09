@@ -1,16 +1,9 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.Characters.Monster;
-using GGemCo.Scripts.Characters.Npc;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Maps;
-using GGemCo.Scripts.Maps.Objects;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
+using GGemCo.Scripts;
 using UnityEditor;
 using UnityEngine;
-using TableLoaderManager = GGemCo.Editor.GGemCoTool.TableLoader.TableLoaderManager;
 
-namespace GGemCo.Editor.GGemCoTool.MapEditor
+namespace GGemCo.Editor
 {
     public class MapExporter : EditorWindow
     {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GGemCo.Scripts.Core
+namespace GGemCo.Scripts
 {
     public static class PlayerPrefsManager
     {

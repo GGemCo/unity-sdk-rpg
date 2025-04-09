@@ -1,13 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using GGemCo.Scripts.Characters;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Effect;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 
-namespace GGemCo.Scripts.Affect
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 캐릭터에서 사용하는 어펙트 컨트롤러

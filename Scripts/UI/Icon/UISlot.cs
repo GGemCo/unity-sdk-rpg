@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GGemCo.Scripts.UI.Icon
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 아이콘 슬롯

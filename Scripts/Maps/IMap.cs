@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GGemCo.Scripts.Maps
+namespace GGemCo.Scripts
 {
     public interface IMap
     {

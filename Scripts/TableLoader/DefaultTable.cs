@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 
-namespace GGemCo.Scripts.TableLoader
+namespace GGemCo.Scripts
 {
     public class DefaultTable
     {

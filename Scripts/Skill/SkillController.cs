@@ -1,9 +1,6 @@
-﻿using GGemCo.Scripts.Characters;
-using GGemCo.Scripts.TableLoader;
-using GGemCo.Scripts.Utils;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace GGemCo.Scripts.Skill
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 캐릭터가 가지고 있는 스킬 컨트롤러

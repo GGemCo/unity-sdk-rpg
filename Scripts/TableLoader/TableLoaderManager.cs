@@ -1,9 +1,7 @@
 using System;
-using GGemCo.Scripts.Configs;
-using GGemCo.Scripts.Utils;
 using UnityEngine;
 
-namespace GGemCo.Scripts.TableLoader
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 데이터 테이블 Loader

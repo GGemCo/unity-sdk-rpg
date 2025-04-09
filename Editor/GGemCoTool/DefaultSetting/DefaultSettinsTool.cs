@@ -1,6 +1,6 @@
 ﻿using UnityEditor;
 
-namespace GGemCo.Editor.GGemCoTool.DefaultSetting
+namespace GGemCo.Editor
 {
     public class DefaultSettinsTool : EditorWindow
     {

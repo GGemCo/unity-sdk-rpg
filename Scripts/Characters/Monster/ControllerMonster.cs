@@ -1,9 +1,8 @@
 ﻿using System.Collections;
-using GGemCo.Scripts.Configs;
 using UnityEngine;
 using Event = UnityEngine.Event;
 
-namespace GGemCo.Scripts.Characters.Monster
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 몬스터 선공, 후공 처리 
@@ -73,7 +72,7 @@ namespace GGemCo.Scripts.Characters.Monster
 
             foreach (var hit in collider2Ds)
             {
-                if (hit.CompareTag(TargetCharacter.attackerTransform.tag) && hit.GetComponent<Player.Player>() != null && hit.GetComponent<Player.Player>().IsStatusDead() == false)
+                if (hit.CompareTag(TargetCharacter.attackerTransform.tag) && hit.GetComponent<Player>() != null && hit.GetComponent<Player>().IsStatusDead() == false)
                 {
                     return true;
                 }

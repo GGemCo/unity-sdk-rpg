@@ -1,4 +1,4 @@
-﻿namespace GGemCo.Scripts.Spine2d
+﻿namespace GGemCo.Scripts
 {
     public static class Spine2dConstants
     {

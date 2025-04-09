@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GGemCo.Scripts.Characters.Npc
+namespace GGemCo.Scripts
 {
     [System.Serializable]
     public class NpcDataList

@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using GGemCo.Scripts.SaveData;
 using TMPro;
 using UnityEngine;
 
-namespace GGemCo.Scripts.SystemMessage
+namespace GGemCo.Scripts
 {
     public class ResultCommon
     {

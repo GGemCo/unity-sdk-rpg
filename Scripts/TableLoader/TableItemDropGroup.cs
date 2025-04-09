@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using GGemCo.Scripts.Items;
 
-namespace GGemCo.Scripts.TableLoader
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 드랍 아이템 그룹 Structure
