@@ -17,7 +17,7 @@ namespace GGemCo.Scripts
         // 최대 interaction 버튼 개수
         private const int ButtonCount = 3;
         private readonly Dictionary<int, Button> buttonChoices = new Dictionary<int, Button>();
-        private InteractionConstants.Type currentInteractionType;
+        private InteractionManager interactionManager;
         
         protected override void Awake()
         {
@@ -25,6 +25,13 @@ namespace GGemCo.Scripts
             base.Awake();
             InitializeButtonChoice();
         }
+
+        protected override void Start()
+        {
+            base.Start();
+            interactionManager = SceneGame.Instance.InteractionManager;
+        }
+
         /// <summary>
         /// interaction 버튼 초기화
         /// </summary>
@@ -62,10 +69,9 @@ namespace GGemCo.Scripts
         /// <param name="interactionData"></param>
         public void SetInfos(StruckTableNpc npcData, StruckTableInteraction interactionData)
         {
-            imageThumbnail.sprite = Resources.Load<Sprite>(npcData.ImageThumbnailPath);
+            imageThumbnail.sprite = Resources.Load<Sprite>($"Images/Thumbnail/Npc/{npcData.ImageThumbnailPath}");
             textName.text = npcData.Name;
             textMessage.text = interactionData.Message;
-            currentInteractionType = InteractionConstants.Type.None;
             
             SetupChoiceButton(0, interactionData.Type1, interactionData.Value1);
             SetupChoiceButton(1, interactionData.Type2, interactionData.Value2);
@@ -105,14 +111,13 @@ namespace GGemCo.Scripts
         /// <param name="value"></param>
         private void OnClickChoice(InteractionConstants.Type interactionType, int value)
         {
-            GcLogger.Log(interactionType);
             if (interactionType == InteractionConstants.Type.None) return;
             if (interactionType == InteractionConstants.Type.Shop)
             {
                 uiWindowShop.Show(true);
                 uiWindowShop.SetInfoByShopUid(value);
             }
-            currentInteractionType = interactionType;
+            interactionManager.SetCurrentType(interactionType);
 
             Show(false);
         }
@@ -121,12 +126,8 @@ namespace GGemCo.Scripts
         /// </summary>
         public void OnEndInteraction()
         {
+            if (!Application.isPlaying || !enabled || !gameObject.activeInHierarchy) return;
             Show(false);
-            
-            if (currentInteractionType == InteractionConstants.Type.Shop)
-            {
-                uiWindowShop.Show(false);
-            }
         }
     }
 }

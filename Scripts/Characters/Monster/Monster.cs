@@ -104,23 +104,6 @@ namespace GGemCo.Scripts
                 info.RegistFire, info.RegistCold, info.RegistLightning);
             CurrentHp.OnNext(info.StatHp);
             SetScale(info.Scale);
-            
-            // animation 테이블 정보 셋팅
-            StruckTableAnimation struckTableAnimation = tableLoaderManager.TableAnimation.GetDataByUid(info.SpineUid);
-            if (struckTableAnimation is { Uid: > 0 })
-            {
-                currentMoveStep = struckTableAnimation.MoveStep;
-                if (colliderCheckCharacter != null)
-                {
-                    colliderCheckCharacter.size = new Vector2(struckTableAnimation.AttackRange, struckTableAnimation.AttackRange/2f);
-                }
-                if (colliderCheckHitArea != null)
-                {
-                    colliderCheckHitArea.offset = new Vector2(0, struckTableAnimation.Height/2f);
-                    colliderCheckHitArea.size = struckTableAnimation.HitAreaSize;
-                }
-                height = struckTableAnimation.Height;
-            }
         }
         public void CreateHpBar()
         {

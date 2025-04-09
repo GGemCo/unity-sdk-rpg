@@ -170,6 +170,7 @@ namespace GGemCo.Scripts
             originalScaleX = transform.localScale.x;
             
             InitializeByTable();
+            InitializeByAnimationTable();
             InitializeByRegenData();
             
             TotalMoveSpeed
@@ -190,6 +191,28 @@ namespace GGemCo.Scripts
         protected virtual void InitializeByRegenData()
         {
             
+        }
+        /// <summary>
+        /// animation 테이블 정보 셋팅
+        /// </summary>
+        private void InitializeByAnimationTable()
+        {
+            if (uid <= 0) return;
+            var info = TableLoaderManager.Instance.TableNpc.GetDataByUid(uid);
+            if (info == null) return;
+            StruckTableAnimation struckTableAnimation = TableLoaderManager.Instance.TableAnimation.GetDataByUid(info.SpineUid);
+            if (struckTableAnimation is not { Uid: > 0 }) return;
+            currentMoveStep = struckTableAnimation.MoveStep;
+            if (colliderCheckCharacter != null)
+            {
+                colliderCheckCharacter.size = new Vector2(struckTableAnimation.AttackRange, struckTableAnimation.AttackRange/2f);
+            }
+            if (colliderCheckHitArea != null)
+            {
+                colliderCheckHitArea.offset = new Vector2(0, struckTableAnimation.Height/2f);
+                colliderCheckHitArea.size = struckTableAnimation.HitAreaSize;
+            }
+            height = struckTableAnimation.Height;
         }
         /// <summary>
         /// 캐릭터가 flip 되었는지 체크

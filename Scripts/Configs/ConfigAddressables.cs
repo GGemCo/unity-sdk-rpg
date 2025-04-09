@@ -21,6 +21,10 @@ namespace GGemCo.Scripts
         public const string KeyPrefabIconSkill = "GGemCo_PrefabIconSkill";
         // 몬스터 hp bar
         public const string KeyPrefabSliderMonsterHp = "GGemCo_PrefabSliderMonsterHp";
+        // 아이템 이름 태그
+        public const string KeyPrefabTextDropItemNameTag = "GGemCo_PrefabTextDropItemNameTag";
+        // npc 이름 태그
+        public const string KeyPrefabTextNpcNameTag = "GGemCo_PrefabTextNpcNameTag";
         
         public static readonly (string key, string path)[] AssetsToAdd =
         {
@@ -34,6 +38,8 @@ namespace GGemCo.Scripts
             (KeyPrefabIconSkill, "Assets/Data/Prefabs/UI/Icon/IconSkill.prefab"),
             (KeyPrefabDropItem, "Assets/Data/Prefabs/Item/DropItem.prefab"),
             (KeyPrefabSliderMonsterHp, "Assets/Data/Prefabs/UI/SliderMonsterHp.prefab"),
+            (KeyPrefabTextDropItemNameTag, "Assets/Data/Prefabs/Item/TextDropItemNameTag.prefab"),
+            (KeyPrefabTextNpcNameTag, "Assets/Data/Prefabs/Item/TextNpcNameTag.prefab"),
         };
         
         // 게임 에서 사용하는 미리 로드해야하는 프리팹
@@ -47,6 +53,8 @@ namespace GGemCo.Scripts
             { KeyPrefabIconSkill, LabelPreLoadGamePrefabs },
             { KeyPrefabDropItem, LabelPreLoadGamePrefabs },
             { KeyPrefabSliderMonsterHp, LabelPreLoadGamePrefabs },
+            { KeyPrefabTextDropItemNameTag, LabelPreLoadGamePrefabs },
+            { KeyPrefabTextNpcNameTag, LabelPreLoadGamePrefabs },
         };
     }
 }

@@ -7,13 +7,19 @@ namespace GGemCo.Scripts
         TableNpc tableNpc;
         TableInteraction tableInteraction;
         private UIWindowInteractionDialogue uiWindowInteractionDialogue;
+        private InteractionConstants.Type currentInteractionType;
+        private UIWindowShop uiWindowShop;
+        
         public void Initialize(SceneGame scene)
         {
+            currentInteractionType = InteractionConstants.Type.None;
             sceneGame = scene;
             tableNpc = TableLoaderManager.Instance.TableNpc;
             tableInteraction = TableLoaderManager.Instance.TableInteraction;
             uiWindowInteractionDialogue =
                 sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowInteractionDialogue>(UIWindowManager.WindowUid.Dialogue);
+            uiWindowShop =
+                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowShop>(UIWindowManager.WindowUid.Shop);
         }
 
         public void SetInfo(CharacterBase characterBase)
@@ -58,6 +64,16 @@ namespace GGemCo.Scripts
         public void EndInteraction()
         {
             uiWindowInteractionDialogue?.OnEndInteraction();
+            
+            if (currentInteractionType == InteractionConstants.Type.Shop)
+            {
+                uiWindowShop.Show(false);
+            }
+        }
+
+        public void SetCurrentType(InteractionConstants.Type interactionType)
+        {
+            currentInteractionType = interactionType;
         }
     }
 }

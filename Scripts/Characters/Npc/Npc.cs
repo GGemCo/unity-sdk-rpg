@@ -8,7 +8,9 @@ namespace GGemCo.Scripts
     public class Npc : CharacterBase
     {
         public NpcData NpcData;
-        
+        private GameObject containerNpcName;
+        TagNameNpc tagNameNpc;
+
         // Start is called before the first frame update
         protected override void Awake()
         {
@@ -19,7 +21,26 @@ namespace GGemCo.Scripts
         protected override void Start()
         {
             base.Start();
-            CharacterAnimationController.SetCharacterColor(ColorHelper.HexToColor("#DAAADB"));
+            
+            CreateTagName();
+        }
+        /// <summary>
+        /// 아이템 이름 tag 만들기
+        /// </summary>
+        private void CreateTagName()
+        {
+            GameObject prefabTagNameNpc =
+                AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabTextNpcNameTag);
+            if (prefabTagNameNpc == null) return;
+            if (containerNpcName == null)
+            {
+                containerNpcName = SceneGame.Instance.containerDropItemName;
+            }
+            GameObject objectTagNameItem = Instantiate(prefabTagNameNpc, containerNpcName.transform);
+            if (objectTagNameItem == null) return;
+            tagNameNpc = objectTagNameItem.GetComponent<TagNameNpc>();
+            if (tagNameNpc == null) return;
+            tagNameNpc.Initialize(gameObject);
         }
 
         /// <summary>
@@ -76,18 +97,9 @@ namespace GGemCo.Scripts
                     statRegistCold, statRegistLightning);
                 float scale = info.Scale;
                 SetScale(scale);
-                
-                StruckTableAnimation struckTableAnimation = tableLoaderManager.TableAnimation.GetDataByUid(info.SpineUid);
-                if (struckTableAnimation is { Uid: > 0 })
-                {
-                    currentMoveStep = struckTableAnimation.MoveStep;
-                    if (colliderCheckCharacter != null)
-                    {
-                        colliderCheckCharacter.size = new Vector2(struckTableAnimation.AttackRange, struckTableAnimation.AttackRange/2f);
-                    }
-                }
             }
         }
+
         /// <summary>
         /// regen_data 의 정보 셋팅
         /// </summary>
@@ -111,12 +123,20 @@ namespace GGemCo.Scripts
 
         protected void OnTriggerExit2D(Collider2D collision)
         {
-            if (!Application.isPlaying || !this.enabled || !gameObject.activeInHierarchy) return;
+            if (!Application.isPlaying || !enabled || !gameObject.activeInHierarchy) return;
             
             if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Player)))
             {
                 SceneGame.Instance.InteractionManager.EndInteraction();
             }
+        }
+        /// <summary>
+        /// Destroy 되었을때 태그 지워주기
+        /// </summary>
+        private void OnDestroy()
+        {
+            if (tagNameNpc == null) return;
+            Destroy(tagNameNpc.gameObject);
         }
     }
 }

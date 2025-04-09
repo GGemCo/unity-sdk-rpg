@@ -9,7 +9,6 @@ namespace GGemCo.Scripts
     {
         public int itemUid;
         public int itemCount;
-        public GameObject prefabTagNameItem;
         private GameObject containerItemName;
         private GameObject objectTagNameItem;
         
@@ -152,6 +151,8 @@ namespace GGemCo.Scripts
         /// </summary>
         private void CreateTagName()
         {
+            GameObject prefabTagNameItem =
+                AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabTextDropItemNameTag);
             if (prefabTagNameItem == null) return;
             if (containerItemName == null)
             {
