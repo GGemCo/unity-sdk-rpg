@@ -7,6 +7,7 @@ namespace GGemCo.Scripts
     public class GGemCoSaveSettings: ScriptableObject
     {
         [Header("세이브 데이터 설정")] 
+        [Header("세이브 데이터 사용여부")] [SerializeField] private bool useSaveData;
         [Header("세이브 데이터 자장할 폴더 이름 입니다.")] [SerializeField] private string saveDataFolderName;
         [Header("저장 슬롯 최대 개수. UI 를 고려하여 개수를 정해주세요.")] public int saveDataMaxSlotCount;
         [Header("세이브 데이터 썸네일을 자장할 폴더 이름 입니다.")] [SerializeField] private string saveDataThumbnailFolderName;
@@ -18,16 +19,11 @@ namespace GGemCo.Scripts
         [Header("강제로 저장할 시간(초)")] public float saveDataForceSaveInterval;
         
         /// <summary>
-        /// 기존 값이 비어있을 때만 기본값을 설정
-        /// </summary>
-        private void OnEnable()
-        {
-        }
-        /// <summary>
         /// 처음 생성 시 한 번만 실행됨
         /// </summary>
         private void Reset()
         {
+            useSaveData = false;
             saveDataFolderName = "SaveData";
             saveDataMaxSlotCount = 3;
             saveDataThumbnailFolderName = "SaveThumbnails";
@@ -37,5 +33,6 @@ namespace GGemCo.Scripts
         
         public string SaveDataFolderName => Path.Combine(Application.persistentDataPath, saveDataFolderName);
         public string SaveDataThumnailFolderName => Path.Combine(Application.persistentDataPath, saveDataThumbnailFolderName);
+        public bool UseSaveData => useSaveData;
     }
 }

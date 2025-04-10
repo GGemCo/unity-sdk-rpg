@@ -27,6 +27,7 @@ namespace GGemCo.Scripts
         [SerializeField] private PopupManager popupManager;
 
         private SlotMetaDatController slotMetaDatController;
+        private GGemCoSaveSettings saveDataSettings;
         private void Awake()
         {
             InitButtons();
@@ -67,11 +68,8 @@ namespace GGemCo.Scripts
                 uIWindowLoadSaveData.InitializeSaveDataSlots(saveSettings, slotMetaDatController);
             }
 
-            // // 남은 슬롯 index 채크해서 없으면 buttonNewGame 버튼 disable 처리 
-            // int slotIndex = slotMetaDatController.GetEmptySlotIndex();
-            // buttonNewGame.gameObject.SetActive(slotIndex > 0);
-            // // slot 데이터가 있는지 채크해서 있으면 buttonOpenSaveDataWindow 버튼 enable 처리 
-            // buttonOpenSaveDataWindow.gameObject.SetActive(slotMetaDatController.GetExistSlotCounts() > 0);
+            saveDataSettings = saveSettings;
+
             UpdateButtons();
         }
         /// <summary>
@@ -95,10 +93,10 @@ namespace GGemCo.Scripts
         {
             // 남은 슬롯 index 채크해서 없으면 buttonNewGame 버튼 disable 처리 
             int slotIndex = slotMetaDatController.GetEmptySlotIndex();
-            buttonNewGame.gameObject.SetActive(slotIndex > 0);
-            buttonGameContinue.gameObject.SetActive(PlayerPrefsManager.LoadSaveDataSlotIndex() > 0);
+            buttonNewGame?.gameObject.SetActive(slotIndex > 0);
+            buttonGameContinue?.gameObject.SetActive(PlayerPrefsManager.LoadSaveDataSlotIndex() > 0);
             // slot 데이터가 있는지 채크해서 있으면 buttonOpenSaveDataWindow 버튼 enable 처리 
-            buttonOpenSaveDataWindow.gameObject.SetActive(slotMetaDatController.GetExistSlotCounts() > 0);
+            buttonOpenSaveDataWindow?.gameObject.SetActive(slotMetaDatController.GetExistSlotCounts() > 0);
         }
         
         /// <summary>
@@ -106,13 +104,17 @@ namespace GGemCo.Scripts
         /// </summary>
         private void OnClickGameContinue()
         {
-            // PlayerPrefs 에서 가져온 값이 있는지 체크 
-            if (PlayerPrefsManager.LoadSaveDataSlotIndex() <= 0)
+            if (saveDataSettings.UseSaveData)
             {
-                popupManager.ShowPopupError("선택된 슬롯이 없습니다. 불러오기를 해주세요.");
-                return;
+                // PlayerPrefs 에서 가져온 값이 있는지 체크 
+                if (PlayerPrefsManager.LoadSaveDataSlotIndex() <= 0)
+                {
+                    popupManager.ShowPopupError("선택된 슬롯이 없습니다. 불러오기를 해주세요.");
+                    return;
+                }
+                // GcLogger.Log("currentSaveDataSlotIndex: " + currentSaveDataSlotIndex);
             }
-            // GcLogger.Log("currentSaveDataSlotIndex: " + currentSaveDataSlotIndex);
+
             SceneManager.ChangeScene(ConfigDefine.SceneNameLoading);
         }
         /// <summary>
@@ -120,18 +122,21 @@ namespace GGemCo.Scripts
         /// </summary>
         private void OnClickNewGame()
         {
-            // 남은 슬롯이 있는지 체크
-            int slotIndex = slotMetaDatController.GetEmptySlotIndex();
-            if (slotIndex <= 0)
+            if (saveDataSettings.UseSaveData)
             {
-                GcLogger.LogError("남은 저장 슬롯이 없습니다. 저장되어있는 데이터를 지워주세요.");
-                return;
+                // 남은 슬롯이 있는지 체크
+                int slotIndex = slotMetaDatController.GetEmptySlotIndex();
+                if (slotIndex <= 0)
+                {
+                    GcLogger.LogError("남은 저장 슬롯이 없습니다. 저장되어있는 데이터를 지워주세요.");
+                    return;
+                }
+                // GcLogger.Log("slotindex : " + slotIndex);
+
+                // PlayerPrefs 에 저장하기
+                PlayerPrefsManager.SaveSaveDataSlotIndex(slotIndex);
             }
-            // GcLogger.Log("slotindex : " + slotIndex);
-            
-            // PlayerPrefs 에 저장하기
-            PlayerPrefsManager.SaveSaveDataSlotIndex(slotIndex);
-            
+
             SceneManager.ChangeScene(ConfigDefine.SceneNameLoading);
         }
         /// <summary>
