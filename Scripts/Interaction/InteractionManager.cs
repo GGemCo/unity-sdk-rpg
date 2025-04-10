@@ -17,9 +17,9 @@ namespace GGemCo.Scripts
             tableNpc = TableLoaderManager.Instance.TableNpc;
             tableInteraction = TableLoaderManager.Instance.TableInteraction;
             uiWindowInteractionDialogue =
-                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowInteractionDialogue>(UIWindowManager.WindowUid.Dialogue);
+                sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowInteractionDialogue>(UIWindowManager.WindowUid.Dialogue);
             uiWindowShop =
-                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowShop>(UIWindowManager.WindowUid.Shop);
+                sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowShop>(UIWindowManager.WindowUid.Shop);
         }
 
         public void SetInfo(CharacterBase characterBase)
@@ -67,7 +67,7 @@ namespace GGemCo.Scripts
             
             if (currentInteractionType == InteractionConstants.Type.Shop)
             {
-                uiWindowShop.Show(false);
+                uiWindowShop?.Show(false);
             }
         }
 

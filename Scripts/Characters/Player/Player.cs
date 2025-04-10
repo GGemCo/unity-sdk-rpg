@@ -39,7 +39,7 @@ namespace GGemCo.Scripts
         {
             base.Start();
             playerData = SceneGame.Instance.saveDataManager.Player;
-            uiWindowHud = SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowHud>(UIWindowManager.WindowUid.Hud);
+            uiWindowHud = SceneGame.Instance.uIWindowManager?.GetUIWindowByUid<UIWindowHud>(UIWindowManager.WindowUid.Hud);
             
             // TotalHp, Mp 가 바뀌어도 현재 값이 바뀌면 안된다.
             TotalHp
