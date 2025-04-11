@@ -31,6 +31,8 @@ namespace GGemCo.Scripts
         private int splitItemCount;
         // 나눌려고 하는 아이템의 인벤토리 slot index
         private int splitItemIndex;
+        
+        private UIWindowInventory uiWindowInventory;
         protected override void Awake()
         {
             uid = UIWindowManager.WindowUid.ItemSplit;
@@ -67,6 +69,16 @@ namespace GGemCo.Scripts
             }
             // GcLogger.Log($"풀 확장: {amount}개 아이템 추가 (총 {poolDropItem.Count}개)");
         }
+
+        protected override void Start()
+        {
+            base.Start();
+            
+            uiWindowInventory =
+                SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
+                    .Inventory);
+        }
+
         /// <summary>
         /// 나누기할 아이템 설정하기
         /// </summary>
@@ -109,13 +121,10 @@ namespace GGemCo.Scripts
         /// </summary>
         private void OnClickConfirm()
         {
-            var inventory =
-                SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
-                    .Inventory);
-            if (inventory == null) return;
+            if (uiWindowInventory == null) return;
             // 빈공 간 확인
             ResultCommon result = SceneGame.Instance.saveDataManager.Inventory.SplitItem(splitItemIndex, itemUid, maxItemCount, splitItemCount);
-            inventory.SetIcons(result);
+            uiWindowInventory.SetIcons(result);
             Show(false);
         }
 

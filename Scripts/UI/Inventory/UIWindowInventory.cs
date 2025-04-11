@@ -10,12 +10,6 @@ namespace GGemCo.Scripts
     /// </summary>
     public class UIWindowInventory : UIWindow
     {
-        [Header("장비 윈도우")]
-        public UIWindowEquip uIWindowEquip;
-        [Header("플레이어 정보 윈도우")]
-        public UIWindowPlayerInfo uiWindowPlayerInfo;
-        [Header("아이템 정보 윈도우")]
-        public UIWindowItemInfo uIWindowItemInfo;
         [Header("모든 아이템 합치기 버튼")]
         public Button buttonMergeAllItems;
         
@@ -27,6 +21,11 @@ namespace GGemCo.Scripts
         private EquipData equipData;
         private SceneGame sceneGame;
         private PopupManager popupManager;
+
+        private UIWindowEquip uIWindowEquip;
+        private UIWindowPlayerInfo uiWindowPlayerInfo;
+        private UIWindowItemInfo uIWindowItemInfo;
+        private UIWindowItemSplit uiWindowItemSplit;
 
         protected override void Awake()
         {
@@ -49,6 +48,18 @@ namespace GGemCo.Scripts
                 inventoryData = sceneGame.saveDataManager.Inventory;
                 equipData = sceneGame.saveDataManager.Equip;
             }
+            uIWindowEquip = 
+                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowEquip>(UIWindowManager.WindowUid
+                    .Equip);
+            uiWindowPlayerInfo = 
+                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowPlayerInfo>(UIWindowManager.WindowUid
+                    .PlayerInfo);
+            uIWindowItemInfo = 
+                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemInfo>(UIWindowManager.WindowUid
+                    .ItemInfo);
+            uiWindowItemSplit =
+                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemSplit>(UIWindowManager.WindowUid
+                    .ItemSplit);
         }
 
         public override bool Show(bool show)
@@ -353,11 +364,8 @@ namespace GGemCo.Scripts
                     return;
                 }
                 // 팝업창 띄우기
-                var window =
-                    sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemSplit>(UIWindowManager.WindowUid
-                        .ItemSplit);
-                if (window == null) return;
-                window.CopyIconCount(0, icon.slotIndex, icon.uid, icon.GetCount());
+                if (uiWindowItemSplit == null) return;
+                uiWindowItemSplit.CopyIconCount(0, icon.slotIndex, icon.uid, icon.GetCount());
             }
         }
         /// <summary>

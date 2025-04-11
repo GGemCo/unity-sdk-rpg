@@ -48,6 +48,8 @@ namespace GGemCo.Scripts
         public CharacterManager CharacterManager;
         public KeyboardManager KeyboardManager;
         public InteractionManager InteractionManager;
+        
+        private UIWindowInventory uiWindowInventory;
 
         private void Awake()
         {
@@ -106,6 +108,10 @@ namespace GGemCo.Scripts
         private void Start()
         {
             if (TableLoaderManager.Instance == null) return;
+            
+            uiWindowInventory = uIWindowManager?.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
+                .Inventory);
+            
             StartCoroutine(UpdateStateRoutine());
         }
         private IEnumerator UpdateStateRoutine()
@@ -209,11 +215,9 @@ namespace GGemCo.Scripts
                 systemMessageManager.ShowMessageWarning(addItem.Message);
                 return;
             }
-            var inventory = uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
-                .Inventory);
-            if (inventory != null)
+            if (uiWindowInventory != null)
             {
-                inventory.SetIcons(addItem);
+                uiWindowInventory.SetIcons(addItem);
             }
         }
     }

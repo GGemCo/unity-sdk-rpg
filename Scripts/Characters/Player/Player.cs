@@ -12,13 +12,14 @@ namespace GGemCo.Scripts
     {
         // 공격할 몬스터 
         private GameObject targetMonster;
-        // 주변에 npc 가 있는지 체크 
-        private bool isNpcNearby;
         private GGemCoSettings gGemCoSettings; 
         private EquipController equipController;
         private ControllerPlayer controllerPlayer;
         private UIWindowHud uiWindowHud;
+        private UIWindowPlayerInfo uiWindowPlayerInfo;
+        private UIWindowPlayerBuffInfo uiWindowPlayerBuffInfo;
         private PlayerData playerData;
+        private SceneGame sceneGame;
             
         [Serializable]
         private struct StatUIBinding
@@ -33,13 +34,18 @@ namespace GGemCo.Scripts
             // 먼저 선언한다.
             IsUseSkill = true;
             base.Awake();
-            isNpcNearby = false;
         }
         protected override void Start()
         {
             base.Start();
-            playerData = SceneGame.Instance.saveDataManager.Player;
-            uiWindowHud = SceneGame.Instance.uIWindowManager?.GetUIWindowByUid<UIWindowHud>(UIWindowManager.WindowUid.Hud);
+            sceneGame = SceneGame.Instance;
+            playerData = sceneGame.saveDataManager.Player;
+            uiWindowHud = sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowHud>(UIWindowManager.WindowUid.Hud);
+            uiWindowPlayerInfo =
+                sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowPlayerInfo>(UIWindowManager.WindowUid.PlayerInfo);
+            uiWindowPlayerBuffInfo =
+                sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowPlayerBuffInfo>(UIWindowManager.WindowUid
+                    .PlayerBuffInfo);
             
             // TotalHp, Mp 가 바뀌어도 현재 값이 바뀌면 안된다.
             TotalHp
@@ -126,7 +132,7 @@ namespace GGemCo.Scripts
         private void LoadEquipItems()
         {
             Dictionary<int, SaveDataIcon> dictionary =
-                SceneGame.Instance.saveDataManager.Equip.GetAllItemCounts();
+                sceneGame.saveDataManager.Equip.GetAllItemCounts();
             foreach (var info in dictionary)
             {
                 if (info.Value == null) continue;
@@ -142,12 +148,12 @@ namespace GGemCo.Scripts
             if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.MapObjectWarp)))
             {
                 ObjectWarp objectWarp = collision.gameObject.GetComponent<ObjectWarp>();
-                SceneGame.Instance.mapManager.LoadMapByWarp(objectWarp);
+                sceneGame.mapManager.LoadMapByWarp(objectWarp);
             }
             // 드랍 아이템 일때
             else if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.DropItem)))
             {
-                SceneGame.Instance.ItemManager.PlayerTaken(collision.gameObject);
+                sceneGame.ItemManager.PlayerTaken(collision.gameObject);
             }
         }
         /// <summary>
@@ -216,7 +222,7 @@ namespace GGemCo.Scripts
         {
             if (IsStatusDead()) return;
             // GcLogger.Log(@event);
-            long totalDamage = SceneGame.Instance.calculateManager.GetPlayerTotalAtk();
+            long totalDamage = sceneGame.calculateManager.GetPlayerTotalAtk();
         
             // 캡슐 콜라이더 2D와 충돌 중인 모든 콜라이더를 검색
             Vector2 size = new Vector2(colliderCheckCharacter.size.x * Mathf.Abs(transform.localScale.x), colliderCheckCharacter.size.y * transform.localScale.y);
@@ -318,12 +324,8 @@ namespace GGemCo.Scripts
         /// <param name="value"></param>
         private void UpdatePlayerInfoText(UIWindowPlayerInfo.IndexPlayerInfo textUI, string label, long value)
         {
-            UIWindowPlayerInfo uiWindowPlayerInfo =
-                SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowPlayerInfo>(UIWindowManager.WindowUid.PlayerInfo);
-            if (uiWindowPlayerInfo != null)
-            {
-                uiWindowPlayerInfo.UpdateText(textUI, label, value);
-            }
+            if (uiWindowPlayerInfo == null) return;
+            uiWindowPlayerInfo.UpdateText(textUI, label, value);
         }
         /// <summary>
         /// 현재 생명력이 최대치인지
@@ -368,7 +370,7 @@ namespace GGemCo.Scripts
         protected override void OnDead()
         {
             base.OnDead();
-            SceneGame.Instance.SetState(SceneGame.GameState.End);
+            sceneGame.SetState(SceneGame.GameState.End);
         }
         
         /// <summary>
@@ -386,7 +388,7 @@ namespace GGemCo.Scripts
             bool result = playerData?.CurrentLevel >= compareLevel;
             if (!result)
             {
-                SceneGame.Instance.systemMessageManager.ShowMessageWarning($"플레이어 레벨이 부족합니다. 필요 레벨 : {compareLevel}");
+                sceneGame.systemMessageManager.ShowMessageWarning($"플레이어 레벨이 부족합니다. 필요 레벨 : {compareLevel}");
             }
             return result;
         }
@@ -396,9 +398,6 @@ namespace GGemCo.Scripts
         /// <param name="affectUid"></param>
         protected override void OnAffect(int affectUid)
         {
-            UIWindowPlayerBuffInfo uiWindowPlayerBuffInfo =
-                SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowPlayerBuffInfo>(UIWindowManager
-                    .WindowUid.PlayerBuffInfo);
             if (uiWindowPlayerBuffInfo == null) return;
             uiWindowPlayerBuffInfo.AddAffectIcon(affectUid);
         }

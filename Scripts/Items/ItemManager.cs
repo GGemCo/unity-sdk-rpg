@@ -25,6 +25,7 @@ namespace GGemCo.Scripts
         // 드랍되는 아이템 pool size 값을 원래 값으로 초기화 시간
         private readonly float poolReduceTime = 10f;
         private SceneGame sceneGame;
+        private UIWindowInventory uiWindowInventory;
         
         public enum MonsterDropRateType
         {
@@ -64,6 +65,8 @@ namespace GGemCo.Scripts
             dropGroupDictionary = TableLoaderManager.Instance.TableItemDropGroup.GetDropGroups();
             monsterDropDictionary = TableLoaderManager.Instance.TableMonsterDropRate.GetMonsterDropDictionary();
             sceneGame = psceneGame;
+            uiWindowInventory =
+                sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid.Inventory);
         }
         /// <summary>
         /// Addressable 에 등록된 damageText 를 불러와서 pool 을 만든다 
@@ -258,11 +261,9 @@ namespace GGemCo.Scripts
             Item item = dropItem.GetComponent<Item>();
             if (item ==null || item.itemUid <= 0) return;
             var result = sceneGame.saveDataManager.Inventory.AddItem(item.itemUid, item.itemCount);
-            var inventory = sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
-                    .Inventory);
-            if (inventory != null)
+            if (uiWindowInventory != null)
             {
-                inventory.SetIcons(result);
+                uiWindowInventory.SetIcons(result);
             }
             
             item.Reset();

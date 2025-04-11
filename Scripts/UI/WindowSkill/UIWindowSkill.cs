@@ -9,8 +9,6 @@ namespace GGemCo.Scripts
     /// </summary>
     public class UIWindowSkill : UIWindow
     {
-        [Tooltip("스킬 정보 윈도우")]
-        public UIWindowSkillInfo uIWindowSkillInfo;
         [Tooltip("스킬 element 프리팹")]
         public GameObject prefabUIElementSkill;
         
@@ -18,6 +16,9 @@ namespace GGemCo.Scripts
         private readonly Dictionary<int, UIElementSkill> uiElementSkills = new Dictionary<int, UIElementSkill>();
         private SkillData skillData;
         private QuickSlotData quickSlotData;
+        
+        private UIWindowQuickSlot uiWindowQuickSlot;
+        private UIWindowSkillInfo uIWindowSkillInfo;
         
         protected override void Awake()
         {
@@ -34,6 +35,12 @@ namespace GGemCo.Scripts
             base.Start();
             skillData = SceneGame.Instance.saveDataManager.Skill;
             quickSlotData = SceneGame.Instance.saveDataManager.QuickSlot;
+            uIWindowSkillInfo =
+                SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowSkillInfo>(UIWindowManager.WindowUid
+                    .SkillInfo);
+            uiWindowQuickSlot =
+                SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowQuickSlot>(UIWindowManager.WindowUid
+                    .QuickSlot);
         }
         /// <summary>
         /// skill 테이블을 읽어서 개수만큼 풀을 확장하여 추가 생성.
@@ -229,9 +236,6 @@ namespace GGemCo.Scripts
                 return;
             }
             if (!icon.CheckRequireLevel()) return;
-            UIWindowQuickSlot uiWindowQuickSlot =
-                SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowQuickSlot>(UIWindowManager.WindowUid
-                    .QuickSlot);
             if (uiWindowQuickSlot == null) return;
             // 퀵슬롯에 하나 넣기
             var result = quickSlotData.AddSkill(icon.uid, icon.GetCount(), icon.GetLevel(), icon.IsLearn());
