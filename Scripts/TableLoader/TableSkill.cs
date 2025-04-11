@@ -13,6 +13,8 @@ namespace GGemCo.Scripts
         public int Level;
         public int Maxlevel;
         public int NeedPlayerLevel;
+        public CurrencyConstants.Type NeedCurrencyType;
+        public int NeedCurrencyValue;
         public SkillConstants.Target Target;
         public SkillConstants.TargetType TargetType;
         public SkillConstants.DamageType DamageType;
@@ -92,6 +94,8 @@ namespace GGemCo.Scripts
                 Level = int.Parse(data["Level"]),
                 Maxlevel = int.Parse(data["Maxlevel"]),
                 NeedPlayerLevel = int.Parse(data["NeedPlayerLevel"]),
+                NeedCurrencyType = ConvertCurrencyType(data["NeedCurrencyType"]),
+                NeedCurrencyValue = int.Parse(data["NeedCurrencyValue"]),
                 Target = ConvertTarget(data["Target"]),
                 TargetType = ConvertTargetType(data["TargetType"]),
                 DamageType = ConvertDamageType(data["DamageType"]),

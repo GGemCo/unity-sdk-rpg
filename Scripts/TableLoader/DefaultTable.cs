@@ -7,6 +7,7 @@ namespace GGemCo.Scripts
     {
         private readonly Dictionary<int, Dictionary<string, string>> table = new Dictionary<int, Dictionary<string, string>>();
         private static readonly Dictionary<string, ConfigCommon.SuffixType> MapSuffix;
+        private static readonly Dictionary<string, CurrencyConstants.Type> MapCurrencyType;
 
         static DefaultTable()
         {
@@ -17,9 +18,18 @@ namespace GGemCo.Scripts
                 { "INCREASE", ConfigCommon.SuffixType.Increase },
                 { "DECREASE", ConfigCommon.SuffixType.Decrease },
             };
+            MapCurrencyType = new Dictionary<string, CurrencyConstants.Type>
+            {
+                { "Gold", CurrencyConstants.Type.Gold },
+                { "Silver", CurrencyConstants.Type.Silver },
+            };
         }
 
-        protected static ConfigCommon.SuffixType ConvertSuffixType(string type) => MapSuffix.GetValueOrDefault(type, ConfigCommon.SuffixType.None);
+        protected static ConfigCommon.SuffixType ConvertSuffixType(string type) =>
+            MapSuffix.GetValueOrDefault(type, ConfigCommon.SuffixType.None);
+
+        protected static CurrencyConstants.Type ConvertCurrencyType(string type) =>
+            MapCurrencyType.GetValueOrDefault(type, CurrencyConstants.Type.None);
 
         public virtual void LoadData(string content)
         {

@@ -14,6 +14,7 @@ namespace GGemCo.Scripts
         public TextMeshProUGUI textName;
         public TextMeshProUGUI textLevel;
         public TextMeshProUGUI textNeedLevel;
+        public TextMeshProUGUI textNeedCurrency;
         public Button buttonLearn;
         public Button buttonLevelUp;
         
@@ -21,6 +22,7 @@ namespace GGemCo.Scripts
         private UIWindowSkillInfo uiWindowSkillInfo;
         private StruckTableSkill struckTableSkill;
         private SaveDataIcon saveDataIcon;
+        private TableSkill tableSkill;
         private int slotIndex;
         
         /// <summary>
@@ -50,6 +52,7 @@ namespace GGemCo.Scripts
             uiWindowSkillInfo =
                 SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowSkillInfo>(
                     UIWindowManager.WindowUid.SkillInfo);
+            tableSkill = TableLoaderManager.Instance.TableSkill;
             
             if (textName != null) textName.text = struckTableSkill.Name;
             UpdateInfos(pstruckTableSkill, saveDataIcon);
@@ -73,6 +76,16 @@ namespace GGemCo.Scripts
             if (textLevel != null) textLevel.text = $"Lv.{level}";
             if (textNeedLevel != null) textNeedLevel.text = $"필요레벨 : {struckTableSkill.NeedPlayerLevel}";
 
+            // 필요 재화
+            if (textNeedCurrency != null)
+            {
+                textNeedCurrency.text = $"{struckTableSkill.NeedCurrencyType} {struckTableSkill.NeedCurrencyValue}";
+                if (struckTableSkill.NeedCurrencyType == CurrencyConstants.Type.None)
+                {
+                    textNeedCurrency.gameObject.SetActive(false);
+                }
+            }
+            
             // 최대 레벨
             if (saveDataIcon != null && struckTableSkill != null && saveDataIcon.Level >= struckTableSkill.Maxlevel)
             {
@@ -81,10 +94,29 @@ namespace GGemCo.Scripts
                 buttonLevelUp.gameObject.SetActive(true);
                 buttonLevelUp.interactable = false;
             }
+            // 레벨업 할때는 다음 레벨 정보로 셋팅
             else if (saveDataIcon is { IsLearned: true })
             {
                 buttonLearn.gameObject.SetActive(false);
                 buttonLevelUp.gameObject.SetActive(true);
+                int nextLevel = level + 1;
+                var infoNextLevel = tableSkill.GetDataByUidLevel(struckTableSkill.Uid, nextLevel);
+                if (infoNextLevel == null)
+                {
+                    GcLogger.LogError("skill 테이블에 정보가 없습니다. skill uid: " + struckTableSkill.Uid + " / Level: " + nextLevel);
+                    return;
+                }
+                if (textNeedLevel != null) textNeedLevel.text = $"필요레벨 : {infoNextLevel.NeedPlayerLevel}";
+                
+                // 필요 재화
+                if (textNeedCurrency != null)
+                {
+                    textNeedCurrency.text = $"{infoNextLevel.NeedCurrencyType} {infoNextLevel.NeedCurrencyValue}";
+                    if (infoNextLevel.NeedCurrencyType == CurrencyConstants.Type.None)
+                    {
+                        textNeedCurrency.gameObject.SetActive(false);
+                    }
+                }
             }
             else
             {
@@ -106,8 +138,66 @@ namespace GGemCo.Scripts
                 SceneGame.Instance.systemMessageManager.ShowMessageWarning("최대 레벨입니다.");
                 return;
             }
-            var result2 =SceneGame.Instance.saveDataManager.Skill.SetSkillLevelUp(slotIndex, struckTableSkill.Uid, 1, nextLevel, true);
+            var infoNextLevel = tableSkill.GetDataByUidLevel(struckTableSkill.Uid, nextLevel);
+            if (infoNextLevel == null)
+            {
+                GcLogger.LogError("skill 테이블에 정보가 없습니다. skill uid: " + struckTableSkill.Uid + " / Level: " + nextLevel);
+                return;
+            }
+            bool resultRequireLevel = CheckLevelCurrency(infoNextLevel.NeedPlayerLevel, infoNextLevel.NeedCurrencyType,
+                infoNextLevel.NeedCurrencyValue);
+            if (!resultRequireLevel) return;
+
+            var result2 =
+                SceneGame.Instance.saveDataManager.Skill.SetSkillLevelUp(slotIndex, struckTableSkill.Uid, 1, nextLevel,
+                    true);
+            if (result2.Code == ResultCommon.Type.Success)
+            {
+                MinusNeedCurrency(infoNextLevel.NeedCurrencyType, infoNextLevel.NeedCurrencyValue);
+            }
             uiWindowSkill.SetIcons(result2);
+        }
+        /// <summary>
+        /// 레벨, 재화 체크
+        /// </summary>
+        /// <param name="needPlayerLevel"></param>
+        /// <param name="needCurrencyType"></param>
+        /// <param name="needCurrencyValue"></param>
+        /// <returns></returns>
+        private bool CheckLevelCurrency(int needPlayerLevel, CurrencyConstants.Type needCurrencyType, int needCurrencyValue)
+        {
+            // 레벨 체크
+            bool result = SceneGame.Instance.player.GetComponent<Player>().IsRequireLevel(needPlayerLevel);
+            if (!result) return false;
+            // 재화 체크
+            if (needCurrencyType != CurrencyConstants.Type.None)
+            {
+                var checkNeedCurrency = SceneGame.Instance.saveDataManager.Player.CheckNeedCurrency(needCurrencyType, needCurrencyValue);
+                if (checkNeedCurrency.Code == ResultCommon.Type.Fail)
+                {
+                    SceneGame.Instance.systemMessageManager.ShowMessageWarning(checkNeedCurrency.Message);
+                    return false;
+                }
+            }
+            return true;
+        }
+        /// <summary>
+        /// 필요 재화 처리
+        /// </summary>
+        /// <param name="needCurrencyType"></param>
+        /// <param name="needCurrencyValue"></param>
+        /// <returns></returns>
+        private bool MinusNeedCurrency(CurrencyConstants.Type needCurrencyType, int needCurrencyValue)
+        {
+            if (needCurrencyType == CurrencyConstants.Type.None) return true;
+            // 재화 빼주기
+            var minusCurrency = SceneGame.Instance.saveDataManager.Player.MinusCurrency(needCurrencyType, needCurrencyValue);
+            if (minusCurrency.Code == ResultCommon.Type.Fail)
+            {
+                SceneGame.Instance.systemMessageManager.ShowMessageWarning(minusCurrency.Message);
+                return false;
+            }
+            return true;
         }
         /// <summary>
         /// 배우기
@@ -115,10 +205,15 @@ namespace GGemCo.Scripts
         private void OnClickLearn()
         {
             // GcLogger.Log("click learn");
-            bool result = SceneGame.Instance.player.GetComponent<Player>().IsRequireLevel(struckTableSkill.NeedPlayerLevel);
+            bool result = CheckLevelCurrency(struckTableSkill.NeedPlayerLevel, struckTableSkill.NeedCurrencyType,
+                struckTableSkill.NeedCurrencyValue);
             if (!result) return;
 
             var result2 = SceneGame.Instance.saveDataManager.Skill.SetSkillLearn(slotIndex, struckTableSkill.Uid, 1, struckTableSkill.Level, true);
+            if (result2.Code == ResultCommon.Type.Success)
+            {
+                MinusNeedCurrency(struckTableSkill.NeedCurrencyType, struckTableSkill.NeedCurrencyValue);
+            }
             uiWindowSkill.SetIcons(result2);
         }
 
