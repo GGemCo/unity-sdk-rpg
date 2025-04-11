@@ -19,16 +19,6 @@ namespace GGemCo.Scripts
 
         private void StartFadeOut()
         {
-            if (coroutineFadeIn != null)
-            {
-                StopCoroutine(coroutineFadeIn);
-            }
-            if (coroutineFadeOut != null)
-            {
-                StopCoroutine(coroutineFadeOut);
-            }
-
-            if (!uiWindow.gameObject.activeSelf) return;
             // 패널 비활성화 시 페이드 아웃
             coroutineFadeOut = StartCoroutine(FadeOut());
         }
@@ -73,24 +63,18 @@ namespace GGemCo.Scripts
         /// </summary>
         public void ShowPanel()
         {
+            if (uiWindow.gameObject.activeSelf) return;
             // 먼저 활성화 해야 fade in 이 작동함
             gameObject.SetActive(true);
-            if (coroutineFadeOut != null)
-            {
-                StopCoroutine(coroutineFadeOut);
-            }
-            if (coroutineFadeIn != null)
-            {
-                StopCoroutine(coroutineFadeIn);
-            }
             // 패널 활성화 시 페이드 인
-            coroutineFadeIn = StartCoroutine(FadeIn());
+            StartCoroutine(FadeIn());
         }
         /// <summary>
         /// window 닫기
         /// </summary>
         public void HidePanel()
         {
+            if (!uiWindow.gameObject.activeSelf) return;
             // 페이드 아웃을 시작하도록 OnDisable을 호출
             StartFadeOut();
         }
