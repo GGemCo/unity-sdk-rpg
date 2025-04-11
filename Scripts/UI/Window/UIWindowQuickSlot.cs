@@ -50,6 +50,11 @@ namespace GGemCo.Scripts
             for (int index = 0; index < maxCountIcon; index++)
             {
                 if (index >= icons.Length) continue;
+                
+                // 단축키 이미지 위치 설정
+                iconHotKey[index].transform.SetParent(slots[index].transform);
+                iconHotKey[index].transform.localPosition = new Vector3(-slotSize.x/2f, slotSize.y/2f, 0);
+                
                 var icon = icons[index];
                 if (icon == null) continue;
                 UIIconSkill uiIcon = icon.GetComponent<UIIconSkill>();
@@ -61,10 +66,6 @@ namespace GGemCo.Scripts
                 int skillCount = structSkillIcon.Count;
                 int skillLevel = structSkillIcon.Level;
                 uiIcon.ChangeInfoByUid(skillUid, skillCount, skillLevel);
-                
-                // 단축키 이미지 위치 설정
-                iconHotKey[index].transform.SetParent(slots[index].transform);
-                iconHotKey[index].transform.localPosition = new Vector3(-slotSize.x/2f, slotSize.y/2f, 0);
             }
         }
         protected void OnDisable()
