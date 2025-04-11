@@ -20,12 +20,6 @@ namespace GGemCo.Scripts
         [Header("전기 속성 저항(100->1)")] public int statRegistLightning;
         
         /// <summary>
-        /// 기존 값이 비어있을 때만 기본값을 설정
-        /// </summary>
-        private void OnEnable()
-        {
-        }
-        /// <summary>
         /// 처음 생성 시 한 번만 실행됨
         /// </summary>
         private void Reset()
@@ -35,6 +29,7 @@ namespace GGemCo.Scripts
             statDef = 100;
             statHp = 100;
             statMp = 100;
+            statAttackSpeed = 100;
             statMoveStep = 100;
             statMoveSpeed = 100;
             statRegistFire = 0;
