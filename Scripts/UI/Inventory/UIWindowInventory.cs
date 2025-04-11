@@ -360,7 +360,6 @@ namespace GGemCo.Scripts
                 window.CopyIconCount(0, icon.slotIndex, icon.uid, icon.GetCount());
             }
         }
-
         /// <summary>
         /// 아이템 정보 보기
         /// </summary>
@@ -371,8 +370,8 @@ namespace GGemCo.Scripts
             RectTransform itemInfoRect = uIWindowItemInfo.GetComponent<RectTransform>();
             itemInfoRect.pivot = new Vector2(1f, 1f);
             uIWindowItemInfo.transform.position =
-                new Vector3(icon.transform.position.x - containerIcon.cellSize.x / 2f,
-                    icon.transform.position.y + containerIcon.cellSize.y / 2f, 0);
+                new Vector3(icon.transform.position.x - slotSize.x / 2f,
+                    icon.transform.position.y + slotSize.y / 2f, 0);
 
             // 화면 밖 체크 & 보정
             MathHelper.ClampToScreen(itemInfoRect);

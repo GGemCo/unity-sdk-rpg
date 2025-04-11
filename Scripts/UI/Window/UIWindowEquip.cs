@@ -10,6 +10,8 @@ namespace GGemCo.Scripts
     {
         // 미리 만들어놓은 slot 이 있을 경우
         public GameObject[] preLoadSlots;
+        [Header("아이템 정보 윈도우")]
+        public UIWindowItemInfo uIWindowItemInfo;
         
         private TableItem tableItem;
         private InventoryData inventoryData;
@@ -206,6 +208,22 @@ namespace GGemCo.Scripts
         {
             if (icon == null) return;
             SceneGame.Instance.uIWindowManager.MoveIcon(UIWindowManager.WindowUid.Equip, icon.index, UIWindowManager.WindowUid.Inventory, 1);
+        }
+        /// <summary>
+        /// 아이템 정보 보기
+        /// </summary>
+        /// <param name="icon"></param>
+        public override void ShowItemInfo(UIIcon icon)
+        {
+            uIWindowItemInfo.SetItemUid(icon.uid);
+            RectTransform itemInfoRect = uIWindowItemInfo.GetComponent<RectTransform>();
+            itemInfoRect.pivot = new Vector2(1f, 1f);
+            uIWindowItemInfo.transform.position =
+                new Vector3(icon.transform.position.x - slotSize.x / 2f,
+                    icon.transform.position.y + slotSize.y / 2f, 0);
+
+            // 화면 밖 체크 & 보정
+            MathHelper.ClampToScreen(itemInfoRect);
         }
     }
 }
