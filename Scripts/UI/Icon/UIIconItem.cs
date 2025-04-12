@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine.EventSystems;
 
 namespace GGemCo.Scripts
@@ -206,6 +207,11 @@ namespace GGemCo.Scripts
                 var optionValue = (int)optionValues[i];
                 player.AddAffect(optionValue);
             }
+        }
+        
+        public override bool IsAntiFlag(ItemConstants.AntiFlag antiFlag)
+        {
+            return struckTableItem.AntiFlag.Any(flag => flag == antiFlag);
         }
     }
 }

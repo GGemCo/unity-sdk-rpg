@@ -55,6 +55,12 @@ namespace GGemCo.Scripts
             Ring,
             Shield,
         }
+        public enum AntiFlag
+        {
+            None,
+            Shop,
+            Stash
+        }
         /// <summary>
         /// 부위별 리소스 폴더 이름
         /// </summary>
@@ -92,6 +98,16 @@ namespace GGemCo.Scripts
             { ConfigCommon.SuffixType.Increase, "+{0}%" },
             { ConfigCommon.SuffixType.Decrease, "-{0}%" }
         };
+        private static readonly Dictionary<AntiFlag, string> AntiFlagName = new Dictionary<AntiFlag, string>
+        {
+            { AntiFlag.None, "" },
+            { AntiFlag.Shop, "상점 판매 금지" },
+            { AntiFlag.Stash, "창고 보관 금지" },
+        };
 
+        public static string GetAntiFlagName(AntiFlag antiFlag)
+        {
+            return AntiFlagName[antiFlag];
+        }
     }
 }

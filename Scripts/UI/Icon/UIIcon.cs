@@ -364,5 +364,10 @@ namespace GGemCo.Scripts
             if (ImageIcon == null) return;
             ImageIcon.raycastTarget = set;
         }
+
+        public virtual bool IsAntiFlag(ItemConstants.AntiFlag flag)
+        {
+            return false;
+        }
     }
 }

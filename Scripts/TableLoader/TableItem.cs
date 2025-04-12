@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace GGemCo.Scripts
 {
@@ -16,7 +17,10 @@ namespace GGemCo.Scripts
         public ItemConstants.Class Class;
         public float CoolTime;
         public string ImagePath;
+        public ItemConstants.AntiFlag[] AntiFlag;
         public int MaxOverlayCount;
+        public string Description;
+        
         public string StatusID1;
         public ConfigCommon.SuffixType StatusSuffix1;
         public int StatusValue1;
@@ -50,6 +54,7 @@ namespace GGemCo.Scripts
         private static readonly Dictionary<string, ItemConstants.SubCategory> MapSubCategory;
         private static readonly Dictionary<string, ItemConstants.Class> MapClass;
         private static readonly Dictionary<string, ItemConstants.PartsType> MapPartsID;
+        private static readonly Dictionary<string, ItemConstants.AntiFlag> MapAntiFlag;
 
         static TableItem()
         {
@@ -88,12 +93,52 @@ namespace GGemCo.Scripts
                 { "Boots", ItemConstants.PartsType.Boots },
                 { "Weapon", ItemConstants.PartsType.Weapon },
             };
+            MapAntiFlag = new Dictionary<string, ItemConstants.AntiFlag>
+            {
+                { "Shop", ItemConstants.AntiFlag.Shop },
+                { "Stash", ItemConstants.AntiFlag.Stash },
+            };
         }
         private static ItemConstants.Type ConvertType(string type) => MapType.GetValueOrDefault(type, ItemConstants.Type.None);
         public static ItemConstants.Category ConvertCategory(string type) => MapCategory.GetValueOrDefault(type, ItemConstants.Category.None);
         public static ItemConstants.SubCategory ConvertSubCategory(string type) => MapSubCategory.GetValueOrDefault(type, ItemConstants.SubCategory.None);
         private static ItemConstants.Class ConvertClass(string type) => MapClass.GetValueOrDefault(type, ItemConstants.Class.None);
         private static ItemConstants.PartsType ConvertPartsID(string type) => MapPartsID.GetValueOrDefault(type, ItemConstants.PartsType.None);
+        private static ItemConstants.AntiFlag[] ConvertAntiFlag(string type)
+        {
+            string[] flags = type.Split(',');
+            ItemConstants.AntiFlag[] antiFlags = new ItemConstants.AntiFlag[flags.Length];
+            for (int i = 0; i < antiFlags.Length; i++)
+            {
+                antiFlags[i] = MapAntiFlag.GetValueOrDefault(type, ItemConstants.AntiFlag.None);
+            }
+            return antiFlags;
+        }
+
+        /// <summary>
+        /// Description 문자열 내 {컬럼명} 형태의 플레이스홀더를 실제 값으로 치환합니다.
+        /// </summary>
+        /// <param name="template">설명 문자열</param>
+        /// <param name="values">컬럼 이름과 값이 들어 있는 딕셔너리</param>
+        /// <returns>치환된 문자열</returns>
+        private static string ParsePlaceholders(string template, Dictionary<string, string> values)
+        {
+            // 정규식: 중괄호 {} 안의 내용을 캡처
+            Regex regex = new Regex(@"\{(.*?)\}");
+
+            return regex.Replace(template, match =>
+            {
+                string key = match.Groups[1].Value;
+
+                if (values.TryGetValue(key, out var value))
+                {
+                    return value ?? "";
+                }
+
+                // 해당 키가 없으면 원래 문자열 유지
+                return match.Value;
+            });
+        }
         
         private readonly Dictionary<ItemConstants.Category, List<StruckTableItem>> dictionaryByCategory = new Dictionary<ItemConstants.Category, List<StruckTableItem>>();
         private readonly Dictionary<ItemConstants.SubCategory, List<StruckTableItem>> dictionaryBySubCategory = new Dictionary<ItemConstants.SubCategory, List<StruckTableItem>>();
@@ -102,6 +147,7 @@ namespace GGemCo.Scripts
             int uid = int.Parse(data["Uid"]);
             ItemConstants.Category category = ConvertCategory(data["Category"]);
             ItemConstants.SubCategory subCategory = ConvertSubCategory(data["SubCategory"]);
+            data["Description"] = ParsePlaceholders(data["Description"], data);
             
             StruckTableItem struckTableItemDropGroup = GetDataByUid(uid);
             {
@@ -150,8 +196,10 @@ namespace GGemCo.Scripts
                 SubCategory = ConvertSubCategory(data["SubCategory"]),
                 Class = ConvertClass(data["Class"]),
                 ImagePath = data["ImagePath"],
+                AntiFlag = ConvertAntiFlag(data["AntiFlag"]),
                 MaxOverlayCount = int.Parse(data["MaxOverlayCount"]),
                 CoolTime = float.Parse(data["CoolTime"]),
+                Description = data["Description"],
                 
                 StatusID1 = data["StatusID1"],
                 StatusSuffix1 = ConvertSuffixType(data["StatusSuffix1"]),
