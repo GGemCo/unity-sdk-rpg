@@ -64,6 +64,8 @@ namespace GGemCo.Scripts
         private void Awake()
         {
             textMessage = objectText.GetComponent<TextMeshProUGUI>();
+            // text interaction 안되도록 처리
+            textMessage.raycastTarget = false;
             canvasGroup = objectText.GetComponent<CanvasGroup>();
             canvasGroup.alpha = 0; // 처음엔 안 보이게 설정
             messageTypeColors = new Dictionary<MessageType, Color>
