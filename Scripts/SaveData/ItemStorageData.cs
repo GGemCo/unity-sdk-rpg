@@ -242,5 +242,72 @@ namespace GGemCo.Scripts
             ItemCounts.Clear();
             TempItemCounts.Clear();
         }
+        
+        
+        /// <summary>
+        /// 같은 아이템 uid 끼리 합치기 
+        /// </summary>
+        /// <param name="fromIndex">옮길 아이템이 있는 슬롯</param>
+        /// <param name="toIndex">옮길 대상 슬롯</param>
+        /// <returns>성공 여부</returns>
+        public ResultCommon MergeItem(int fromIndex, int toIndex)
+        {
+            // 이동할 슬롯과 대상 슬롯이 동일하면 무시
+            if (fromIndex == toIndex)
+            {
+                return new ResultCommon(ResultCommon.Type.Fail, "같은 슬롯으로 이동할 수 없습니다.");
+            }
+
+            // fromIndex 아이템 존재 확인
+            if (!ItemCounts.TryGetValue(fromIndex, out var fromItem) || fromItem.Count <= 0)
+            {
+                return new ResultCommon(ResultCommon.Type.Fail, $"이동할 아이템이 없습니다. 슬롯: {fromIndex}");
+            }
+
+            // toIndex 아이템 존재 확인
+            if (!ItemCounts.TryGetValue(toIndex, out var toItem) || toItem.Count <= 0)
+            {
+                return new ResultCommon(ResultCommon.Type.Fail, $"대상 슬롯에 아이템이 없습니다. 슬롯: {toIndex}");
+            }
+
+            // 같은 아이템인지 확인
+            if (fromItem.Uid != toItem.Uid)
+            {
+                return new ResultCommon(ResultCommon.Type.Fail, "다른 종류의 아이템은 합칠 수 없습니다.");
+            }
+
+            // 아이템 정보 가져오기 (최대 중첩 개수 확인)
+            var info = TableLoaderManager.Instance.TableItem.GetDataByUid(fromItem.Uid);
+            if (info == null || info.Uid <= 0)
+            {
+                return new ResultCommon(ResultCommon.Type.Fail, $"아이템 정보가 없습니다. itemUid: {fromItem.Uid}");
+            }
+
+            int maxOverlayCount = info.MaxOverlayCount; // 최대 중첩 개수
+            int availableSpace = maxOverlayCount - toItem.Count; // toIndex 슬롯의 남은 공간
+
+            // 합칠 공간이 없는 경우
+            if (availableSpace <= 0)
+            {
+                return new ResultCommon(ResultCommon.Type.Fail, "대상 슬롯에 합칠 공간이 없습니다.");
+            }
+
+            // 이동 가능한 개수 계산
+            int moveAmount = Math.Min(fromItem.Count, availableSpace);
+
+            List<SaveDataIcon> controls = new List<SaveDataIcon>();
+            // 아이템 이동
+            int toItemCount = toItem.Count + moveAmount;
+            controls.Add(new SaveDataIcon(toIndex, toItem.Uid, toItemCount));
+            
+            int fromItemCount = fromItem.Count - moveAmount;
+
+            // fromIndex 슬롯이 비었으면 제거
+            controls.Add(fromItemCount <= 0
+                ? new SaveDataIcon(fromIndex, 0)
+                : new SaveDataIcon(fromIndex, fromItem.Uid, fromItemCount));
+
+            return new ResultCommon(ResultCommon.Type.Success, $"{moveAmount}개 아이템이 {fromIndex} → {toIndex}로 이동되었습니다.", controls);
+        }
     }
 }

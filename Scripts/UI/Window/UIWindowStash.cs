@@ -242,15 +242,5 @@ namespace GGemCo.Scripts
          
             stashData.RemoveItemCount(slotIndex);
         }
-        /// <summary>
-        /// index 가 없을때는, 같은 uid 는 중첩 가능여부를 확인하고 합치고, 나머지는 추가
-        /// </summary>
-        /// <param name="iconUid"></param>
-        /// <param name="iconCount"></param>
-        public override void SetIconCount(int iconUid, int iconCount)
-        {
-            ResultCommon result = stashData.AddItem(iconUid, iconCount);
-            SetIcons(result);
-        }
     }
 }

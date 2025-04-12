@@ -3,12 +3,13 @@ namespace GGemCo.Scripts
 {
     public class InteractionManager
     {
-        SceneGame sceneGame;
-        TableNpc tableNpc;
-        TableInteraction tableInteraction;
+        private SceneGame sceneGame;
+        private TableNpc tableNpc;
+        private TableInteraction tableInteraction;
         private UIWindowInteractionDialogue uiWindowInteractionDialogue;
         private InteractionConstants.Type currentInteractionType;
         private UIWindowShop uiWindowShop;
+        private UIWindowStash uiWindowStash;
         
         public void Initialize(SceneGame scene)
         {
@@ -20,6 +21,8 @@ namespace GGemCo.Scripts
                 sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowInteractionDialogue>(UIWindowManager.WindowUid.Dialogue);
             uiWindowShop =
                 sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowShop>(UIWindowManager.WindowUid.Shop);
+            uiWindowStash =
+                sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowStash>(UIWindowManager.WindowUid.Stash);
         }
 
         public void SetInfo(CharacterBase characterBase)
@@ -68,6 +71,10 @@ namespace GGemCo.Scripts
             if (currentInteractionType == InteractionConstants.Type.Shop)
             {
                 uiWindowShop?.Show(false);
+            }
+            else if (currentInteractionType == InteractionConstants.Type.Stash)
+            {
+                uiWindowStash?.Show(false);
             }
         }
 

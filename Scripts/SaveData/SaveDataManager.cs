@@ -15,6 +15,7 @@ namespace GGemCo.Scripts
         public QuestData QuestData;
         public SkillData SkillData;
         public QuickSlotData QuickSlotData;
+        public StashData StashData;
     }
     /// <summary>
     /// 세이브 데이터 메인 매니저
@@ -27,6 +28,7 @@ namespace GGemCo.Scripts
         public QuestData Quest { get; private set; }
         public SkillData Skill { get; private set; }
         public QuickSlotData QuickSlot { get; private set; }
+        public StashData Stash { get; private set; }
 
         private TableLoaderManager tableLoaderManager;
         private SlotMetaDatController slotMetaDatController;
@@ -90,6 +92,7 @@ namespace GGemCo.Scripts
             Quest = new QuestData();
             Skill = new SkillData();
             QuickSlot = new QuickSlotData();
+            Stash = new StashData();
 
             currentSaveSlot = PlayerPrefsManager.LoadSaveDataSlotIndex();
             
@@ -103,6 +106,7 @@ namespace GGemCo.Scripts
             Quest.Initialize(tableLoaderManager, saveDataContainer);
             Skill.Initialize(tableLoaderManager, saveDataContainer);
             QuickSlot.Initialize(tableLoaderManager, saveDataContainer);
+            Stash.Initialize(tableLoaderManager, saveDataContainer);
         }
         private void Start()
         {
@@ -161,6 +165,7 @@ namespace GGemCo.Scripts
                 QuestData = Quest,
                 SkillData = Skill,
                 QuickSlotData = QuickSlot,
+                StashData = Stash,
             };
 
             string json = JsonConvert.SerializeObject(saveData);

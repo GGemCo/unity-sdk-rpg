@@ -26,6 +26,7 @@ namespace GGemCo.Scripts
         private UIWindowPlayerInfo uiWindowPlayerInfo;
         private UIWindowItemInfo uIWindowItemInfo;
         private UIWindowItemSplit uiWindowItemSplit;
+        private UIWindowStash uiWindowStash;
 
         protected override void Awake()
         {
@@ -60,6 +61,9 @@ namespace GGemCo.Scripts
             uiWindowItemSplit =
                 sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemSplit>(UIWindowManager.WindowUid
                     .ItemSplit);
+            uiWindowStash =
+                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowStash>(UIWindowManager.WindowUid
+                    .Stash);
         }
 
         public override bool Show(bool show)
@@ -282,54 +286,67 @@ namespace GGemCo.Scripts
         public override void OnRightClick(UIIcon icon)
         {
             if (icon == null) return;
-            // 장비일때
-            if (icon.IsEquipType())
+            // 창고가 열려 있으면 창고로 이동
+            if (uiWindowStash.IsOpen())
             {
-                var partSlotIndex = (int)icon.GetPartsType();
-                sceneGame.uIWindowManager.MoveIcon(uid, icon.index, UIWindowManager.WindowUid.Equip, 1, partSlotIndex);
-            }
-            // 물약 일때
-            else if (icon.IsPotionType())
-            {
-                // hp 물약일 때 
-                if (icon.IsHpPotionType() || icon.IsMpPotionType())
+                if (icon.IsAntiFlag(ItemConstants.AntiFlag.Stash))
                 {
-                    if (icon.uid <= 0 || icon.GetCount() <= 0)
-                    {
-                        popupManager.ShowPopupError("사용할 수 있는 아이템 개수가 없습니다.");
-                        return;
-                    }
-
-                    // mp 물약일 때 
-                    if (icon.IsMpPotionType())
-                    {
-                        if (sceneGame.player.GetComponent<Player>().IsMaxMp())
-                        {
-                            sceneGame.systemMessageManager.ShowMessageWarning("현재 마력이 가득하여 사용할 수 없습니다.");
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        if (sceneGame.player.GetComponent<Player>().IsMaxHp())
-                        {
-                            sceneGame.systemMessageManager.ShowMessageWarning("현재 생명력이 가득하여 사용할 수 없습니다.");
-                            return;
-                        }
-                    }
-                    var result = inventoryData.MinusItem(icon.slotIndex, icon.uid, 1);
-                    SetIcons(result);
-                    if (result is { Code: ResultCommon.Type.Success })
-                    {
-                        if (icon.IsMpPotionType())
-                            sceneGame.player.GetComponent<Player>().AddMp(icon.GetStatusValue1());
-                        else
-                            sceneGame.player.GetComponent<Player>().AddHp(icon.GetStatusValue1());
-                        
-                    }
+                    sceneGame.systemMessageManager.ShowMessageWarning("보관할 수 없는 아이템 입니다.");
+                    return;
                 }
-                // affect 가 있을 때 
-                icon.CheckStatusAffect();
+                
+            }
+            else
+            {
+                // 장비일때
+                if (icon.IsEquipType())
+                {
+                    var partSlotIndex = (int)icon.GetPartsType();
+                    sceneGame.uIWindowManager.MoveIcon(uid, icon.index, UIWindowManager.WindowUid.Equip, 1, partSlotIndex);
+                }
+                // 물약 일때
+                else if (icon.IsPotionType())
+                {
+                    // hp 물약일 때 
+                    if (icon.IsHpPotionType() || icon.IsMpPotionType())
+                    {
+                        if (icon.uid <= 0 || icon.GetCount() <= 0)
+                        {
+                            popupManager.ShowPopupError("사용할 수 있는 아이템 개수가 없습니다.");
+                            return;
+                        }
+
+                        // mp 물약일 때 
+                        if (icon.IsMpPotionType())
+                        {
+                            if (sceneGame.player.GetComponent<Player>().IsMaxMp())
+                            {
+                                sceneGame.systemMessageManager.ShowMessageWarning("현재 마력이 가득하여 사용할 수 없습니다.");
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            if (sceneGame.player.GetComponent<Player>().IsMaxHp())
+                            {
+                                sceneGame.systemMessageManager.ShowMessageWarning("현재 생명력이 가득하여 사용할 수 없습니다.");
+                                return;
+                            }
+                        }
+                        var result = inventoryData.MinusItem(icon.slotIndex, icon.uid, 1);
+                        SetIcons(result);
+                        if (result is { Code: ResultCommon.Type.Success })
+                        {
+                            if (icon.IsMpPotionType())
+                                sceneGame.player.GetComponent<Player>().AddMp(icon.GetStatusValue1());
+                            else
+                                sceneGame.player.GetComponent<Player>().AddHp(icon.GetStatusValue1());
+                            
+                        }
+                    }
+                    // affect 가 있을 때 
+                    icon.CheckStatusAffect();
+                }
             }
 
         }

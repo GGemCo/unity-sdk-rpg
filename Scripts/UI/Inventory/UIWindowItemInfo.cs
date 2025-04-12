@@ -20,6 +20,10 @@ namespace GGemCo.Scripts
         public TextMeshProUGUI textCategory;
         [Tooltip("아이템 서브카테고리")]
         public TextMeshProUGUI textSubCategory;
+        [Tooltip("아이템 Anti Flag")]
+        public TextMeshProUGUI textAntiFlag;
+        [Tooltip("아이템 설명")]
+        public TextMeshProUGUI textDescription;
         
         [Header("메인옵션")]
         [Tooltip("옵션 이름")]
@@ -64,11 +68,43 @@ namespace GGemCo.Scripts
             
             SetName();
             SetType();
+            SetAntiFlag();
             SetCategory();
+            SetDescription();
             SetStatusOptions();
             SetCategoryUI();
             Show(true);
         }
+
+        private void SetDescription()
+        {
+            if (currentStruckTableItem == null) return;
+            textDescription.text = $"{currentStruckTableItem.Description}";
+        }
+
+        private void SetAntiFlag()
+        {
+            if (currentStruckTableItem == null) return;
+            string antiFlag = "";
+            foreach (var t in currentStruckTableItem.AntiFlag)
+            {
+                if (antiFlag != "")
+                {
+                    antiFlag += ",";
+                }
+                antiFlag += ItemConstants.GetAntiFlagName(t);
+            }
+
+            if (antiFlag == "")
+            {
+                textAntiFlag.gameObject.SetActive(false);
+                return;
+            }
+
+            textAntiFlag.gameObject.SetActive(true);
+            textAntiFlag.text = $"{antiFlag}";
+        }
+
         /// <summary>
         /// 이름 설정하기
         /// </summary>

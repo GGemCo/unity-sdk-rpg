@@ -12,12 +12,15 @@ namespace GGemCo.Scripts
         public TextMeshProUGUI textMessage;
         public GameObject prefabButtonChoice;
         public Transform containerButton;
-        public UIWindowShop uiWindowShop;
 
         // 최대 interaction 버튼 개수
         private const int ButtonCount = 3;
         private readonly Dictionary<int, Button> buttonChoices = new Dictionary<int, Button>();
+        
+        private SceneGame sceneGame;
         private InteractionManager interactionManager;
+        private UIWindowShop uiWindowShop;
+        private UIWindowStash uiWindowStash;
         
         protected override void Awake()
         {
@@ -30,6 +33,11 @@ namespace GGemCo.Scripts
         {
             base.Start();
             interactionManager = SceneGame.Instance.InteractionManager;
+            sceneGame = SceneGame.Instance;
+            uiWindowShop =
+                sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowShop>(UIWindowManager.WindowUid.Shop);
+            uiWindowStash =
+                sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowStash>(UIWindowManager.WindowUid.Stash);
         }
 
         /// <summary>
@@ -116,6 +124,10 @@ namespace GGemCo.Scripts
             {
                 uiWindowShop.Show(true);
                 uiWindowShop.SetInfoByShopUid(value);
+            }
+            else if (interactionType == InteractionConstants.Type.Stash)
+            {
+                uiWindowStash?.Show(true);
             }
             interactionManager.SetCurrentType(interactionType);
 
