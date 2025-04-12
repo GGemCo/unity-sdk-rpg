@@ -16,6 +16,8 @@ namespace GGemCo.Scripts
         public Image imageCoolTimeGauge;
         [Tooltip("선택되었을때 보여줄 이미지")]
         [HideInInspector] public Image imageSelected;
+        [Tooltip("잠금 표시 이미지")]
+        public Image imageLock;
 
         private bool isSelected;
         
@@ -29,6 +31,11 @@ namespace GGemCo.Scripts
         [HideInInspector] public int slotIndex;
         // 고유번호 (아이템일때는 아이템 고유번호)
         [HideInInspector] public int uid;
+        
+        // 부모 윈도우 uid
+        private UIWindowManager.WindowUid parentWindowUid;
+        // 부모 아이콘 슬롯 index
+        private int parentSlotIndex;
 
         protected IconConstants.Type IconType;
         private IconConstants.Status iconStatus;
@@ -45,8 +52,6 @@ namespace GGemCo.Scripts
         private IconConstants.Grade grade;
         // 등급 아이콘
         [HideInInspector] public Image imageGrade;
-        // 잠금 아이콘
-        [HideInInspector] public GameObject imageLock;
             
         // 드래그 핸들러
         private UIDragHandler dragHandler;
@@ -60,6 +65,8 @@ namespace GGemCo.Scripts
             level = 0;
             index = 0;
             slotIndex = 0;
+            parentWindowUid = 0;
+            parentSlotIndex = 0;
             isLearn = false;
             window = null;
             windowUid = UIWindowManager.WindowUid.None;
@@ -75,14 +82,11 @@ namespace GGemCo.Scripts
                 imageCoolTimeGauge.gameObject.SetActive(false);
             }
             SetSelected(false);
+            SetIconLock(false);
         }
 
         protected virtual void Start()
         {
-            if (imageLock != null)
-            {
-                SetIconLock(count <= 0);
-            }
             // 선택되었을때 보여줄 이미지 크기를 slot size 로 변경
             if (imageSelected == null) return;
             imageSelected.rectTransform.sizeDelta = window.slotSize;
@@ -145,7 +149,12 @@ namespace GGemCo.Scripts
         }
         public IconConstants.Type GetIconType() => IconType;
         public IconConstants.Grade GetGrade() => grade;
-        public void SetStatus(IconConstants.Status status) => this.iconStatus = status;
+        private void SetStatus(IconConstants.Status status) => this.iconStatus = status;
+
+        protected bool IsLock()
+        {
+            return iconStatus == IconConstants.Status.Lock;
+        }
 
         protected void UpdateInfo()
         {
@@ -186,7 +195,6 @@ namespace GGemCo.Scripts
         /// <param name="value"></param>
         public void SetCount(int value)
         {
-            SetIconLock(value <= 0);
             count = value;
             if (textCount != null)
             {
@@ -197,15 +205,30 @@ namespace GGemCo.Scripts
         /// 아이템 잠금
         /// </summary>
         /// <param name="set"></param>
-        private void SetIconLock(bool set)
+        public void SetIconLock(bool set)
         {
-            if (imageLock == null) return;
-            imageLock.SetActive(set);
+            SetStatus(set ? IconConstants.Status.Lock : IconConstants.Status.Normal);
+
+            if (imageLock != null)
+            {
+                imageLock.gameObject.SetActive(set);
+            }
+
+            SetDrag(!set);
+        }
+        /// <summary>
+        /// 드래그 가능 여부 on/off
+        /// </summary>
+        /// <param name="set"></param>
+        public void SetDrag(bool set)
+        {
+            if (dragHandler == null) return;
+            dragHandler.SetIsPossibleDrag(set);
         }
         /// <summary>
         /// 아이템 정보 지우기
         /// </summary>
-        public virtual void ClearIconInfos()
+        public void ClearIconInfos()
         {
             SceneGame.Instance.uIIconCoolTimeManager.ResetCoolTime(windowUid, uid);
             
@@ -219,6 +242,8 @@ namespace GGemCo.Scripts
             {
                 imageGrade.sprite = newSprite;
             }
+
+            SetIconLock(false);
             SetCount(0);
         }
         /// <summary>
@@ -368,6 +393,20 @@ namespace GGemCo.Scripts
         public virtual bool IsAntiFlag(ItemConstants.AntiFlag flag)
         {
             return false;
+        }
+        /// <summary>
+        /// Regist 되었을때 부모 윈도우와 slot index 정보 셋팅하기
+        /// </summary>
+        /// <param name="fromWindowUid"></param>
+        /// <param name="fromIndex"></param>
+        public void SetParentInfo(UIWindowManager.WindowUid fromWindowUid, int fromIndex)
+        {
+            parentWindowUid = fromWindowUid;
+            parentSlotIndex = fromIndex;
+        }
+        public (UIWindowManager.WindowUid, int) GetParentInfo()
+        {
+            return (parentWindowUid, parentSlotIndex);
         }
     }
 }

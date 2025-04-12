@@ -88,6 +88,7 @@ namespace GGemCo.Scripts
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            if (IsLock()) return;
             if(eventData.button == PointerEventData.InputButton.Left)
             {
                 if (!window) return;
@@ -212,6 +213,22 @@ namespace GGemCo.Scripts
         public override bool IsAntiFlag(ItemConstants.AntiFlag antiFlag)
         {
             return struckTableItem.AntiFlag.Any(flag => flag == antiFlag);
+        }
+        /// <summary>
+        /// 상점 판매 재화 타입 가져오기
+        /// </summary>
+        /// <returns></returns>
+        public CurrencyConstants.Type GetSaleCurrencyType()
+        {
+            return struckTableItem.SaleCurrencyType;
+        }
+        /// <summary>
+        /// 상점 판매가격 가져오기
+        /// </summary>
+        /// <returns></returns>
+        public int GetSaleCurrencyValue()
+        {
+            return struckTableItem.SaleCurrencyValue;
         }
     }
 }
