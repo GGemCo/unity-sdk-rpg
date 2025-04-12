@@ -15,10 +15,12 @@ namespace GGemCo.Scripts
         public ItemConstants.SubCategory SubCategory;
         public ItemConstants.PartsType PartsID;
         public ItemConstants.Class Class;
-        public float CoolTime;
         public string ImagePath;
-        public ItemConstants.AntiFlag[] AntiFlag;
         public int MaxOverlayCount;
+        public float CoolTime;
+        public CurrencyConstants.Type SaleCurrencyType;
+        public int SaleCurrencyValue;
+        public ItemConstants.AntiFlag[] AntiFlag;
         public string Description;
         
         public string StatusID1;
@@ -95,7 +97,7 @@ namespace GGemCo.Scripts
             };
             MapAntiFlag = new Dictionary<string, ItemConstants.AntiFlag>
             {
-                { "Shop", ItemConstants.AntiFlag.Shop },
+                { "Shop", ItemConstants.AntiFlag.ShopSale },
                 { "Stash", ItemConstants.AntiFlag.Stash },
             };
         }
@@ -110,7 +112,7 @@ namespace GGemCo.Scripts
             ItemConstants.AntiFlag[] antiFlags = new ItemConstants.AntiFlag[flags.Length];
             for (int i = 0; i < antiFlags.Length; i++)
             {
-                antiFlags[i] = MapAntiFlag.GetValueOrDefault(type, ItemConstants.AntiFlag.None);
+                antiFlags[i] = MapAntiFlag.GetValueOrDefault(flags[i], ItemConstants.AntiFlag.None);
             }
             return antiFlags;
         }
@@ -200,6 +202,8 @@ namespace GGemCo.Scripts
                 MaxOverlayCount = int.Parse(data["MaxOverlayCount"]),
                 CoolTime = float.Parse(data["CoolTime"]),
                 Description = data["Description"],
+                SaleCurrencyType = ConvertCurrencyType(data["SaleCurrencyType"]),
+                SaleCurrencyValue = int.Parse(data["SaleCurrencyValue"]),
                 
                 StatusID1 = data["StatusID1"],
                 StatusSuffix1 = ConvertSuffixType(data["StatusSuffix1"]),

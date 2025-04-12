@@ -25,5 +25,21 @@ namespace GGemCo.Scripts
         {
             return DictionaryNames[type];
         }
+        /// <summary>
+        /// 골드 재화 이름 가져오기
+        /// </summary>
+        /// <returns></returns>
+        public static string GetNameGold()
+        {
+            return GetNameByCurrencyType(Type.Gold);
+        }
+        /// <summary>
+        /// 실버 재화 이름 가져오기
+        /// </summary>
+        /// <returns></returns>
+        public static string GetNameSilver()
+        {
+            return GetNameByCurrencyType(Type.Silver);
+        }
     }
 }

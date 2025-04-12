@@ -58,7 +58,7 @@ namespace GGemCo.Scripts
         public enum AntiFlag
         {
             None,
-            Shop,
+            ShopSale,
             Stash
         }
         /// <summary>
@@ -101,7 +101,7 @@ namespace GGemCo.Scripts
         private static readonly Dictionary<AntiFlag, string> AntiFlagName = new Dictionary<AntiFlag, string>
         {
             { AntiFlag.None, "" },
-            { AntiFlag.Shop, "상점 판매 금지" },
+            { AntiFlag.ShopSale, "상점 판매 금지" },
             { AntiFlag.Stash, "창고 보관 금지" },
         };
 

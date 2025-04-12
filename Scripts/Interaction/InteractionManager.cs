@@ -10,6 +10,7 @@ namespace GGemCo.Scripts
         private InteractionConstants.Type currentInteractionType;
         private UIWindowShop uiWindowShop;
         private UIWindowStash uiWindowStash;
+        private UIWindowShopSale uiWindowShopSale;
         
         public void Initialize(SceneGame scene)
         {
@@ -23,6 +24,8 @@ namespace GGemCo.Scripts
                 sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowShop>(UIWindowManager.WindowUid.Shop);
             uiWindowStash =
                 sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowStash>(UIWindowManager.WindowUid.Stash);
+            uiWindowShopSale =
+                sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowShopSale>(UIWindowManager.WindowUid.ShopSale);
         }
 
         public void SetInfo(CharacterBase characterBase)
@@ -75,6 +78,10 @@ namespace GGemCo.Scripts
             else if (currentInteractionType == InteractionConstants.Type.Stash)
             {
                 uiWindowStash?.Show(false);
+            }
+            else if (currentInteractionType == InteractionConstants.Type.ShopSale)
+            {
+                uiWindowShopSale?.Show(false);
             }
         }
 

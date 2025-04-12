@@ -29,6 +29,7 @@ namespace GGemCo.Scripts
             MapType = new Dictionary<string, InteractionConstants.Type>
             {
                 { "Shop", InteractionConstants.Type.Shop },
+                { "ShopSale", InteractionConstants.Type.ShopSale },
                 { "ItemUpgrade", InteractionConstants.Type.ItemUpgrade },
                 { "ItemSalvage", InteractionConstants.Type.ItemSalvage },
                 { "Stash", InteractionConstants.Type.Stash },

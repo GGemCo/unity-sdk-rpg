@@ -19,19 +19,6 @@ namespace GGemCo.Scripts
     /// </summary>
     public class TableShop : DefaultTable
     {
-        private static readonly Dictionary<string, CurrencyConstants.Type> MapType;
-
-        static TableShop()
-        {
-            MapType = new Dictionary<string, CurrencyConstants.Type>
-            {
-                { "Gold", CurrencyConstants.Type.Gold },
-                { "Silver", CurrencyConstants.Type.Silver },
-            };
-        }
-
-        private CurrencyConstants.Type ConvertType(string type) => MapType.GetValueOrDefault(type, CurrencyConstants.Type.None);
-        
         // 레벨 1인 것만 모아놓은 dictionary
         private readonly Dictionary<int, List<StruckTableShop>> shopItems = new Dictionary<int, List<StruckTableShop>>();
         protected override void OnLoadedData(Dictionary<string, string> data)
@@ -48,7 +35,7 @@ namespace GGemCo.Scripts
                 Uid = int.Parse(data["Uid"]),
                 Memo = data["Memo"],
                 ItemUid = int.Parse(data["ItemUid"]),
-                CurrencyType = ConvertType(data["CurrencyType"]),
+                CurrencyType = ConvertCurrencyType(data["CurrencyType"]),
                 CurrencyValue = int.Parse(data["CurrencyValue"]),
                 MaxBuyCount = int.Parse(data["MaxBuyCount"]),
             };

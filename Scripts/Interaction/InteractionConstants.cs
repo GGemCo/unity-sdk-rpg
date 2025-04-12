@@ -8,6 +8,7 @@ namespace GGemCo.Scripts
         {
             None,
             Shop,
+            ShopSale,
             ItemUpgrade,
             ItemSalvage,
             Stash,
@@ -17,7 +18,8 @@ namespace GGemCo.Scripts
         private static readonly Dictionary<Type, string> DictionaryTypeName = new Dictionary<Type, string>
         {
             { Type.None, "" },
-            { Type.Shop, "상점" },
+            { Type.Shop, "상점 구매" },
+            { Type.ShopSale, "상점 판매" },
             { Type.ItemUpgrade, "아이템 강화" },
             { Type.ItemSalvage, "아이템 분해" },
             { Type.Stash, "창고" },

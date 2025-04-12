@@ -188,6 +188,23 @@ namespace GGemCo.Scripts
             }
             SetIconCount(emptySlot, iconUid, iconCount);
         }
+
+        public UIIcon SetIconCountReturnIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0,
+            bool iconLearn = false)
+        {
+            return SetIconCount(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
+        }
+        public UIIcon SetIconCountReturnIcon(int iconUid, int iconCount)
+        {
+            int emptySlot = FindEmptySlot();
+            if (emptySlot == -1)
+            {
+                SceneGame.Instance.popupManager.ShowPopupError("윈도우에 빈 공간이 없습니다.");
+                return null;
+            }
+            return SetIconCount(emptySlot, iconUid, iconCount);
+        }
+
         /// <summary>
         /// 아이콘 붙여주기 
         /// </summary>
@@ -196,31 +213,32 @@ namespace GGemCo.Scripts
         /// <param name="iconCount"></param>
         /// <param name="iconLevel"></param>
         /// <param name="iconLearn"></param>
-        public void SetIconCount(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
+        public UIIcon SetIconCount(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
         {
             GameObject icon = icons[slotIndex];
             if (icon == null)
             {
                 GcLogger.LogError("슬롯에 아이콘이 없습니다. slot index: " +slotIndex);
-                return;
+                return null;
             }
             UIIcon uiIcon = icon.GetComponent<UIIcon>();
             if (uiIcon == null)
             {
                 GcLogger.LogError("슬롯에 UIIcon 이 없습니다. slot index: " +slotIndex);
-                return;
+                return null;
             }
 
             if (iconCount <= 0)
             {
                 DetachIcon(slotIndex);
-                return;
+                return null;
             }
             uiIcon.window = this;
             uiIcon.windowUid = uid;
             uiIcon.ChangeInfoByUid(iconUid, iconCount, iconLevel, iconLearn);
             
             OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
+            return uiIcon;
         }
         /// <summary>
         /// 아이콘 이동 후 슬롯별 uid, count 처리  
@@ -379,5 +397,6 @@ namespace GGemCo.Scripts
         public virtual void ShowItemInfo(UIIcon icon)
         {
         }
+        
     }
 }

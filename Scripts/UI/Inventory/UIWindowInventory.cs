@@ -16,17 +16,21 @@ namespace GGemCo.Scripts
         private GameObject iconItem;
         private TableItem tableItem;
         private Camera mainCamera;
+        
+        private SceneGame sceneGame;
         private ItemManager itemManager;
+        private PopupManager popupManager;
+        
         private InventoryData inventoryData;
         private EquipData equipData;
-        private SceneGame sceneGame;
-        private PopupManager popupManager;
-
-        private UIWindowEquip uIWindowEquip;
+        private StashData stashData;
+        
+        private UIWindowEquip uiWindowEquip;
         private UIWindowPlayerInfo uiWindowPlayerInfo;
-        private UIWindowItemInfo uIWindowItemInfo;
+        private UIWindowItemInfo uiWindowItemInfo;
         private UIWindowItemSplit uiWindowItemSplit;
         private UIWindowStash uiWindowStash;
+        private UIWindowShopSale uiWindowShopSale;
 
         protected override void Awake()
         {
@@ -48,14 +52,15 @@ namespace GGemCo.Scripts
             {
                 inventoryData = sceneGame.saveDataManager.Inventory;
                 equipData = sceneGame.saveDataManager.Equip;
+                stashData = sceneGame.saveDataManager.Stash;
             }
-            uIWindowEquip = 
+            uiWindowEquip = 
                 sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowEquip>(UIWindowManager.WindowUid
                     .Equip);
             uiWindowPlayerInfo = 
                 sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowPlayerInfo>(UIWindowManager.WindowUid
                     .PlayerInfo);
-            uIWindowItemInfo = 
+            uiWindowItemInfo = 
                 sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemInfo>(UIWindowManager.WindowUid
                     .ItemInfo);
             uiWindowItemSplit =
@@ -64,12 +69,15 @@ namespace GGemCo.Scripts
             uiWindowStash =
                 sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowStash>(UIWindowManager.WindowUid
                     .Stash);
+            uiWindowShopSale =
+                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowShopSale>(UIWindowManager.WindowUid
+                    .ShopSale);
         }
 
         public override bool Show(bool show)
         {
             if (!base.Show(show)) return false;
-            uIWindowEquip?.Show(show);
+            uiWindowEquip?.Show(show);
             uiWindowPlayerInfo?.Show(show);
             return true;
         }
@@ -78,7 +86,7 @@ namespace GGemCo.Scripts
             if (sceneGame == null || TableLoaderManager.Instance == null) return;
             if (!show)
             {
-                uIWindowItemInfo?.Show(false);
+                uiWindowItemInfo?.Show(false);
                 return;
             }
             LoadIcons();
@@ -185,14 +193,17 @@ namespace GGemCo.Scripts
             {
                 switch (droppedWindowUid)
                 {
+                    case UIWindowManager.WindowUid.Stash:
+                        sceneGame.uIWindowManager.MoveIcon(UIWindowManager.WindowUid.Stash, dropIconSlotIndex, UIWindowManager.WindowUid.Inventory, dropIconCount);
+                        break;
                     case UIWindowManager.WindowUid.Equip:
                         // 같은 uid 아이템인지 확인
                         if (droppedUIIcon.uid == targetUIIcon.uid || targetUIIcon.uid <= 0)
                         {
-                            var result = equipData.MinusItem(dropIconSlotIndex, dropIconUid, 1);
+                            var result = equipData.MinusItem(dropIconSlotIndex, dropIconUid, dropIconCount);
                             droppedWindow.SetIcons(result);
                             
-                            result = inventoryData.AddItem(targetIconSlotIndex, dropIconUid, 1);
+                            result = inventoryData.AddItem(targetIconSlotIndex, dropIconUid, dropIconCount);
                             targetWindow.SetIcons(result);
                         }
                         else if (droppedUIIcon.GetPartsType() == targetUIIcon.GetPartsType())
@@ -286,15 +297,29 @@ namespace GGemCo.Scripts
         public override void OnRightClick(UIIcon icon)
         {
             if (icon == null) return;
+            // 상점 판매창이 열려있으면
+            if (uiWindowShopSale.IsOpen())
+            {
+                if (icon.IsAntiFlag(ItemConstants.AntiFlag.ShopSale))
+                {
+                    sceneGame.systemMessageManager.ShowMessageWarning("판매할 수 없는 아이템 입니다.");
+                    return;
+                }
+                sceneGame.uIWindowManager.RegisterIcon(uid, icon.slotIndex, UIWindowManager.WindowUid.ShopSale, icon.GetCount());
+            }
             // 창고가 열려 있으면 창고로 이동
-            if (uiWindowStash.IsOpen())
+            else if (uiWindowStash.IsOpen())
             {
                 if (icon.IsAntiFlag(ItemConstants.AntiFlag.Stash))
                 {
                     sceneGame.systemMessageManager.ShowMessageWarning("보관할 수 없는 아이템 입니다.");
                     return;
                 }
-                
+                // int iconUid = icon.uid;
+                // int iconCount = icon.GetCount();
+                // uiWindowStash.SetIconCount(iconUid, iconCount);
+                // DetachIcon(icon.slotIndex);
+                sceneGame.uIWindowManager.MoveIcon(uid, icon.slotIndex, UIWindowManager.WindowUid.Stash, icon.GetCount());
             }
             else
             {
@@ -391,10 +416,10 @@ namespace GGemCo.Scripts
         /// <param name="icon"></param>
         public override void ShowItemInfo(UIIcon icon)
         {
-            uIWindowItemInfo.SetItemUid(icon.uid);
-            RectTransform itemInfoRect = uIWindowItemInfo.GetComponent<RectTransform>();
+            uiWindowItemInfo.SetItemUid(icon.uid);
+            RectTransform itemInfoRect = uiWindowItemInfo.GetComponent<RectTransform>();
             itemInfoRect.pivot = new Vector2(1f, 1f);
-            uIWindowItemInfo.transform.position =
+            uiWindowItemInfo.transform.position =
                 new Vector3(icon.transform.position.x - slotSize.x / 2f,
                     icon.transform.position.y + slotSize.y / 2f, 0);
 

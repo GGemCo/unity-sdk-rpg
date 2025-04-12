@@ -26,7 +26,8 @@ namespace GGemCo.Scripts
             Dialogue,
             Shop,
             ItemBuy,
-            Stash
+            Stash,
+            ShopSale
         }
         [Header("기본속성")]
         [Tooltip("윈도우 리스트")]
@@ -169,6 +170,91 @@ namespace GGemCo.Scripts
             else
             {
                 toWindow.SetIconCount(itemUid, toCount);    
+            }
+        }
+        /// <summary>
+        /// 등록 해제하기
+        /// </summary>
+        /// <param name="fromWindowUid"></param>
+        /// <param name="fromIndex"></param>
+        /// <param name="toWindowUid"></param>
+        public void UnRegisterIcon(WindowUid fromWindowUid, int fromIndex, WindowUid toWindowUid)
+        {
+            UIWindow fromWindow = GetUIWindowByUid<UIWindow>(fromWindowUid);
+            UIWindow toWindow = GetUIWindowByUid<UIWindow>(toWindowUid);
+            if (fromWindow == null || toWindow == null)
+            {
+                GcLogger.LogError("from window 또는 to window 값이 잘 못 되었습니다. from window:"+fromWindowUid+"/to window:"+toWindowUid);
+                return;
+            }
+            UIIcon fromIcon = fromWindow.GetIconByIndex(fromIndex);
+            if (fromIcon == null)
+            {
+                GcLogger.LogError("from Icon 또는 to Icon 값이 잘 못 되었습니다. from Index:"+fromIndex);
+                return;
+            }
+            var info = fromIcon.GetParentInfo();
+            WindowUid parentWindowUid = info.Item1;
+            int parentIconIndex = info.Item2;
+            UIWindow parent = GetUIWindowByUid<UIWindow>(parentWindowUid);
+            var parentIcon = parent.GetIconByIndex(parentIconIndex);
+            if (parentIcon != null)
+            {
+                parentIcon.SetIconLock(false);
+            }
+            
+            fromWindow.DetachIcon(fromIndex);
+            
+        }
+        /// <summary>
+        /// 아이콘 등록하기
+        /// </summary>
+        /// <param name="fromWindowUid"></param>
+        /// <param name="fromIndex"></param>
+        /// <param name="toWindowUid"></param>
+        /// <param name="toCount"></param>
+        /// <param name="toIndex"></param>
+        public void RegisterIcon(WindowUid fromWindowUid, int fromIndex, WindowUid toWindowUid, int toCount, int toIndex = -1)
+        {
+            UIWindow fromWindow = GetUIWindowByUid<UIWindow>(fromWindowUid);
+            UIWindow toWindow = GetUIWindowByUid<UIWindow>(toWindowUid);
+            if (fromWindow == null || toWindow == null)
+            {
+                GcLogger.LogError("from window 또는 to window 값이 잘 못 되었습니다. from window:"+fromWindowUid+"/to window:"+toWindowUid);
+                return;
+            }
+            UIIcon fromIcon = fromWindow.GetIconByIndex(fromIndex);
+            if (fromIcon == null)
+            {
+                GcLogger.LogError("from Icon 또는 to Icon 값이 잘 못 되었습니다. from Index:"+fromIndex);
+                return;
+            }
+
+            fromIcon.SetIconLock(true);
+            int itemUid = fromIcon.uid;
+            // fromWindow.SetIconCount(fromIndex, fromIcon.uid, fromIcon.GetCount() - toCount);
+            
+            if (toIndex >= 0)
+            {
+                // 그 위치에 아이콘이 있으면 되돌려준다
+                var icon = toWindow.GetIconByIndex(toIndex);
+                if (icon != null && icon.uid > 0 && icon.GetCount() > 0)
+                {
+                    fromWindow.SetIconCount(icon.uid, icon.GetCount());
+                }
+                UIIcon uiIcon = toWindow.SetIconCountReturnIcon(toIndex, itemUid, toCount);
+                if (uiIcon != null)
+                {
+                    uiIcon.SetParentInfo(fromWindowUid, fromIndex);
+                }
+            }
+            else
+            {
+                UIIcon uiIcon = toWindow.SetIconCountReturnIcon(itemUid, toCount);
+                if (uiIcon != null)
+                {
+                    uiIcon.SetParentInfo(fromWindowUid, fromIndex);
+                }
             }
         }
         /// <summary>

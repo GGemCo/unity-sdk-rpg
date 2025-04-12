@@ -20,6 +20,7 @@ namespace GGemCo.Scripts
         private SceneGame sceneGame;
         private InteractionManager interactionManager;
         private UIWindowShop uiWindowShop;
+        private UIWindowShopSale uiWindowShopSale;
         private UIWindowStash uiWindowStash;
         
         protected override void Awake()
@@ -38,6 +39,8 @@ namespace GGemCo.Scripts
                 sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowShop>(UIWindowManager.WindowUid.Shop);
             uiWindowStash =
                 sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowStash>(UIWindowManager.WindowUid.Stash);
+            uiWindowShopSale =
+                sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowShopSale>(UIWindowManager.WindowUid.ShopSale);
         }
 
         /// <summary>
@@ -128,6 +131,10 @@ namespace GGemCo.Scripts
             else if (interactionType == InteractionConstants.Type.Stash)
             {
                 uiWindowStash?.Show(true);
+            }
+            else if (interactionType == InteractionConstants.Type.ShopSale)
+            {
+                uiWindowShopSale?.Show(true);
             }
             interactionManager.SetCurrentType(interactionType);
 

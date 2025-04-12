@@ -29,6 +29,7 @@ namespace GGemCo.Scripts
         public SkillData Skill { get; private set; }
         public QuickSlotData QuickSlot { get; private set; }
         public StashData Stash { get; private set; }
+        public ShopSaleData ShopSale { get; private set; }
 
         private TableLoaderManager tableLoaderManager;
         private SlotMetaDatController slotMetaDatController;
@@ -93,6 +94,7 @@ namespace GGemCo.Scripts
             Skill = new SkillData();
             QuickSlot = new QuickSlotData();
             Stash = new StashData();
+            ShopSale = new ShopSaleData();
 
             currentSaveSlot = PlayerPrefsManager.LoadSaveDataSlotIndex();
             
@@ -107,6 +109,7 @@ namespace GGemCo.Scripts
             Skill.Initialize(tableLoaderManager, saveDataContainer);
             QuickSlot.Initialize(tableLoaderManager, saveDataContainer);
             Stash.Initialize(tableLoaderManager, saveDataContainer);
+            ShopSale.Initialize(tableLoaderManager, saveDataContainer);
         }
         private void Start()
         {

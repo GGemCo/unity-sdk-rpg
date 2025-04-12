@@ -24,6 +24,8 @@ namespace GGemCo.Scripts
         public TextMeshProUGUI textAntiFlag;
         [Tooltip("아이템 설명")]
         public TextMeshProUGUI textDescription;
+        [Tooltip("아이템 판매가")]
+        public TextMeshProUGUI textSalePrice;
         
         [Header("메인옵션")]
         [Tooltip("옵션 이름")]
@@ -71,9 +73,17 @@ namespace GGemCo.Scripts
             SetAntiFlag();
             SetCategory();
             SetDescription();
+            SetSalePrice();
             SetStatusOptions();
             SetCategoryUI();
             Show(true);
+        }
+
+        private void SetSalePrice()
+        {
+            if (currentStruckTableItem == null) return;
+            textSalePrice.text =
+                $"상점 판매가: {CurrencyConstants.GetNameByCurrencyType(currentStruckTableItem.SaleCurrencyType)} {currentStruckTableItem.SaleCurrencyValue}";
         }
 
         private void SetDescription()
