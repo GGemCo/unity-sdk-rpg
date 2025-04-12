@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace GGemCo.Scripts
 {
@@ -9,19 +8,16 @@ namespace GGemCo.Scripts
     /// </summary>
     public class UIWindowShop : UIWindow
     {
-        [Tooltip("아이템 정보 윈도우")]
-        public UIWindowItemInfo uIWindowItemInfo;
-        [Tooltip("인벤토리 윈도우")]
-        public UIWindowInventory uIWindowInventory;
-        [Tooltip("구매하기 윈도우")]
-        public UIWindowItemBuy uIWindowItemBuy;
         [Tooltip("샵 element 프리팹")]
         public GameObject prefabUIElementShop;
         
         private TableShop tableShop;
         private readonly Dictionary<int, UIElementShop> uiElementShops = new Dictionary<int, UIElementShop>();
-
         private int currentShopUid;
+        
+        private SceneGame sceneGame;
+        private UIWindowItemInfo uIWindowItemInfo;
+        private UIWindowInventory uIWindowInventory;
         
         protected override void Awake()
         {
@@ -36,9 +32,16 @@ namespace GGemCo.Scripts
         protected override void Start()
         {
             base.Start();
+            sceneGame = SceneGame.Instance;
+            uIWindowItemInfo = 
+                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemInfo>(UIWindowManager.WindowUid
+                    .ItemInfo);
+            uIWindowInventory = 
+                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
+                    .Inventory);
         }
         /// <summary>
-        /// skill 테이블을 읽어서 개수만큼 풀을 확장하여 추가 생성.
+        /// 상점 uid 로 ui element shop 정보 셋팅하기
         /// </summary>
         public void SetInfoByShopUid(int shopUid)
         {

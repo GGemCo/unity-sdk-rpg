@@ -16,11 +16,26 @@ namespace GGemCo.Scripts
         public Button buttonBuy;
         
         private UIWindowShop uiWindowShop;
+        private UIWindowItemBuy uIWindowItemBuy;
+        private UIWindowItemInfo uIWindowItemInfo;
+        private SceneGame sceneGame;
+        
         private StruckTableShop struckTableShop;
         private TableItem tableItem;
         private PlayerData playerData;
         private int slotIndex;
-        
+
+        private void Start()
+        {
+            sceneGame = SceneGame.Instance;
+            uIWindowItemBuy  = 
+                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemBuy>(UIWindowManager.WindowUid
+                    .ItemBuy);
+            uIWindowItemInfo  = 
+                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemInfo>(UIWindowManager.WindowUid
+                    .ItemInfo);
+        }
+
         /// <summary>
         /// 초기화
         /// </summary>
@@ -87,8 +102,8 @@ namespace GGemCo.Scripts
                     count = info.MaxOverlayCount;
                 }
                 
-                uiWindowShop.uIWindowItemBuy?.CopyIconCount(0, slotIndex, struckTableShop.ItemUid, count);
-                uiWindowShop.uIWindowItemBuy?.SetPriceInfo(struckTableShop);
+                uIWindowItemBuy?.CopyIconCount(0, slotIndex, struckTableShop.ItemUid, count);
+                uIWindowItemBuy?.SetPriceInfo(struckTableShop);
             }
             // 한번에 하나만 살 수 있는지
                 // 골드가 충분하지 체크
@@ -101,10 +116,10 @@ namespace GGemCo.Scripts
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            uiWindowShop.uIWindowItemInfo.SetItemUid(struckTableShop.ItemUid);
-            RectTransform itemInfoRect = uiWindowShop.uIWindowItemInfo.GetComponent<RectTransform>();
+            uIWindowItemInfo.SetItemUid(struckTableShop.ItemUid);
+            RectTransform itemInfoRect = uIWindowItemInfo.GetComponent<RectTransform>();
             itemInfoRect.pivot = new Vector2(0, 1f);
-            uiWindowShop.uIWindowItemInfo.transform.position =
+            uIWindowItemInfo.transform.position =
                 new Vector3(transform.position.x + uiWindowShop.containerIcon.cellSize.x / 2f,
                     transform.position.y + uiWindowShop.containerIcon.cellSize.y / 2f, 0);
             // 화면 밖 체크 & 보정
@@ -113,7 +128,7 @@ namespace GGemCo.Scripts
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            uiWindowShop.uIWindowItemInfo.Show(false);
+            uIWindowItemInfo.Show(false);
         }
 
         public Vector3 GetIconPosition() => iconPosition;
