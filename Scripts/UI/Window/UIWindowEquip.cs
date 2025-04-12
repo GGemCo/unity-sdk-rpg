@@ -10,13 +10,12 @@ namespace GGemCo.Scripts
     {
         // 미리 만들어놓은 slot 이 있을 경우
         public GameObject[] preLoadSlots;
-        [Header("아이템 정보 윈도우")]
-        public UIWindowItemInfo uIWindowItemInfo;
         
         private TableItem tableItem;
         private InventoryData inventoryData;
         private EquipData equipData;
         private SceneGame sceneGame;
+        private UIWindowItemInfo uIWindowItemInfo;
         
         protected override void Awake()
         {
@@ -35,6 +34,9 @@ namespace GGemCo.Scripts
                 equipData = sceneGame.saveDataManager.Equip;
                 inventoryData = sceneGame.saveDataManager.Inventory;
             }
+            uIWindowItemInfo =
+                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemInfo>(UIWindowManager.WindowUid
+                    .ItemInfo);
         }
         public override void OnShow(bool show)
         {
