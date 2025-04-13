@@ -43,7 +43,7 @@ namespace GGemCo.Scripts
         
         // 서브 매니저
         // 아이콘 생성 관리
-        private IconPoolManager iconPool;
+        private IconPoolManager iconPoolManager;
         // 아이콘 드래그 관리
         protected IconDragDropHandler DragDropHandler;
 
@@ -64,13 +64,13 @@ namespace GGemCo.Scripts
             }
 
             // 기능 위임 객체 생성
-            iconPool = new IconPoolManager(this);
+            iconPoolManager = new IconPoolManager(this);
             // 커스텀 전략 설정 지점
             var strategy = GetSlotIconBuildStrategy();
             if (strategy != null)
-                iconPool.SetBuildStrategy(strategy);
+                iconPoolManager.SetBuildStrategy(strategy);
 
-            iconPool.Initialize();
+            iconPoolManager.Initialize();
             
             DragDropHandler = new IconDragDropHandler(this);
         }
@@ -91,8 +91,8 @@ namespace GGemCo.Scripts
 
         protected void SetSetIconHandler(ISetIconHandler handler)
         {
-            if (iconPool != null)
-                iconPool.SetSetIconHandler(handler);
+            if (iconPoolManager != null)
+                iconPoolManager.SetSetIconHandler(handler);
         }
         protected virtual void Start()
         {
@@ -109,11 +109,11 @@ namespace GGemCo.Scripts
         /// <param name="slotIndex"></param>
         public void DetachIcon(int slotIndex)
         {
-            iconPool.DetachIcon(slotIndex);
+            iconPoolManager.DetachIcon(slotIndex);
         }
-        public UIIcon GetIconByIndex(int index) => iconPool.GetIcon(index);
-        public UIIcon GetIconByUid(int windowUid) => iconPool.GetIconByUid(windowUid);
-        public UIIcon SetIconCount(int slotIndex, int windowUid, int count, int level = 0, bool learn = false) => iconPool.SetIcon(slotIndex, windowUid, count, level, learn);
+        public UIIcon GetIconByIndex(int index) => iconPoolManager.GetIcon(index);
+        public UIIcon GetIconByUid(int windowUid) => iconPoolManager.GetIconByUid(windowUid);
+        public UIIcon SetIconCount(int slotIndex, int windowUid, int count, int level = 0, bool learn = false) => iconPoolManager.SetIcon(slotIndex, windowUid, count, level, learn);
 
         /// <summary>
         /// 빈 슬롯 찾기
@@ -174,10 +174,6 @@ namespace GGemCo.Scripts
                 SetIconCount(icon.SlotIndex, icon.Uid, icon.Count, icon.Level, icon.IsLearned);
             }
         }
-        public virtual void OnClickIcon(UIIcon icon)
-        {
-        
-        }
         public void OnDrop(PointerEventData eventData)
         {
         }
@@ -202,15 +198,6 @@ namespace GGemCo.Scripts
         {
             // GcLogger.Log("OnEndDragInIcon");
             DragDropHandler?.HandleDragOut(eventData, droppedIcon, targetIcon, originalPosition);
-        }
-        /// <summary>
-        /// 아이콘 등급 이미지 path 가져오기
-        /// </summary>
-        /// <param name="valueGrade"></param>
-        /// <returns></returns>
-        public static string GetIconGradePath(IconConstants.Grade valueGrade)
-        {
-            return $"Images/UI/{IconConstants.IconGradeImagePath[valueGrade]}";
         }
         /// <summary>
         /// window 테이블에 있는 OpenWindowUid, CloseWindowUid 컬럼 처리
@@ -289,20 +276,6 @@ namespace GGemCo.Scripts
             }
         }
         /// <summary>
-        /// 아이콘 원래 자리로 이동시키기
-        /// </summary>
-        /// <param name="droppedIcon"></param>
-        protected void GoBackToSlot(GameObject droppedIcon)
-        {
-            if (droppedIcon == null) return;
-            UIIcon icon = droppedIcon.GetComponent<UIIcon>();
-            if (icon == null) return;
-            GameObject targetSlot = icon.window.slots[icon.slotIndex];
-            droppedIcon.transform.SetParent(targetSlot.transform);
-            droppedIcon.transform.position = icon.GetDragOriginalPosition();
-            droppedIcon.transform.SetSiblingIndex(1);
-        }
-        /// <summary>
         /// 각 윈도우에 table 정보 연결하기
         /// </summary>
         /// <param name="pstruckTableWindow"></param>
@@ -323,20 +296,10 @@ namespace GGemCo.Scripts
             selectedIcon = icon.GetComponent<UIIcon>();
             selectedIcon.SetSelected(true);
         }
-
-        protected UIIcon GetSelectedIcon()
-        {
-            return selectedIcon;
-        }
         public virtual void OnRightClick(UIIcon icon)
         {
             
         }
-        public virtual void CopyIconCount(int toIndex, int fromIndex, int fromItemUid, int fromItemCount)
-        {
-            
-        }
-
         public bool GetDefaultActive()
         {
             return struckTableWindow.DefaultActive;
@@ -350,10 +313,15 @@ namespace GGemCo.Scripts
         public virtual void ShowItemInfo(UIIcon icon)
         {
         }
-
-        public virtual UIElementSkill GetElementSkillByIndex(int slotIndex)
+        /// <summary>
+        /// 모든 아이콘 Un Register 처리 하기
+        /// </summary>
+        /// <param name="fromWindowUid"></param>
+        /// <param name="toWindowUid"></param>
+        protected void UnRegisterAllIcons(UIWindowManager.WindowUid fromWindowUid, UIWindowManager.WindowUid toWindowUid)
         {
-            return null;
+            if (iconPoolManager == null) return;
+            iconPoolManager.UnRegisterAllIcons(fromWindowUid, toWindowUid);
         }
     }
 }

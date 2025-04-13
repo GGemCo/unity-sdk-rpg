@@ -11,6 +11,7 @@ namespace GGemCo.Scripts
     public class UIElementShop : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         public Vector3 iconPosition;
+        public Image imageIcon;
         public TextMeshProUGUI textName;
         public TextMeshProUGUI textPrice;
         public Button buttonBuy;
@@ -66,14 +67,22 @@ namespace GGemCo.Scripts
             struckTableShop = pstruckTableShop;
             if (struckTableShop == null)
             {
-                GcLogger.LogError($"item 테이블에 정보가 없습니다. struckTableItem is null");
+                GcLogger.LogError($"shop 테이블에 정보가 없습니다. struckTableItem is null");
+                return;
+            }
+            var info = tableItem.GetDataByUid(struckTableShop.ItemUid);
+            if (info == null)
+            {
+                GcLogger.LogError($"item 테이블에 정보가 없습니다. item uid: {struckTableShop.ItemUid}");
                 return;
             }
 
+            if (imageIcon != null)
+            {
+                imageIcon.sprite = Resources.Load<Sprite>($"{info.ImagePath}");
+            }
             if (textName != null)
             {
-                var info = tableItem.GetDataByUid(struckTableShop.ItemUid);
-                if (info == null) return;
                 textName.text = info.Name;
             }
             if (textPrice != null) textPrice.text = $"{struckTableShop.CurrencyType} {struckTableShop.CurrencyValue}";
@@ -102,11 +111,11 @@ namespace GGemCo.Scripts
                     count = info.MaxOverlayCount;
                 }
                 
-                uIWindowItemBuy?.CopyIconCount(0, slotIndex, struckTableShop.ItemUid, count);
                 uIWindowItemBuy?.SetPriceInfo(struckTableShop);
+                SceneGame.Instance.uIWindowManager.RegisterIcon(uiWindowShop.uid, slotIndex, UIWindowManager.WindowUid.ItemBuy, count);
             }
             // 한번에 하나만 살 수 있는지
-                // 골드가 충분하지 체크
+            // 골드가 충분하지 체크
             else
             {
                 SceneGame.Instance.BuyItem(struckTableShop.ItemUid, struckTableShop.CurrencyType,

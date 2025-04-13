@@ -105,6 +105,7 @@ namespace GGemCo.Scripts
                 uiIcon.ChangeInfoByUid(info.ItemUid, 1);
                 // element 에서 마우스 이벤트 처리
                 uiIcon.SetRaycastTarget(false);
+                uiIcon.RemoveLockImage();
                 
                 icons[index] = icon;
                 index++;

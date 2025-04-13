@@ -122,5 +122,19 @@ namespace GGemCo.Scripts
             setIconHandler?.OnSetIcon(window, slotIndex, uid, count, level, learn);
             return uiIcon;
         }
+        /// <summary>
+        /// 모든 icon Un Register 처리 하기
+        /// </summary>
+        /// <param name="fromWindowUid"></param>
+        /// <param name="toWindowUid"></param>
+        public void UnRegisterAllIcons(UIWindowManager.WindowUid fromWindowUid, UIWindowManager.WindowUid toWindowUid)
+        {
+            foreach (var icon in window.icons)
+            {
+                UIIcon uiIcon = icon.GetComponent<UIIcon>();
+                if (uiIcon == null || uiIcon.uid <= 0 || uiIcon.GetCount() <= 0) continue;
+                SceneGame.Instance.uIWindowManager.UnRegisterIcon(fromWindowUid, uiIcon.slotIndex, toWindowUid);
+            }
+        }
     }
 }

@@ -413,5 +413,12 @@ namespace GGemCo.Scripts
         {
             return 0;
         }
+        /// <summary>
+        /// lock 이미지를 사용안하도록 삭제처리 하기
+        /// </summary>
+        public void RemoveLockImage()
+        {
+            imageLock = null;
+        }
     }
 }

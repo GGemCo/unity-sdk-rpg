@@ -14,6 +14,8 @@ namespace GGemCo.Scripts
         public TextMeshProUGUI textItemName;
         [Tooltip("아이템 개수")]
         public TextMeshProUGUI textItemCount;
+        [Tooltip("최종 금액")]
+        public TextMeshProUGUI textTotalPrice;
         [Tooltip("나누기 슬라이드")]
         public Slider sliderSplit;
         [Tooltip("구매하기 버튼")]
@@ -31,7 +33,7 @@ namespace GGemCo.Scripts
         private int buyItemIndex;
         // 판매하는 아이템의 shop 테이블 정보
         private StruckTableShop struckTableShop;
-        private PlayerData playerData;
+        
         protected override void Awake()
         {
             uid = UIWindowManager.WindowUid.ItemBuy;
@@ -42,22 +44,10 @@ namespace GGemCo.Scripts
             
             SetSetIconHandler(new SetIconHandlerItemBuy());
         }
-
-        protected override void Start()
-        {
-            base.Start();
-            playerData = SceneGame.Instance.saveDataManager.Player;
-        }
-        public override void CopyIconCount(int toIndex, int fromIndex, int fromItemUid, int fromItemCount)
-        {
-            buyItemIndex = fromIndex;
-            SetIconCount(0, fromItemUid, fromItemCount);
-        }
         public void UpdateInfo(int iconUid, int iconCount)
         {
             var info = TableLoaderManager.Instance.TableItem.GetDataByUid(iconUid);
             if (info == null) return;
-            itemUid = iconUid;
             textItemName.text = info.Name;
             textItemCount.text = $"{iconCount / iconCount}";
             maxItemCount = iconCount;
@@ -76,6 +66,11 @@ namespace GGemCo.Scripts
                 sliderSplit.value = (float)buyItemCount / maxItemCount;
             }
             textItemCount.text = $"{buyItemCount} / {maxItemCount}";
+            textTotalPrice.text = "0";
+            if (struckTableShop != null)
+            {
+                textTotalPrice.text = $"{CurrencyConstants.GetNameByCurrencyType(struckTableShop.CurrencyType)} {struckTableShop.CurrencyValue * buyItemCount}";
+            }
         }
         /// <summary>
         /// 아이템 나누기
@@ -100,6 +95,15 @@ namespace GGemCo.Scripts
         public void SetPriceInfo(StruckTableShop pstruckTableShop)
         {
             struckTableShop = pstruckTableShop;
+        }
+        /// <summary>
+        /// 창 닫힐때 register 됬던 아이콘 정보 지워주기
+        /// </summary>
+        /// <param name="show"></param>
+        public override void OnShow(bool show)
+        {
+            if (show) return;
+            UnRegisterAllIcons(uid, UIWindowManager.WindowUid.Inventory);
         }
     }
 }

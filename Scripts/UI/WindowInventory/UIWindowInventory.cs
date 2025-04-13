@@ -195,7 +195,6 @@ namespace GGemCo.Scripts
                     icon.CheckStatusAffect();
                 }
             }
-
         }
         /// <summary>
         /// index 가 없을때는, 같은 uid 는 중첩 가능여부를 확인하고 합치고, 나머지는 추가
@@ -229,7 +228,7 @@ namespace GGemCo.Scripts
                 }
                 // 팝업창 띄우기
                 if (uiWindowItemSplit == null) return;
-                uiWindowItemSplit.CopyIconCount(0, icon.slotIndex, icon.uid, icon.GetCount());
+                SceneGame.Instance.uIWindowManager.RegisterIcon(uid, icon.slotIndex, UIWindowManager.WindowUid.ItemSplit, icon.GetCount());
             }
         }
         /// <summary>

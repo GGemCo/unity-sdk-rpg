@@ -27,8 +27,6 @@ namespace GGemCo.Scripts
         private int itemUid;
         // 나눌려고 하는 아이템 개수
         private int splitItemCount;
-        // 나눌려고 하는 아이템의 인벤토리 slot index
-        private int splitItemIndex;
         
         private UIWindowInventory uiWindowInventory;
         protected override void Awake()
@@ -48,19 +46,11 @@ namespace GGemCo.Scripts
                 SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
                     .Inventory);
         }
-
         /// <summary>
-        /// 나누기할 아이템 설정하기
+        /// Set Icon 되었을때 정보 업데이트 해주기
         /// </summary>
-        /// <param name="toIndex"></param>
-        /// <param name="fromIndex"></param>
-        /// <param name="fromItemUid"></param>
-        /// <param name="fromItemCount"></param>
-        public override void CopyIconCount(int toIndex, int fromIndex, int fromItemUid, int fromItemCount)
-        {
-            splitItemIndex = fromIndex;
-            SetIconCount(0, fromItemUid, fromItemCount);
-        }
+        /// <param name="iconUid"></param>
+        /// <param name="iconCount"></param>
         public void UpdateInfo(int iconUid, int iconCount)
         {
             var info = TableLoaderManager.Instance.TableItem.GetDataByUid(iconUid);
@@ -91,7 +81,15 @@ namespace GGemCo.Scripts
         private void OnClickConfirm()
         {
             if (uiWindowInventory == null) return;
-            // 빈공 간 확인
+            var icon = GetIconByIndex(0);
+            if (icon == null) return;
+            var infoParent = icon.GetParentInfo();
+            if (infoParent.Item1 == UIWindowManager.WindowUid.None)
+            {
+                GcLogger.LogError("부모 아이콘 정보가 없습니다.");
+                return;
+            }
+            int splitItemIndex = infoParent.Item2;
             ResultCommon result = SceneGame.Instance.saveDataManager.Inventory.SplitItem(splitItemIndex, itemUid, maxItemCount, splitItemCount);
             uiWindowInventory.SetIcons(result);
             Show(false);
@@ -100,6 +98,15 @@ namespace GGemCo.Scripts
         private void OnClickCancel()
         {
             Show(false);
+        }
+        /// <summary>
+        /// 창 닫힐때 register 됬던 아이콘 정보 지워주기
+        /// </summary>
+        /// <param name="show"></param>
+        public override void OnShow(bool show)
+        {
+            if (show) return;
+            UnRegisterAllIcons(uid, UIWindowManager.WindowUid.Inventory);
         }
     }
 }

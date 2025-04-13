@@ -146,15 +146,8 @@ namespace GGemCo.Scripts
         public override void OnShow(bool show)
         {
             if (SceneGame == null || TableLoaderManager.Instance == null) return;
-            if (!show)
-            {
-                foreach (var icon in icons)
-                {
-                    UIIcon uiIcon = icon.GetComponent<UIIcon>();
-                    if (uiIcon == null || uiIcon.uid <= 0 || uiIcon.GetCount() <= 0) continue;
-                    SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ShopSale, uiIcon.slotIndex, UIWindowManager.WindowUid.Inventory);
-                }
-            }
+            if (show) return;
+            UnRegisterAllIcons(uid, UIWindowManager.WindowUid.Inventory);
         }
     }
 }
