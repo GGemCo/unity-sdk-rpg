@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -62,7 +63,7 @@ namespace GGemCo.Scripts
             };
         }
 
-        public void SetItemUid(int itemUid)
+        public void SetItemUid(int itemUid, Vector2 pivot, Vector2 position)
         {
             if (itemUid <= 0) return;
             currentStruckTableItem = tableItem.GetDataByUid(itemUid);
@@ -77,6 +78,7 @@ namespace GGemCo.Scripts
             SetStatusOptions();
             SetCategoryUI();
             Show(true);
+            SetPosition(pivot, position);
         }
 
         private void SetSalePrice()
@@ -263,6 +265,30 @@ namespace GGemCo.Scripts
 
         private void SetDefaultUI()
         {
+        }
+        /// <summary>
+        /// 위치 보정하기
+        /// </summary>
+        /// <param name="pivot"></param>
+        /// <param name="position"></param>
+        private void SetPosition(Vector2 pivot, Vector2 position)
+        {
+            RectTransform itemInfoRect = GetComponent<RectTransform>();
+            itemInfoRect.pivot = pivot;
+            transform.position = position;
+
+            // 화면 밖 체크 & 보정
+            StartCoroutine(DelayClampToScreen(itemInfoRect));
+        }
+        /// <summary>
+        /// 위치 보정 코루틴
+        /// </summary>
+        /// <param name="rectTransform"></param>
+        /// <returns></returns>
+        private IEnumerator DelayClampToScreen(RectTransform rectTransform)
+        {
+            yield return null; // 한 프레임 대기
+            MathHelper.ClampToScreen(rectTransform);
         }
     }
 }

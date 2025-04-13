@@ -82,15 +82,10 @@ namespace GGemCo.Scripts
         /// <param name="icon"></param>
         public override void ShowItemInfo(UIIcon icon)
         {
-            uiWindowItemInfo.SetItemUid(icon.uid);
             RectTransform itemInfoRect = uiWindowItemInfo.GetComponent<RectTransform>();
-            itemInfoRect.pivot = new Vector2(1f, 1f);
-            uiWindowItemInfo.transform.position =
-                new Vector3(icon.transform.position.x + itemInfoRect.sizeDelta.x + slotSize.x / 2f,
-                    icon.transform.position.y + slotSize.y / 2f, 0);
-
-            // 화면 밖 체크 & 보정
-            MathHelper.ClampToScreen(itemInfoRect);
+            uiWindowItemInfo.SetItemUid(icon.uid, new Vector2(1f, 1f), new Vector2(
+                icon.transform.position.x + itemInfoRect.sizeDelta.x + slotSize.x / 2f,
+                icon.transform.position.y + slotSize.y / 2f));
         }
         /// <summary>
         /// 아이템 팔기

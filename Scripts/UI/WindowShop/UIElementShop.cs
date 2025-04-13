@@ -116,14 +116,9 @@ namespace GGemCo.Scripts
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            uIWindowItemInfo.SetItemUid(struckTableShop.ItemUid);
-            RectTransform itemInfoRect = uIWindowItemInfo.GetComponent<RectTransform>();
-            itemInfoRect.pivot = new Vector2(0, 1f);
-            uIWindowItemInfo.transform.position =
-                new Vector3(transform.position.x + uiWindowShop.containerIcon.cellSize.x / 2f,
-                    transform.position.y + uiWindowShop.containerIcon.cellSize.y / 2f, 0);
-            // 화면 밖 체크 & 보정
-            MathHelper.ClampToScreen(itemInfoRect);
+            uIWindowItemInfo.SetItemUid(struckTableShop.ItemUid, new Vector2(0, 1f), new Vector2(
+                transform.position.x + uiWindowShop.containerIcon.cellSize.x / 2f,
+                transform.position.y + uiWindowShop.containerIcon.cellSize.y / 2f));
         }
 
         public void OnPointerExit(PointerEventData eventData)
