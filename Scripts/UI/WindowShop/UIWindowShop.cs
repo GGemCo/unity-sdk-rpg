@@ -18,7 +18,7 @@ namespace GGemCo.Scripts
         protected override void Awake()
         {
             uiElementShops.Clear();
-            uid = UIWindowManager.WindowUid.Skill;
+            uid = UIWindowManager.WindowUid.Shop;
             if (TableLoaderManager.Instance == null) return;
             tableShop = TableLoaderManager.Instance.TableShop;
             base.Awake();
