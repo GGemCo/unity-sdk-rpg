@@ -17,7 +17,6 @@ namespace GGemCo.Scripts
         private TableItem tableItem;
         private Camera mainCamera;
         
-        private SceneGame sceneGame;
         private ItemManager itemManager;
         private PopupManager popupManager;
         
@@ -44,52 +43,41 @@ namespace GGemCo.Scripts
         protected override void Start()
         {
             base.Start();
-            sceneGame = SceneGame.Instance;
-            popupManager = sceneGame.popupManager;
-            mainCamera = sceneGame.mainCamera;
-            itemManager = sceneGame.ItemManager;
-            if (sceneGame != null && sceneGame.saveDataManager != null)
+            popupManager = SceneGame.popupManager;
+            mainCamera = SceneGame.mainCamera;
+            itemManager = SceneGame.ItemManager;
+            if (SceneGame != null && SceneGame.saveDataManager != null)
             {
-                inventoryData = sceneGame.saveDataManager.Inventory;
-                equipData = sceneGame.saveDataManager.Equip;
-                stashData = sceneGame.saveDataManager.Stash;
+                inventoryData = SceneGame.saveDataManager.Inventory;
+                equipData = SceneGame.saveDataManager.Equip;
+                stashData = SceneGame.saveDataManager.Stash;
             }
             uiWindowEquip = 
-                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowEquip>(UIWindowManager.WindowUid
+                SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowEquip>(UIWindowManager.WindowUid
                     .Equip);
             uiWindowPlayerInfo = 
-                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowPlayerInfo>(UIWindowManager.WindowUid
+                SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowPlayerInfo>(UIWindowManager.WindowUid
                     .PlayerInfo);
             uiWindowItemInfo = 
-                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemInfo>(UIWindowManager.WindowUid
+                SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemInfo>(UIWindowManager.WindowUid
                     .ItemInfo);
             uiWindowItemSplit =
-                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemSplit>(UIWindowManager.WindowUid
+                SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemSplit>(UIWindowManager.WindowUid
                     .ItemSplit);
             uiWindowStash =
-                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowStash>(UIWindowManager.WindowUid
+                SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowStash>(UIWindowManager.WindowUid
                     .Stash);
             uiWindowShopSale =
-                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowShopSale>(UIWindowManager.WindowUid
+                SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowShopSale>(UIWindowManager.WindowUid
                     .ShopSale);
-        }
-
-        public override bool Show(bool show)
-        {
-            if (!base.Show(show)) return false;
-            uiWindowEquip?.Show(show);
-            uiWindowPlayerInfo?.Show(show);
-            return true;
         }
         public override void OnShow(bool show)
         {
-            if (sceneGame == null || TableLoaderManager.Instance == null) return;
-            if (!show)
+            if (SceneGame == null || TableLoaderManager.Instance == null) return;
+            if (show)
             {
-                uiWindowItemInfo?.Show(false);
-                return;
+                LoadIcons();
             }
-            LoadIcons();
         }
         /// <summary>
         /// 저장되어있는 아이템 정보로 아이콘 셋팅하기
@@ -98,7 +86,7 @@ namespace GGemCo.Scripts
         public void LoadIcons()
         {
             if (!gameObject.activeSelf) return;
-            var datas = sceneGame.saveDataManager.Inventory.GetAllItemCounts();
+            var datas = SceneGame.saveDataManager.Inventory.GetAllItemCounts();
             if (datas == null) return;
             for (int index = 0; index < maxCountIcon; index++)
             {
@@ -194,7 +182,7 @@ namespace GGemCo.Scripts
                 switch (droppedWindowUid)
                 {
                     case UIWindowManager.WindowUid.Stash:
-                        sceneGame.uIWindowManager.MoveIcon(UIWindowManager.WindowUid.Stash, dropIconSlotIndex, UIWindowManager.WindowUid.Inventory, dropIconCount);
+                        SceneGame.uIWindowManager.MoveIcon(UIWindowManager.WindowUid.Stash, dropIconSlotIndex, UIWindowManager.WindowUid.Inventory, dropIconCount);
                         break;
                     case UIWindowManager.WindowUid.Equip:
                         // 같은 uid 아이템인지 확인
@@ -228,7 +216,7 @@ namespace GGemCo.Scripts
                         else
                         {
                             // 교체가 불가능하면 원래 자리로 되돌리기
-                            sceneGame.systemMessageManager.ShowMessageWarning("해당 부위에 장착할 수 없는 아이템입니다.");
+                            SceneGame.systemMessageManager.ShowMessageWarning("해당 부위에 장착할 수 없는 아이템입니다.");
                             GoBackToSlot(droppedIcon);
                         }
                         break;
@@ -302,24 +290,20 @@ namespace GGemCo.Scripts
             {
                 if (icon.IsAntiFlag(ItemConstants.AntiFlag.ShopSale))
                 {
-                    sceneGame.systemMessageManager.ShowMessageWarning("판매할 수 없는 아이템 입니다.");
+                    SceneGame.systemMessageManager.ShowMessageWarning("판매할 수 없는 아이템 입니다.");
                     return;
                 }
-                sceneGame.uIWindowManager.RegisterIcon(uid, icon.slotIndex, UIWindowManager.WindowUid.ShopSale, icon.GetCount());
+                SceneGame.uIWindowManager.RegisterIcon(uid, icon.slotIndex, UIWindowManager.WindowUid.ShopSale, icon.GetCount());
             }
             // 창고가 열려 있으면 창고로 이동
             else if (uiWindowStash.IsOpen())
             {
                 if (icon.IsAntiFlag(ItemConstants.AntiFlag.Stash))
                 {
-                    sceneGame.systemMessageManager.ShowMessageWarning("보관할 수 없는 아이템 입니다.");
+                    SceneGame.systemMessageManager.ShowMessageWarning("보관할 수 없는 아이템 입니다.");
                     return;
                 }
-                // int iconUid = icon.uid;
-                // int iconCount = icon.GetCount();
-                // uiWindowStash.SetIconCount(iconUid, iconCount);
-                // DetachIcon(icon.slotIndex);
-                sceneGame.uIWindowManager.MoveIcon(uid, icon.slotIndex, UIWindowManager.WindowUid.Stash, icon.GetCount());
+                SceneGame.uIWindowManager.MoveIcon(uid, icon.slotIndex, UIWindowManager.WindowUid.Stash, icon.GetCount());
             }
             else
             {
@@ -327,7 +311,7 @@ namespace GGemCo.Scripts
                 if (icon.IsEquipType())
                 {
                     var partSlotIndex = (int)icon.GetPartsType();
-                    sceneGame.uIWindowManager.MoveIcon(uid, icon.index, UIWindowManager.WindowUid.Equip, 1, partSlotIndex);
+                    SceneGame.uIWindowManager.MoveIcon(uid, icon.index, UIWindowManager.WindowUid.Equip, 1, partSlotIndex);
                 }
                 // 물약 일때
                 else if (icon.IsPotionType())
@@ -344,17 +328,17 @@ namespace GGemCo.Scripts
                         // mp 물약일 때 
                         if (icon.IsMpPotionType())
                         {
-                            if (sceneGame.player.GetComponent<Player>().IsMaxMp())
+                            if (SceneGame.player.GetComponent<Player>().IsMaxMp())
                             {
-                                sceneGame.systemMessageManager.ShowMessageWarning("현재 마력이 가득하여 사용할 수 없습니다.");
+                                SceneGame.systemMessageManager.ShowMessageWarning("현재 마력이 가득하여 사용할 수 없습니다.");
                                 return;
                             }
                         }
                         else
                         {
-                            if (sceneGame.player.GetComponent<Player>().IsMaxHp())
+                            if (SceneGame.player.GetComponent<Player>().IsMaxHp())
                             {
-                                sceneGame.systemMessageManager.ShowMessageWarning("현재 생명력이 가득하여 사용할 수 없습니다.");
+                                SceneGame.systemMessageManager.ShowMessageWarning("현재 생명력이 가득하여 사용할 수 없습니다.");
                                 return;
                             }
                         }
@@ -363,9 +347,9 @@ namespace GGemCo.Scripts
                         if (result is { Code: ResultCommon.Type.Success })
                         {
                             if (icon.IsMpPotionType())
-                                sceneGame.player.GetComponent<Player>().AddMp(icon.GetStatusValue1());
+                                SceneGame.player.GetComponent<Player>().AddMp(icon.GetStatusValue1());
                             else
-                                sceneGame.player.GetComponent<Player>().AddHp(icon.GetStatusValue1());
+                                SceneGame.player.GetComponent<Player>().AddHp(icon.GetStatusValue1());
                             
                         }
                     }

@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace GGemCo.Scripts
 {
     public class InteractionManager
@@ -7,24 +9,15 @@ namespace GGemCo.Scripts
         private TableNpc tableNpc;
         private TableInteraction tableInteraction;
         private UIWindowInteractionDialogue uiWindowInteractionDialogue;
-        private InteractionConstants.Type currentInteractionType;
-        private UIWindowShop uiWindowShop;
-        private UIWindowStash uiWindowStash;
-        private UIWindowShopSale uiWindowShopSale;
+        private CharacterBase currentNpc;
         
         public void Initialize(SceneGame scene)
         {
-            currentInteractionType = InteractionConstants.Type.None;
             sceneGame = scene;
             tableNpc = TableLoaderManager.Instance.TableNpc;
             tableInteraction = TableLoaderManager.Instance.TableInteraction;
             uiWindowInteractionDialogue =
                 sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowInteractionDialogue>(UIWindowManager.WindowUid.Dialogue);
-            uiWindowShop =
-                sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowShop>(UIWindowManager.WindowUid.Shop);
-            uiWindowStash =
-                sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowStash>(UIWindowManager.WindowUid.Stash);
-            uiWindowShopSale =
                 sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowShopSale>(UIWindowManager.WindowUid.ShopSale);
         }
 
@@ -50,6 +43,7 @@ namespace GGemCo.Scripts
                 GcLogger.LogError("interaction 테이블에 정보가 없습니다. interaction uid: "+infoNpc.InteractionUid);
                 return;
             }
+            currentNpc = characterBase;
 
             // 메시지가 있으면 메시지 창에서 버튼으로 선택
             var message = infoInteraction.Message;
@@ -67,27 +61,29 @@ namespace GGemCo.Scripts
             uiWindowInteractionDialogue?.Show(true);
         }
 
+        public void RemoveCurrentNpc()
+        {
+            currentNpc = null;
+        }
+        /// <summary>
+        /// interaction 종료하기
+        /// </summary>
         public void EndInteraction()
         {
+            // npc 가 interaction 범위면 다시 열기
+            if (currentNpc != null)
+            {
+                sceneGame?.uIWindowManager?.CloseAll(new List<UIWindowManager.WindowUid>
+                    { UIWindowManager.WindowUid.Dialogue });
+                SetInfo(currentNpc);
+                return;
+            }
+            sceneGame?.uIWindowManager?.CloseAll();
             uiWindowInteractionDialogue?.OnEndInteraction();
-            
-            if (currentInteractionType == InteractionConstants.Type.Shop)
-            {
-                uiWindowShop?.Show(false);
-            }
-            else if (currentInteractionType == InteractionConstants.Type.Stash)
-            {
-                uiWindowStash?.Show(false);
-            }
-            else if (currentInteractionType == InteractionConstants.Type.ShopSale)
-            {
-                uiWindowShopSale?.Show(false);
-            }
         }
-
-        public void SetCurrentType(InteractionConstants.Type interactionType)
+        public bool IsInteractioning()
         {
-            currentInteractionType = interactionType;
+            return currentNpc != null;
         }
     }
 }

@@ -14,7 +14,6 @@ namespace GGemCo.Scripts
         private TableItem tableItem;
         private InventoryData inventoryData;
         private EquipData equipData;
-        private SceneGame sceneGame;
         private UIWindowItemInfo uIWindowItemInfo;
         
         protected override void Awake()
@@ -28,19 +27,18 @@ namespace GGemCo.Scripts
         protected override void Start()
         {
             base.Start();
-            sceneGame = SceneGame.Instance;
-            if (sceneGame != null && sceneGame.saveDataManager != null)
+            if (SceneGame != null && SceneGame.saveDataManager != null)
             {
-                equipData = sceneGame.saveDataManager.Equip;
-                inventoryData = sceneGame.saveDataManager.Inventory;
+                equipData = SceneGame.saveDataManager.Equip;
+                inventoryData = SceneGame.saveDataManager.Inventory;
             }
             uIWindowItemInfo =
-                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemInfo>(UIWindowManager.WindowUid
+                SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemInfo>(UIWindowManager.WindowUid
                     .ItemInfo);
         }
         public override void OnShow(bool show)
         {
-            if (sceneGame == null || TableLoaderManager.Instance == null) return;
+            if (SceneGame == null || TableLoaderManager.Instance == null) return;
             if (!show) return;
             LoadIcons();
         }
@@ -77,7 +75,7 @@ namespace GGemCo.Scripts
         private void LoadIcons()
         {
             if (!gameObject.activeSelf) return;
-            var datas = sceneGame.saveDataManager.Equip.GetAllItemCounts();
+            var datas = SceneGame.saveDataManager.Equip.GetAllItemCounts();
             if (datas == null) return;
             foreach (var info in datas)
             {
@@ -178,7 +176,7 @@ namespace GGemCo.Scripts
                 }
                 else
                 {
-                    sceneGame.systemMessageManager.ShowMessageWarning("해당 슬롯에는 착용할 수 없는 아이템 입니다.");
+                    SceneGame.systemMessageManager.ShowMessageWarning("해당 슬롯에는 착용할 수 없는 아이템 입니다.");
                 }
             }
             GoBackToSlot(droppedIcon);
@@ -189,7 +187,7 @@ namespace GGemCo.Scripts
             UIIcon uiIcon = GetIconByIndex(slotIndex);
             if (uiIcon == null) return;
          
-            sceneGame.player.GetComponent<Player>().EquipItem(slotIndex, iconUid, iconCount);
+            SceneGame.player.GetComponent<Player>().EquipItem(slotIndex, iconUid, iconCount);
             equipData.SetItemCount(slotIndex, iconUid, iconCount);
         }
 
@@ -199,7 +197,7 @@ namespace GGemCo.Scripts
             UIIcon uiIcon = GetIconByIndex(slotIndex);
             if (uiIcon == null) return;
          
-            sceneGame.player.GetComponent<Player>().UnEquipItem(slotIndex);
+            SceneGame.player.GetComponent<Player>().UnEquipItem(slotIndex);
             equipData.RemoveItemCount(slotIndex);
         }
         /// <summary>

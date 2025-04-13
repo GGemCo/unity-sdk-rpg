@@ -19,7 +19,6 @@ namespace GGemCo.Scripts
         
         private UIWindowQuickSlot uiWindowQuickSlot;
         private UIWindowSkillInfo uIWindowSkillInfo;
-        private SceneGame sceneGame;
         
         protected override void Awake()
         {
@@ -34,14 +33,13 @@ namespace GGemCo.Scripts
         protected override void Start()
         {
             base.Start();
-            sceneGame = SceneGame.Instance;
-            skillData = sceneGame.saveDataManager.Skill;
-            quickSlotData = sceneGame.saveDataManager.QuickSlot;
+            skillData = SceneGame.saveDataManager.Skill;
+            quickSlotData = SceneGame.saveDataManager.QuickSlot;
             uIWindowSkillInfo =
-                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowSkillInfo>(UIWindowManager.WindowUid
+                SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowSkillInfo>(UIWindowManager.WindowUid
                     .SkillInfo);
             uiWindowQuickSlot =
-                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowQuickSlot>(UIWindowManager.WindowUid
+                SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowQuickSlot>(UIWindowManager.WindowUid
                     .QuickSlot);
         }
         /// <summary>
@@ -134,7 +132,7 @@ namespace GGemCo.Scripts
         private void LoadIcons()
         {
             if (!gameObject.activeSelf) return;
-            var datas = sceneGame.saveDataManager.Skill.GetAllDatas();
+            var datas = SceneGame.saveDataManager.Skill.GetAllDatas();
             if (datas == null) return;
             for (int index = 0; index < maxCountIcon; index++)
             {
@@ -226,15 +224,15 @@ namespace GGemCo.Scripts
         {
             if (icon == null) return;
             
-            float time = sceneGame.uIIconCoolTimeManager.GetCurrentCoolTime(uid, icon.uid);
+            float time = SceneGame.uIIconCoolTimeManager.GetCurrentCoolTime(uid, icon.uid);
             if (time > 0)
             {
-                sceneGame.systemMessageManager.ShowMessageWarning("쿨타임 중에는 바꿀 수 없습니다.");
+                SceneGame.systemMessageManager.ShowMessageWarning("쿨타임 중에는 바꿀 수 없습니다.");
                 return;
             }
             if (!icon.IsLearn())
             {
-                sceneGame.systemMessageManager.ShowMessageWarning("배운 후 사용할 수 있습니다.");
+                SceneGame.systemMessageManager.ShowMessageWarning("배운 후 사용할 수 있습니다.");
                 return;
             }
             if (!icon.CheckRequireLevel()) return;

@@ -1,7 +1,5 @@
-﻿using PlasticGui;
-using R3;
+﻿using R3;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -17,10 +15,6 @@ namespace GGemCo.Scripts
         [Tooltip("판매 총 금액 골드")] public TextMeshProUGUI textTotalPriceGold;
         [Tooltip("판매 총 금액 실버")] public TextMeshProUGUI textTotalPriceSilver;
         
-        private TableShop tableShop;
-        private int currentShopUid;
-        
-        private SceneGame sceneGame;
         private UIWindowItemInfo uiWindowItemInfo;
         private UIWindowInventory uiWindowInventory;
 
@@ -33,10 +27,8 @@ namespace GGemCo.Scripts
         
         protected override void Awake()
         {
-            currentShopUid = 0;
             uid = UIWindowManager.WindowUid.ShopSale;
             if (TableLoaderManager.Instance == null) return;
-            tableShop = TableLoaderManager.Instance.TableShop;
             base.Awake();
             buttonSale?.onClick.AddListener(OnClickSale);
             
@@ -50,28 +42,22 @@ namespace GGemCo.Scripts
             base.Start();
             tableItem = TableLoaderManager.Instance.TableItem;
             
-            sceneGame = SceneGame.Instance;
-            if (sceneGame != null && sceneGame.saveDataManager != null)
+            if (SceneGame != null && SceneGame.saveDataManager != null)
             {
-                inventoryData = sceneGame.saveDataManager.Inventory;
-                shopSaleData = sceneGame.saveDataManager.ShopSale;
+                inventoryData = SceneGame.saveDataManager.Inventory;
+                shopSaleData = SceneGame.saveDataManager.ShopSale;
             }
             uiWindowItemInfo = 
-                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemInfo>(UIWindowManager.WindowUid
+                SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemInfo>(UIWindowManager.WindowUid
                     .ItemInfo);
             uiWindowInventory = 
-                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
+                SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
                     .Inventory);
         }
         public override bool Show(bool show)
         {
             if (!base.Show(show)) return false;
-            uiWindowInventory?.Show(show);
-            if (!show)
-            {
-                uiWindowItemInfo?.Show(false);
-            }
-            else
+            if (show)
             {
                 Initialize();
             }
@@ -112,15 +98,15 @@ namespace GGemCo.Scripts
         private void OnClickSale()
         {
             // 먼저 재화 처리한다
-            sceneGame.saveDataManager.Player.AddCurrency(CurrencyConstants.Type.Gold, totalPriceGold.Value);
-            sceneGame.saveDataManager.Player.AddCurrency(CurrencyConstants.Type.Silver, totalPriceSilver.Value);
+            SceneGame.saveDataManager.Player.AddCurrency(CurrencyConstants.Type.Gold, totalPriceGold.Value);
+            SceneGame.saveDataManager.Player.AddCurrency(CurrencyConstants.Type.Silver, totalPriceSilver.Value);
             foreach (var icon in icons)
             {
                 UIIconItem uiIconItem = icon.GetComponent<UIIconItem>();
                 if (uiIconItem == null || uiIconItem.uid <= 0 || uiIconItem.GetCount() <= 0) continue;
                 DetachIcon(uiIconItem.slotIndex);
                 var parentInfo = uiIconItem.GetParentInfo();
-                sceneGame.uIWindowManager.RemoveIcon(parentInfo.Item1, parentInfo.Item2);
+                SceneGame.uIWindowManager.RemoveIcon(parentInfo.Item1, parentInfo.Item2);
             }
         }
         protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
@@ -223,7 +209,7 @@ namespace GGemCo.Scripts
                 // 판매할 수 있는 아이템 인지 체크
                 if (droppedUIIcon.IsAntiFlag(ItemConstants.AntiFlag.ShopSale))
                 {
-                    sceneGame.systemMessageManager.ShowMessageWarning("해당 아이템은 판매할 수 없는 아이템 입니다.");
+                    SceneGame.systemMessageManager.ShowMessageWarning("해당 아이템은 판매할 수 없는 아이템 입니다.");
                 }
                 else
                 {
@@ -245,7 +231,7 @@ namespace GGemCo.Scripts
                 // 판매할 수 있는 아이템 인지 체크
                 if (droppedUIIcon.IsAntiFlag(ItemConstants.AntiFlag.ShopSale))
                 {
-                    sceneGame.systemMessageManager.ShowMessageWarning("해당 아이템은 판매할 수 없는 아이템 입니다.");
+                    SceneGame.systemMessageManager.ShowMessageWarning("해당 아이템은 판매할 수 없는 아이템 입니다.");
                 }
                 else
                 {
@@ -285,7 +271,7 @@ namespace GGemCo.Scripts
         public override void OnRightClick(UIIcon icon)
         {
             if (icon == null) return;
-            sceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ShopSale, icon.slotIndex, UIWindowManager.WindowUid.Inventory);
+            SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ShopSale, icon.slotIndex, UIWindowManager.WindowUid.Inventory);
         }
         protected override void OnDetachIcon(int slotIndex)
         {
@@ -294,14 +280,14 @@ namespace GGemCo.Scripts
         }
         public override void OnShow(bool show)
         {
-            if (sceneGame == null || TableLoaderManager.Instance == null) return;
+            if (SceneGame == null || TableLoaderManager.Instance == null) return;
             if (!show)
             {
                 foreach (var icon in icons)
                 {
                     UIIcon uiIcon = icon.GetComponent<UIIcon>();
                     if (uiIcon == null || uiIcon.uid <= 0 || uiIcon.GetCount() <= 0) continue;
-                    sceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ShopSale, uiIcon.slotIndex, UIWindowManager.WindowUid.Inventory);
+                    SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ShopSale, uiIcon.slotIndex, UIWindowManager.WindowUid.Inventory);
                 }
             }
         }

@@ -481,10 +481,5 @@ namespace GGemCo.Scripts
         {
             return mapTileCommon?.GetNearByMonsterDistance(range);
         }
-
-        public GameObject GetGridTileMap()
-        {
-            return gridTileMap;
-        }
     }
 }

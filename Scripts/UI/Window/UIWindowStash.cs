@@ -1,13 +1,10 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace GGemCo.Scripts
 {
     public class UIWindowStash : UIWindow
     {
-        private SceneGame sceneGame;
-        private UIWindowInventory uiWindowInventory;
         private UIWindowItemInfo uiWindowItemInfo;
         
         private StashData stashData;
@@ -23,25 +20,21 @@ namespace GGemCo.Scripts
         protected override void Start()
         {
             base.Start();
-            sceneGame = SceneGame.Instance;
-            if (sceneGame != null && sceneGame.saveDataManager != null)
+            if (SceneGame != null && SceneGame.saveDataManager != null)
             {
-                stashData = sceneGame.saveDataManager.Stash;
-                inventoryData = sceneGame.saveDataManager.Inventory;
+                stashData = SceneGame.saveDataManager.Stash;
+                inventoryData = SceneGame.saveDataManager.Inventory;
             }
 
             tableItem = TableLoaderManager.Instance.TableItem;
-            uiWindowInventory = 
-                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
-                    .Inventory);
             uiWindowItemInfo = 
-                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemInfo>(UIWindowManager.WindowUid
+                SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemInfo>(UIWindowManager.WindowUid
                     .ItemInfo);
         }
 
         public override void OnShow(bool show)
         {
-            if (sceneGame == null || TableLoaderManager.Instance == null) return;
+            if (SceneGame == null || TableLoaderManager.Instance == null) return;
             if (!show) return;
             LoadIcons();
         }
@@ -51,7 +44,7 @@ namespace GGemCo.Scripts
         private void LoadIcons()
         {
             if (!gameObject.activeSelf) return;
-            var datas = sceneGame.saveDataManager.Stash.GetAllItemCounts();
+            var datas = SceneGame.saveDataManager.Stash.GetAllItemCounts();
             if (datas == null) return;
             foreach (var info in datas)
             {
@@ -135,7 +128,7 @@ namespace GGemCo.Scripts
                 // 보관할 수 있는 아이템 인지 체크
                 if (droppedUIIcon.IsAntiFlag(ItemConstants.AntiFlag.Stash))
                 {
-                    sceneGame.systemMessageManager.ShowMessageWarning("해당 아이템은 보관할 수 없는 아이템 입니다.");
+                    SceneGame.systemMessageManager.ShowMessageWarning("해당 아이템은 보관할 수 없는 아이템 입니다.");
                 }
                 else
                 {
@@ -157,7 +150,7 @@ namespace GGemCo.Scripts
                 // 보관할 수 있는 아이템 인지 체크
                 if (droppedUIIcon.IsAntiFlag(ItemConstants.AntiFlag.Stash))
                 {
-                    sceneGame.systemMessageManager.ShowMessageWarning("해당 아이템은 보관할 수 없는 아이템 입니다.");
+                    SceneGame.systemMessageManager.ShowMessageWarning("해당 아이템은 보관할 수 없는 아이템 입니다.");
                 }
                 else
                 {
@@ -189,16 +182,6 @@ namespace GGemCo.Scripts
             }
 
             GoBackToSlot(droppedIcon);
-        }
-        public override bool Show(bool show)
-        {
-            if (!base.Show(show)) return false;
-            uiWindowInventory?.Show(show);
-            if (!show)
-            {
-                uiWindowInventory?.Show(false);
-            }
-            return true;
         }
         /// <summary>
         /// 아이콘 우클릭했을때 처리 

@@ -33,6 +33,8 @@ namespace GGemCo.Scripts
         
         private UIWindowFade uiWindowFade;
         private StruckTableWindow struckTableWindow;
+        private InteractionManager interactionManager;
+        protected SceneGame SceneGame;
 
         protected virtual void Awake()
         {
@@ -97,6 +99,8 @@ namespace GGemCo.Scripts
             {
                 gameObject.SetActive(false);
             }
+            SceneGame = SceneGame.Instance;
+            interactionManager = SceneGame.InteractionManager;
         }
         /// <summary>
         /// index 로 아이콘 가져오기
@@ -183,7 +187,7 @@ namespace GGemCo.Scripts
             int emptySlot = FindEmptySlot();
             if (emptySlot == -1)
             {
-                SceneGame.Instance.popupManager.ShowPopupError("윈도우에 빈 공간이 없습니다.");
+                SceneGame.popupManager.ShowPopupError("윈도우에 빈 공간이 없습니다.");
                 return;
             }
             SetIconCount(emptySlot, iconUid, iconCount);
@@ -199,7 +203,7 @@ namespace GGemCo.Scripts
             int emptySlot = FindEmptySlot();
             if (emptySlot == -1)
             {
-                SceneGame.Instance.popupManager.ShowPopupError("윈도우에 빈 공간이 없습니다.");
+                SceneGame.popupManager.ShowPopupError("윈도우에 빈 공간이 없습니다.");
                 return null;
             }
             return SetIconCount(emptySlot, iconUid, iconCount);
@@ -249,7 +253,7 @@ namespace GGemCo.Scripts
             if (!result.IsSuccess())
             {
                 GcLogger.LogError(result.Message);
-                SceneGame.Instance.systemMessageManager.ShowMessageWarning(result.Message);
+                SceneGame.systemMessageManager.ShowMessageWarning(result.Message);
             }
             if (result.ResultIcons == null || result.ResultIcons.Count <= 0) return;
             foreach (var icon in result.ResultIcons)
@@ -297,6 +301,36 @@ namespace GGemCo.Scripts
             return $"Images/UI/{IconConstants.IconGradeImagePath[valueGrade]}";
         }
         /// <summary>
+        /// window 테이블에 있는 OpenWindowUid, CloseWindowUid 컬럼 처리
+        /// </summary>
+        /// <param name="windowUids"></param>
+        /// <param name="show"></param>
+        private void ShowByTable(int[] windowUids, bool show)
+        {
+            foreach (var openWindowUid in windowUids)
+            {
+                UIWindowManager.WindowUid windowUid = (UIWindowManager.WindowUid)openWindowUid;
+                UIWindow uiWindow = SceneGame.uIWindowManager.GetUIWindowByUid<UIWindow>(windowUid);
+                    
+                if (uiWindow.uiWindowFade == null)
+                {
+                    if (uiWindow.gameObject == null) continue;
+                    uiWindow.gameObject.SetActive(show);
+                    uiWindow.OnShow(show); 
+                    continue;
+                }
+
+                if (show)
+                {
+                    uiWindow.uiWindowFade.ShowPanel();
+                }
+                else
+                {
+                    uiWindow.uiWindowFade.HidePanel();
+                }
+            }
+        }
+        /// <summary>
         /// 윈도우 open/close
         /// </summary>
         /// <param name="show"></param>
@@ -309,14 +343,15 @@ namespace GGemCo.Scripts
                 OnShow(show);
                 return false;
             }
-            // if (gameObject.activeSelf == show) return false;
             if (show)
             {
                 uiWindowFade.ShowPanel();
+                ShowByTable(struckTableWindow.OpenWindowUid, true);
             }
             else
             {
                 uiWindowFade.HidePanel();
+                ShowByTable(struckTableWindow.CloseWindowUid, false);
             }
 
             return true;
@@ -332,7 +367,14 @@ namespace GGemCo.Scripts
         public void OnClickClose()
         {
             if (uiWindowFade == null) return;
-            Show(false);
+            if (struckTableWindow.IsInteraction && interactionManager != null && interactionManager.IsInteractioning())
+            {
+                interactionManager.EndInteraction();
+            }
+            else
+            {
+                Show(false);
+            }
         }
         /// <summary>
         /// 아이콘 원래 자리로 이동시키기

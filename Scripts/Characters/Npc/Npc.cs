@@ -9,7 +9,7 @@ namespace GGemCo.Scripts
     {
         public NpcData NpcData;
         private GameObject containerNpcName;
-        TagNameNpc tagNameNpc;
+        private TagNameNpc tagNameNpc;
 
         // Start is called before the first frame update
         protected override void Awake()
@@ -127,6 +127,7 @@ namespace GGemCo.Scripts
             
             if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Player)))
             {
+                SceneGame.Instance.InteractionManager.RemoveCurrentNpc();
                 SceneGame.Instance.InteractionManager.EndInteraction();
             }
         }

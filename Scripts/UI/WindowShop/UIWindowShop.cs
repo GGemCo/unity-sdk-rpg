@@ -15,30 +15,13 @@ namespace GGemCo.Scripts
         private readonly Dictionary<int, UIElementShop> uiElementShops = new Dictionary<int, UIElementShop>();
         private int currentShopUid;
         
-        private SceneGame sceneGame;
-        private UIWindowItemInfo uIWindowItemInfo;
-        private UIWindowInventory uIWindowInventory;
-        
         protected override void Awake()
         {
-            currentShopUid = 0;
             uiElementShops.Clear();
             uid = UIWindowManager.WindowUid.Skill;
             if (TableLoaderManager.Instance == null) return;
             tableShop = TableLoaderManager.Instance.TableShop;
             base.Awake();
-        }
-
-        protected override void Start()
-        {
-            base.Start();
-            sceneGame = SceneGame.Instance;
-            uIWindowItemInfo = 
-                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemInfo>(UIWindowManager.WindowUid
-                    .ItemInfo);
-            uIWindowInventory = 
-                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
-                    .Inventory);
         }
         /// <summary>
         /// 상점 uid 로 ui element shop 정보 셋팅하기
@@ -141,18 +124,6 @@ namespace GGemCo.Scripts
             if (position == Vector3.zero) return;
             slot.transform.localPosition = position;
         }
-
-        public override bool Show(bool show)
-        {
-            if (!base.Show(show)) return false;
-            uIWindowInventory?.Show(show);
-            if (!show)
-            {
-                uIWindowItemInfo?.Show(false);
-            }
-            return true;
-        }
-
         /// <summary>
         /// npc uid 정보로 아이콘 셋팅하기
         /// 상점이 열려있지 않으면 업데이트 하지 않음

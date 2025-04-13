@@ -17,8 +17,6 @@ namespace GGemCo.Scripts
         private const int ButtonCount = 3;
         private readonly Dictionary<int, Button> buttonChoices = new Dictionary<int, Button>();
         
-        private SceneGame sceneGame;
-        private InteractionManager interactionManager;
         private UIWindowShop uiWindowShop;
         private UIWindowShopSale uiWindowShopSale;
         private UIWindowStash uiWindowStash;
@@ -33,14 +31,12 @@ namespace GGemCo.Scripts
         protected override void Start()
         {
             base.Start();
-            interactionManager = SceneGame.Instance.InteractionManager;
-            sceneGame = SceneGame.Instance;
             uiWindowShop =
-                sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowShop>(UIWindowManager.WindowUid.Shop);
+                SceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowShop>(UIWindowManager.WindowUid.Shop);
             uiWindowStash =
-                sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowStash>(UIWindowManager.WindowUid.Stash);
+                SceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowStash>(UIWindowManager.WindowUid.Stash);
             uiWindowShopSale =
-                sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowShopSale>(UIWindowManager.WindowUid.ShopSale);
+                SceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowShopSale>(UIWindowManager.WindowUid.ShopSale);
         }
 
         /// <summary>
@@ -62,12 +58,10 @@ namespace GGemCo.Scripts
 
             for (int i = 0; i < ButtonCount; i++)
             {
-                int index = i; // Lambda 캡처용
                 GameObject buttonObj = Instantiate(prefabButtonChoice, containerButton);
                 Button button = buttonObj.GetComponent<Button>();
                 if (button != null)
                 {
-                    // button.onClick.AddListener(() => OnClickChoice(index));
                     buttonChoices.TryAdd(i, button);
                     button.gameObject.SetActive(false); // 초기 상태 비활성화
                 }
@@ -136,7 +130,6 @@ namespace GGemCo.Scripts
             {
                 uiWindowShopSale?.Show(true);
             }
-            interactionManager.SetCurrentType(interactionType);
 
             Show(false);
         }

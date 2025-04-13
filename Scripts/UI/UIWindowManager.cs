@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -260,13 +261,15 @@ namespace GGemCo.Scripts
         /// <summary>
         /// 모든 윈도우 닫기
         /// </summary>
-        public void CloseAll()
+        /// <param name="exceptWindowUids">제외할 윈도우 uid</param>
+        public void CloseAll(List<WindowUid> exceptWindowUids = null)
         {
             foreach (var window in uiWindows)
             {
                 if (window == null) continue;
                 if (window.GetDefaultActive()) continue;
                 if (!window.gameObject.activeSelf) continue;
+                if (exceptWindowUids is { Count: > 0 } && exceptWindowUids.Contains(window.uid)) continue;
                 window.Show(false);
             }
         }

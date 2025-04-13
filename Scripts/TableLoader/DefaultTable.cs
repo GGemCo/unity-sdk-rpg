@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace GGemCo.Scripts
@@ -52,6 +53,22 @@ namespace GGemCo.Scripts
 
                 OnLoadedData(data);
             }
+        }
+        /// <summary>
+        /// xx,xx,xx 타입을 int 배열로 변환
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        protected static int[] ConvertIntArray(string value)
+        {
+            if (value == "0") return Array.Empty<int>();
+            string[] values = value.Split(',');
+            int[] intArray = new int[values.Length];
+            for (int i = 0; i < values.Length; i++)
+            {
+                intArray[i] = int.Parse(values[i]);
+            }
+            return intArray;
         }
 
         protected virtual void OnLoadedData(Dictionary<string, string> data)

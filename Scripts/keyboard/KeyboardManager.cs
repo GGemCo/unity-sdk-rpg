@@ -55,16 +55,17 @@ namespace GGemCo.Scripts
             else if (Input.GetKeyDown(KeyCode.F))
             {
             }
-            // else if (Input.GetKeyDown(KeyCode.Alpha1))
-            // {
-            //     GcLogger.Log("KeyboardManager Key pressed Alpha1");
-            // }
         }
 
         protected virtual void OnTriggerEscapeKeyDown()
         {
             // GcLogger.Log("OnTriggerEscapeKeyDown");
-            if (sceneGame.uIWindowManager == null) return;
+            if (sceneGame == null) return;
+            if (sceneGame.InteractionManager != null && sceneGame.InteractionManager.IsInteractioning())
+            {
+                sceneGame.InteractionManager.EndInteraction();
+                return;
+            }
             sceneGame.uIWindowManager.CloseAll();
         }
     }

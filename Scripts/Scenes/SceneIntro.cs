@@ -104,7 +104,7 @@ namespace GGemCo.Scripts
         /// </summary>
         private void OnClickGameContinue()
         {
-            if (saveDataSettings.UseSaveData)
+            if (saveDataSettings != null && saveDataSettings.UseSaveData)
             {
                 // PlayerPrefs 에서 가져온 값이 있는지 체크 
                 if (PlayerPrefsManager.LoadSaveDataSlotIndex() <= 0)
@@ -122,7 +122,7 @@ namespace GGemCo.Scripts
         /// </summary>
         private void OnClickNewGame()
         {
-            if (saveDataSettings.UseSaveData)
+            if (saveDataSettings != null && saveDataSettings.UseSaveData)
             {
                 // 남은 슬롯이 있는지 체크
                 int slotIndex = slotMetaDatController.GetEmptySlotIndex();
