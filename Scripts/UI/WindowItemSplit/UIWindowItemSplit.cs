@@ -10,8 +10,6 @@ namespace GGemCo.Scripts
     public class UIWindowItemSplit : UIWindow
     {
         [Header("기본오브젝트")]
-        // 미리 만들어놓은 slot 이 있을 경우
-        public GameObject[] preLoadSlots;
         [Tooltip("아이템 이름")]
         public TextMeshProUGUI textItemName;
         [Tooltip("아이템 개수")]
@@ -40,36 +38,8 @@ namespace GGemCo.Scripts
             buttonConfirm.onClick.AddListener(OnClickConfirm);
             buttonCancel.onClick.AddListener(OnClickCancel);
             sliderSplit.onValueChanged.AddListener(OnValueChanged);
+            SetSetIconHandler(new SetIconHandlerItemSplit());
         }
-        
-        /// <summary>
-        /// 특정 개수만큼 풀을 확장하여 아이템을 추가 생성.
-        /// </summary>
-        protected override void ExpandPool(int amount)
-        {
-            if (AddressableSettingsLoader.Instance == null) return;
-            if (amount <= 0) return;
-            GameObject iconItem = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconItem);
-            if (iconItem == null) return;
-            for (int i = 0; i < amount; i++)
-            {
-                GameObject slotObject = preLoadSlots[i];
-                if (slotObject == null) continue;
-                
-                UISlot uiSlot = slotObject.GetComponent<UISlot>();
-                if (uiSlot == null) continue;
-                uiSlot.Initialize(this, uid, i, slotSize);
-                slots[i] = slotObject;
-                
-                GameObject icon = Instantiate(iconItem, slotObject.transform);
-                UIIcon uiIcon = icon.GetComponent<UIIcon>();
-                if (uiIcon == null) continue;
-                uiIcon.Initialize(this, uid, i, i, iconSize, slotSize);
-                icons[i] = icon;
-            }
-            // GcLogger.Log($"풀 확장: {amount}개 아이템 추가 (총 {poolDropItem.Count}개)");
-        }
-
         protected override void Start()
         {
             base.Start();
@@ -91,7 +61,7 @@ namespace GGemCo.Scripts
             splitItemIndex = fromIndex;
             SetIconCount(0, fromItemUid, fromItemCount);
         }
-        protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
+        public void UpdateInfo(int iconUid, int iconCount)
         {
             var info = TableLoaderManager.Instance.TableItem.GetDataByUid(iconUid);
             if (info == null) return;
@@ -104,7 +74,6 @@ namespace GGemCo.Scripts
             // 강제로 특정 값으로 이벤트 호출 (값은 그대로 유지)
             sliderSplit.onValueChanged.Invoke(sliderSplit.value);
         }
-
         private void OnValueChanged(float value)
         {
             if (sliderSplit == null) return;

@@ -11,9 +11,9 @@ namespace GGemCo.Scripts
     {
         [Tooltip("스킬 element 프리팹")]
         public GameObject prefabUIElementSkill;
-        
-        private TableSkill tableSkill;
-        private readonly Dictionary<int, UIElementSkill> uiElementSkills = new Dictionary<int, UIElementSkill>();
+
+        public TableSkill TableSkill;
+        public readonly Dictionary<int, UIElementSkill> UIElementSkills = new Dictionary<int, UIElementSkill>();
         private SkillData skillData;
         private QuickSlotData quickSlotData;
         
@@ -22,12 +22,13 @@ namespace GGemCo.Scripts
         
         protected override void Awake()
         {
-            uiElementSkills.Clear();
+            UIElementSkills.Clear();
             uid = UIWindowManager.WindowUid.Skill;
             if (TableLoaderManager.Instance == null) return;
-            tableSkill = TableLoaderManager.Instance.TableSkill;
-            maxCountIcon = tableSkill.GetSkills().Count;
+            TableSkill = TableLoaderManager.Instance.TableSkill;
+            maxCountIcon = TableSkill.GetSkills().Count;
             base.Awake();
+            SetSetIconHandler(new SetIconHandlerSkill());
         }
 
         protected override void Start()
@@ -43,71 +44,13 @@ namespace GGemCo.Scripts
                     .QuickSlot);
         }
         /// <summary>
-        /// skill 테이블을 읽어서 개수만큼 풀을 확장하여 추가 생성.
-        /// </summary>
-        protected override void ExpandPool(int amount)
-        {
-            if (AddressableSettingsLoader.Instance == null || containerIcon == null) return;
-            if (prefabUIElementSkill == null)
-            {
-                GcLogger.LogError("UIElementSkill 프리팹이 없습니다.");
-                return;
-            }
-            var datas = tableSkill.GetSkills();
-            maxCountIcon = datas.Count;
-            if (datas.Count <= 0) return;
-            
-            GameObject iconSkill = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconSkill);
-            GameObject slot = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabSlot);
-            if (iconSkill == null) return;
-
-            int index = 0;
-            foreach (var data in datas)
-            {
-                int skillUid = data.Key;
-                if (skillUid <= 0) continue;
-                var info = data.Value;
-
-                GameObject parent = gameObject;
-                // UI Element 프리팹이 있으면 만든다.
-                if (prefabUIElementSkill != null)
-                {
-                    parent = Instantiate(prefabUIElementSkill, containerIcon.gameObject.transform);
-                    if (parent == null) continue;
-                    UIElementSkill uiElementSkill = parent.GetComponent<UIElementSkill>();
-                    if (uiElementSkill == null) continue;
-                    uiElementSkill.Initialize(this, index, info);
-                    uiElementSkills.TryAdd(index, uiElementSkill);
-                }
-
-                GameObject slotObject = Instantiate(slot, parent.transform);
-                UISlot uiSlot = slotObject.GetComponent<UISlot>();
-                if (uiSlot == null) continue;
-                uiSlot.Initialize(this, uid, index, slotSize);
-                SetPositionUiSlot(uiSlot, index);
-                slots[index] = slotObject;
-                
-                GameObject icon = Instantiate(iconSkill, slotObject.transform);
-                UIIconSkill uiIcon = icon.GetComponent<UIIconSkill>();
-                if (uiIcon == null) continue;
-                uiIcon.Initialize(this, uid, index, index, iconSize, slotSize);
-                // count, 레벨 1로 초기화
-                uiIcon.ChangeInfoByUid(skillUid, 1, 1);
-                uiIcon.SetRaycastTarget(false);
-                
-                icons[index] = icon;
-                index++;
-            }
-            // GcLogger.Log($"풀 확장: {amount}개 아이템 추가 (총 {poolDropItem.Count}개)");
-        }
-        /// <summary>
         /// 슬롯 위치 정해주기
         /// </summary>
         /// <param name="slot"></param>
         /// <param name="index"></param>
-        private void SetPositionUiSlot(UISlot slot, int index)
+        public void SetPositionUiSlot(UISlot slot, int index)
         {
-            UIElementSkill uiElementSkill = uiElementSkills[index];
+            UIElementSkill uiElementSkill = UIElementSkills[index];
             if (uiElementSkill == null) return;
             Vector3 position = uiElementSkill.GetIconPosition();
             if (position == Vector3.zero) return;
@@ -151,7 +94,7 @@ namespace GGemCo.Scripts
                 var info = TableLoaderManager.Instance.TableSkill.GetDataByUidLevel(skillUid, skillLevel);
                 if (info == null) continue;
                 uiIcon.ChangeInfoByUid(skillUid, skillCount, skillLevel, skillIsLearned);
-                UIElementSkill uiElementSkill = uiElementSkills[index];
+                UIElementSkill uiElementSkill = UIElementSkills[index];
                 if (uiElementSkill != null)
                 {
                     uiElementSkill.UpdateInfos(info, saveDataIcon);
@@ -241,18 +184,9 @@ namespace GGemCo.Scripts
             var result = quickSlotData.AddSkill(icon.uid, icon.GetCount(), icon.GetLevel(), icon.IsLearn());
             uiWindowQuickSlot.SetIcons(result);
         }
-        protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
+        public override UIElementSkill GetElementSkillByIndex(int slotIndex)
         {
-            base.OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
-            UIIcon uiIcon = GetIconByIndex(slotIndex);
-            if (uiIcon == null) return;
-            skillData.SetSkill(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
-            UIElementSkill uiElementSkill = uiElementSkills[slotIndex];
-            if (uiElementSkill != null)
-            {
-                UIIconSkill uiIconSkill = uiIcon.GetComponent<UIIconSkill>();
-                uiElementSkill.UpdateInfos(uiIconSkill.GetTableInfo(), uiIconSkill.GetSaveDataInfo());
-            }
+            return UIElementSkills[slotIndex];
         }
     }
 }

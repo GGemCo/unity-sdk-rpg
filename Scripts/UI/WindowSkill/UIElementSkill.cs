@@ -219,15 +219,8 @@ namespace GGemCo.Scripts
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            uiWindowSkillInfo.SetSkillUid(struckTableSkill.Uid, struckTableSkill.Level);
-            
-            RectTransform itemInfoRect = uiWindowSkillInfo.GetComponent<RectTransform>();
-            itemInfoRect.pivot = new Vector2(1f, 1f);
-            uiWindowSkillInfo.transform.position =
-                new Vector3(transform.position.x - uiWindowSkill.containerIcon.cellSize.x / 2f,
-                    transform.position.y + uiWindowSkill.containerIcon.cellSize.y / 2f, 0);
-            // 화면 밖 체크 & 보정
-            MathHelper.ClampToScreen(itemInfoRect);
+            uiWindowSkillInfo.SetSkillUid(struckTableSkill.Uid, struckTableSkill.Level, new Vector2(1f, 1f), new Vector3(transform.position.x - uiWindowSkill.containerIcon.cellSize.x / 2f,
+                transform.position.y + uiWindowSkill.containerIcon.cellSize.y / 2f));
         }
 
         public void OnPointerExit(PointerEventData eventData)

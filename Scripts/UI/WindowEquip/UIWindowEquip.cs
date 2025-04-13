@@ -8,9 +8,6 @@ namespace GGemCo.Scripts
     /// </summary>
     public class UIWindowEquip : UIWindow
     {
-        // 미리 만들어놓은 slot 이 있을 경우
-        public GameObject[] preLoadSlots;
-        
         private TableItem tableItem;
         private InventoryData inventoryData;
         private EquipData equipData;
@@ -23,6 +20,8 @@ namespace GGemCo.Scripts
             if (TableLoaderManager.Instance == null) return;
             tableItem = TableLoaderManager.Instance.TableItem;
             base.Awake();
+            
+            SetSetIconHandler(new SetIconHandlerEquip());
         }
         protected override void Start()
         {
@@ -41,33 +40,6 @@ namespace GGemCo.Scripts
             if (SceneGame == null || TableLoaderManager.Instance == null) return;
             if (!show) return;
             LoadIcons();
-        }
-        /// <summary>
-        /// 특정 개수만큼 풀을 확장하여 아이템을 추가 생성.
-        /// </summary>
-        protected override void ExpandPool(int amount)
-        {
-            if (AddressableSettingsLoader.Instance == null) return;
-            if (amount <= 0) return;
-            GameObject iconItem = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconItem);
-            if (iconItem == null) return;
-            for (int i = 0; i < amount; i++)
-            {
-                GameObject slotObject = preLoadSlots[i];
-                if (slotObject == null) continue;
-                
-                UISlot uiSlot = slotObject.GetComponent<UISlot>();
-                if (uiSlot == null) continue;
-                uiSlot.Initialize(this, uid, i, slotSize);
-                slots[i] = slotObject;
-                
-                GameObject icon = Instantiate(iconItem, slotObject.transform);
-                UIIcon uiIcon = icon.GetComponent<UIIcon>();
-                if (uiIcon == null) continue;
-                uiIcon.Initialize(this, uid, i, i, iconSize, slotSize);
-                icons[i] = icon;
-            }
-            // GcLogger.Log($"풀 확장: {amount}개 아이템 추가 (총 {poolDropItem.Count}개)");
         }
         /// <summary>
         /// 저장되어있는 아이템 정보로 아이콘 셋팅하기
@@ -181,25 +153,25 @@ namespace GGemCo.Scripts
             }
             GoBackToSlot(droppedIcon);
         }
-        protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
-        {
-            base.OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
-            UIIcon uiIcon = GetIconByIndex(slotIndex);
-            if (uiIcon == null) return;
-         
-            SceneGame.player.GetComponent<Player>().EquipItem(slotIndex, iconUid, iconCount);
-            equipData.SetItemCount(slotIndex, iconUid, iconCount);
-        }
-
-        protected override void OnDetachIcon(int slotIndex)
-        {
-            base.OnDetachIcon(slotIndex);
-            UIIcon uiIcon = GetIconByIndex(slotIndex);
-            if (uiIcon == null) return;
-         
-            SceneGame.player.GetComponent<Player>().UnEquipItem(slotIndex);
-            equipData.RemoveItemCount(slotIndex);
-        }
+        // protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
+        // {
+        //     base.OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
+        //     UIIcon uiIcon = GetIconByIndex(slotIndex);
+        //     if (uiIcon == null) return;
+        //  
+        //     SceneGame.player.GetComponent<Player>().EquipItem(slotIndex, iconUid, iconCount);
+        //     equipData.SetItemCount(slotIndex, iconUid, iconCount);
+        // }
+        //
+        // protected override void OnDetachIcon(int slotIndex)
+        // {
+        //     base.OnDetachIcon(slotIndex);
+        //     UIIcon uiIcon = GetIconByIndex(slotIndex);
+        //     if (uiIcon == null) return;
+        //  
+        //     SceneGame.player.GetComponent<Player>().UnEquipItem(slotIndex);
+        //     equipData.RemoveItemCount(slotIndex);
+        // }
         /// <summary>
         /// 아이콘 우클릭했을때 처리 
         /// </summary>

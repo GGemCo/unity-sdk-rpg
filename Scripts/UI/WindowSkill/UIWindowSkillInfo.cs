@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System.Collections;
+using TMPro;
 using UnityEngine;
 
 namespace GGemCo.Scripts
@@ -48,7 +49,7 @@ namespace GGemCo.Scripts
             tableAffect = TableLoaderManager.Instance.TableAffect;
             base.Awake();
         }
-        public void SetSkillUid(int skillUid, int skillLevel)
+        public void SetSkillUid(int skillUid, int skillLevel, Vector2 pivot, Vector2 position)
         {
             if (skillUid <= 0) return;
             struckTableSkill = tableSkill.GetDataByUidLevel(skillUid, skillLevel);
@@ -57,6 +58,8 @@ namespace GGemCo.Scripts
             SetBasicInfo();
             SetAffectInfo();
             Show(true);
+            // active 된 후 위치 조정한다.
+            SetPosition(pivot, position);
         }
         /// <summary>
         /// 이름 설정하기
@@ -120,6 +123,30 @@ namespace GGemCo.Scripts
             string option =
                 $"{struckTableSkill.AffectRate}% 확률로 {GetStatusName(info.StatusID)} {GetValueText(info.StatusSuffix, info.Value)} 가 {info.Duration} 초 동안 발동합니다.";
             textAffect.text = option;
+        }
+        /// <summary>
+        /// 위치 보정하기
+        /// </summary>
+        /// <param name="pivot"></param>
+        /// <param name="position"></param>
+        private void SetPosition(Vector2 pivot, Vector2 position)
+        {
+            RectTransform itemInfoRect = GetComponent<RectTransform>();
+            itemInfoRect.pivot = pivot;
+            transform.position = position;
+
+            // 화면 밖 체크 & 보정
+            StartCoroutine(DelayClampToScreen(itemInfoRect));
+        }
+        /// <summary>
+        /// 위치 보정 코루틴
+        /// </summary>
+        /// <param name="rectTransform"></param>
+        /// <returns></returns>
+        private IEnumerator DelayClampToScreen(RectTransform rectTransform)
+        {
+            yield return null; // 한 프레임 대기
+            MathHelper.ClampToScreen(rectTransform);
         }
 
     }

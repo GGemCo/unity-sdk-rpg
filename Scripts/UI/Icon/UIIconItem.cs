@@ -100,12 +100,6 @@ namespace GGemCo.Scripts
             else if(eventData.button == PointerEventData.InputButton.Right)
             {
                 if (uid <= 0 || GetCount() <= 0) return;
-                float coolTime = struckTableItem.CoolTime;
-                if (coolTime > 0)
-                {
-                    if (!PlayCoolTime(coolTime)) return;
-                }
-
                 window.OnRightClick(this);
             }
         }
@@ -229,6 +223,10 @@ namespace GGemCo.Scripts
         public int GetSaleCurrencyValue()
         {
             return struckTableItem.SaleCurrencyValue;
+        }
+        public override float GetCoolTime()
+        {
+            return struckTableItem.CoolTime;
         }
     }
 }

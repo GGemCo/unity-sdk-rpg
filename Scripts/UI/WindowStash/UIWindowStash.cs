@@ -16,6 +16,7 @@ namespace GGemCo.Scripts
         {
             uid = UIWindowManager.WindowUid.Stash;
             base.Awake();
+            SetSetIconHandler(new SetIconHandlerStash());
         }
         protected override void Start()
         {
@@ -203,22 +204,22 @@ namespace GGemCo.Scripts
                 icon.transform.position.x + itemInfoRect.sizeDelta.x + slotSize.x / 2f,
                 icon.transform.position.y + slotSize.y / 2f));
         }
-        protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
-        {
-            base.OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
-            UIIcon uiIcon = GetIconByIndex(slotIndex);
-            if (uiIcon == null) return;
-         
-            stashData.SetItemCount(slotIndex, iconUid, iconCount);
-        }
-
-        protected override void OnDetachIcon(int slotIndex)
-        {
-            base.OnDetachIcon(slotIndex);
-            UIIcon uiIcon = GetIconByIndex(slotIndex);
-            if (uiIcon == null) return;
-         
-            stashData.RemoveItemCount(slotIndex);
-        }
+        // protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
+        // {
+        //     base.OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
+        //     UIIcon uiIcon = GetIconByIndex(slotIndex);
+        //     if (uiIcon == null) return;
+        //  
+        //     stashData.SetItemCount(slotIndex, iconUid, iconCount);
+        // }
+        //
+        // protected override void OnDetachIcon(int slotIndex)
+        // {
+        //     base.OnDetachIcon(slotIndex);
+        //     UIIcon uiIcon = GetIconByIndex(slotIndex);
+        //     if (uiIcon == null) return;
+        //  
+        //     stashData.RemoveItemCount(slotIndex);
+        // }
     }
 }

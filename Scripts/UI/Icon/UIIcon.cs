@@ -408,5 +408,10 @@ namespace GGemCo.Scripts
         {
             return (parentWindowUid, parentSlotIndex);
         }
+
+        public virtual float GetCoolTime()
+        {
+            return 0;
+        }
     }
 }

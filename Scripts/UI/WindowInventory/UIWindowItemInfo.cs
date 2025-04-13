@@ -78,6 +78,7 @@ namespace GGemCo.Scripts
             SetStatusOptions();
             SetCategoryUI();
             Show(true);
+            // active 된 후 위치 조정한다.
             SetPosition(pivot, position);
         }
 

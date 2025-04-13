@@ -36,6 +36,8 @@ namespace GGemCo.Scripts
                 .CombineLatest(totalPriceSilver, (_, _) => Unit.Default)
                 .Subscribe(_ => SetTotalPriceText())
                 .AddTo(this);
+            
+            SetSetIconHandler(new SetIconHandlerShopSale());
         }
         protected override void Start()
         {
@@ -104,20 +106,20 @@ namespace GGemCo.Scripts
                 SceneGame.uIWindowManager.RemoveIcon(parentInfo.Item1, parentInfo.Item2);
             }
         }
-        protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
-        {
-            base.OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
-            var icon = GetIconByIndex(slotIndex);
-            if (icon != null)
-            {
-                icon.SetDrag(false);
-            }
-            ReCalculateSaleItem();
-        }
+        // protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
+        // {
+        //     base.OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
+        //     var icon = GetIconByIndex(slotIndex);
+        //     if (icon != null)
+        //     {
+        //         icon.SetDrag(false);
+        //     }
+        //     ReCalculateSaleItem();
+        // }
         /// <summary>
         /// 총 판매 금액 계산하기
         /// </summary>
-        private void ReCalculateSaleItem()
+        public void ReCalculateSaleItem()
         {
             int totalGold = 0;
             int totalSilver = 0;
@@ -268,11 +270,11 @@ namespace GGemCo.Scripts
             if (icon == null) return;
             SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ShopSale, icon.slotIndex, UIWindowManager.WindowUid.Inventory);
         }
-        protected override void OnDetachIcon(int slotIndex)
-        {
-            base.OnDetachIcon(slotIndex);
-            ReCalculateSaleItem();
-        }
+        // protected override void OnDetachIcon(int slotIndex)
+        // {
+        //     base.OnDetachIcon(slotIndex);
+        //     ReCalculateSaleItem();
+        // }
         public override void OnShow(bool show)
         {
             if (SceneGame == null || TableLoaderManager.Instance == null) return;

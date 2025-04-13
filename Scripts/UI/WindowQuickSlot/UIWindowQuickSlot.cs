@@ -29,6 +29,7 @@ namespace GGemCo.Scripts
             // uid 를 먼저 지정해야 한다.
             uid = UIWindowManager.WindowUid.QuickSlot;
             base.Awake();
+            SetSetIconHandler(new SetIconHandlerQuickSlot());
         }
 
         protected override void Start()
@@ -241,22 +242,22 @@ namespace GGemCo.Scripts
             if (!uiWindowSkill.IsOpen()) return;
             DetachIcon(icon.slotIndex);
         }
-        protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
-        {
-            base.OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
-            UIIcon uiIcon = GetIconByIndex(slotIndex);
-            if (uiIcon == null) return;
-            quickSlotData.SetSkill(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
-        }
-
-        protected override void OnDetachIcon(int slotIndex)
-        {
-            base.OnDetachIcon(slotIndex);
-            UIIcon uiIcon = GetIconByIndex(slotIndex);
-            if (uiIcon == null) return;
-            UIIconSkill uiIconSkill = uiIcon.GetComponent<UIIconSkill>();
-            if (uiIconSkill == null) return;
-            quickSlotData.RemoveSkill(slotIndex);
-        }
+        // protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
+        // {
+        //     base.OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
+        //     UIIcon uiIcon = GetIconByIndex(slotIndex);
+        //     if (uiIcon == null) return;
+        //     quickSlotData.SetSkill(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
+        // }
+        //
+        // protected override void OnDetachIcon(int slotIndex)
+        // {
+        //     base.OnDetachIcon(slotIndex);
+        //     UIIcon uiIcon = GetIconByIndex(slotIndex);
+        //     if (uiIcon == null) return;
+        //     UIIconSkill uiIconSkill = uiIcon.GetComponent<UIIconSkill>();
+        //     if (uiIconSkill == null) return;
+        //     quickSlotData.RemoveSkill(slotIndex);
+        // }
     }
 }

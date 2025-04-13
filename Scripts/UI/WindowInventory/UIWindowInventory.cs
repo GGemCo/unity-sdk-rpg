@@ -38,6 +38,8 @@ namespace GGemCo.Scripts
             tableItem = TableLoaderManager.Instance.TableItem;
             buttonMergeAllItems?.onClick.AddListener(OnClickMergeAllItems);
             base.Awake();
+            
+            SetSetIconHandler(new SetIconHandlerInventory());
         }
 
         protected override void Start()
@@ -259,17 +261,17 @@ namespace GGemCo.Scripts
             }
             GoBackToSlot(droppedIcon);
         }
-        protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
-        {
-            base.OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
-            UIIcon uiIcon = GetIconByIndex(slotIndex);
-            if (uiIcon == null) return;
-            inventoryData.SetItemCount(slotIndex, uiIcon.uid, uiIcon.GetCount());
-        }
-        protected override void OnDetachIcon(int slotIndex)
-        {
-            inventoryData.RemoveItemCount(slotIndex);
-        }
+        // protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
+        // {
+        //     base.OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
+        //     UIIcon uiIcon = GetIconByIndex(slotIndex);
+        //     if (uiIcon == null) return;
+        //     inventoryData.SetItemCount(slotIndex, uiIcon.uid, uiIcon.GetCount());
+        // }
+        // protected override void OnDetachIcon(int slotIndex)
+        // {
+        //     inventoryData.RemoveItemCount(slotIndex);
+        // }
         /// <summary>
         /// 모든 아이템 합치기
         /// </summary>
@@ -316,6 +318,12 @@ namespace GGemCo.Scripts
                 // 물약 일때
                 else if (icon.IsPotionType())
                 {
+                    float coolTime = icon.GetCoolTime();
+                    if (coolTime > 0)
+                    {
+                        if (!icon.PlayCoolTime(coolTime)) return;
+                    }
+
                     // hp 물약일 때 
                     if (icon.IsHpPotionType() || icon.IsMpPotionType())
                     {

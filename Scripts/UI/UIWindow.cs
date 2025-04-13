@@ -28,6 +28,8 @@ namespace GGemCo.Scripts
         public Vector2 iconSize;
         
         [Header("오브젝트")]
+        [Tooltip("미리 만들어놓은 slot 이 있을 경우")]
+        public GameObject[] preLoadSlots;
         [Tooltip("icon 이 들어갈 panel")]
         public GridLayoutGroup containerIcon;
         
@@ -35,6 +37,9 @@ namespace GGemCo.Scripts
         private StruckTableWindow struckTableWindow;
         private InteractionManager interactionManager;
         protected SceneGame SceneGame;
+        
+        // 서브 매니저
+        private IconPoolManager iconPool;
 
         protected virtual void Awake()
         {
@@ -52,50 +57,39 @@ namespace GGemCo.Scripts
                 containerIcon.cellSize = new Vector2(slotSize.x, slotSize.y);
             }
 
-            InitializePool();
-        }
+            // 기능 위임 객체 생성
+            iconPool = new IconPoolManager(this);
 
-        private void InitializePool()
-        {
-            ExpandPool(maxCountIcon);
+            // 커스텀 전략 설정 지점
+            var strategy = GetSlotIconBuildStrategy();
+            if (strategy != null)
+                iconPool.SetBuildStrategy(strategy);
+
+            iconPool.Initialize();
         }
         /// <summary>
-        /// 특정 개수만큼 풀을 확장하여 아이템을 추가 생성.
+        /// 커스텀 빌드 전략을 반환. 기본은 null → Default 사용
         /// </summary>
-        protected virtual void ExpandPool(int amount)
+        private ISlotIconBuildStrategy GetSlotIconBuildStrategy()
         {
-            if (AddressableSettingsLoader.Instance == null || containerIcon == null) return;
-            if (amount <= 0) return;
-            GameObject iconItem;
-            if (iconType == IconConstants.Type.Skill)
+            return uid switch
             {
-                iconItem = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconSkill);
-            }
-            else
-            {
-                iconItem = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconItem);
-            }
-            GameObject slot = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabSlot);
-            if (iconItem == null) return;
-            for (int i = 0; i < amount; i++)
-            {
-                GameObject slotObject = Instantiate(slot, containerIcon.gameObject.transform);
-                UISlot uiSlot = slotObject.GetComponent<UISlot>();
-                if (uiSlot == null) continue;
-                uiSlot.Initialize(this, uid, i, slotSize);
-                slots[i] = slotObject;
-                
-                GameObject icon = Instantiate(iconItem, slotObject.transform);
-                UIIcon uiIcon = icon.GetComponent<UIIcon>();
-                if (uiIcon == null) continue;
-                uiIcon.Initialize(this, uid, i, i, iconSize, slotSize);
-                icons[i] = icon;
-            }
-            // GcLogger.Log($"풀 확장: {amount}개 아이템 추가 (총 {poolDropItem.Count}개)");
+                UIWindowManager.WindowUid.Equip => new SlotIconBuildStrategyEquip(),
+                UIWindowManager.WindowUid.ItemSplit => new SlotIconBuildStrategyEquip(),
+                UIWindowManager.WindowUid.ItemBuy => new SlotIconBuildStrategyEquip(),
+                UIWindowManager.WindowUid.Skill => new SlotIconBuildStrategySkill(),
+                _ => null,
+            };
+        }
+
+        protected void SetSetIconHandler(ISetIconHandler handler)
+        {
+            if (iconPool != null)
+                iconPool.SetSetIconHandler(handler);
         }
         protected virtual void Start()
         {
-            if (struckTableWindow != null && !struckTableWindow.DefaultActive)
+            if (struckTableWindow is { DefaultActive: false })
             {
                 gameObject.SetActive(false);
             }
@@ -103,69 +97,17 @@ namespace GGemCo.Scripts
             interactionManager = SceneGame.InteractionManager;
         }
         /// <summary>
-        /// index 로 아이콘 가져오기
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        public UIIcon GetIconByIndex(int index)
-        {
-            if (icons.Length == 0 || icons[index] == null)
-            {
-                GcLogger.LogError("아이콘이 없습니다. index: " +index);
-                return null;
-            }
-        
-            return icons[index].GetComponent<UIIcon>();
-        }
-        /// <summary>
-        /// Uid 로 아이콘 가져오기
-        /// </summary>
-        /// <param name="iconUid"></param>
-        /// <returns></returns>
-        public UIIcon GetIconByUid(int iconUid)
-        {
-            if (icons.Length == 0)
-            {
-                GcLogger.LogError("아이콘이 없습니다.");
-                return null;
-            }
-
-            foreach (var icon in icons)
-            {
-                if (icon == null) continue;
-                UIIcon uiIcon = icon.GetComponent<UIIcon>();
-                if (uiIcon == null) continue;
-                if (uiIcon.uid == iconUid)
-                {
-                    return uiIcon;
-                }
-            }
-
-            return null;
-        }
-        /// <summary>
         /// 아이콘 지우기 
         /// </summary>
         /// <param name="slotIndex"></param>
         public void DetachIcon(int slotIndex)
         {
-            if (icons.Length <= 0) return;
-            GameObject icon = icons[slotIndex];
-            if (icon == null || icon.GetComponent<UIIcon>() == null)
-            {
-                GcLogger.LogError("슬롯에 아이콘이 없습니다. slot index: " +slotIndex);
-                return;
-            }
-            UIIcon uiIcon = icon.GetComponent<UIIcon>();
-            uiIcon.ClearIconInfos();
-            
-            OnDetachIcon(slotIndex);
+            iconPool.DetachIcon(slotIndex);
         }
+        public UIIcon GetIconByIndex(int index) => iconPool.GetIcon(index);
+        public UIIcon GetIconByUid(int windowUid) => iconPool.GetIconByUid(windowUid);
+        public UIIcon SetIconCount(int slotIndex, int windowUid, int count, int level = 0, bool learn = false) => iconPool.SetIcon(slotIndex, windowUid, count, level, learn);
 
-        protected virtual void OnDetachIcon(int slotIndex)
-        {
-        }
-        
         /// <summary>
         /// 빈 슬롯 찾기
         /// </summary>
@@ -208,42 +150,6 @@ namespace GGemCo.Scripts
             }
             return SetIconCount(emptySlot, iconUid, iconCount);
         }
-
-        /// <summary>
-        /// 아이콘 붙여주기 
-        /// </summary>
-        /// <param name="slotIndex"></param>
-        /// <param name="iconUid"></param>
-        /// <param name="iconCount"></param>
-        /// <param name="iconLevel"></param>
-        /// <param name="iconLearn"></param>
-        public UIIcon SetIconCount(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
-        {
-            GameObject icon = icons[slotIndex];
-            if (icon == null)
-            {
-                GcLogger.LogError("슬롯에 아이콘이 없습니다. slot index: " +slotIndex);
-                return null;
-            }
-            UIIcon uiIcon = icon.GetComponent<UIIcon>();
-            if (uiIcon == null)
-            {
-                GcLogger.LogError("슬롯에 UIIcon 이 없습니다. slot index: " +slotIndex);
-                return null;
-            }
-
-            if (iconCount <= 0)
-            {
-                DetachIcon(slotIndex);
-                return null;
-            }
-            uiIcon.window = this;
-            uiIcon.windowUid = uid;
-            uiIcon.ChangeInfoByUid(iconUid, iconCount, iconLevel, iconLearn);
-            
-            OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
-            return uiIcon;
-        }
         /// <summary>
         /// 아이콘 이동 후 슬롯별 uid, count 처리  
         /// </summary>
@@ -260,9 +166,6 @@ namespace GGemCo.Scripts
             {
                 SetIconCount(icon.SlotIndex, icon.Uid, icon.Count, icon.Level, icon.IsLearned);
             }
-        }
-        protected virtual void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
-        {
         }
         public virtual void OnClickIcon(UIIcon icon)
         {
@@ -439,6 +342,10 @@ namespace GGemCo.Scripts
         public virtual void ShowItemInfo(UIIcon icon)
         {
         }
-        
+
+        public virtual UIElementSkill GetElementSkillByIndex(int slotIndex)
+        {
+            return null;
+        }
     }
 }
