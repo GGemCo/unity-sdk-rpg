@@ -182,7 +182,7 @@ namespace GGemCo.Scripts
             {
                 string attachmentName = ItemConstants.AttachmentNameBySlotName[slotName];
                 
-                string changeSpritePath = $"Images/Parts/{ItemConstants.FolderNameByPartsType[partsType]}/{info.ImagePath}_{slotName}";
+                string changeSpritePath = $"{info.PartsImagePath}_{slotName}";
                 var sprite = Resources.Load<Sprite>(changeSpritePath);
 
                 StruckChangeSlotImage struckChangeSlotImage = new StruckChangeSlotImage(slotName, attachmentName, sprite);

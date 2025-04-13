@@ -14,6 +14,8 @@ namespace GGemCo.Scripts
         public ItemConstants.Category Category;
         public ItemConstants.SubCategory SubCategory;
         public ItemConstants.PartsType PartsID;
+        public string PartsImagePath;
+        public string ImageItemPath;
         public ItemConstants.Class Class;
         public string ImagePath;
         public int MaxOverlayCount;
@@ -102,8 +104,8 @@ namespace GGemCo.Scripts
             };
         }
         private static ItemConstants.Type ConvertType(string type) => MapType.GetValueOrDefault(type, ItemConstants.Type.None);
-        public static ItemConstants.Category ConvertCategory(string type) => MapCategory.GetValueOrDefault(type, ItemConstants.Category.None);
-        public static ItemConstants.SubCategory ConvertSubCategory(string type) => MapSubCategory.GetValueOrDefault(type, ItemConstants.SubCategory.None);
+        private static ItemConstants.Category ConvertCategory(string type) => MapCategory.GetValueOrDefault(type, ItemConstants.Category.None);
+        private static ItemConstants.SubCategory ConvertSubCategory(string type) => MapSubCategory.GetValueOrDefault(type, ItemConstants.SubCategory.None);
         private static ItemConstants.Class ConvertClass(string type) => MapClass.GetValueOrDefault(type, ItemConstants.Class.None);
         private static ItemConstants.PartsType ConvertPartsID(string type) => MapPartsID.GetValueOrDefault(type, ItemConstants.PartsType.None);
         private static ItemConstants.AntiFlag[] ConvertAntiFlag(string type)
@@ -141,7 +143,24 @@ namespace GGemCo.Scripts
                 return match.Value;
             });
         }
-        
+
+        private static string ConvertImagePath(Dictionary<string, string> values, ItemConstants.Category category, ItemConstants.SubCategory subCategory)
+        {
+            string type = values["Type"];
+            string categoryValue = values["Category"];
+            string subCategoryValue = values["SubCategory"];
+            string imagePath = values["ImagePath"];
+            string newImagePath = $"Images/Icon/Item/{type}/{categoryValue}/{subCategoryValue}/{imagePath}";
+            if (category == ItemConstants.Category.None && subCategory == ItemConstants.SubCategory.None)
+            {
+                newImagePath = $"Images/Icon/Item/{type}/{imagePath}";
+            }
+            else if (subCategory == ItemConstants.SubCategory.None)
+            {
+                newImagePath = $"Images/Icon/Item/{type}/{categoryValue}/{imagePath}";
+            }
+            return newImagePath;
+        }
         private readonly Dictionary<ItemConstants.Category, List<StruckTableItem>> dictionaryByCategory = new Dictionary<ItemConstants.Category, List<StruckTableItem>>();
         private readonly Dictionary<ItemConstants.SubCategory, List<StruckTableItem>> dictionaryBySubCategory = new Dictionary<ItemConstants.SubCategory, List<StruckTableItem>>();
         protected override void OnLoadedData(Dictionary<string, string> data)
@@ -150,6 +169,12 @@ namespace GGemCo.Scripts
             ItemConstants.Category category = ConvertCategory(data["Category"]);
             ItemConstants.SubCategory subCategory = ConvertSubCategory(data["SubCategory"]);
             data["Description"] = ParsePlaceholders(data["Description"], data);
+            data["PartsImagePath"] = $"Images/Parts/{data["PartsID"]}/{data["ImagePath"]}";
+            
+            // 아이콘 이미지 경로
+            data["ImagePath"] = ConvertImagePath(data, category, subCategory);
+            // 드랍 아이템 이미지 경로
+            data["ImageItemPath"] = data["ImagePath"].Replace("/Icon/Item/", "/Item/");
             
             StruckTableItem struckTableItemDropGroup = GetDataByUid(uid);
             {
@@ -195,6 +220,8 @@ namespace GGemCo.Scripts
                 Type = ConvertType(data["Type"]),
                 Category = ConvertCategory(data["Category"]),
                 PartsID = ConvertPartsID(data["PartsID"]),
+                PartsImagePath = data["PartsImagePath"],
+                ImageItemPath = data["ImageItemPath"],
                 SubCategory = ConvertSubCategory(data["SubCategory"]),
                 Class = ConvertClass(data["Class"]),
                 ImagePath = data["ImagePath"],

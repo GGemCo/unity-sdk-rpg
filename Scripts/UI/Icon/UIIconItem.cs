@@ -109,8 +109,7 @@ namespace GGemCo.Scripts
         /// <returns></returns>
         protected override string GetIconImagePath()
         {
-            if (struckTableItem == null) return null;
-            return $"Images/Icon/Item/{struckTableItem.Type.ToString()}/{struckTableItem.Category.ToString()}/{struckTableItem.SubCategory.ToString()}/{struckTableItem.ImagePath}";
+            return struckTableItem?.ImagePath;
         }
         /// <summary>
         /// 장착 가능한 타입 인지 체크 
