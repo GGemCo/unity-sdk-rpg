@@ -233,7 +233,6 @@ namespace GGemCo.Scripts
 
             fromIcon.SetIconLock(true);
             int itemUid = fromIcon.uid;
-            // fromWindow.SetIconCount(fromIndex, fromIcon.uid, fromIcon.GetCount() - toCount);
             
             if (toIndex >= 0)
             {

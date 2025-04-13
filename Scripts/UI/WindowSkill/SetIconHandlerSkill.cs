@@ -4,12 +4,14 @@
     {
         public void OnSetIcon(UIWindow window, int slotIndex, int iconUid, int iconCount, int iconLevel, bool isLearned)
         {
+            UIWindowSkill uiWindowSkill = window as UIWindowSkill;
+            if (uiWindowSkill == null) return;
             var skillData = SceneGame.Instance.saveDataManager.Skill;
             UIIcon icon = window.GetIconByIndex(slotIndex);
             if (icon != null)
             {
                 skillData.SetSkill(slotIndex, iconUid, iconCount, iconLevel, isLearned);
-                UIElementSkill uiElementSkill = window.GetElementSkillByIndex(slotIndex);
+                UIElementSkill uiElementSkill = uiWindowSkill.GetElementSkillByIndex(slotIndex);
                 if (uiElementSkill != null)
                 {
                     UIIconSkill uiIconSkill = icon.GetComponent<UIIconSkill>();

@@ -130,7 +130,7 @@ namespace GGemCo.Scripts
             var result = quickSlotData.AddSkill(icon.uid, icon.GetCount(), icon.GetLevel(), icon.IsLearn());
             uiWindowQuickSlot.SetIcons(result);
         }
-        public override UIElementSkill GetElementSkillByIndex(int slotIndex)
+        public UIElementSkill GetElementSkillByIndex(int slotIndex)
         {
             return UIElementSkills[slotIndex];
         }

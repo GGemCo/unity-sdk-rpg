@@ -83,20 +83,6 @@ namespace GGemCo.Scripts
         {
             return SkillDatas;
         }
-        /// <summary>
-        /// 빈 슬롯 찾기
-        /// </summary>
-        public int FindEmptySlot()
-        {
-            for (int i = 0; i < MaxSlotCount; i++)
-            {
-                if (!SkillDatas.ContainsKey(i) || SkillDatas[i].Uid <= 0 || SkillDatas[i].Count <= 0)
-                {
-                    return i;
-                }
-            }
-            return -1;
-        }
 
         public SaveDataIcon GetData(int slotIndex)
         {
