@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace GGemCo.Scripts
 {
@@ -9,8 +8,8 @@ namespace GGemCo.Scripts
     public class UIWindowEquip : UIWindow
     {
         private TableItem tableItem;
-        private InventoryData inventoryData;
-        private EquipData equipData;
+        public InventoryData InventoryData;
+        public EquipData EquipData;
         private UIWindowItemInfo uIWindowItemInfo;
         
         protected override void Awake()
@@ -22,14 +21,15 @@ namespace GGemCo.Scripts
             base.Awake();
             
             SetSetIconHandler(new SetIconHandlerEquip());
+            DragDropHandler.SetStrategy(new DragDropStrategyEquip());
         }
         protected override void Start()
         {
             base.Start();
             if (SceneGame != null && SceneGame.saveDataManager != null)
             {
-                equipData = SceneGame.saveDataManager.Equip;
-                inventoryData = SceneGame.saveDataManager.Inventory;
+                EquipData = SceneGame.saveDataManager.Equip;
+                InventoryData = SceneGame.saveDataManager.Inventory;
             }
             uIWindowItemInfo =
                 SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemInfo>(UIWindowManager.WindowUid
@@ -72,106 +72,6 @@ namespace GGemCo.Scripts
                 uiIcon.SetCount(itemCount);
             }
         }
-        
-        /// <summary>
-        /// 아이템 아이콘 드랍이 끝났을때 
-        /// </summary>
-        /// <param name="eventData"></param>
-        public override void OnDrop(PointerEventData eventData)
-        {
-        }
-        
-        /// <summary>
-        ///  window 밖에 드래그앤 드랍 했을때 처리 
-        /// </summary>
-        /// <param name="eventData"></param>
-        /// <param name="droppedIcon"></param>
-        /// <param name="targetIcon"></param>
-        /// <param name="originalPosition"></param>
-        public override void OnEndDragOutWindow(PointerEventData eventData, GameObject droppedIcon, GameObject targetIcon, Vector3 originalPosition)
-        {
-            GoBackToSlot(droppedIcon);
-        }
-        /// <summary>
-        /// 아이콘 위에서 드래그가 끝났을때 처리 
-        /// </summary>
-        /// <param name="droppedIcon">드랍한 한 아이콘</param>
-        /// <param name="targetIcon">드랍되는 곳에 있는 아이콘</param>
-        public override void OnEndDragInIcon(GameObject droppedIcon, GameObject targetIcon)
-        {
-            // GcLogger.Log("skill window. OnEndDragInIcon");
-            UIIconItem droppedUIIcon = droppedIcon.GetComponent<UIIconItem>();
-            UIWindow droppedWindow = droppedUIIcon.window;
-            UIWindowManager.WindowUid droppedWindowUid = droppedUIIcon.windowUid;
-            int dropIconSlotIndex = droppedUIIcon.slotIndex;
-            int dropIconUid = droppedUIIcon.uid;
-            int dropIconCount = droppedUIIcon.GetCount();
-            if (dropIconUid <= 0)
-            {
-                GoBackToSlot(droppedIcon);
-                return;
-            }
-            
-            UIIconItem targetUIIcon = targetIcon.GetComponent<UIIconItem>();
-            // 드래그앤 드랍 한 곳에 아무것도 없을때 
-            if (targetUIIcon == null)
-            {
-                GoBackToSlot(droppedIcon);
-                return;
-            }
-            UIWindow targetWindow = targetUIIcon.window;
-            UIWindowManager.WindowUid targetWindowUid = targetUIIcon.windowUid;
-            int targetIconSlotIndex = targetUIIcon.slotIndex;
-            int targetIconUid = targetUIIcon.uid;
-            int targetIconCount = targetUIIcon.GetCount();
-
-            if (targetIconSlotIndex < maxCountIcon)
-            {
-                // 장착 아이템 인지 체크
-                // 착용할 수 있는 부위인지 체크
-                if (droppedUIIcon.IsTypeEquip() && droppedUIIcon.IsEquipParts(targetIconSlotIndex))
-                {
-                    var result = inventoryData.MinusItem(dropIconSlotIndex, dropIconUid, 1);
-                    droppedWindow.SetIcons(result);
-                        
-                    // 장착된 아이템이 있을 때
-                    if (targetIconUid > 0)
-                    {
-                        result = equipData.MinusItem(targetIconSlotIndex, targetIconUid, 1);
-                        targetWindow.SetIcons(result);
-                        
-                        result = inventoryData.AddItem(dropIconSlotIndex, targetIconUid, 1);
-                        droppedWindow.SetIcons(result);
-                    }
-                    result = equipData.AddItem(targetIconSlotIndex, dropIconUid, 1);
-                    targetWindow.SetIcons(result);
-                }
-                else
-                {
-                    SceneGame.systemMessageManager.ShowMessageWarning("해당 슬롯에는 착용할 수 없는 아이템 입니다.");
-                }
-            }
-            GoBackToSlot(droppedIcon);
-        }
-        // protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
-        // {
-        //     base.OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
-        //     UIIcon uiIcon = GetIconByIndex(slotIndex);
-        //     if (uiIcon == null) return;
-        //  
-        //     SceneGame.player.GetComponent<Player>().EquipItem(slotIndex, iconUid, iconCount);
-        //     equipData.SetItemCount(slotIndex, iconUid, iconCount);
-        // }
-        //
-        // protected override void OnDetachIcon(int slotIndex)
-        // {
-        //     base.OnDetachIcon(slotIndex);
-        //     UIIcon uiIcon = GetIconByIndex(slotIndex);
-        //     if (uiIcon == null) return;
-        //  
-        //     SceneGame.player.GetComponent<Player>().UnEquipItem(slotIndex);
-        //     equipData.RemoveItemCount(slotIndex);
-        // }
         /// <summary>
         /// 아이콘 우클릭했을때 처리 
         /// </summary>

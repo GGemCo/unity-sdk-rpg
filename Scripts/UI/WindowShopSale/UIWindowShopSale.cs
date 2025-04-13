@@ -1,7 +1,6 @@
 ﻿using R3;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace GGemCo.Scripts
@@ -16,14 +15,13 @@ namespace GGemCo.Scripts
         [Tooltip("판매 총 금액 실버")] public TextMeshProUGUI textTotalPriceSilver;
         
         private UIWindowItemInfo uiWindowItemInfo;
-        private UIWindowInventory uiWindowInventory;
 
         private readonly BehaviorSubject<int> totalPriceGold = new(0);
         private readonly BehaviorSubject<int> totalPriceSilver = new(0);
 
-        private InventoryData inventoryData;
-        private ShopSaleData shopSaleData;
-        private TableItem tableItem;
+        public InventoryData InventoryData;
+        public ShopSaleData ShopSaleData;
+        public TableItem TableItem;
         
         protected override void Awake()
         {
@@ -38,23 +36,21 @@ namespace GGemCo.Scripts
                 .AddTo(this);
             
             SetSetIconHandler(new SetIconHandlerShopSale());
+            DragDropHandler.SetStrategy(new DragDropStrategyShopSale());
         }
         protected override void Start()
         {
             base.Start();
-            tableItem = TableLoaderManager.Instance.TableItem;
+            TableItem = TableLoaderManager.Instance.TableItem;
             
             if (SceneGame != null && SceneGame.saveDataManager != null)
             {
-                inventoryData = SceneGame.saveDataManager.Inventory;
-                shopSaleData = SceneGame.saveDataManager.ShopSale;
+                InventoryData = SceneGame.saveDataManager.Inventory;
+                ShopSaleData = SceneGame.saveDataManager.ShopSale;
             }
             uiWindowItemInfo = 
                 SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemInfo>(UIWindowManager.WindowUid
                     .ItemInfo);
-            uiWindowInventory = 
-                SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid
-                    .Inventory);
         }
         public override bool Show(bool show)
         {
@@ -106,16 +102,6 @@ namespace GGemCo.Scripts
                 SceneGame.uIWindowManager.RemoveIcon(parentInfo.Item1, parentInfo.Item2);
             }
         }
-        // protected override void OnSetIcon(int slotIndex, int iconUid, int iconCount, int iconLevel = 0, bool iconLearn = false)
-        // {
-        //     base.OnSetIcon(slotIndex, iconUid, iconCount, iconLevel, iconLearn);
-        //     var icon = GetIconByIndex(slotIndex);
-        //     if (icon != null)
-        //     {
-        //         icon.SetDrag(false);
-        //     }
-        //     ReCalculateSaleItem();
-        // }
         /// <summary>
         /// 총 판매 금액 계산하기
         /// </summary>
@@ -149,119 +135,6 @@ namespace GGemCo.Scripts
             textTotalPriceSilver.text = $"{CurrencyConstants.GetNameSilver()}: {totalPriceSilver.Value}";
         }
         /// <summary>
-        /// 아이템 아이콘 드랍이 끝났을때 
-        /// </summary>
-        /// <param name="eventData"></param>
-        public override void OnDrop(PointerEventData eventData)
-        {
-        }
-        
-        /// <summary>
-        ///  window 밖에 드래그앤 드랍 했을때 처리 
-        /// </summary>
-        /// <param name="eventData"></param>
-        /// <param name="droppedIcon"></param>
-        /// <param name="targetIcon"></param>
-        /// <param name="originalPosition"></param>
-        public override void OnEndDragOutWindow(PointerEventData eventData, GameObject droppedIcon, GameObject targetIcon, Vector3 originalPosition)
-        {
-            GoBackToSlot(droppedIcon);
-        }
-        /// <summary>
-        /// 아이콘 위에서 드래그가 끝났을때 처리 
-        /// </summary>
-        /// <param name="droppedIcon">드랍한 한 아이콘</param>
-        /// <param name="targetIcon">드랍되는 곳에 있는 아이콘</param>
-        public override void OnEndDragInIcon(GameObject droppedIcon, GameObject targetIcon)
-        {
-            // GcLogger.Log("skill window. OnEndDragInIcon");
-            UIIconItem droppedUIIcon = droppedIcon.GetComponent<UIIconItem>();
-            UIWindow droppedWindow = droppedUIIcon.window;
-            UIWindowManager.WindowUid droppedWindowUid = droppedUIIcon.windowUid;
-            int dropIconSlotIndex = droppedUIIcon.slotIndex;
-            int dropIconUid = droppedUIIcon.uid;
-            int dropIconCount = droppedUIIcon.GetCount();
-            if (dropIconUid <= 0)
-            {
-                GoBackToSlot(droppedIcon);
-                return;
-            }
-            
-            UIIconItem targetUIIcon = targetIcon.GetComponent<UIIconItem>();
-            // 드래그앤 드랍 한 곳에 아무것도 없을때 
-            if (targetUIIcon == null)
-            {
-                GoBackToSlot(droppedIcon);
-                return;
-            }
-            UIWindow targetWindow = targetUIIcon.window;
-            UIWindowManager.WindowUid targetWindowUid = targetUIIcon.windowUid;
-            int targetIconSlotIndex = targetUIIcon.slotIndex;
-            int targetIconUid = targetUIIcon.uid;
-            int targetIconCount = targetUIIcon.GetCount();
-
-            // 인벤토리에서 상점으로 드래그 앤 드랍 했을 때만 처리한다 
-            if (droppedWindowUid == UIWindowManager.WindowUid.Inventory && targetIconSlotIndex < maxCountIcon)
-            {
-                // 판매할 수 있는 아이템 인지 체크
-                if (droppedUIIcon.IsAntiFlag(ItemConstants.AntiFlag.ShopSale))
-                {
-                    SceneGame.systemMessageManager.ShowMessageWarning("해당 아이템은 판매할 수 없는 아이템 입니다.");
-                }
-                else
-                {
-                    // 보관된 아이템이 있을 때
-                    if (targetIconUid > 0)
-                    {
-                        return;
-                    }
-
-                    var result = inventoryData.MinusItem(dropIconSlotIndex, dropIconUid, dropIconCount);
-                    droppedWindow.SetIcons(result);
-
-                    result = shopSaleData.AddItem(targetIconSlotIndex, dropIconUid, dropIconCount);
-                    targetWindow.SetIcons(result);
-                }
-            }
-            else
-            {
-                // 판매할 수 있는 아이템 인지 체크
-                if (droppedUIIcon.IsAntiFlag(ItemConstants.AntiFlag.ShopSale))
-                {
-                    SceneGame.systemMessageManager.ShowMessageWarning("해당 아이템은 판매할 수 없는 아이템 입니다.");
-                }
-                else
-                {
-                    if (targetIconSlotIndex < maxCountIcon)
-                    {
-                        // 같은 아이템일때 
-                        if (dropIconUid == targetIconUid)
-                        {
-                            // 중첩 가능한지 체크
-                            var info = tableItem.GetDataByUid(targetUIIcon.uid);
-                            if (info is { MaxOverlayCount: > 1 })
-                            {
-                                var result = shopSaleData.MergeItem(dropIconSlotIndex, targetIconSlotIndex);
-                                droppedWindow.SetIcons(result);
-                            }
-                            else
-                            {
-                                droppedWindow.SetIconCount(dropIconSlotIndex, targetIconUid, targetIconCount);
-                                targetWindow.SetIconCount(targetIconSlotIndex, dropIconUid, dropIconCount);
-                            }
-                        }
-                        else
-                        {
-                            droppedWindow.SetIconCount(dropIconSlotIndex, targetIconUid, targetIconCount);
-                            targetWindow.SetIconCount(targetIconSlotIndex, dropIconUid, dropIconCount);
-                        }
-                    }
-                }
-            }
-
-            GoBackToSlot(droppedIcon);
-        }
-        /// <summary>
         /// 아이콘 우클릭했을때 처리 
         /// </summary>
         /// <param name="icon"></param>
@@ -270,11 +143,6 @@ namespace GGemCo.Scripts
             if (icon == null) return;
             SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ShopSale, icon.slotIndex, UIWindowManager.WindowUid.Inventory);
         }
-        // protected override void OnDetachIcon(int slotIndex)
-        // {
-        //     base.OnDetachIcon(slotIndex);
-        //     ReCalculateSaleItem();
-        // }
         public override void OnShow(bool show)
         {
             if (SceneGame == null || TableLoaderManager.Instance == null) return;

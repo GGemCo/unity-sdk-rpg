@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace GGemCo.Scripts
 {
@@ -29,6 +28,7 @@ namespace GGemCo.Scripts
             maxCountIcon = TableSkill.GetSkills().Count;
             base.Awake();
             SetSetIconHandler(new SetIconHandlerSkill());
+            DragDropHandler.SetStrategy(new DragDropStrategySkill());
         }
 
         protected override void Start()
@@ -101,64 +101,6 @@ namespace GGemCo.Scripts
                 }
             }
         }
-        
-        /// <summary>
-        ///  window 밖에 드래그앤 드랍 했을때 처리 
-        /// </summary>
-        /// <param name="eventData"></param>
-        /// <param name="droppedIcon"></param>
-        /// <param name="targetIcon"></param>
-        /// <param name="originalPosition"></param>
-        public override void OnEndDragOutWindow(PointerEventData eventData, GameObject droppedIcon, GameObject targetIcon, Vector3 originalPosition)
-        {
-            // GcLogger.Log("OnEndDragOutWindow");
-            GoBackToSlot(droppedIcon);
-        }
-        /// <summary>
-        /// 아이콘 프리팹을 미리 만들어 놓기 때문에 무조건 아이콘 위에서 드래그가 끝나면 GameObject 는 존재한다. 
-        /// </summary>
-        /// <param name="droppedIcon">드랍한 한 아이콘</param>
-        /// <param name="targetIcon">드랍되는 곳에 있는 아이콘</param>
-        public override void OnEndDragInIcon(GameObject droppedIcon, GameObject targetIcon)
-        {
-            // GcLogger.Log("skill window. OnEndDragInIcon");
-            UIIconSkill droppedUIIcon = droppedIcon.GetComponent<UIIconSkill>();
-            UIWindow droppedWindow = droppedUIIcon.window;
-            UIWindowManager.WindowUid droppedWindowUid = droppedUIIcon.windowUid;
-            int dropIconSlotIndex = droppedUIIcon.slotIndex;
-            int dropIconUid = droppedUIIcon.uid;
-            int dropIconCount = droppedUIIcon.GetCount();
-            if (dropIconUid <= 0)
-            {
-                GoBackToSlot(droppedIcon);
-                return;
-            }
-            
-            UIIconSkill targetUIIcon = targetIcon.GetComponent<UIIconSkill>();
-            // 드래그앤 드랍 한 곳에 아무것도 없을때 
-            if (targetUIIcon == null)
-            {
-                GoBackToSlot(droppedIcon);
-                return;
-            }
-            UIWindow targetWindow = targetUIIcon.window;
-            UIWindowManager.WindowUid targetWindowUid = targetUIIcon.windowUid;
-            int targetIconSlotIndex = targetUIIcon.slotIndex;
-            int targetIconUid = targetUIIcon.uid;
-            int targetIconCount = targetUIIcon.GetCount();
-
-            // 다른 윈도우에서 Skill로 드래그 앤 드랍 했을 때 
-            if (droppedWindowUid != targetWindowUid)
-            {
-            }
-            else
-            {
-                if (targetIconSlotIndex < maxCountIcon)
-                {
-                }
-            }
-            GoBackToSlot(droppedIcon);
-        }
         /// <summary>
         /// 아이콘 우클릭했을때 처리 
         /// </summary>
@@ -166,7 +108,11 @@ namespace GGemCo.Scripts
         public override void OnRightClick(UIIcon icon)
         {
             if (icon == null) return;
-            
+            AddToQuickSlot(icon);
+        }
+
+        public void AddToQuickSlot(UIIcon icon)
+        {
             float time = SceneGame.uIIconCoolTimeManager.GetCurrentCoolTime(uid, icon.uid);
             if (time > 0)
             {

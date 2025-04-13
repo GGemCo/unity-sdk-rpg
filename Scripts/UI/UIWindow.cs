@@ -1,3 +1,4 @@
+using GGemCo.Scripts.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -33,13 +34,18 @@ namespace GGemCo.Scripts
         [Tooltip("icon 이 들어갈 panel")]
         public GridLayoutGroup containerIcon;
         
+        private UIIcon selectedIcon;
+        
         private UIWindowFade uiWindowFade;
         private StruckTableWindow struckTableWindow;
         private InteractionManager interactionManager;
         protected SceneGame SceneGame;
         
         // 서브 매니저
+        // 아이콘 생성 관리
         private IconPoolManager iconPool;
+        // 아이콘 드래그 관리
+        protected IconDragDropHandler DragDropHandler;
 
         protected virtual void Awake()
         {
@@ -59,13 +65,14 @@ namespace GGemCo.Scripts
 
             // 기능 위임 객체 생성
             iconPool = new IconPoolManager(this);
-
             // 커스텀 전략 설정 지점
             var strategy = GetSlotIconBuildStrategy();
             if (strategy != null)
                 iconPool.SetBuildStrategy(strategy);
 
             iconPool.Initialize();
+            
+            DragDropHandler = new IconDragDropHandler(this);
         }
         /// <summary>
         /// 커스텀 빌드 전략을 반환. 기본은 null → Default 사용
@@ -171,7 +178,7 @@ namespace GGemCo.Scripts
         {
         
         }
-        public virtual void OnDrop(PointerEventData eventData)
+        public void OnDrop(PointerEventData eventData)
         {
         }
         /// <summary>
@@ -179,9 +186,10 @@ namespace GGemCo.Scripts
         /// </summary>
         /// <param name="droppedIcon">드랍한 한 아이콘</param>
         /// <param name="targetIcon">드랍되는 곳에 있는 아이콘</param>
-        public virtual void OnEndDragInIcon(GameObject droppedIcon, GameObject targetIcon)
+        public void OnEndDragInIcon(GameObject droppedIcon, GameObject targetIcon)
         {
             // GcLogger.Log("OnEndDragInIcon");
+            DragDropHandler?.HandleDragInIcon(droppedIcon, targetIcon);
         }
         /// <summary>
         ///  window 밖에다 드래그앤 드랍 했을때 처리 
@@ -190,9 +198,10 @@ namespace GGemCo.Scripts
         /// <param name="droppedIcon"></param>
         /// <param name="targetIcon"></param>
         /// <param name="originalPosition"></param>
-        public virtual void OnEndDragOutWindow(PointerEventData eventData, GameObject droppedIcon, GameObject targetIcon, Vector3 originalPosition)
+        public void OnEndDragOutWindow(PointerEventData eventData, GameObject droppedIcon, GameObject targetIcon, Vector3 originalPosition)
         {
             // GcLogger.Log("OnEndDragInIcon");
+            DragDropHandler?.HandleDragOut(eventData, droppedIcon, targetIcon, originalPosition);
         }
         /// <summary>
         /// 아이콘 등급 이미지 path 가져오기
@@ -302,7 +311,6 @@ namespace GGemCo.Scripts
             struckTableWindow = pstruckTableWindow;
         }
 
-        private UIIcon selectedIcon;
         public virtual void SetSelectedIcon(int index)
         {
             if (selectedIcon != null)
