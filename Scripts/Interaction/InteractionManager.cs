@@ -50,7 +50,8 @@ namespace GGemCo.Scripts
             if (message != "")
             {
                 // 다른 윈도우가 열려있으면 닫아주기
-                sceneGame.uIWindowManager.CloseAll();
+                sceneGame.uIWindowManager.CloseAll(new List<UIWindowManager.WindowUid>
+                    { UIWindowManager.WindowUid.Dialogue });
                 ShowDialogue(infoNpc, infoInteraction);
             }
             // 메시지가 없으면 type별로 npc 머리 위로?
