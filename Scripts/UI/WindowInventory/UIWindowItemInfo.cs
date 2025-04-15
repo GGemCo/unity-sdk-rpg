@@ -11,6 +11,12 @@ namespace GGemCo.Scripts
     /// </summary>
     public class UIWindowItemInfo : UIWindow
     {
+        public enum PositionType
+        {
+            None,
+            Left,
+            Right,
+        }
         private TableItem tableItem;
         [Header("기본정보")]
         [Tooltip("아이템 이름")]
@@ -63,9 +69,9 @@ namespace GGemCo.Scripts
             };
         }
 
-        public void SetItemUid(int itemUid, Vector2 pivot, Vector2 position)
+        public void SetItemUid(int itemUid, GameObject icon, PositionType type, Vector2 iconSlotSize, Vector2? pivot = null, Vector3? position = null)
         {
-            if (itemUid <= 0) return;
+            if (icon == null || itemUid <= 0) return;
             currentStruckTableItem = tableItem.GetDataByUid(itemUid);
             if (currentStruckTableItem is not { Uid: > 0 }) return;
             
@@ -79,7 +85,11 @@ namespace GGemCo.Scripts
             SetCategoryUI();
             Show(true);
             // active 된 후 위치 조정한다.
-            SetPosition(pivot, position);
+            
+            // null 체크 후 기본값 대입 (예: pivot이 null이면 Vector2.zero 사용)
+            Vector2 finalPivot = pivot ?? Vector2.zero;
+            Vector3 finalPosition = position ?? Vector3.zero;
+            SetPosition(icon, type, iconSlotSize, finalPivot, finalPosition);
         }
 
         private void SetSalePrice()
@@ -270,13 +280,33 @@ namespace GGemCo.Scripts
         /// <summary>
         /// 위치 보정하기
         /// </summary>
+        /// <param name="icon"></param>
+        /// <param name="type"></param>
+        /// <param name="iconSlotSize"></param>
         /// <param name="pivot"></param>
         /// <param name="position"></param>
-        private void SetPosition(Vector2 pivot, Vector2 position)
+        private void SetPosition(GameObject icon, PositionType type, Vector2 iconSlotSize, Vector2 pivot, Vector2 position)
         {
             RectTransform itemInfoRect = GetComponent<RectTransform>();
-            itemInfoRect.pivot = pivot;
-            transform.position = position;
+            if (type == PositionType.Left)
+            {
+                itemInfoRect.pivot = new Vector2(0, 1f);
+                transform.position = new Vector3(
+                    icon.transform.position.x + iconSlotSize.x / 2f,
+                    icon.transform.position.y + iconSlotSize.y / 2f);
+            }
+            else if (type == PositionType.Right)
+            {
+                itemInfoRect.pivot = new Vector2(1f, 1f);
+                transform.position = new Vector2(
+                    icon.transform.position.x - iconSlotSize.x / 2f,
+                    icon.transform.position.y + iconSlotSize.y / 2f);
+            }
+            else
+            {
+                itemInfoRect.pivot = pivot;
+                transform.position = position;
+            }
 
             // 화면 밖 체크 & 보정
             StartCoroutine(DelayClampToScreen(itemInfoRect));

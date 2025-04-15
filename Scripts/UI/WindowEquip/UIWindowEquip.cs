@@ -79,7 +79,7 @@ namespace GGemCo.Scripts
         public override void OnRightClick(UIIcon icon)
         {
             if (icon == null) return;
-            SceneGame.Instance.uIWindowManager.MoveIcon(UIWindowManager.WindowUid.Equip, icon.index, UIWindowManager.WindowUid.Inventory, 1);
+            SceneGame.Instance.uIWindowManager.MoveIcon(uid, icon.index, UIWindowManager.WindowUid.Inventory, 1);
         }
         /// <summary>
         /// 아이템 정보 보기
@@ -87,9 +87,7 @@ namespace GGemCo.Scripts
         /// <param name="icon"></param>
         public override void ShowItemInfo(UIIcon icon)
         {
-            uIWindowItemInfo.SetItemUid(icon.uid, new Vector2(1f, 1f), new Vector2(
-                icon.transform.position.x - slotSize.x / 2f,
-                icon.transform.position.y + slotSize.y / 2f));
+            uIWindowItemInfo.SetItemUid(icon.uid, icon.gameObject, UIWindowItemInfo.PositionType.Right, slotSize);
         }
     }
 }

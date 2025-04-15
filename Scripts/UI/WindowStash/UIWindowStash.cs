@@ -85,10 +85,7 @@ namespace GGemCo.Scripts
         /// <param name="icon"></param>
         public override void ShowItemInfo(UIIcon icon)
         {
-            RectTransform itemInfoRect = uiWindowItemInfo.GetComponent<RectTransform>();
-            uiWindowItemInfo.SetItemUid(icon.uid, new Vector2(1f, 1f), new Vector3(
-                icon.transform.position.x + itemInfoRect.sizeDelta.x + slotSize.x / 2f,
-                icon.transform.position.y + slotSize.y / 2f));
+            uiWindowItemInfo.SetItemUid(icon.uid, icon.gameObject, UIWindowItemInfo.PositionType.Left, slotSize);
         }
     }
 }
