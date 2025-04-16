@@ -90,14 +90,8 @@ namespace GGemCo.Scripts
             // 먼저 재화 처리한다
             SceneGame.saveDataManager.Player.AddCurrency(CurrencyConstants.Type.Gold, totalPriceGold.Value);
             SceneGame.saveDataManager.Player.AddCurrency(CurrencyConstants.Type.Silver, totalPriceSilver.Value);
-            foreach (var icon in icons)
-            {
-                UIIconItem uiIconItem = icon.GetComponent<UIIconItem>();
-                if (uiIconItem == null || uiIconItem.uid <= 0 || uiIconItem.GetCount() <= 0) continue;
-                DetachIcon(uiIconItem.slotIndex);
-                var parentInfo = uiIconItem.GetParentInfo();
-                SceneGame.uIWindowManager.RemoveIcon(parentInfo.Item1, parentInfo.Item2);
-            }
+            
+            RemoveAndDetachIcon();
         }
         /// <summary>
         /// 총 판매 금액 계산하기
@@ -138,13 +132,13 @@ namespace GGemCo.Scripts
         public override void OnRightClick(UIIcon icon)
         {
             if (icon == null) return;
-            SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ShopSale, icon.slotIndex, UIWindowManager.WindowUid.Inventory);
+            SceneGame.uIWindowManager.UnRegisterIcon(uid, icon.slotIndex);
         }
         public override void OnShow(bool show)
         {
             if (SceneGame == null || TableLoaderManager.Instance == null) return;
             if (show) return;
-            UnRegisterAllIcons(uid, UIWindowManager.WindowUid.Inventory);
+            UnRegisterAllIcons(uid);
         }
     }
 }

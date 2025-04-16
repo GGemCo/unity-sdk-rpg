@@ -106,7 +106,7 @@ namespace GGemCo.Scripts
         public override void OnShow(bool show)
         {
             if (show) return;
-            UnRegisterAllIcons(uid, UIWindowManager.WindowUid.Inventory);
+            UnRegisterAllIcons(uid);
         }
     }
 }

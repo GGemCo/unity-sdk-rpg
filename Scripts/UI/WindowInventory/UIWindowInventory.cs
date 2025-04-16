@@ -24,6 +24,7 @@ namespace GGemCo.Scripts
         private UIWindowStash uiWindowStash;
         private UIWindowShopSale uiWindowShopSale;
         private UIWindowItemUpgrade uiWindowItemUpgrade;
+        private UIWindowItemSalvage uiWindowItemSalvage;
 
         protected override void Awake()
         {
@@ -61,6 +62,9 @@ namespace GGemCo.Scripts
             uiWindowItemUpgrade =
                 SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemUpgrade>(UIWindowManager.WindowUid
                     .ItemUpgrade);
+            uiWindowItemSalvage =
+                SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemSalvage>(UIWindowManager.WindowUid
+                    .ItemSalvage);
         }
         public override void OnShow(bool show)
         {
@@ -129,7 +133,9 @@ namespace GGemCo.Scripts
                     SceneGame.systemMessageManager.ShowMessageWarning("판매할 수 없는 아이템 입니다.");
                     return;
                 }
-                SceneGame.uIWindowManager.RegisterIcon(uid, icon.slotIndex, UIWindowManager.WindowUid.ShopSale, icon.GetCount());
+
+                SceneGame.uIWindowManager.RegisterIcon(uid, icon.slotIndex, UIWindowManager.WindowUid.ShopSale,
+                    icon.GetCount());
             }
             // 창고가 열려 있으면 창고로 이동
             else if (uiWindowStash.IsOpen())
@@ -154,9 +160,26 @@ namespace GGemCo.Scripts
                 var registerIcon = uiWindowItemUpgrade.GetIconByIndex(0);
                 if (registerIcon != null && registerIcon.uid > 0)
                 {
-                    SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ItemUpgrade, 0, uid);
+                    SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ItemUpgrade, 0);
                 }
                 SceneGame.uIWindowManager.RegisterIcon(uid, icon.slotIndex, UIWindowManager.WindowUid.ItemUpgrade, 1);
+            }
+            // 아이템 분해
+            else if (uiWindowItemSalvage.IsOpen())
+            {
+                if (icon.IsAntiFlag(ItemConstants.AntiFlag.Salvage))
+                {
+                    SceneGame.systemMessageManager.ShowMessageWarning("분해할 수 없는 아이템 입니다.");
+                    return;
+                }
+                // 분해 할 수 있는 개수가 넘어가지 않았는지 체크
+                if (uiWindowItemSalvage.CheckSalvagePossibleCount() == false)
+                {
+                    SceneGame.systemMessageManager.ShowMessageWarning("더 이상 아이템을 등록할 수 없습니다.");
+                    return;
+                }
+                SceneGame.uIWindowManager.RegisterIcon(uid, icon.slotIndex, UIWindowManager.WindowUid.ItemSalvage,
+                    icon.GetCount());
             }
             else
             {

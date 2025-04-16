@@ -15,6 +15,8 @@ namespace GGemCo.Scripts
         // 윈도우 고유번호
         [HideInInspector] public UIWindowManager.WindowUid uid;
         [Header("기본속성")] 
+        [Tooltip("윈도우 닫기 버튼")] 
+        public Button buttonClose;
         [Tooltip("아이콘 타입")] 
         public IconConstants.Type iconType;
         [Tooltip("사용할 최대 아이콘 개수")]
@@ -63,6 +65,11 @@ namespace GGemCo.Scripts
                 containerIcon.cellSize = new Vector2(slotSize.x, slotSize.y);
             }
 
+            if (buttonClose != null)
+            {
+                buttonClose.onClick.AddListener(OnClickClose);
+            }
+
             // 기능 위임 객체 생성
             iconPoolManager = new IconPoolManager(this);
             // 커스텀 전략 설정 지점
@@ -85,6 +92,7 @@ namespace GGemCo.Scripts
             return uid switch
             {
                 UIWindowManager.WindowUid.Skill => new SlotIconBuildStrategySkill(),
+                UIWindowManager.WindowUid.ItemSalvage => new SlotIconBuildStrategyItemSalvage(),
                 _ => null,
             };
         }
@@ -319,10 +327,29 @@ namespace GGemCo.Scripts
         /// </summary>
         /// <param name="fromWindowUid"></param>
         /// <param name="toWindowUid"></param>
-        protected void UnRegisterAllIcons(UIWindowManager.WindowUid fromWindowUid, UIWindowManager.WindowUid toWindowUid)
+        protected void UnRegisterAllIcons(UIWindowManager.WindowUid fromWindowUid, UIWindowManager.WindowUid toWindowUid = UIWindowManager.WindowUid.Inventory)
         {
             if (iconPoolManager == null) return;
             iconPoolManager.UnRegisterAllIcons(fromWindowUid, toWindowUid);
+        }
+        /// <summary>
+        /// 해당 윈도우에 있던 아이콘은 Detach 하고, Register 되었던 인벤토리 아이템은 지운다.
+        /// </summary>
+        protected void RemoveAndDetachIcon()
+        {
+            foreach (var icon in icons)
+            {
+                UIIconItem uiIconItem = icon.GetComponent<UIIconItem>();
+                if (uiIconItem == null || uiIconItem.uid <= 0 || uiIconItem.GetCount() <= 0) continue;
+                var parentInfo = uiIconItem.GetParentInfo();
+                // 분해 등록 되었던것을 빼준다.
+                DetachIcon(uiIconItem.slotIndex);
+                // 인벤토리에서 지워준다.
+                if (parentInfo.Item1 != UIWindowManager.WindowUid.None)
+                {
+                    SceneGame.uIWindowManager.RemoveIcon(parentInfo.Item1, parentInfo.Item2);
+                }
+            }
         }
     }
 }

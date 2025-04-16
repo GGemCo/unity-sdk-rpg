@@ -29,7 +29,8 @@ namespace GGemCo.Scripts
             ItemBuy,
             Stash,
             ShopSale,
-            ItemUpgrade
+            ItemUpgrade,
+            ItemSalvage
         }
         [Header("기본속성")]
         [Tooltip("윈도우 리스트")]
@@ -180,7 +181,7 @@ namespace GGemCo.Scripts
         /// <param name="fromWindowUid"></param>
         /// <param name="fromIndex"></param>
         /// <param name="toWindowUid"></param>
-        public void UnRegisterIcon(WindowUid fromWindowUid, int fromIndex, WindowUid toWindowUid)
+        public void UnRegisterIcon(WindowUid fromWindowUid, int fromIndex, WindowUid toWindowUid = WindowUid.Inventory)
         {
             UIWindow fromWindow = GetUIWindowByUid<UIWindow>(fromWindowUid);
             UIWindow toWindow = GetUIWindowByUid<UIWindow>(toWindowUid);

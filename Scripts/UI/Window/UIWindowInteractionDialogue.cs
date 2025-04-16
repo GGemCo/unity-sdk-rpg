@@ -21,6 +21,7 @@ namespace GGemCo.Scripts
         private UIWindowShopSale uiWindowShopSale;
         private UIWindowStash uiWindowStash;
         private UIWindowItemUpgrade uiWindowItemUpgrade;
+        private UIWindowItemSalvage uiWindowItemSalvage;
         
         protected override void Awake()
         {
@@ -40,6 +41,8 @@ namespace GGemCo.Scripts
                 SceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowShopSale>(UIWindowManager.WindowUid.ShopSale);
             uiWindowItemUpgrade =
                 SceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowItemUpgrade>(UIWindowManager.WindowUid.ItemUpgrade);
+            uiWindowItemSalvage =
+                SceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowItemSalvage>(UIWindowManager.WindowUid.ItemSalvage);
         }
 
         /// <summary>
@@ -136,6 +139,10 @@ namespace GGemCo.Scripts
             else if (interactionType == InteractionConstants.Type.ItemUpgrade)
             {
                 uiWindowItemUpgrade?.Show(true);
+            }
+            else if (interactionType == InteractionConstants.Type.ItemSalvage)
+            {
+                uiWindowItemSalvage?.Show(true);
             }
 
             Show(false);

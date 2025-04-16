@@ -109,7 +109,7 @@ namespace GGemCo.Scripts
             if (icon == null) return;
             // 업그레이드 결과 아이콘을 우클릭했을때는 아무 처리도 하지 않는다.
             if (icon.slotIndex > SourceIconSlotIndex) return;
-            SceneGame.Instance.uIWindowManager.UnRegisterIcon(uid, icon.slotIndex, UIWindowManager.WindowUid.Inventory);
+            SceneGame.Instance.uIWindowManager.UnRegisterIcon(uid, icon.slotIndex);
             DetachIcon(ResultIconSlotIndex);
         }
         /// <summary>
@@ -241,7 +241,7 @@ namespace GGemCo.Scripts
             if (SceneGame == null || TableLoaderManager.Instance == null) return;
             if (show) return;
             // 윈도우가 닫힐때
-            UnRegisterAllIcons(uid, UIWindowManager.WindowUid.Inventory);
+            UnRegisterAllIcons(uid);
             InitializeInfo();
         }
         /// <summary>
@@ -354,7 +354,7 @@ namespace GGemCo.Scripts
                 uiWindowInventory.SetIcons(resultUpgrade);
             
                 // 기존 정보에서 업그레이드 된 아이콘으로 다시 셋팅하기
-                SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ItemUpgrade, SourceIconSlotIndex, uid);
+                SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ItemUpgrade, SourceIconSlotIndex);
             
                 var inventoryIcon = uiWindowInventory.GetIconByIndex(parent.Item2) as UIIconItem;
                 if (inventoryIcon == null) return;
@@ -368,7 +368,7 @@ namespace GGemCo.Scripts
             }
             else
             {
-                SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ItemUpgrade, SourceIconSlotIndex, uid);
+                SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ItemUpgrade, SourceIconSlotIndex);
                 SceneGame.uIWindowManager.RegisterIcon(UIWindowManager.WindowUid.Inventory, parent.Item2, uid, 1);
             }
         }
