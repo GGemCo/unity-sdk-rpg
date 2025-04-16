@@ -18,6 +18,7 @@ namespace GGemCo.Scripts
         public string ImageItemPath;
         public ItemConstants.Class Class;
         public string ImagePath;
+        public int Upgrade;
         public int MaxOverlayCount;
         public float CoolTime;
         public CurrencyConstants.Type SaleCurrencyType;
@@ -67,6 +68,7 @@ namespace GGemCo.Scripts
                 { "Equip", ItemConstants.Type.Equip },
                 { "Consumable", ItemConstants.Type.Consumable },
                 { "Currency", ItemConstants.Type.Currency },
+                { "Misc", ItemConstants.Type.Misc },
             };
             MapCategory = new Dictionary<string, ItemConstants.Category>
             {
@@ -75,6 +77,7 @@ namespace GGemCo.Scripts
                 { "Potion", ItemConstants.Category.Potion },
                 { "Gold", ItemConstants.Category.Gold },
                 { "Silver", ItemConstants.Category.Silver },
+                { "Material", ItemConstants.Category.Material },
             };
             MapSubCategory = new Dictionary<string, ItemConstants.SubCategory>
             {
@@ -166,6 +169,12 @@ namespace GGemCo.Scripts
         protected override void OnLoadedData(Dictionary<string, string> data)
         {
             int uid = int.Parse(data["Uid"]);
+            int upgrade = int.Parse(data["Upgrade"]);
+            if (upgrade > 0)
+            {
+                data["Name"] = $"{data["Name"]} +{data["Upgrade"]}"; 
+            }
+
             ItemConstants.Category category = ConvertCategory(data["Category"]);
             ItemConstants.SubCategory subCategory = ConvertSubCategory(data["SubCategory"]);
             data["Description"] = ParsePlaceholders(data["Description"], data);
@@ -225,6 +234,7 @@ namespace GGemCo.Scripts
                 SubCategory = ConvertSubCategory(data["SubCategory"]),
                 Class = ConvertClass(data["Class"]),
                 ImagePath = data["ImagePath"],
+                Upgrade = int.Parse(data["Upgrade"]),
                 AntiFlag = ConvertAntiFlag(data["AntiFlag"]),
                 MaxOverlayCount = int.Parse(data["MaxOverlayCount"]),
                 CoolTime = float.Parse(data["CoolTime"]),

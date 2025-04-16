@@ -10,6 +10,11 @@ namespace GGemCo.Scripts
     {
         public void BuildSlotsAndIcons(UIWindow window, GridLayoutGroup container, int maxCount, IconConstants.Type iconType, Vector2 slotSize, Vector2 iconSize, GameObject[] slots, GameObject[] icons)
         {
+            if (maxCount > 0 && container == null)
+            {
+                GcLogger.LogError("아이콘을 담을 Container Icon 항목을 설정해주세요.");
+                return;
+            }
             if (AddressablePrefabLoader.Instance == null) return;
             GameObject iconPrefab = iconType == IconConstants.Type.Skill
                 ? AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconSkill)

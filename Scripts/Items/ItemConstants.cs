@@ -9,7 +9,8 @@ namespace GGemCo.Scripts
             None,
             Equip, // 장비
             Consumable, //소모품
-            Currency
+            Currency,
+            Misc
         }
 
         public enum Category
@@ -19,7 +20,8 @@ namespace GGemCo.Scripts
             Armor, // 방어구
             Potion, // 물약
             Gold,
-            Silver
+            Silver,
+            Material,
         }
 
         public enum SubCategory

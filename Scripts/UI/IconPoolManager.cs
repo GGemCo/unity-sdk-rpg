@@ -48,6 +48,7 @@ namespace GGemCo.Scripts
         /// <param name="index"></param>
         /// <returns></returns>
         public UIIcon GetIcon(int index) => window.icons[index]?.GetComponent<UIIcon>();
+        public UISlot GetSlot(int index) => window.slots[index]?.GetComponent<UISlot>();
         /// <summary>
         /// icon uid 로 아이콘 가져오기
         /// </summary>

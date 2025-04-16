@@ -26,6 +26,10 @@ namespace GGemCo.Scripts
         {
             Level = level;
         }
+        public void SetUid(int uid)
+        {
+            Uid = uid;
+        }
     }
 
     /// <summary>

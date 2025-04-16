@@ -21,5 +21,6 @@
         public const string Effect = "effect";
         public const string Interaction = "interaction";
         public const string Shop = "shop";
+        public const string ItemUpgrade = "item_upgrade";
     }
 }

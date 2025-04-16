@@ -23,6 +23,7 @@ namespace GGemCo.Scripts
         private UIWindowItemSplit uiWindowItemSplit;
         private UIWindowStash uiWindowStash;
         private UIWindowShopSale uiWindowShopSale;
+        private UIWindowItemUpgrade uiWindowItemUpgrade;
 
         protected override void Awake()
         {
@@ -57,6 +58,9 @@ namespace GGemCo.Scripts
             uiWindowShopSale =
                 SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowShopSale>(UIWindowManager.WindowUid
                     .ShopSale);
+            uiWindowItemUpgrade =
+                SceneGame.uIWindowManager.GetUIWindowByUid<UIWindowItemUpgrade>(UIWindowManager.WindowUid
+                    .ItemUpgrade);
         }
         public override void OnShow(bool show)
         {
@@ -136,6 +140,23 @@ namespace GGemCo.Scripts
                     return;
                 }
                 SceneGame.uIWindowManager.MoveIcon(uid, icon.slotIndex, UIWindowManager.WindowUid.Stash, icon.GetCount());
+            }
+            // 아이템 강화
+            else if (uiWindowItemUpgrade.IsOpen())
+            {
+                var info = TableLoaderManager.Instance.TableItemUpgrade.GetDataBySourceItemUid(icon.uid);
+                if (info == null)
+                {
+                    SceneGame.systemMessageManager.ShowMessageWarning("강화 할 수 없는 아이템 입니다.");
+                    return;
+                }
+                // 기존 register 된 아이콘이 있으면 un register 해주기
+                var registerIcon = uiWindowItemUpgrade.GetIconByIndex(0);
+                if (registerIcon != null && registerIcon.uid > 0)
+                {
+                    SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ItemUpgrade, 0, uid);
+                }
+                SceneGame.uIWindowManager.RegisterIcon(uid, icon.slotIndex, UIWindowManager.WindowUid.ItemUpgrade, 1);
             }
             else
             {
@@ -237,9 +258,7 @@ namespace GGemCo.Scripts
         /// <param name="icon"></param>
         public override void ShowItemInfo(UIIcon icon)
         {
-            uiWindowItemInfo.SetItemUid(icon.uid, new Vector2(1f, 1f), new Vector2(
-                icon.transform.position.x - slotSize.x / 2f,
-                icon.transform.position.y + slotSize.y / 2f));
+            uiWindowItemInfo.SetItemUid(icon.uid, icon.gameObject, UIWindowItemInfo.PositionType.Right, slotSize);
         }
     }
 }

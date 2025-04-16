@@ -51,13 +51,16 @@ namespace GGemCo.Scripts
             List<SaveDataIcon> controls = new List<SaveDataIcon>();
             
             int count = item.Count - itemCount;
-            if (count <= 0)
+            switch (count)
             {
-                controls.Add(new SaveDataIcon(slotIndex, 0, 0));
-            }
-            else
-            {
-                controls.Add(new SaveDataIcon(slotIndex, itemUid, count));
+                case < 0:
+                    return new ResultCommon(ResultCommon.Type.Fail, $"슬롯에 있는 아이템 개수가 부족합니다. slotIndex: {slotIndex}");
+                case 0:
+                    controls.Add(new SaveDataIcon(slotIndex, 0, 0));
+                    break;
+                default:
+                    controls.Add(new SaveDataIcon(slotIndex, itemUid, count));
+                    break;
             }
 
             return new ResultCommon(ResultCommon.Type.Success, $"", controls);
@@ -308,6 +311,52 @@ namespace GGemCo.Scripts
                 : new SaveDataIcon(fromIndex, fromItem.Uid, fromItemCount));
 
             return new ResultCommon(ResultCommon.Type.Success, $"{moveAmount}개 아이템이 {fromIndex} → {toIndex}로 이동되었습니다.", controls);
+        }
+        /// <summary>
+        /// 아이템 uid 로 찾아서 개수 빼기 
+        /// </summary>
+        /// <param name="itemUid"></param>
+        /// <param name="itemCount"></param>
+        /// <returns></returns>
+        public ResultCommon MinusItem(int itemUid, int itemCount)
+        {
+            var info = TableLoaderManager.Instance.TableItem.GetDataByUid(itemUid);
+            if (info == null || info.Uid <= 0)
+            {
+                return new ResultCommon(ResultCommon.Type.Fail, $"아이템 정보가 없습니다. itemUid: {itemUid}");
+            }
+
+            int remainCount = itemCount;
+            List<SaveDataIcon> controls = new List<SaveDataIcon>();
+            // 남은 개수가 0 이 될때까지 같은 item uid 를 찾아서 빼준다.
+            foreach (var data in ItemCounts)
+            {
+                SaveDataIcon saveDataIcon = data.Value;
+                if (saveDataIcon.Uid == itemUid)
+                {
+                    remainCount = saveDataIcon.Count - remainCount;
+                    if (remainCount < 0)
+                    {
+                        remainCount = Math.Abs(remainCount);
+                        controls.Add(new SaveDataIcon(saveDataIcon.SlotIndex, 0));
+                    }
+                    else if (remainCount == 0)
+                    {
+                        controls.Add(new SaveDataIcon(saveDataIcon.SlotIndex, 0));
+                    }
+                    else
+                    {
+                        controls.Add(new SaveDataIcon(saveDataIcon.SlotIndex, itemUid, remainCount));
+                    }
+                }
+
+                if (remainCount == 0)
+                {
+                    break;
+                }
+            }
+
+            return new ResultCommon(ResultCommon.Type.Success, $"", controls);
         }
     }
 }

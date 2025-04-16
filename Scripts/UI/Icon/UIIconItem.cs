@@ -1,4 +1,5 @@
 using System.Linq;
+using Codice.CM.Common.Tree.Partial;
 using UnityEngine.EventSystems;
 
 namespace GGemCo.Scripts
@@ -88,6 +89,7 @@ namespace GGemCo.Scripts
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            if (!possibleClick) return;
             if (IsLock()) return;
             if(eventData.button == PointerEventData.InputButton.Left)
             {
@@ -226,6 +228,11 @@ namespace GGemCo.Scripts
         public override float GetCoolTime()
         {
             return struckTableItem.CoolTime;
+        }
+
+        public int GetUpgrade()
+        {
+            return struckTableItem.Upgrade;
         }
     }
 }

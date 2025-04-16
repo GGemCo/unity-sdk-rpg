@@ -79,11 +79,11 @@ namespace GGemCo.Scripts
         /// </summary>
         private ISlotIconBuildStrategy GetSlotIconBuildStrategy()
         {
+            if (preLoadSlots.Length > 0)
+                return new SlotIconBuildStrategyPreLoad();
+            
             return uid switch
             {
-                UIWindowManager.WindowUid.Equip => new SlotIconBuildStrategyEquip(),
-                UIWindowManager.WindowUid.ItemSplit => new SlotIconBuildStrategyEquip(),
-                UIWindowManager.WindowUid.ItemBuy => new SlotIconBuildStrategyEquip(),
                 UIWindowManager.WindowUid.Skill => new SlotIconBuildStrategySkill(),
                 _ => null,
             };
@@ -112,6 +112,7 @@ namespace GGemCo.Scripts
             iconPoolManager.DetachIcon(slotIndex);
         }
         public UIIcon GetIconByIndex(int index) => iconPoolManager.GetIcon(index);
+        public UISlot GetSlotByIndex(int index) => iconPoolManager.GetSlot(index);
         public UIIcon GetIconByUid(int windowUid) => iconPoolManager.GetIconByUid(windowUid);
         public UIIcon SetIconCount(int slotIndex, int windowUid, int count, int level = 0, bool learn = false) => iconPoolManager.SetIcon(slotIndex, windowUid, count, level, learn);
 

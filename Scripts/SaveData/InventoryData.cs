@@ -141,5 +141,30 @@ namespace GGemCo.Scripts
             return new ResultCommon(ResultCommon.Type.Success, "", controls); 
         }
 
+        public int GetCountByItemUid(int itemUid)
+        {
+            if (itemUid <= 0) return 0;
+            int totalCount = 0;
+            foreach (var info in ItemCounts)
+            {
+                SaveDataIcon saveDataIcon = info.Value;
+                if (saveDataIcon.Uid == itemUid)
+                {
+                    totalCount += saveDataIcon.Count;
+                }
+            }
+            return totalCount;
+        }
+
+        public ResultCommon UpgradeItem(int iconSlotIndex, int resultItemUid)
+        {
+            SaveDataIcon saveDataIcon = ItemCounts[iconSlotIndex];
+            if (saveDataIcon == null) return new ResultCommon(ResultCommon.Type.Fail, "강화하려는 아이템 정보가 없습니다.");
+            saveDataIcon.SetUid(resultItemUid);
+            
+            List<SaveDataIcon> controls = new List<SaveDataIcon>();
+            controls.Add(new SaveDataIcon(saveDataIcon.SlotIndex, resultItemUid, saveDataIcon.Count));
+            return new ResultCommon(ResultCommon.Type.Success, "", controls); 
+        }
     }
 }

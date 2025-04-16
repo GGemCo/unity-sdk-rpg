@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace GGemCo.Scripts
 {
-    public class SlotIconBuildStrategyEquip : ISlotIconBuildStrategy
+    public class SlotIconBuildStrategyItemUpgrade : ISlotIconBuildStrategy
     {
         public void BuildSlotsAndIcons(UIWindow window, GridLayoutGroup container, int maxCount,
             IconConstants.Type iconType, Vector2 slotSize, Vector2 iconSize, GameObject[] slots, GameObject[] icons)

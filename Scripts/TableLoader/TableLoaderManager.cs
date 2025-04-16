@@ -27,6 +27,7 @@ namespace GGemCo.Scripts
         public TableEffect TableEffect { get; private set; } = new TableEffect();
         public TableInteraction TableInteraction { get; private set; } = new TableInteraction();
         public TableShop TableShop { get; private set; } = new TableShop();
+        public TableItemUpgrade TableItemUpgrade { get; private set; } = new TableItemUpgrade();
 
         protected void Awake()
         {
@@ -46,7 +47,7 @@ namespace GGemCo.Scripts
                 ConfigTableFileName.Npc, ConfigTableFileName.Animation, ConfigTableFileName.Item,
                 ConfigTableFileName.MonsterDropRate, ConfigTableFileName.ItemDropGroup, ConfigTableFileName.Exp,
                 ConfigTableFileName.Window, ConfigTableFileName.Status, ConfigTableFileName.Skill, ConfigTableFileName.Affect,
-                ConfigTableFileName.Effect, ConfigTableFileName.Interaction, ConfigTableFileName.Shop
+                ConfigTableFileName.Effect, ConfigTableFileName.Interaction, ConfigTableFileName.Shop, ConfigTableFileName.ItemUpgrade
             };
         }
 
@@ -106,6 +107,9 @@ namespace GGemCo.Scripts
                                 break;
                             case ConfigTableFileName.Shop:
                                 TableShop.LoadData(content);
+                                break;
+                            case ConfigTableFileName.ItemUpgrade:
+                                TableItemUpgrade.LoadData(content);
                                 break;
                         }
                     }

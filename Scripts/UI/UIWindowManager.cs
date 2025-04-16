@@ -28,7 +28,8 @@ namespace GGemCo.Scripts
             Shop,
             ItemBuy,
             Stash,
-            ShopSale
+            ShopSale,
+            ItemUpgrade
         }
         [Header("기본속성")]
         [Tooltip("윈도우 리스트")]
@@ -196,6 +197,7 @@ namespace GGemCo.Scripts
             }
             var info = fromIcon.GetParentInfo();
             WindowUid parentWindowUid = info.Item1;
+            if (parentWindowUid == WindowUid.None) return;
             int parentIconIndex = info.Item2;
             UIWindow parent = GetUIWindowByUid<UIWindow>(parentWindowUid);
             var parentIcon = parent.GetIconByIndex(parentIconIndex);

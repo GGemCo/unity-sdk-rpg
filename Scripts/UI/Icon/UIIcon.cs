@@ -55,11 +55,12 @@ namespace GGemCo.Scripts
             
         // 드래그 핸들러
         private UIDragHandler dragHandler;
-        
         private RectTransform rectTransform;
+        protected bool possibleClick;
 
         protected virtual void Awake()
         {
+            possibleClick = true;
             uid = 0;
             count = 0;
             level = 0;
@@ -419,6 +420,11 @@ namespace GGemCo.Scripts
         public void RemoveLockImage()
         {
             imageLock = null;
+        }
+
+        public void SetClick(bool set)
+        {
+            possibleClick = set;
         }
     }
 }

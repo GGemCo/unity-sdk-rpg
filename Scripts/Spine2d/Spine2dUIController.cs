@@ -1,4 +1,5 @@
 #if GGEMCO_USE_SPINE
+using System.Collections.Generic;
 using Spine;
 using Spine.Unity;
 using UnityEngine;
@@ -12,9 +13,8 @@ namespace GGemCo.Scripts
     public class Spine2dUIController : MonoBehaviour
     {
         [HideInInspector] public SkeletonGraphic skeletonGraphic;
-
         private void Awake() {
-            // Spine 오브젝트의 SkeletonAnimation 컴포넌트 가져오기
+            // Spine 오브젝트의 SkeletonGraphic 컴포넌트 가져오기
             skeletonGraphic = GetComponent<SkeletonGraphic>();
             if (skeletonGraphic != null)
             {
@@ -54,14 +54,29 @@ namespace GGemCo.Scripts
         /// </summary>
         /// <param name="animationName"></param>
         /// <param name="loop"></param>
-        public void PlayAnimation(string animationName, bool loop = false)
+        /// <param name="timeScale"></param>
+        /// <param name="addAnimations"></param>
+        public TrackEntry PlayAnimation(string animationName, bool loop = false, float timeScale = 1.0f, List<StruckAddAnimation> addAnimations = null)
         {
-            if (skeletonGraphic == null) return;
+            if (skeletonGraphic == null) return null;
             //  GcLogger.Log("PlayAnimation gameobject: " + this.gameObject.name + " / animationName: " + animationName + " / " + loop);
-            skeletonGraphic.AnimationState.SetAnimation(0, animationName, loop);
+            TrackEntry trackEntry = skeletonGraphic.AnimationState.SetAnimation(0, animationName, loop);
+            trackEntry.TimeScale = timeScale;
 
-            // 애니메이션 이벤트 리스너 등록
-            skeletonGraphic.AnimationState.Complete += OnAnimationComplete;
+            if (addAnimations != null)
+            {
+                foreach (StruckAddAnimation info in addAnimations)
+                {
+                    if (info == null) continue;
+                    trackEntry =
+                        skeletonGraphic.AnimationState.AddAnimation(0, info.AnimationName, info.Loop, info.Delay);
+                    if (info.TimeScale > 0)
+                    {
+                        trackEntry.TimeScale = info.TimeScale;
+                    }
+                }
+            }
+            return trackEntry;
         }
         /// <summary>
         /// 현재 재생 중인 애니메이션 이름 가져오기
