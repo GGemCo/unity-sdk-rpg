@@ -43,52 +43,8 @@ namespace GGemCo.Scripts
                 }
                 else
                 {
-                    // 보관된 아이템이 있을 때
-                    if (targetIconUid > 0)
-                    {
-                        return;
-                    }
-
-                    var result = uiwindowShopSale.InventoryData.MinusItem(dropIconSlotIndex, dropIconUid, dropIconCount);
-                    droppedWindow.SetIcons(result);
-
-                    result = uiwindowShopSale.ShopSaleData.AddItem(targetIconSlotIndex, dropIconUid, dropIconCount);
-                    targetWindow.SetIcons(result);
-                }
-            }
-            else
-            {
-                // 판매할 수 있는 아이템 인지 체크
-                if (droppedUIIcon.IsAntiFlag(ItemConstants.AntiFlag.ShopSale))
-                {
-                    SceneGame.Instance.systemMessageManager.ShowMessageWarning("해당 아이템은 판매할 수 없는 아이템 입니다.");
-                }
-                else
-                {
-                    if (targetIconSlotIndex < uiwindowShopSale.maxCountIcon)
-                    {
-                        // 같은 아이템일때 
-                        if (dropIconUid == targetIconUid)
-                        {
-                            // 중첩 가능한지 체크
-                            var info = uiwindowShopSale.TableItem.GetDataByUid(targetUIIcon.uid);
-                            if (info is { MaxOverlayCount: > 1 })
-                            {
-                                var result = uiwindowShopSale.ShopSaleData.MergeItem(dropIconSlotIndex, targetIconSlotIndex);
-                                droppedWindow.SetIcons(result);
-                            }
-                            else
-                            {
-                                droppedWindow.SetIconCount(dropIconSlotIndex, targetIconUid, targetIconCount);
-                                targetWindow.SetIconCount(targetIconSlotIndex, dropIconUid, dropIconCount);
-                            }
-                        }
-                        else
-                        {
-                            droppedWindow.SetIconCount(dropIconSlotIndex, targetIconUid, targetIconCount);
-                            targetWindow.SetIconCount(targetIconSlotIndex, dropIconUid, dropIconCount);
-                        }
-                    }
+                    SceneGame.Instance.uIWindowManager.RegisterIcon(droppedWindowUid, dropIconSlotIndex,
+                        UIWindowManager.WindowUid.ShopSale, dropIconCount);
                 }
             }
         }
