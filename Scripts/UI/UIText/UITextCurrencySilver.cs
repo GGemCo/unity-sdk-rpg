@@ -5,7 +5,7 @@ using UnityEngine;
 namespace GGemCo.Scripts
 {
     /// <summary>
-    /// Level 데이터 변경 시 UI 업데이트
+    /// 실버 재화 데이터 변경 시 UI 업데이트
     /// </summary>
     public class UITextCurrencySilver : MonoBehaviour
     {

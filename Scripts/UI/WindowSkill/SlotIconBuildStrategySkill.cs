@@ -3,6 +3,9 @@ using UnityEngine.UI;
 
 namespace GGemCo.Scripts
 {
+    /// <summary>
+    /// 플레이어 스킬 윈도우 - 아이콘 생성
+    /// </summary>
     public class SlotIconBuildStrategySkill : ISlotIconBuildStrategy
     {
         public void BuildSlotsAndIcons(UIWindow window, GridLayoutGroup container, int maxCount,

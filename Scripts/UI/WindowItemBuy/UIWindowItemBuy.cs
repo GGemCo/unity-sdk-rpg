@@ -5,7 +5,7 @@ using UnityEngine.UI;
 namespace GGemCo.Scripts
 {
     /// <summary>
-    /// 인벤토리 아이템 나누기
+    /// 아이템 구매하기 윈도우
     /// </summary>
     public class UIWindowItemBuy : UIWindow
     {

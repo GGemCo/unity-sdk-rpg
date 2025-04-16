@@ -1,5 +1,8 @@
 ﻿namespace GGemCo.Scripts
 {
+    /// <summary>
+    /// 퀵슬롯 윈도우 - 아이콘 관리
+    /// </summary>
     public class SetIconHandlerQuickSlot : ISetIconHandler
     {
         public void OnSetIcon(UIWindow window, int slotIndex, int iconUid, int iconCount, int iconLevel, bool isLearned)

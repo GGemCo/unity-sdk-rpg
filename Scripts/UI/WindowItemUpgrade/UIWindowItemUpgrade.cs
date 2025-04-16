@@ -6,6 +6,10 @@ using UnityEngine.UI;
 
 namespace GGemCo.Scripts
 {
+    /// <summary>
+    /// 아이템 강화 윈도우
+    /// preLoadSlots 의 Element 0 에는 강화 하는 아이템 슬롯, Element 1 에는 강화 결과 아이템 슬롯 프리팹을 연결한다.
+    /// </summary>
     public class UIWindowItemUpgrade : UIWindow
     {
         [Header("강화 정보")]
@@ -31,7 +35,6 @@ namespace GGemCo.Scripts
         public Button buttonUpgrade;
 
         [Header("강화 이펙트 오브젝트")] public Spine2dUIController effectItemUpgrade;
-     
         
         private TableItem tableItem;
         private TableStatus tableStatus;
@@ -43,9 +46,13 @@ namespace GGemCo.Scripts
 
         private InventoryData inventoryData;
         
+        // 재료 최대 개수. item_upgrade 테이블에 있는 컬럼수와 맞아야 한다
         private const int MaxElementCount = 4;
         private readonly List<UIElementMaterial> elementMaterials = new List<UIElementMaterial>();
+        // 성공, 실패 결과
         private bool updateResult;
+        private const int SourceIconSlotIndex = 0;
+        private const int ResultIconSlotIndex = 1;
         
         protected override void Awake()
         {
@@ -60,6 +67,7 @@ namespace GGemCo.Scripts
             SetSetIconHandler(new SetIconHandlerItemUpgrade());
             DragDropHandler.SetStrategy(new DragDropStrategyItemUpgrade());
 
+            // 재료 element 초기 생성하기
             if (prefabElementMaterial != null)
             {
                 for (int i = 0; i < MaxElementCount; i++)
@@ -100,9 +108,9 @@ namespace GGemCo.Scripts
         {
             if (icon == null) return;
             // 업그레이드 결과 아이콘을 우클릭했을때는 아무 처리도 하지 않는다.
-            if (icon.slotIndex > 0) return;
+            if (icon.slotIndex > SourceIconSlotIndex) return;
             SceneGame.Instance.uIWindowManager.UnRegisterIcon(uid, icon.slotIndex, UIWindowManager.WindowUid.Inventory);
-            DetachIcon(1);
+            DetachIcon(ResultIconSlotIndex);
         }
         /// <summary>
         /// 아이템 정보 보기
@@ -112,10 +120,14 @@ namespace GGemCo.Scripts
         {
             uiWindowItemInfo.SetItemUid(icon.uid, icon.gameObject, UIWindowItemInfo.PositionType.Left, slotSize);
         }
-
+        /// <summary>
+        /// 강화 정보 초기화하기
+        /// </summary>
         private void InitializeInfo()
         {
+            // 강화 테이블 정보 초기화
             struckTableItemUpgrade = null;
+            // 재료 정보 초기화
             ClearMaterials();
             if (textItemName != null)
             {
@@ -137,7 +149,7 @@ namespace GGemCo.Scripts
             {
                 textStatusID2.gameObject.SetActive(false); 
             }
-            DetachIcon(1);
+            DetachIcon(ResultIconSlotIndex);
         }
         public void SetInfo(UIIcon icon)
         {
@@ -171,7 +183,7 @@ namespace GGemCo.Scripts
 
             struckTableItemUpgrade = info;
 
-            UIIcon resultItemIcon = GetIconByIndex(1);
+            UIIcon resultItemIcon = GetIconByIndex(ResultIconSlotIndex);
             if (resultItemIcon == null) return;
             resultItemIcon.SetDrag(false);
             resultItemIcon.ChangeInfoByUid(info.ResultItemUid, 1);
@@ -277,7 +289,6 @@ namespace GGemCo.Scripts
                 if (materialInfo.Item1 == 0 || materialInfo.Item2 == 0) continue;
                 ResultCommon resultMaterial = inventoryData.MinusItem(materialInfo.Item1, materialInfo.Item2);
                 uiWindowInventory.SetIcons(resultMaterial);
-                
             }
 
             // 확률 체크
@@ -287,7 +298,7 @@ namespace GGemCo.Scripts
                 return;
             }
             // 인벤토리에 아이템 체크
-            UIIcon icon = GetIconByIndex(0);
+            UIIcon icon = GetIconByIndex(SourceIconSlotIndex);
             var parent = icon.GetParentInfo();
             if (parent.Item1 == UIWindowManager.WindowUid.None || parent.Item2 < 0)
             {
@@ -313,32 +324,12 @@ namespace GGemCo.Scripts
             if (random < struckTableItemUpgrade.Rate)
             {
                 updateResult = true;
-                // SceneGame.systemMessageManager.ShowMessageWarning("강화에 실패하였습니다.");
-                
-                // // 기존 정보에서 업그레이드 된 아이콘으로 다시 셋팅하기
-                // SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ItemUpgrade, 0, uid);
-                // SceneGame.uIWindowManager.RegisterIcon(UIWindowManager.WindowUid.Inventory, parent.Item2, uid, 1);
             }
-            // 강화 성공
-            
-            // // 강화 처리, inventoryData 에서 item uid 바꿔주기
-            // var resultUpgrade = inventoryData.UpgradeItem(parent.Item2, struckTableItemUpgrade.ResultItemUid);
-            // uiWindowInventory.SetIcons(resultUpgrade);
-            //
-            // // 기존 정보에서 업그레이드 된 아이콘으로 다시 셋팅하기
-            // SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ItemUpgrade, 0, uid);
-            //
-            // var inventoryIcon = uiWindowInventory.GetIconByIndex(parent.Item2) as UIIconItem;
-            // if (inventoryIcon == null) return;
-            // if (inventoryIcon.GetUpgrade() >= struckTableItemUpgrade.MaxUpgrade)
-            // {
-            //     SceneGame.systemMessageManager.ShowMessageWarning("강화수치가 최대치 입니다.\n더이상 강화 할 수 없습니다.");
-            //     InitializeInfo();
-            //     return;
-            // }
-            // SceneGame.uIWindowManager.RegisterIcon(UIWindowManager.WindowUid.Inventory, parent.Item2, uid, 1);
         }
-
+        /// <summary>
+        /// 강화 연출 스파인 애니메이션이 종료된 후 UI에 결과를 반영합니다.
+        /// </summary>
+        /// <param name="e"></param>
         private void OnAnimationComplete(TrackEntry e)
         {
             textResult.gameObject.SetActive(true);
@@ -353,7 +344,7 @@ namespace GGemCo.Scripts
                 textResult.color = Color.red;
             }
             // 인벤토리에 아이템 체크
-            UIIcon icon = GetIconByIndex(0);
+            UIIcon icon = GetIconByIndex(SourceIconSlotIndex);
             var parent = icon.GetParentInfo();
             // 성공, 실패 체크 
             if (updateResult)
@@ -363,7 +354,7 @@ namespace GGemCo.Scripts
                 uiWindowInventory.SetIcons(resultUpgrade);
             
                 // 기존 정보에서 업그레이드 된 아이콘으로 다시 셋팅하기
-                SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ItemUpgrade, 0, uid);
+                SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ItemUpgrade, SourceIconSlotIndex, uid);
             
                 var inventoryIcon = uiWindowInventory.GetIconByIndex(parent.Item2) as UIIconItem;
                 if (inventoryIcon == null) return;
@@ -377,10 +368,9 @@ namespace GGemCo.Scripts
             }
             else
             {
-                SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ItemUpgrade, 0, uid);
+                SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ItemUpgrade, SourceIconSlotIndex, uid);
                 SceneGame.uIWindowManager.RegisterIcon(UIWindowManager.WindowUid.Inventory, parent.Item2, uid, 1);
             }
-            
         }
     }
 }

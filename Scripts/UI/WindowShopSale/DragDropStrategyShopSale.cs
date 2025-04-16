@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace GGemCo.Scripts
 {
+    /// <summary>
+    /// 아이템 판매 윈도우 - 아이콘 드래그 앤 드랍 관리
+    /// </summary>
     public class DragDropStrategyShopSale : IDragDropStrategy
     {
         public void HandleDragInIcon(UIWindow window, UIIcon droppedUIIcon, UIIcon targetUIIcon)

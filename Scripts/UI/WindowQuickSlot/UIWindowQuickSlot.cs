@@ -5,7 +5,7 @@ using UnityEngine.UI;
 namespace GGemCo.Scripts
 {
     /// <summary>
-    /// 퀵슬롯
+    /// 퀵슬롯 윈도우
     /// </summary>
     public class UIWindowQuickSlot : UIWindow, IInputHandler
     {

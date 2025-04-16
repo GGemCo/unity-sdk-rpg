@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace GGemCo.Scripts
 {
     /// <summary>
-    /// 스킬 리스트 element
+    /// 아이템 구매 리스트 element
     /// </summary>
     public class UIElementShop : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {

@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace GGemCo.Scripts
 {
+    /// <summary>
+    /// 퀵슬롯 윈도우 - 아이콘 드래그 앤 드랍 관리
+    /// </summary>
     public class DragDropStrategyQuickSlot : IDragDropStrategy
     {
         public void HandleDragInIcon(UIWindow window, UIIcon droppedUIIcon, UIIcon targetUIIcon)

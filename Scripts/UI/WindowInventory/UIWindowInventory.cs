@@ -4,7 +4,7 @@ using UnityEngine.UI;
 namespace GGemCo.Scripts
 {
     /// <summary>
-    /// 인벤토리
+    /// 인벤토리 윈도우
     /// </summary>
     public class UIWindowInventory : UIWindow
     {

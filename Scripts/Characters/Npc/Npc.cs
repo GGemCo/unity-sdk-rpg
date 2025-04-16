@@ -125,6 +125,7 @@ namespace GGemCo.Scripts
         }
         protected void OnTriggerExit2D(Collider2D collision)
         {
+            // 에디터에서 플레이 종료시 OnTriggerExit2D 함수를 호출하지 않도록 처리 
 #if UNITY_EDITOR
             if (UnityEditorHelper.GetIsExitingPlayMode())
                 return;

@@ -1,5 +1,8 @@
 ﻿namespace GGemCo.Scripts
 {
+    /// <summary>
+    /// 인벤토리 윈도우 - 아이콘 관리
+    /// </summary>
     public class SetIconHandlerInventory : ISetIconHandler
     {
         public void OnSetIcon(UIWindow window, int slotIndex, int iconUid, int iconCount, int iconLevel, bool isLearned)

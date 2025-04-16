@@ -5,14 +5,15 @@ using UnityEngine.UI;
 
 namespace GGemCo.Scripts
 {
+    /// <summary>
+    /// 아이템 강화 재료 element
+    /// </summary>
     public class UIElementMaterial : MonoBehaviour
     {
-        [Header("재료 아이콘 이미지")]
-        public Image imageIcon;
+        [Header("재료 아이콘")]
+        public UIIcon uIIcon;
         [Header("재료 개수 텍스트")]
         public TextMeshProUGUI textItemCount;
-
-        public UIIcon uIIcon;
 
         [Header("재료 개수 텍스트 색상")] public Color colorItemCount = Color.white;
         [Header("재료 개수 텍스트 부족할때 색상")] public Color colorItemCountLack = Color.red;
@@ -58,14 +59,12 @@ namespace GGemCo.Scripts
             uIIcon.windowUid = UIWindowManager.WindowUid.ItemUpgrade;
             uIIcon.SetDrag(false);
             uIIcon.SetClick(false);
-            // if (imageIcon != null)
-            // {
-            //     imageIcon.sprite = Resources.Load<Sprite>(info.ImagePath);
-            // }
 
             UpdateCount();
         }
-
+        /// <summary>
+        /// 강화 후 내가 가지고 있는 재료 count 업데이트 해주기
+        /// </summary>
         private void UpdateCount()
         {
             if (textItemCount == null) return;
@@ -82,14 +81,20 @@ namespace GGemCo.Scripts
         public void ClearInfo()
         {
         }
-
+        /// <summary>
+        /// 필요한 재료 개수를 가지고 있는지 체크
+        /// </summary>
+        /// <returns></returns>
         public bool CheckHaveCount()
         {
             if (currentItemUid <= 0) return true;
             int haveCount = inventoryData.GetCountByItemUid(currentItemUid);
             return haveCount >= currentNeedCount;
         }
-
+        /// <summary>
+        /// 재료 item uid, 필요한 개수
+        /// </summary>
+        /// <returns></returns>
         public (int, int) GetItemUidCount()
         {
             return (currentItemUid, currentNeedCount);

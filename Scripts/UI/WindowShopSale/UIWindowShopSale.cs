@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace GGemCo.Scripts
 {
     /// <summary>
-    /// 플레이어 스킬
+    /// 아이템 판매 윈도우
     /// </summary>
     public class UIWindowShopSale : UIWindow
     {

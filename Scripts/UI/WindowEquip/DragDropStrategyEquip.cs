@@ -1,9 +1,11 @@
-﻿using System;
-using GGemCo.Scripts.UI;
+﻿using GGemCo.Scripts.UI;
 using UnityEngine;
 
 namespace GGemCo.Scripts
 {
+    /// <summary>
+    /// 플레이어 장비 윈도우 - 아이콘 드래그 앤 드랍 관리
+    /// </summary>
     public class DragDropStrategyEquip : IDragDropStrategy
     {
         public void HandleDragInIcon(UIWindow window, UIIcon droppedUIIcon, UIIcon targetUIIcon)

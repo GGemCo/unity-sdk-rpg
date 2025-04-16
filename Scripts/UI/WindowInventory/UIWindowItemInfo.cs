@@ -7,7 +7,7 @@ using UnityEngine;
 namespace GGemCo.Scripts
 {
     /// <summary>
-    /// 아이템 정보
+    /// 아이템 정보 윈도우
     /// </summary>
     public class UIWindowItemInfo : UIWindow
     {

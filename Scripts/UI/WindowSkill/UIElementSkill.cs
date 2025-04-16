@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace GGemCo.Scripts
 {
     /// <summary>
-    /// 스킬 리스트 element
+    /// 플레이어 스킬 윈도우 - 스킬 리스트 element
     /// </summary>
     public class UIElementSkill : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler 
     {

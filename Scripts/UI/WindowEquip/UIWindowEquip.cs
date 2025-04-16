@@ -1,9 +1,8 @@
-﻿using UnityEngine;
-
+﻿
 namespace GGemCo.Scripts
 {
     /// <summary>
-    /// 플레이어 장비
+    /// 플레이어 장비 윈도우
     /// </summary>
     public class UIWindowEquip : UIWindow
     {

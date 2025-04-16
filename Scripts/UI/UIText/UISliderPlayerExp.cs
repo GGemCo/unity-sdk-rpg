@@ -4,6 +4,9 @@ using UnityEngine.UI;
 
 namespace GGemCo.Scripts
 {
+    /// <summary>
+    /// EXP 데이터 변경 시 UI 업데이트
+    /// </summary>
     public class UISliderPlayerExp : MonoBehaviour
     {
         private Slider sliderExp;

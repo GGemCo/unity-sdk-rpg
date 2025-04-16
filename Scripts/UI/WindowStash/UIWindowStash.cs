@@ -1,7 +1,9 @@
-﻿using UnityEngine;
-
+﻿
 namespace GGemCo.Scripts
 {
+    /// <summary>
+    /// 창고 윈도우
+    /// </summary>
     public class UIWindowStash : UIWindow
     {
         private UIWindowItemInfo uiWindowItemInfo;

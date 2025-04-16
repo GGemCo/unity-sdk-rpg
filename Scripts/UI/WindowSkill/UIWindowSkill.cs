@@ -4,7 +4,7 @@ using UnityEngine;
 namespace GGemCo.Scripts
 {
     /// <summary>
-    /// 플레이어 스킬
+    /// 플레이어 스킬 윈도우
     /// </summary>
     public class UIWindowSkill : UIWindow
     {
