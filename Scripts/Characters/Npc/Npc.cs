@@ -1,3 +1,6 @@
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace GGemCo.Scripts
@@ -120,10 +123,12 @@ namespace GGemCo.Scripts
                 SceneGame.Instance.InteractionManager.SetInfo(this);
             }
         }
-
         protected void OnTriggerExit2D(Collider2D collision)
         {
-            if (!Application.isPlaying || !enabled || !gameObject.activeInHierarchy) return;
+#if UNITY_EDITOR
+            if (UnityEditorHelper.GetIsExitingPlayMode())
+                return;
+#endif
             
             if (collision.gameObject.CompareTag(ConfigTags.GetValue(ConfigTags.Keys.Player)))
             {
