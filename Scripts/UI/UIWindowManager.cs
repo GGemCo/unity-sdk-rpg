@@ -30,7 +30,8 @@ namespace GGemCo.Scripts
             Stash,
             ShopSale,
             ItemUpgrade,
-            ItemSalvage
+            ItemSalvage,
+            ItemCraft
         }
         [Header("기본속성")]
         [Tooltip("윈도우 리스트")]

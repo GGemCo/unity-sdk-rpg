@@ -93,6 +93,7 @@ namespace GGemCo.Scripts
             {
                 UIWindowManager.WindowUid.Skill => new SlotIconBuildStrategySkill(),
                 UIWindowManager.WindowUid.ItemSalvage => new SlotIconBuildStrategyItemSalvage(),
+                UIWindowManager.WindowUid.ItemCraft => new SlotIconBuildStrategyItemCraft(),
                 _ => null,
             };
         }
