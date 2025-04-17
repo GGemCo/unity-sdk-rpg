@@ -372,5 +372,8 @@ namespace GGemCo.Scripts
                 SceneGame.uIWindowManager.RegisterIcon(UIWindowManager.WindowUid.Inventory, parent.Item2, uid, 1);
             }
         }
+
+        public int GetResultIconSlotIndex() => ResultIconSlotIndex;
+        public int GetSourceIconSlotIndex() => SourceIconSlotIndex;
     }
 }

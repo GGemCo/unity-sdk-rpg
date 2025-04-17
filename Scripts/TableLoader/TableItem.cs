@@ -105,6 +105,7 @@ namespace GGemCo.Scripts
                 { "Shop", ItemConstants.AntiFlag.ShopSale },
                 { "Stash", ItemConstants.AntiFlag.Stash },
                 { "Salvage", ItemConstants.AntiFlag.Salvage },
+                { "Upgrade", ItemConstants.AntiFlag.Upgrade },
             };
         }
         private static ItemConstants.Type ConvertType(string type) => MapType.GetValueOrDefault(type, ItemConstants.Type.None);

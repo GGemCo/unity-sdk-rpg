@@ -10,8 +10,8 @@ namespace GGemCo.Scripts
     {
         public void HandleDragInIcon(UIWindow window, UIIcon droppedUIIcon, UIIcon targetUIIcon)
         {
-            UIWindowItemUpgrade uiWindowEquip = window as UIWindowItemUpgrade;
-            if (uiWindowEquip == null) return;
+            UIWindowItemUpgrade uiWindowItemUpgrade = window as UIWindowItemUpgrade;
+            if (uiWindowItemUpgrade == null) return;
             UIIconItem uiIconItem = droppedUIIcon as UIIconItem;
             if (uiIconItem == null) return;
             UIWindow droppedWindow = droppedUIIcon.window;
@@ -35,17 +35,27 @@ namespace GGemCo.Scripts
             int targetIconUid = targetUIIcon.uid;
             int targetIconCount = targetUIIcon.GetCount();
 
-            if (targetIconSlotIndex < window.maxCountIcon)
+            // 결과 slot 에 드래그 했을 때 return 처리 
+            if (targetIconSlotIndex == uiWindowItemUpgrade.GetResultIconSlotIndex())
             {
-                // 장착 아이템 인지 체크
-                // 착용할 수 있는 부위인지 체크
-                if (uiIconItem.IsTypeEquip() && uiIconItem.IsEquipParts(targetIconSlotIndex))
+                return;
+            }
+            // 인벤토리에서 상점으로 드래그 앤 드랍 했을 때만 처리한다 
+            if (droppedWindowUid == UIWindowManager.WindowUid.Inventory && targetIconSlotIndex < uiWindowItemUpgrade.maxCountIcon)
+            {
+                // 분해할 수 있는 아이템 인지 체크
+                if (droppedUIIcon.IsAntiFlag(ItemConstants.AntiFlag.Upgrade))
                 {
+                    SceneGame.Instance.systemMessageManager.ShowMessageWarning("강화 할 수 없는 아이템 입니다.");
+                    return;
                 }
-                else
+                // 기존 register 된 아이콘이 있으면 un register 해주기
+                var registerIcon = uiWindowItemUpgrade.GetIconByIndex(uiWindowItemUpgrade.GetSourceIconSlotIndex());
+                if (registerIcon != null && registerIcon.uid > 0)
                 {
-                    SceneGame.Instance.systemMessageManager.ShowMessageWarning("해당 슬롯에는 착용할 수 없는 아이템 입니다.");
+                    SceneGame.Instance.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ItemUpgrade, 0);
                 }
+                SceneGame.Instance.uIWindowManager.RegisterIcon(UIWindowManager.WindowUid.Inventory, dropIconSlotIndex, UIWindowManager.WindowUid.ItemUpgrade, 1);
             }
         }
 

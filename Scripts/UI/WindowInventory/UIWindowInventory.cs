@@ -150,14 +150,13 @@ namespace GGemCo.Scripts
             // 아이템 강화
             else if (uiWindowItemUpgrade.IsOpen())
             {
-                var info = TableLoaderManager.Instance.TableItemUpgrade.GetDataBySourceItemUid(icon.uid);
-                if (info == null)
+                if (icon.IsAntiFlag(ItemConstants.AntiFlag.Upgrade))
                 {
-                    SceneGame.systemMessageManager.ShowMessageWarning("강화 할 수 없는 아이템 입니다.");
+                    SceneGame.systemMessageManager.ShowMessageWarning("강화할 수 없는 아이템 입니다.");
                     return;
                 }
                 // 기존 register 된 아이콘이 있으면 un register 해주기
-                var registerIcon = uiWindowItemUpgrade.GetIconByIndex(0);
+                var registerIcon = uiWindowItemUpgrade.GetIconByIndex(uiWindowItemUpgrade.GetSourceIconSlotIndex());
                 if (registerIcon != null && registerIcon.uid > 0)
                 {
                     SceneGame.uIWindowManager.UnRegisterIcon(UIWindowManager.WindowUid.ItemUpgrade, 0);
@@ -176,12 +175,6 @@ namespace GGemCo.Scripts
                 if (uiWindowItemSalvage.CheckSalvagePossibleCount() == false)
                 {
                     SceneGame.systemMessageManager.ShowMessageWarning("더 이상 아이템을 등록할 수 없습니다.");
-                    return;
-                }
-                var info = TableLoaderManager.Instance.TableItemSalvage.GetDataBySourceItemUid(icon.uid);
-                if (info == null)
-                {
-                    GcLogger.LogError("분해 테이블에 정보가 없습니다. item uid:" + icon.uid);
                     return;
                 }
                 SceneGame.uIWindowManager.RegisterIcon(uid, icon.slotIndex, UIWindowManager.WindowUid.ItemSalvage,

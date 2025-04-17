@@ -62,7 +62,8 @@ namespace GGemCo.Scripts
             None,
             ShopSale,
             Stash,
-            Salvage
+            Salvage,
+            Upgrade,
         }
         /// <summary>
         /// 부위별 리소스 폴더 이름
@@ -107,6 +108,7 @@ namespace GGemCo.Scripts
             { AntiFlag.ShopSale, "상점 판매 불가" },
             { AntiFlag.Stash, "창고 보관 불가" },
             { AntiFlag.Salvage, "분해 불가" },
+            { AntiFlag.Upgrade, "강화 불가" },
         };
 
         public static string GetAntiFlagName(AntiFlag antiFlag)

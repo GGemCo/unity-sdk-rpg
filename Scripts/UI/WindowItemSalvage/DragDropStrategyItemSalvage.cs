@@ -33,25 +33,29 @@ namespace GGemCo.Scripts
             int targetIconUid = targetUIIcon.uid;
             int targetIconCount = targetUIIcon.GetCount();
 
+            // 분해 결과 slot 에 드래그 했을 때 return 처리 
+            if (targetIconSlotIndex >= uiWindowItemSalvage.salvageIconCount)
+            {
+                return;
+            }
+            
             // 인벤토리에서 상점으로 드래그 앤 드랍 했을 때만 처리한다 
             if (droppedWindowUid == UIWindowManager.WindowUid.Inventory && targetIconSlotIndex < uiWindowItemSalvage.maxCountIcon)
             {
                 // 분해할 수 있는 아이템 인지 체크
                 if (droppedUIIcon.IsAntiFlag(ItemConstants.AntiFlag.Salvage))
                 {
-                    SceneGame.Instance.systemMessageManager.ShowMessageWarning("해당 아이템은 분해할 수 없는 아이템 입니다.");
+                    SceneGame.Instance.systemMessageManager.ShowMessageWarning("분해할 수 없는 아이템 입니다.");
+                    return;
                 }
-                else
+                // 분해 할 수 있는 개수가 넘어가지 않았는지 체크
+                if (uiWindowItemSalvage.CheckSalvagePossibleCount() == false)
                 {
-                    // 분해 할 수 있는 개수가 넘어가지 않았는지 체크
-                    if (uiWindowItemSalvage.CheckSalvagePossibleCount() == false)
-                    {
-                        SceneGame.Instance.systemMessageManager.ShowMessageWarning("더 이상 아이템을 등록할 수 없습니다.");
-                        return;
-                    }
-                    SceneGame.Instance.uIWindowManager.RegisterIcon(droppedWindowUid, dropIconSlotIndex,
-                        UIWindowManager.WindowUid.ItemSalvage, dropIconCount);
+                    SceneGame.Instance.systemMessageManager.ShowMessageWarning("더 이상 아이템을 등록할 수 없습니다.");
+                    return;
                 }
+                SceneGame.Instance.uIWindowManager.RegisterIcon(droppedWindowUid, dropIconSlotIndex,
+                    UIWindowManager.WindowUid.ItemSalvage, dropIconCount);
             }
         }
 
