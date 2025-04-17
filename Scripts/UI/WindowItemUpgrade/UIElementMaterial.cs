@@ -23,7 +23,7 @@ namespace GGemCo.Scripts
         private int currentItemUid;
         private int currentNeedCount;
         
-        private UIWindowItemUpgrade uiWindowItemUpgrade;
+        private UIWindow uiWindowParent;
 
         /// <summary>
         /// 초기 설정 해주고 active 해준다.
@@ -31,9 +31,9 @@ namespace GGemCo.Scripts
         /// <param name="itemUid"></param>
         /// <param name="needCount"></param>
         /// <param name="parentWindow"></param>
-        public void InitializeSetInfo(int itemUid, int needCount, UIWindowItemUpgrade parentWindow)
+        public void InitializeSetInfo(int itemUid, int needCount, UIWindow parentWindow)
         {
-            uiWindowItemUpgrade = parentWindow;
+            uiWindowParent = parentWindow;
             currentItemUid = itemUid;
             currentNeedCount = needCount;
             gameObject.SetActive(true);
@@ -55,7 +55,7 @@ namespace GGemCo.Scripts
             }
 
             uIIcon.ChangeInfoByUid(currentItemUid, 1);
-            uIIcon.window = uiWindowItemUpgrade;
+            uIIcon.window = uiWindowParent;
             uIIcon.windowUid = UIWindowManager.WindowUid.ItemUpgrade;
             uIIcon.SetDrag(false);
             uIIcon.SetClick(false);

@@ -10,10 +10,14 @@ namespace GGemCo.Scripts
     /// </summary>
     public class UIElementShop : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
+        [Header("기본속성")]
+        [Tooltip("아이콘 위치")]
         public Vector3 iconPosition;
-        public Image imageIcon;
+        [Tooltip("아이템 이름")]
         public TextMeshProUGUI textName;
+        [Tooltip("구매 가격")]
         public TextMeshProUGUI textPrice;
+        [Tooltip("구매하기 버튼")]
         public Button buttonBuy;
         
         private UIWindowShop uiWindowShop;
@@ -77,10 +81,6 @@ namespace GGemCo.Scripts
                 return;
             }
 
-            if (imageIcon != null)
-            {
-                imageIcon.sprite = Resources.Load<Sprite>($"{info.ImagePath}");
-            }
             if (textName != null)
             {
                 textName.text = info.Name;

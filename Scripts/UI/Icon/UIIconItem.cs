@@ -23,6 +23,7 @@ namespace GGemCo.Scripts
             base.Awake();
             IconType = IconConstants.Type.Item;
             struckTableItem = null;
+            if (TableLoaderManager.Instance == null) return;
             tableItem = TableLoaderManager.Instance.TableItem;
         }
 
