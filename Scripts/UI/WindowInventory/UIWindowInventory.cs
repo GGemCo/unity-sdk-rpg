@@ -178,6 +178,12 @@ namespace GGemCo.Scripts
                     SceneGame.systemMessageManager.ShowMessageWarning("더 이상 아이템을 등록할 수 없습니다.");
                     return;
                 }
+                var info = TableLoaderManager.Instance.TableItemSalvage.GetDataBySourceItemUid(icon.uid);
+                if (info == null)
+                {
+                    GcLogger.LogError("분해 테이블에 정보가 없습니다. item uid:" + icon.uid);
+                    return;
+                }
                 SceneGame.uIWindowManager.RegisterIcon(uid, icon.slotIndex, UIWindowManager.WindowUid.ItemSalvage,
                     icon.GetCount());
             }

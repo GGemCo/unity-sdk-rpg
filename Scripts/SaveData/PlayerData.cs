@@ -1,4 +1,5 @@
-﻿using R3;
+﻿using System.Collections.Generic;
+using R3;
 using UnityEngine;
 
 namespace GGemCo.Scripts
@@ -221,6 +222,25 @@ namespace GGemCo.Scripts
                 return new ResultCommon(ResultCommon.Type.Success);
             }
             return new ResultCommon(ResultCommon.Type.Fail, $"{currency} 가 부족합니다.");
+        }
+        /// <summary>
+        /// 모든 재화를 채크해야하는 경우
+        /// </summary>
+        /// <param name="needCurrency"></param>
+        /// <returns></returns>
+        public ResultCommon CheckNeedCurrency(Dictionary<CurrencyConstants.Type, int> needCurrency)
+        {
+            foreach (var info in needCurrency)
+            {
+                ResultCommon resultCommon = CheckNeedCurrency(info.Key, info.Value);
+                if (resultCommon.Code == ResultCommon.Type.Fail)
+                {
+                    return new ResultCommon(ResultCommon.Type.Fail,
+                        $"{CurrencyConstants.GetNameByCurrencyType(info.Key)} 가 부족합니다.");
+                }
+            }
+
+            return new ResultCommon(ResultCommon.Type.Success);
         }
         /// <summary>
         /// 재화 빼기

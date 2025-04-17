@@ -82,6 +82,7 @@ namespace GGemCo.Scripts
         {
             if (icon == null) return;
             SceneGame.uIWindowManager.UnRegisterIcon(uid, icon.slotIndex);
+            UpdateResultInfos();
         }
 
         public override void OnShow(bool show)
@@ -89,6 +90,8 @@ namespace GGemCo.Scripts
             if (SceneGame == null || TableLoaderManager.Instance == null) return;
             if (show) return;
             UnRegisterAllIcons(uid);
+            // 분해 결과 아이콘 지워주기
+            DetachAllIcons();
         }
 
         private void InitializeInfo()
@@ -108,8 +111,13 @@ namespace GGemCo.Scripts
             {
                 UIIcon uiIcon = icon.GetComponent<UIIcon>();
                 if (uiIcon == null || uiIcon.uid <= 0 || uiIcon.GetCount() <= 0) continue;
-                // 분해 결과 icon 은 건너뛴다
-                if (uiIcon.slotIndex >= salvageIconCount) continue;
+                // 분해 결과 icon 정보는 지워준다.
+                // Detach 를 하면 UpdateResultInfos 함수가 호출되버린다.
+                if (uiIcon.slotIndex >= salvageIconCount)
+                {
+                    uiIcon.ClearIconInfos();
+                    continue;
+                }
                 var info = tableItemSalvage.GetDataBySourceItemUid(uiIcon.uid);
                 if (info == null)
                 {
@@ -143,6 +151,7 @@ namespace GGemCo.Scripts
                 int itemCount = info.Value;
                 UIIcon uiIcon = GetIconByIndex(resultIconSlotIndex);
                 uiIcon.ChangeInfoByUid(itemUid, itemCount);
+                uiIcon.SetDrag(false);
                 resultIconSlotIndex++;
             }
             totalPriceGold.OnNext(totalGold);
@@ -169,7 +178,19 @@ namespace GGemCo.Scripts
         /// </summary>
         private void OnClickSalvage()
         {
-            // 먼저 재화 처리한다
+            // 먼저 필요한 재화 모두 체크한다
+            Dictionary<CurrencyConstants.Type, int> needCurrency = new Dictionary<CurrencyConstants.Type, int>
+            {
+                { CurrencyConstants.Type.Gold, totalPriceGold.Value },
+                { CurrencyConstants.Type.Silver, totalPriceSilver.Value }
+            };
+            ResultCommon resultCommon = SceneGame.saveDataManager.Player.CheckNeedCurrency(needCurrency);
+            if (resultCommon.Code == ResultCommon.Type.Fail)
+            {
+                SceneGame.systemMessageManager.ShowMessageWarning(resultCommon.Message);
+                return;
+            }
+            // 재화 사용처리 하기
             SceneGame.saveDataManager.Player.MinusCurrency(CurrencyConstants.Type.Gold, totalPriceGold.Value);
             SceneGame.saveDataManager.Player.MinusCurrency(CurrencyConstants.Type.Silver, totalPriceSilver.Value);
 
@@ -178,7 +199,7 @@ namespace GGemCo.Scripts
             {
                 int itemUid = info.Key;
                 int itemCount = info.Value;
-                ResultCommon resultCommon = SceneGame.saveDataManager.Inventory.AddItem(itemUid, itemCount);
+                resultCommon = SceneGame.saveDataManager.Inventory.AddItem(itemUid, itemCount);
                 uiWindowInventory.SetIcons(resultCommon);
             }
             

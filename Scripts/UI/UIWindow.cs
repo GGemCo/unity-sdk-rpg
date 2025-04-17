@@ -342,13 +342,24 @@ namespace GGemCo.Scripts
                 UIIconItem uiIconItem = icon.GetComponent<UIIconItem>();
                 if (uiIconItem == null || uiIconItem.uid <= 0 || uiIconItem.GetCount() <= 0) continue;
                 var parentInfo = uiIconItem.GetParentInfo();
-                // 분해 등록 되었던것을 빼준다.
+                // 등록 되었던것을 빼준다.
                 DetachIcon(uiIconItem.slotIndex);
                 // 인벤토리에서 지워준다.
                 if (parentInfo.Item1 != UIWindowManager.WindowUid.None)
                 {
                     SceneGame.uIWindowManager.RemoveIcon(parentInfo.Item1, parentInfo.Item2);
                 }
+            }
+        }
+        /// <summary>
+        /// 모든 아이콘 detach 하기
+        /// </summary>
+        protected void DetachAllIcons()
+        {
+            foreach (var icon in icons)
+            {
+                UIIconItem uiIconItem = icon.GetComponent<UIIconItem>();
+                DetachIcon(uiIconItem.slotIndex);
             }
         }
     }
