@@ -240,6 +240,10 @@ namespace GGemCo.Scripts
         {
             if (SceneGame == null || TableLoaderManager.Instance == null) return;
             if (show) return;
+            if (textResult != null)
+            {
+                textResult.gameObject.SetActive(false);
+            }
             // 윈도우가 닫힐때
             UnRegisterAllIcons(uid);
             InitializeInfo();
