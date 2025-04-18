@@ -75,6 +75,7 @@ namespace GGemCo.Scripts
         /// <param name="slotIndex"></param>
         public void DetachIcon(int slotIndex)
         {
+            if (window.icons.Length <= 0) return;
             var icon = window.icons[slotIndex];
             var uiIcon = icon?.GetComponent<UIIcon>();
             if (uiIcon != null)
