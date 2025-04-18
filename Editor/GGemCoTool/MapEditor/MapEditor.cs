@@ -50,7 +50,6 @@ namespace GGemCo.Editor
         
         private int selectedNpcIndex;
         private int selectedMonsterIndex;
-        private const float GRID_CELL_SIZE = 64;
 
         [MenuItem("GGemCoTool/Map 배치툴", false, 3)]
         public static void ShowWindow()
@@ -74,7 +73,13 @@ namespace GGemCo.Editor
                     tag = ConfigTags.GetValue(ConfigTags.Keys.GridTileMap)
                 };
                 Grid grid = _gridTileMap.gameObject.AddComponent<Grid>();
-                grid.cellSize = new Vector3(GRID_CELL_SIZE, GRID_CELL_SIZE, 0);
+                Vector2 tilemapGridSize = AddressableSettingsLoader.Instance.mapSettings.tilemapGridCellSize;
+                if (tilemapGridSize == Vector2.zero)
+                {
+                    GcLogger.LogError("타일맵 Grid 사이즈가 정해지지 않았습니다. GGemCoMapSettings 에 Tilemap Grid Cell Size 를 입력해주세요.");
+                    return;
+                }
+                grid.cellSize = new Vector3(tilemapGridSize.x, tilemapGridSize.y, 0);
                 grid.cellLayout = GridLayout.CellLayout.Rectangle;
             }
 
