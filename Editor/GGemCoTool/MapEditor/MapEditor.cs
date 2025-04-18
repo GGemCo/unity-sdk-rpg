@@ -57,13 +57,27 @@ namespace GGemCo.Editor
             GetWindow<MapExporter>(Title);
         }
 
+        private AddressableSettingsLoader addressableSettingsLoader;
         private void OnEnable()
         {
             selectedNpcIndex = 0;
             selectedMonsterIndex = 0;
             tableLoaderManager = new TableLoaderManager();
             _tableMap = tableLoaderManager.LoadMapTable();
-            
+            addressableSettingsLoader = new AddressableSettingsLoader();
+            _ = addressableSettingsLoader.InitializeAsync();
+            addressableSettingsLoader.OnLoadSettings += Initialize;
+        }
+        /// <summary>
+        /// Addressable Settings 파일이 로드 되면 처리 하기   
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="playerSettings"></param>
+        /// <param name="mapSettings"></param>
+        /// <param name="saveSettings"></param>
+        private void Initialize(GGemCoSettings settings, GGemCoPlayerSettings playerSettings,
+            GGemCoMapSettings mapSettings, GGemCoSaveSettings saveSettings)
+        {
             // 타일맵을 추가할 grid
             _gridTileMap = GameObject.Find(ConfigTags.GetValue(ConfigTags.Keys.GridTileMap));
             if (_gridTileMap == null)
@@ -73,10 +87,11 @@ namespace GGemCo.Editor
                     tag = ConfigTags.GetValue(ConfigTags.Keys.GridTileMap)
                 };
                 Grid grid = _gridTileMap.gameObject.AddComponent<Grid>();
-                Vector2 tilemapGridSize = AddressableSettingsLoader.Instance.mapSettings.tilemapGridCellSize;
+                Vector2 tilemapGridSize = mapSettings.tilemapGridCellSize;
                 if (tilemapGridSize == Vector2.zero)
                 {
-                    GcLogger.LogError("타일맵 Grid 사이즈가 정해지지 않았습니다. GGemCoMapSettings 에 Tilemap Grid Cell Size 를 입력해주세요.");
+                    GcLogger.LogError(
+                        "타일맵 Grid 사이즈가 정해지지 않았습니다. GGemCoMapSettings 에 Tilemap Grid Cell Size 를 입력해주세요.");
                     return;
                 }
                 grid.cellSize = new Vector3(tilemapGridSize.x, tilemapGridSize.y, 0);
@@ -92,8 +107,8 @@ namespace GGemCo.Editor
             npcExporter.Initialize(tableNpc, tableSpine, defaultMap);
             monsterExporter.Initialize(tableMonster, tableSpine, defaultMap);
             warpExporter.Initialize(defaultMap);
-             LoadNpcInfoData();
-             LoadMonsterInfoData();
+            LoadNpcInfoData();
+            LoadMonsterInfoData();
         }
 
         private void OnDestroy()
@@ -109,10 +124,14 @@ namespace GGemCo.Editor
             {
                 DestroyImmediate(obj);
             }
+            
+            addressableSettingsLoader.OnLoadSettings -= Initialize;
         }
 
         private void OnGUI()
         {
+            if (_npcNames == null) return;
+            
             GUILayout.Label("* 맵 배치 불러오기", EditorStyles.whiteLargeLabel);
             // 파일 경로 및 파일명 입력
             loadMapUid = EditorGUILayout.TextField("Map Uid", loadMapUid);
