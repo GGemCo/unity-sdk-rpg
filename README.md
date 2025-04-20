@@ -7,6 +7,12 @@
 - 맵 이동
 - 인벤토리
 - 게임 데이터 저장
+- 기능 Npc
+  - 상점
+  - 창고
+  - 아이템 강화
+  - 아이템 분해
+  - 아이템 제작
 
 ## 제작 환경
 - Unity : 2022.3.16f1 이상
@@ -22,7 +28,7 @@
 
 ## 관련 링크
 - 설명 동영상 : https://www.youtube.com/@ggemco
-- 설명 문서 : https://sturdy-coat-0d2.notion.site/Unity-example-rpg-v1-0-1-fb36d91845834d13a565dcbd987e192c?pvs=4
+- 설명 문서 : https://sturdy-coat-0d2.notion.site/2D-RPG-Unity-2D-RPG-Tutorial-1ccbf593397e802ba3edcda8b2e3a8c3?pvs=4
 
 ## 라이센스
 이 코드를 사용하여 게임을 개발 및 판매하는 것은 허용됩니다.<br>
