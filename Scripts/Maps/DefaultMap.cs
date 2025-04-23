@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -13,6 +14,10 @@ namespace GGemCo.Scripts
         private MapConstants.Type mapType;
         private MapConstants.SubType mapSubType;
         private Tilemap tilemap;
+        // 맵에 배치된 몬스터
+        protected readonly Dictionary<int, GameObject> Monsters = new Dictionary<int, GameObject>();
+        // 맵에 배치된 npc
+        protected readonly Dictionary<int, GameObject> Npcs = new Dictionary<int, GameObject>();
 
         protected virtual void Awake()
         {
@@ -94,24 +99,60 @@ namespace GGemCo.Scripts
             return (totalWidth, totalHeight);
         }
         /// <summary>
+        /// vid 값으로 몬스터 찾기  
+        /// </summary>
+        /// <param name="vid"></param>
+        /// <returns></returns>
+        public NpcData GetNpcDataByVid(int vid)
+        {
+            GameObject npc = Npcs.GetValueOrDefault(vid);
+            if (npc == null) return null;
+            Npc myNpc = npc.GetComponent<Npc>();
+            if (myNpc == null) return null;
+            return myNpc.NpcData;
+        }
+        /// <summary>
+        /// vid 값으로 몬스터 찾기  
+        /// </summary>
+        /// <param name="vid"></param>
+        /// <returns></returns>
+        public MonsterData GetMonsterDataByVid(int vid)
+        {
+            GameObject monster = Monsters.GetValueOrDefault(vid);
+            if (monster == null) return null;
+            Monster myMonster = monster.GetComponent<Monster>();
+            if (myMonster == null) return null;
+            return myMonster.MonsterData;
+        }
+        /// <summary>
         /// 맵에 배치된 npc 중에 uid 로 가져오기
         /// </summary>
         /// <param name="npcUid"></param>
         /// <returns></returns>
         public Npc GetNpcByUid(int npcUid)
         {
-            for (var i = 0; i < transform.childCount; i++)
+            foreach (var data in Npcs)
             {
-                var childTransform = transform.GetChild(i);
-                if (childTransform == null) continue;
-                Npc npc = childTransform.GetComponent<Npc>();
+                Npc npc = data.Value?.GetComponent<Npc>();
                 if (npc == null) continue;
                 if (npc.uid == npcUid)
                 {
                     return npc;
                 }
             }
-        
+            return null;
+        }
+        public Monster GetMonsterByUid(int monsterUid)
+        {
+            foreach (var data in Monsters)
+            {
+                Monster monster = data.Value?.GetComponent<Monster>();
+                if (monster == null) continue;
+                if (monster.uid == monsterUid)
+                {
+                    return monster;
+                }
+            }
             return null;
         }
         protected void LateUpdate()
@@ -122,6 +163,56 @@ namespace GGemCo.Scripts
 
         protected virtual void CalculateCullingBounds()
         {
+        }
+        /// <summary>
+        /// npc를 스폰하면서 List 에 추가하기
+        /// </summary>
+        /// <param name="vid"></param>
+        /// <param name="npc"></param>
+        public void AddNpc(int vid, GameObject npc)
+        {
+            if (npc == null) return;
+            Npcs.Add(vid, npc);
+        }
+        /// <summary>
+        /// 몬스터를 스폰하면서 List 에 추가하기
+        /// </summary>
+        /// <param name="vid"></param>
+        /// <param name="monster"></param>
+        public void AddMonster(int vid, GameObject monster)
+        {
+            if (monster == null) return;
+            Monsters.Add(vid, monster);
+        }
+        /// <summary>
+        /// 플레이어 기준 range 안에서 가장 가까운 몬스터 찾기
+        /// </summary>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        public Monster GetNearByMonsterDistance(int range)
+        {
+            Monster closeMonster = null;
+            float closestDistance = float.MaxValue;
+            Vector3 playerPosition = SceneGame.Instance.player.transform.position;
+            foreach (var data in Monsters)
+            {
+                GameObject monster = data.Value;
+                if (monster == null) continue;
+                Monster myMonster = monster.GetComponent<Monster>();
+                if (myMonster == null || myMonster.IsStatusDead() || !myMonster.gameObject.activeSelf) continue;
+                
+                // 거리 계산
+                float distance = Vector2.Distance(playerPosition, monster.transform.position);
+                if (distance > range) continue;
+
+                // 가장 가까운 NPC 업데이트
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closeMonster = myMonster;
+                }
+            }
+            return closeMonster;
         }
 
     }

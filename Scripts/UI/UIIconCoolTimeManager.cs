@@ -22,7 +22,6 @@ namespace GGemCo.Scripts
                 dictionaryCoolTime[windowUid][icon.uid] = handler;
             }
         }
-
         private void Update()
         {
             foreach (var datas in dictionaryCoolTime)

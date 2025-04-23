@@ -58,8 +58,8 @@ namespace GGemCo.Scripts
             {
                 spawnPosition = playSpawnPosition;
             }
-            SceneGame.Instance.player.GetComponent<Player>().MoveForce(spawnPosition.x, spawnPosition.y);
-            // SceneGame.Instance.cameraManager.MoveCameraPosition(spawnPosition.x, spawnPosition.y);
+            SceneGame.Instance.player.GetComponent<Player>().MoveTeleport(spawnPosition.x, spawnPosition.y);
+            SceneGame.Instance.cameraManager.SetFollowTarget(SceneGame.Instance.player.transform);
 
             // yield return new WaitForSeconds(ConfigCommon.CharacterFadeSec/2);
             yield return null;
@@ -126,7 +126,9 @@ namespace GGemCo.Scripts
                 GcLogger.LogError("프리팹이 없습니다. spine uid: " + info.SpineUid);
                 return;
             }
-            GameObject monster = SceneGame.Instance.CharacterManager.CreateMonster(monsterPrefab, new Vector3(monsterData.x, monsterData.y, monsterData.z), mapTileCommon.gameObject.transform);
+
+            GameObject monster = SceneGame.Instance.CharacterManager.CreateMonster(monsterPrefab,
+                new Vector3(monsterData.x, monsterData.y, monsterData.z), mapTileCommon.gameObject.transform);
             
             // 몬스터의 이름과 기타 속성 설정
             Monster myMonsterScript = monster.GetComponent<Monster>();

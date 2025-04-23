@@ -13,7 +13,7 @@ namespace GGemCo.Scripts
         public int SpineUid;
         public string DefaultSkin;
         public float Scale;
-        public CharacterBase.Grade Grade;
+        public CharacterConstants.Grade Grade;
         public int Level;
         public int StatHp;
         public int StatAtk;
@@ -31,18 +31,18 @@ namespace GGemCo.Scripts
     /// </summary>
     public class TableMonster : DefaultTable
     {
-        private static readonly Dictionary<string, CharacterBase.Grade> MapGrade;
+        private static readonly Dictionary<string, CharacterConstants.Grade> MapGrade;
 
         static TableMonster()
         {
-            MapGrade = new Dictionary<string, CharacterBase.Grade>
+            MapGrade = new Dictionary<string, CharacterConstants.Grade>
             {
-                { "Common", CharacterBase.Grade.Common },
-                { "Boss", CharacterBase.Grade.Boss },
+                { "Common", CharacterConstants.Grade.Common },
+                { "Boss", CharacterConstants.Grade.Boss },
             };
         }
 
-        private CharacterBase.Grade ConvertGrade(string grade) => MapGrade.GetValueOrDefault(grade, CharacterBase.Grade.None);
+        private CharacterConstants.Grade ConvertGrade(string grade) => MapGrade.GetValueOrDefault(grade, CharacterConstants.Grade.None);
 
         public StruckTableMonster GetDataByUid(int uid)
         {

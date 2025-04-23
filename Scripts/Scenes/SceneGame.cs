@@ -29,6 +29,8 @@ namespace GGemCo.Scripts
         public GameObject bgBlackForMapLoading;
         [Tooltip("몬스터 Hp Bar 오브젝트가 들어갈 오브젝트 입니다.")]
         public GameObject containerMonsterHpBar;
+        [Tooltip("연출 말풍선이 들어갈 오브젝트 입니다.")]
+        public GameObject containerDialogueBalloon;
         
         [Header("매니저")]
         [Tooltip("윈도우 매니저")]
@@ -39,6 +41,8 @@ namespace GGemCo.Scripts
         public CameraManager cameraManager;
         [Tooltip("팝업 매니저")]
         public PopupManager popupManager;
+        [Tooltip("연출 매니저")]
+        public CutsceneManager cutsceneManager;
         [HideInInspector] public SaveDataManager saveDataManager;
         [HideInInspector] public CalculateManager calculateManager;
         [HideInInspector] public MapManager mapManager;

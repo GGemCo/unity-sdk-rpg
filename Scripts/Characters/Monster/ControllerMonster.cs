@@ -22,6 +22,7 @@ namespace GGemCo.Scripts
         }
         private void Update()
         {
+            if (TargetCharacter.IsStatusMoveForce()) return;
             if (TargetCharacter.IsStatusDead()) return;
             
             if (TargetCharacter.IsAggro())
@@ -154,7 +155,7 @@ namespace GGemCo.Scripts
                     Attack();
                 }
                 // 선공
-                else if (TargetCharacter.GetAttackType() == CharacterBase.AttackType.AggroFirst && TargetCharacter.IsAggro() == false)
+                else if (TargetCharacter.GetAttackType() == CharacterConstants.AttackType.AggroFirst && TargetCharacter.IsAggro() == false)
                 {
                     TargetCharacter.SetAggro(true);
                     TargetCharacter.SetAttackerTarget(collision.gameObject.transform);

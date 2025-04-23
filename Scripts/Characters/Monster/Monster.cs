@@ -12,7 +12,7 @@ namespace GGemCo.Scripts
         // 몬스터 데이터
         [HideInInspector] public MonsterData MonsterData;
         // 선공/후공
-        private AttackType attackType;
+        private CharacterConstants.AttackType attackType;
         public delegate void DelegateMonsterDead(int monsterVid, int monsterUid, GameObject monsterObject);
         public event DelegateMonsterDead OnMonsterDead;
         
@@ -28,7 +28,7 @@ namespace GGemCo.Scripts
         {
             base.Awake();
             MonsterData = null;
-            attackType = AttackType.PassiveDefense;
+            attackType = CharacterConstants.AttackType.PassiveDefense;
             
             OnMonsterDead += SceneGame.Instance.ItemManager.OnMonsterDead;
             OnMonsterDead += SceneGame.Instance.saveDataManager.Player.AddExp;

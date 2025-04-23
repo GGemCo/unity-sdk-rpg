@@ -20,9 +20,15 @@ namespace GGemCo.Scripts
                 sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowInteractionDialogue>(UIWindowManager.WindowUid.Dialogue);
                 sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowShopSale>(UIWindowManager.WindowUid.ShopSale);
         }
-
+        /// <summary>
+        /// Npc 의 interaction 정보 가져오기
+        /// </summary>
+        /// <param name="characterBase"></param>
         public void SetInfo(CharacterBase characterBase)
         {
+            // 연출 중이면 실행하지 않는다.
+            if (sceneGame.cutsceneManager.IsPlaying()) return;
+            
             if (characterBase == null)
             {
                 GcLogger.LogError("Npc 스크립트가 없습니다.");

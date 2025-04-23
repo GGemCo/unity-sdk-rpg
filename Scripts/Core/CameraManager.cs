@@ -6,11 +6,15 @@ namespace GGemCo.Scripts
 {
     public class CameraManager : MonoBehaviour
     {
+        private float originalOrthographicSize;
         private Vector3 originCameraPosition;
+        private Camera currentCamera;
+        
         private Vector3 cameraPosition;
         private Vector2 center;
         private Vector2 mapSize;
         private Vector2 monsterSpawnPositionBoxSize;
+        private Transform followTarget;
         
         [SerializeField] float cameraMoveSpeed;
         float width;
@@ -19,19 +23,35 @@ namespace GGemCo.Scripts
         // 흔들림 효과 관련 변수
         private Vector3 originalPos;
         private bool isShaking;
+        
+        // 줌 관련 처리 
+        private bool isZooming;
+        private float zoomTimer;
+        private float zoomDuration;
+        private float zoomStartSize;
+        private float zoomEndSize;
+        private Easing.EaseType zoomEasing;
 
         private void Awake()
         {
+            isShaking = false;
+            isZooming = false;
+            zoomTimer = 0;
+            zoomDuration = 0;
+            zoomStartSize = 0;
+            zoomEndSize = 0;
+            zoomEasing = Easing.EaseType.Linear;
             originCameraPosition = Vector3.zero;
+            
+            currentCamera = GetComponent<Camera>();
+            originalOrthographicSize = currentCamera.orthographicSize;
+            height = originalOrthographicSize;
+            width = height * Screen.width / Screen.height;
+            originalPos = transform.localPosition;
         }
 
         private void Start()
         {
-            Camera mainCamera = GetComponent<Camera>();
-            height = mainCamera.orthographicSize;
-            width = height * Screen.width / Screen.height;
-            originalPos = transform.localPosition;
-            isShaking = false;
         }
 
         private void Update()
@@ -40,9 +60,9 @@ namespace GGemCo.Scripts
         }
         private void LimitCameraArea()
         {
-            if (SceneGame.Instance.player == null || mapSize.x == 0) return;
+            if (followTarget == null || mapSize.x == 0) return;
             // 플레이어를 따라가는 카메라 위치 계산
-            Vector3 targetPos = SceneGame.Instance.player.transform.position + cameraPosition;
+            Vector3 targetPos = followTarget.position + cameraPosition;
             targetPos = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * cameraMoveSpeed);
     
             // 맵의 좌측 상단을 기준으로 경계 내로 제한
@@ -66,8 +86,20 @@ namespace GGemCo.Scripts
                 transform.position = new Vector3(clampX, clampY, -10f);
                 originalPos = transform.position;
             }
-        }
 
+            if (isZooming)
+            {
+                zoomTimer += Time.deltaTime;
+                float t = Mathf.Clamp01(zoomTimer / zoomDuration);
+                float easedT = Easing.Apply(t, zoomEasing);
+                float zoom = Mathf.Lerp(zoomStartSize, zoomEndSize, easedT);
+                currentCamera.orthographicSize = zoom;
+                if (t >= 1f)
+                {
+                    isZooming = false;
+                }
+            }
+        }
         private IEnumerator Shake(float duration, float magnitude)
         {
             isShaking = true;
@@ -134,7 +166,47 @@ namespace GGemCo.Scripts
             cameraPosition.x = originCameraPosition.x;
             cameraPosition.y = originCameraPosition.y;
         }
-        
+        /// <summary>
+        /// 따라가는 캐릭터 변경
+        /// </summary>
+        /// <param name="target"></param>
+        public void SetFollowTarget(Transform target)
+        {
+            followTarget = target == null ? SceneGame.Instance.player.transform : target;
+        }
+        /// <summary>
+        /// player 따라가도록 설정
+        /// </summary>
+        public void SetFollowPlayer()
+        {
+            if (SceneGame.Instance == null || SceneGame.Instance.player == null) return;
+            SetFollowTarget(SceneGame.Instance.player.transform);
+        }
+        /// <summary>
+        /// orthographicSize 변경하기
+        /// </summary>
+        /// <param name="size"></param>
+        public void StartZoom(float size)
+        {
+            zoomTimer = 0;
+            zoomStartSize = currentCamera.orthographicSize;
+            zoomEndSize = size;
+            zoomDuration = 1f;
+            zoomEasing = Easing.EaseType.EaseOutQuad;
+            isZooming = true;
+        }
+        /// <summary>
+        /// orthographicSize 초기화
+        /// </summary>
+        public void ReSetZoom()
+        {
+            zoomTimer = 0;
+            zoomStartSize = currentCamera.orthographicSize;
+            zoomEndSize = originalOrthographicSize;
+            zoomDuration = 1f;
+            zoomEasing = Easing.EaseType.EaseOutQuad;
+            isZooming = true;
+        }
         private void OnDrawGizmos()
         {
             // Gizmos.color = Color.red;

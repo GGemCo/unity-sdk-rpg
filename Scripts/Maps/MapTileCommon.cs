@@ -10,11 +10,6 @@ namespace GGemCo.Scripts
         public float extraTileCount = 200f;
         private TilemapRenderer tilemapRenderer;
 
-        // 맵에 배치된 몬스터
-        private readonly Dictionary<int, GameObject> monsters = new Dictionary<int, GameObject>();
-        // 맵에 배치된 npc
-        private readonly Dictionary<int, GameObject> npcs = new Dictionary<int, GameObject>();
-
         private Bounds cullingBounds; // 현재 컬링 범위를 저장할 변수
         private float mainCameraZ;
 
@@ -66,8 +61,8 @@ namespace GGemCo.Scripts
             ));
 
             // 오브젝트 활성화/비활성화 처리
-            UpdateObjectActivation(monsters, cullingBounds);
-            UpdateObjectActivation(npcs, cullingBounds);
+            UpdateObjectActivation(Monsters, cullingBounds);
+            UpdateObjectActivation(Npcs, cullingBounds);
         }
         /// <summary>
         /// npc, 몬스터 컬링 처리
@@ -102,80 +97,17 @@ namespace GGemCo.Scripts
             }
         }
         /// <summary>
-        /// npc를 스폰하면서 List 에 추가하기
-        /// </summary>
-        /// <param name="vid"></param>
-        /// <param name="npc"></param>
-        public void AddNpc(int vid, GameObject npc)
-        {
-            if (npc == null) return;
-            npcs.Add(vid, npc);
-        }
-        /// <summary>
-        /// 몬스터를 스폰하면서 List 에 추가하기
-        /// </summary>
-        /// <param name="vid"></param>
-        /// <param name="monster"></param>
-        public void AddMonster(int vid, GameObject monster)
-        {
-            if (monster == null) return;
-            monsters.Add(vid, monster);
-        }
-        /// <summary>
         /// 퀘스트 상태가 변경되었을때, npc 에 연결된 퀘스트 버튼 업데이트 해주기 
         /// </summary>
         public void OnChangeNpcQuestStatus()
         {
-            foreach (var npc in npcs)
+            foreach (var npc in Npcs)
             {
                 if (npc.Value == null) continue;
                 // NpcQuestButton npcQuestButton = npc.GetComponent<NpcQuestButton>();
                 // if (npcQuestButton == null) continue;
                 // npcQuestButton.OnChangeQuestStatus();
             }
-        }
-        /// <summary>
-        /// vid 값으로 몬스터 찾기  
-        /// </summary>
-        /// <param name="vid"></param>
-        /// <returns></returns>
-        public MonsterData GetMonsterDataByVid(int vid)
-        {
-            GameObject monster = monsters.GetValueOrDefault(vid);
-            if (monster == null) return null;
-            Monster myMonster = monster.GetComponent<Monster>();
-            if (myMonster == null) return null;
-            return myMonster.MonsterData;
-        }
-        /// <summary>
-        /// 플레이어 기준 range 안에서 가장 가까운 몬스터 찾기
-        /// </summary>
-        /// <param name="range"></param>
-        /// <returns></returns>
-        public Monster GetNearByMonsterDistance(int range)
-        {
-            Monster closeMonster = null;
-            float closestDistance = float.MaxValue;
-            Vector3 playerPosition = SceneGame.Instance.player.transform.position;
-            foreach (var data in monsters)
-            {
-                GameObject monster = data.Value;
-                if (monster == null) continue;
-                Monster myMonster = monster.GetComponent<Monster>();
-                if (myMonster == null || myMonster.IsStatusDead() || !myMonster.gameObject.activeSelf) continue;
-                
-                // 거리 계산
-                float distance = Vector2.Distance(playerPosition, monster.transform.position);
-                if (distance > range) continue;
-
-                // 가장 가까운 NPC 업데이트
-                if (distance < closestDistance)
-                {
-                    closestDistance = distance;
-                    closeMonster = myMonster;
-                }
-            }
-            return closeMonster;
         }
 #if UNITY_EDITOR
         /// <summary>
@@ -201,6 +133,6 @@ namespace GGemCo.Scripts
             Gizmos.color = Color.red;
             Gizmos.DrawWireCube(cullingBounds.center, cullingBounds.size);
         }
-#endif 
+#endif
     }
 }

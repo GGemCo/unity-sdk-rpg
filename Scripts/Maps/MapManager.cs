@@ -481,5 +481,20 @@ namespace GGemCo.Scripts
         {
             return mapTileCommon?.GetNearByMonsterDistance(range);
         }
+
+        public CharacterBase GetNpcByUid(int uid)
+        {
+            return mapTileCommon?.GetNpcByUid(uid);
+        }
+
+        public CharacterBase GetMonsterByUid(int uid)
+        {
+            return mapTileCommon?.GetMonsterByUid(uid);
+        }
+
+        public Transform GetCurrentMap()
+        {
+            return mapTileCommon.transform;
+        }
     }
 }
