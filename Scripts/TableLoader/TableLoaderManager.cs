@@ -30,6 +30,7 @@ namespace GGemCo.Scripts
         public TableItemUpgrade TableItemUpgrade { get; private set; } = new TableItemUpgrade();
         public TableItemSalvage TableItemSalvage { get; private set; } = new TableItemSalvage();
         public TableItemCraft TableItemCraft { get; private set; } = new TableItemCraft();
+        public TableCutscene TableCutscene { get; private set; } = new TableCutscene();
 
         protected void Awake()
         {
@@ -50,7 +51,7 @@ namespace GGemCo.Scripts
                 ConfigTableFileName.MonsterDropRate, ConfigTableFileName.ItemDropGroup, ConfigTableFileName.Exp,
                 ConfigTableFileName.Window, ConfigTableFileName.Status, ConfigTableFileName.Skill, ConfigTableFileName.Affect,
                 ConfigTableFileName.Effect, ConfigTableFileName.Interaction, ConfigTableFileName.Shop, ConfigTableFileName.ItemUpgrade,
-                ConfigTableFileName.ItemSalvage, ConfigTableFileName.ItemCraft
+                ConfigTableFileName.ItemSalvage, ConfigTableFileName.ItemCraft, ConfigTableFileName.Cutscene
             };
         }
 
@@ -119,6 +120,9 @@ namespace GGemCo.Scripts
                                 break;
                             case ConfigTableFileName.ItemCraft:
                                 TableItemCraft.LoadData(content);
+                                break;
+                            case ConfigTableFileName.Cutscene:
+                                TableCutscene.LoadData(content);
                                 break;
                         }
                     }
