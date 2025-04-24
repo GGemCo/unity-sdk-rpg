@@ -361,6 +361,7 @@ namespace GGemCo.Scripts
         /// <param name="damageType">속성 데미지 타입</param>
         public bool TakeDamage(long damage, GameObject attacker, SkillConstants.DamageType damageType = SkillConstants.DamageType.None)
         {
+            if (SceneGame.Instance.CutsceneManager.IsPlaying()) return false;
             if (IsStatusDead())
             {
                 // GcLogger.Log("monster dead");

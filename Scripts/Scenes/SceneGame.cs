@@ -41,8 +41,7 @@ namespace GGemCo.Scripts
         public CameraManager cameraManager;
         [Tooltip("팝업 매니저")]
         public PopupManager popupManager;
-        [Tooltip("연출 매니저")]
-        public CutsceneManager cutsceneManager;
+
         [HideInInspector] public SaveDataManager saveDataManager;
         [HideInInspector] public CalculateManager calculateManager;
         [HideInInspector] public MapManager mapManager;
@@ -52,6 +51,7 @@ namespace GGemCo.Scripts
         public CharacterManager CharacterManager;
         public KeyboardManager KeyboardManager;
         public InteractionManager InteractionManager;
+        public CutsceneManager CutsceneManager;
         
         private UIWindowInventory uiWindowInventory;
 
@@ -89,7 +89,6 @@ namespace GGemCo.Scripts
             calculateManager = CreateManager<CalculateManager>(managerContainer);
             mapManager = CreateManager<MapManager>(managerContainer);
             saveDataManager = CreateManager<SaveDataManager>(managerContainer);
-            damageTextManager = CreateManager<DamageTextManager>(managerContainer);
             uIIconCoolTimeManager = CreateManager<UIIconCoolTimeManager>(managerContainer);
             
             ItemManager = new ItemManager();
@@ -101,6 +100,8 @@ namespace GGemCo.Scripts
             KeyboardManager.Initialize(this);
             InteractionManager = new InteractionManager();
             InteractionManager.Initialize(this);
+            CutsceneManager = new CutsceneManager();
+            CutsceneManager.Initialize(this);
         }
 
         private T CreateManager<T>(GameObject parent) where T : Component
@@ -187,6 +188,11 @@ namespace GGemCo.Scripts
             if (KeyboardManager != null)
             {
                 KeyboardManager.Update();
+            }
+
+            if (CutsceneManager != null)
+            {
+                CutsceneManager.Update();
             }
         }
         /// <summary>

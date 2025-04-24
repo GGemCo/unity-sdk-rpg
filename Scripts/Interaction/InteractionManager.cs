@@ -27,7 +27,7 @@ namespace GGemCo.Scripts
         public void SetInfo(CharacterBase characterBase)
         {
             // 연출 중이면 실행하지 않는다.
-            if (sceneGame.cutsceneManager.IsPlaying()) return;
+            if (sceneGame.CutsceneManager.IsPlaying()) return;
             
             if (characterBase == null)
             {

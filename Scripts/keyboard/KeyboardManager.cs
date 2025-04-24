@@ -29,7 +29,7 @@ namespace GGemCo.Scripts
         public void Update()
         {
             // 연출 중이면 
-            if (sceneGame.cutsceneManager.IsPlaying())
+            if (sceneGame.CutsceneManager.IsPlaying())
             {
                 return;
             }

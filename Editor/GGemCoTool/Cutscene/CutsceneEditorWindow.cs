@@ -68,7 +68,7 @@ namespace GGemCo.Editor
                     return;
                 }
                 var info = cutsceneInfos.GetValueOrDefault(selectedCutsceneIndex);
-                SceneGame.Instance.cutsceneManager.PlayCutscene(info.Uid);
+                SceneGame.Instance.CutsceneManager.PlayCutscene(info.Uid);
             }
             
             GUILayout.Space(20);

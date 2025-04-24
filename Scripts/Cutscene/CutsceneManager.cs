@@ -8,7 +8,7 @@ namespace GGemCo.Scripts
     /// <summary>
     /// 연출 매니저
     /// </summary>
-    public class CutsceneManager : MonoBehaviour
+    public class CutsceneManager
     {
         private enum State { Idle, Loading, Ready, Playing, Finished }
         private State currentState;
@@ -35,19 +35,18 @@ namespace GGemCo.Scripts
         private CharacterAnimationController characterAnimationController;
         
         private DialogueBalloonController dialogueBalloonController;
-
-        private void Awake()
+        private SceneGame sceneGame;
+        
+        public void Initialize(SceneGame scene)
         {
+            sceneGame = scene;
             createCharacters.Clear();
             playTimer = 0f;
             currentIndex = 0;
             currentState = State.Idle;
-        }
-
-        private void Start()
-        {
+            
             // 기존 컨트롤러 초기화 이후
-            dialogueBalloonPool = new DialogueBalloonPool(SceneGame.Instance.containerDialogueBalloon.transform); // 부모는 선택
+            dialogueBalloonPool = new DialogueBalloonPool(sceneGame.containerDialogueBalloon.transform); // 부모는 선택
         }
         public bool IsPlaying() => currentState == State.Playing;
         /// <summary>
@@ -84,7 +83,7 @@ namespace GGemCo.Scripts
             currentCutscene = JsonConvert.DeserializeObject<CutsceneData>(asset.text);
 
             // 리소스 생성, 프리팹 로딩, 사운드 등 선행 처리
-            StartCoroutine(PrepareAndPlay());
+            sceneGame.StartCoroutine(PrepareAndPlay());
         }
         /// <summary>
         /// 연출 준비
@@ -100,14 +99,14 @@ namespace GGemCo.Scripts
                 if (controller == null) continue;
                 cutsceneEvent.Controller = controller; // 저장
                 activeControllers.Add(controller);
-                yield return StartCoroutine(controller.Ready(cutsceneEvent));
+                yield return sceneGame.StartCoroutine(controller.Ready(cutsceneEvent));
             }
 
             // GcLogger.Log("모든 컨트롤러 준비 완료 → 연출 시작");
             currentState = State.Playing;
         }
 
-        private void Update()
+        public void Update()
         {
             if (currentState != State.Playing || currentCutscene == null) return;
 
@@ -149,7 +148,7 @@ namespace GGemCo.Scripts
             {
                 foreach (var dic2 in dic1.Value)
                 {
-                    Destroy(dic2.Value);
+                    Object.Destroy(dic2.Value);
                 }
             }
             
