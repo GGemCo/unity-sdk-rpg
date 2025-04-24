@@ -14,6 +14,7 @@ namespace GGemCo.Scripts
         private float duration;
 
         private Transform newTarget;
+        private bool isChange;
 
         public CameraChangeTargetController(CutsceneManager manager)
         {
@@ -38,12 +39,15 @@ namespace GGemCo.Scripts
             }
 
             timer = 0f;
+            isChange = true;
         }
         public void Update()
         {
+            if (!isChange) return;
             timer += Time.deltaTime;
             float t = Mathf.Clamp01(timer / duration);
-            if (t >= 1f)
+            
+            if (timer > duration)
             {
                 Stop();
             }
@@ -51,7 +55,7 @@ namespace GGemCo.Scripts
 
         public void Stop()
         {
-            
+            isChange = false;
         }
         public void End()
         {
