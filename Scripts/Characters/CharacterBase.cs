@@ -71,6 +71,7 @@ namespace GGemCo.Scripts
         
         protected override void Awake()
         {
+            if (AddressableSettingsLoader.Instance == null) return;
             base.Awake();
             AffectController = new AffectController(this);
             SetAttackType(CharacterConstants.AttackType.None);
