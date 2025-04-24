@@ -67,5 +67,10 @@ namespace GGemCo.Editor
         {
             return LoadTable<TableMonsterDropRate>(ConfigTableFileName.MonsterDropRate);
         }
+
+        public TableCutscene LoadCutsceneTable()
+        {
+            return LoadTable<TableCutscene>(ConfigTableFileName.Cutscene);
+        }
     }
 }

@@ -18,11 +18,59 @@ namespace GGemCo.Editor
 
         private TextAsset selectedJson;
         
+        private TableLoaderManager tableLoaderManager;
+        private TableCutscene tableCutscene;
+        private int selectedCutsceneIndex;
+        
+        private List<string> cutsceneMemos = new List<string>();
+        private Dictionary<int, StruckTableCutscene> cutsceneInfos = new Dictionary<int, StruckTableCutscene>(); 
+        
         [MenuItem("GGemCoTool/"+Title)]
         static void Open() => GetWindow<CutsceneEditorWindow>(Title);
 
+        private void OnEnable()
+        {
+            
+            tableLoaderManager = new TableLoaderManager();
+            tableCutscene = tableLoaderManager.LoadCutsceneTable();
+            LoadCutsceneInfoData();
+        }
+        /// <summary>
+        /// npc 정보 불러오기
+        /// </summary>
+        private void LoadCutsceneInfoData()
+        {
+            Dictionary<int, Dictionary<string, string>> npcDictionary = tableCutscene.GetDatas();
+             
+            cutsceneMemos.Clear();
+            cutsceneInfos.Clear();
+            int index = 0;
+            // foreach 문을 사용하여 딕셔너리 내용을 출력
+            foreach (KeyValuePair<int, Dictionary<string, string>> outerPair in npcDictionary)
+            {
+                var info = tableCutscene.GetDataByUid(outerPair.Key);
+                if (info.Uid <= 0) continue;
+                cutsceneMemos.Add($"{info.Uid} - {info.Memo}");
+                cutsceneInfos.TryAdd(index, info);
+                index++;
+            }
+        }
+
         private void OnGUI()
         {
+            // NPC 드롭다운
+            selectedCutsceneIndex = EditorGUILayout.Popup("연출 선택", selectedCutsceneIndex, cutsceneMemos.ToArray());
+            if (GUILayout.Button("연출 플레이"))
+            {
+                if (SceneGame.Instance == null)
+                {
+                    EditorUtility.DisplayDialog(Title, "게임을 실행해주세요.", "OK");
+                    return;
+                }
+                var info = cutsceneInfos.GetValueOrDefault(selectedCutsceneIndex);
+                SceneGame.Instance.cutsceneManager.PlayCutscene(info.Uid);
+            }
+            
             GUILayout.Space(20);
             GUILayout.Label("JSON -> Timeline 생성", EditorStyles.boldLabel);
             selectedJson = (TextAsset)EditorGUILayout.ObjectField("JSON 파일", selectedJson, typeof(TextAsset), false);
