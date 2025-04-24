@@ -8,7 +8,7 @@ namespace GGemCo.Scripts
         protected CharacterBase TargetCharacter;
         private Vector2 minBounds; // 타일맵의 최소/최대 경계
         private Vector2 maxBounds; // 타일맵의 최소/최대 경계
-        private (float width, float height) mapSize;
+        private Vector2 mapSize;
         protected ICharacterAnimationController ICharacterAnimationController;
         protected Vector2 CapsuleColliderSize;
         protected CapsuleDirection2D CapsuleDirection2D;
@@ -43,7 +43,7 @@ namespace GGemCo.Scripts
             characterSize.x *= Math.Abs(TargetCharacter.transform.localScale.x);
             characterSize.y *= TargetCharacter.transform.localScale.y;
             minBounds.x = characterSize.x / 2;
-            maxBounds = new Vector2(mapSize.width - (characterSize.x/2), mapSize.height - characterSize.y);   // 우측 상단 경계
+            maxBounds = new Vector2(mapSize.x - (characterSize.x/2), mapSize.y - characterSize.y);   // 우측 상단 경계
         }
 
         protected void UpdateDirection(float targetDirection = 0)
@@ -108,6 +108,12 @@ namespace GGemCo.Scripts
             TargetCharacter.SetAggro(false);
             TargetCharacter.SetStatusIdle();
             ICharacterAnimationController?.PlayWaitAnimation();
+        }
+
+        public void ChangeMapSize(Vector2 newMapSize)
+        {
+            mapSize.x = newMapSize.x;
+            mapSize.y = newMapSize.y;
         }
     }
 }

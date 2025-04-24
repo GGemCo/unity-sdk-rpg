@@ -172,7 +172,7 @@ namespace GGemCo.Scripts
                         break;
 
                     case MapConstants.State.LoadPlayerPrefabs:
-                        yield return StartCoroutineSafe(mapLoadCharacters.LoadPlayer(playSpawnPosition, currentMapTableData));
+                        yield return StartCoroutineSafe(mapLoadCharacters.LoadPlayer(playSpawnPosition, currentMapTableData, mapTileCommon));
                         if (currentState == MapConstants.State.Failed) yield break;
                         currentState = MapConstants.State.LoadMonsterPrefabs;
                         break;
@@ -363,7 +363,7 @@ namespace GGemCo.Scripts
             var result = mapTileCommon.GetMapSize();
 
             // 로드된 맵에 맞게 맵 영역 사이즈 갱신하기 
-            SceneGame.Instance.cameraManager.ChangeMapSize(result.width, result.height);
+            SceneGame.Instance.cameraManager.ChangeMapSize(result.x, result.y);
             
             onLoadTileMap?.Invoke();
             // Logger.Log("타일맵 프리팹 로드 완료");
@@ -438,9 +438,9 @@ namespace GGemCo.Scripts
         /// 현재 맵 사이즈 가져오기
         /// </summary>
         /// <returns></returns>
-        public (float width, float height) GetCurrentMapSize()
+        public Vector2 GetCurrentMapSize()
         {
-            if (mapTileCommon == null) return (0, 0);
+            if (mapTileCommon == null) return Vector2.zero;
             return mapTileCommon.GetMapSize();
         }
         /// <summary>

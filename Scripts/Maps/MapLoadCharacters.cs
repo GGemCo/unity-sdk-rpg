@@ -37,8 +37,9 @@ namespace GGemCo.Scripts
         /// </summary>
         /// <param name="playSpawnPosition"></param>
         /// <param name="currentMapTableData"></param>
+        /// <param name="mapTileCommon"></param>
         /// <returns></returns>
-        public IEnumerator LoadPlayer(Vector3 playSpawnPosition, StruckTableMap currentMapTableData)
+        public IEnumerator LoadPlayer(Vector3 playSpawnPosition, StruckTableMap currentMapTableData, DefaultMap mapTileCommon)
         {
             if (SceneGame.Instance.player == null)
             {
@@ -53,6 +54,7 @@ namespace GGemCo.Scripts
                 spawnPosition = playSpawnPosition;
             }
             SceneGame.Instance.player.GetComponent<Player>().MoveTeleport(spawnPosition.x, spawnPosition.y);
+            SceneGame.Instance.player.GetComponent<Player>().SetMapSize(mapTileCommon.GetMapSize());
             SceneGame.Instance.cameraManager.SetFollowTarget(SceneGame.Instance.player.transform);
 
             // yield return new WaitForSeconds(ConfigCommon.CharacterFadeSec/2);

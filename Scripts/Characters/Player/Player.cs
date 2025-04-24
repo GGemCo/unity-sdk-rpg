@@ -411,5 +411,10 @@ namespace GGemCo.Scripts
         {
             return CharacterAnimationController.GetCharacterHeight() * Math.Abs(transform.localScale.x);
         }
+
+        public void SetMapSize(Vector2 mapSize)
+        {
+            controllerPlayer?.ChangeMapSize(mapSize);
+        }
     }
 }

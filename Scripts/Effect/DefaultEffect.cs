@@ -60,7 +60,8 @@ namespace GGemCo.Scripts
             {
                 EffectAnimationController.SetEffectColor($"#{struckTableEffect.Color}");
             }
-            mapSizeHeight = SceneGame.Instance.mapManager.GetCurrentMapSize().height;
+            Vector2 size = SceneGame.Instance.mapManager.GetCurrentMapSize();
+            mapSizeHeight = size.y;
             UpdateSortingOrder();
         }
 

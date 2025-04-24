@@ -66,7 +66,7 @@ namespace GGemCo.Scripts
         /// 맵 사이즈 구하기
         /// </summary>
         /// <returns></returns>
-        public (float width, float height) GetMapSize()
+        public Vector2 GetMapSize()
         {
             if (tilemap == null)
             {
@@ -96,7 +96,7 @@ namespace GGemCo.Scripts
 
             // Logger.Log("Total Tilemap Width: " + totalWidth + ", Total Tilemap Height: " + totalHeight);
 
-            return (totalWidth, totalHeight);
+            return new Vector2(totalWidth, totalHeight);
         }
         /// <summary>
         /// vid 값으로 몬스터 찾기  

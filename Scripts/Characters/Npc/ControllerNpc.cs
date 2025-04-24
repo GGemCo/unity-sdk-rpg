@@ -10,7 +10,7 @@ namespace GGemCo.Scripts
         private Npc npc;
         private ICharacterAnimationController iCharacterAnimationController;
         private Vector2 minBounds, maxBounds; // 타일맵의 최소/최대 경계
-        private (float width, float height) mapSize;
+        private Vector2 mapSize;
         
         protected override void Awake()
         {
@@ -24,7 +24,9 @@ namespace GGemCo.Scripts
         {
             base.Start();
             iCharacterAnimationController = npc.CharacterAnimationController;
-            mapSize = SceneGame.Instance.mapManager.GetCurrentMapSize();
+            Vector2 size = SceneGame.Instance.mapManager.GetCurrentMapSize();
+            mapSize.x = size.x;
+            mapSize.y = size.y;
             iCharacterAnimationController?.PlayWaitAnimation();
         }
     }

@@ -123,7 +123,9 @@ namespace GGemCo.Scripts
                 .Subscribe(UpdateAnimationMoveTimeScale)
                 .AddTo(this);
 
-            mapSizeHeight = SceneGame.Instance.mapManager.GetCurrentMapSize().height;
+            Vector2 size = SceneGame.Instance.mapManager.GetCurrentMapSize();
+            mapSizeHeight = size.y;
+            Stop();
         }
         /// <summary>
         /// 테이블에서 가져온 몬스터 정보 셋팅
