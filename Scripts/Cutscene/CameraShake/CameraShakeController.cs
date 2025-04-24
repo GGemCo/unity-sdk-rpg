@@ -24,14 +24,14 @@ namespace GGemCo.Scripts
 
         public IEnumerator Ready(CutsceneEvent evt)
         {
-            if (evt.type != EventType.CameraShake) yield break;
+            if (evt.type != CutsceneEventType.CameraShake) yield break;
             var data = evt.cameraShake;
             // 캐릭터 타겟 찾기 같은 준비
             yield return null;
         }
         public void Trigger(CutsceneEvent evt)
         {
-            if (evt.type != EventType.CameraShake) return;
+            if (evt.type != CutsceneEventType.CameraShake) return;
             var data = evt.cameraShake;
             shakeDuration = evt.duration;
             shakeIntensity = data.shakeIntensity;

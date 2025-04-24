@@ -27,7 +27,7 @@ namespace GGemCo.Scripts
         }
         public void Trigger(CutsceneEvent evt)
         {
-            if (evt.type != EventType.CameraChangeTarget) return;
+            if (evt.type != CutsceneEventType.CameraChangeTarget) return;
             duration = evt.duration;
             var data = evt.cameraChangeTarget;
             newTarget = GetTargetTransform(data.characterType, data.characterUid);

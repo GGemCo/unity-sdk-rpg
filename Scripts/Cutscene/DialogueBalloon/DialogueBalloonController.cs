@@ -29,7 +29,7 @@ namespace GGemCo.Scripts
 
         public IEnumerator Ready(CutsceneEvent evt)
         {
-            if (evt.type != EventType.DialogueBalloon) yield break;
+            if (evt.type != CutsceneEventType.DialogueBalloon) yield break;
             var data = evt.dialogueBalloon;
             
             // 캐릭터 타겟 찾기 같은 준비
@@ -38,7 +38,7 @@ namespace GGemCo.Scripts
 
         public void Trigger(CutsceneEvent evt)
         {
-            if (evt.type != EventType.DialogueBalloon) return;
+            if (evt.type != CutsceneEventType.DialogueBalloon) return;
             // 비정상적으로 종료될 경우가 있다
             if (isBalloon)
             {

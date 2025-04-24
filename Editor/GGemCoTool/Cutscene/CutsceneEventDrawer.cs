@@ -1,7 +1,6 @@
 ﻿using GGemCo.Scripts;
 using UnityEditor;
 using UnityEngine;
-using EventType = GGemCo.Scripts.EventType;
 
 namespace GGemCo.Editor
 {
@@ -34,26 +33,26 @@ namespace GGemCo.Editor
             EditorGUI.PropertyField(line, typeProp);
             line.y += line.height + 2;
 
-            EventType eventType = (EventType)typeProp.enumValueIndex;
+            CutsceneEventType cutsceneEventType = (CutsceneEventType)typeProp.enumValueIndex;
 
-            switch (eventType)
+            switch (cutsceneEventType)
             {
-                case EventType.CameraMove:
+                case CutsceneEventType.CameraMove:
                     EditorGUI.PropertyField(line, cameraMoveProp, true);
                     break;
-                case EventType.CameraZoom:
+                case CutsceneEventType.CameraZoom:
                     EditorGUI.PropertyField(line, cameraZoomProp, true);
                     break;
-                case EventType.CameraShake:
+                case CutsceneEventType.CameraShake:
                     EditorGUI.PropertyField(line, cameraShakeProp, true);
                     break;
-                case EventType.CameraChangeTarget:
+                case CutsceneEventType.CameraChangeTarget:
                     EditorGUI.PropertyField(line, cameraChangeTargetProp, true);
                     break;
-                case EventType.CharacterMove:
+                case CutsceneEventType.CharacterMove:
                     EditorGUI.PropertyField(line, characterMoveProp, true);
                     break;
-                case EventType.DialogueBalloon:
+                case CutsceneEventType.DialogueBalloon:
                     EditorGUI.PropertyField(line, dialogueBalloonProp, true);
                     break;
             }
@@ -62,24 +61,24 @@ namespace GGemCo.Editor
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             var typeProp = property.FindPropertyRelative("type");
-            EventType eventType = (EventType)typeProp.enumValueIndex;
+            CutsceneEventType cutsceneEventType = (CutsceneEventType)typeProp.enumValueIndex;
 
             float baseHeight = EditorGUIUtility.singleLineHeight * 2 + 6;
-            switch (eventType)
+            switch (cutsceneEventType)
             {
-                case EventType.CameraMove:
+                case CutsceneEventType.CameraMove:
                     return baseHeight + EditorGUI.GetPropertyHeight(property.FindPropertyRelative("cameraMove"));
-                case EventType.CameraZoom:
+                case CutsceneEventType.CameraZoom:
                     return baseHeight + EditorGUI.GetPropertyHeight(property.FindPropertyRelative("cameraZoom"));
-                case EventType.CameraShake:
+                case CutsceneEventType.CameraShake:
                     return baseHeight + EditorGUI.GetPropertyHeight(property.FindPropertyRelative("cameraShake"));
-                case EventType.CameraChangeTarget:
+                case CutsceneEventType.CameraChangeTarget:
                     return baseHeight + EditorGUI.GetPropertyHeight(property.FindPropertyRelative("cameraChangeTarget"));
                 
-                case EventType.CharacterMove: 
+                case CutsceneEventType.CharacterMove: 
                     return baseHeight + EditorGUI.GetPropertyHeight(property.FindPropertyRelative("characterMove"));
                 
-                case EventType.DialogueBalloon: 
+                case CutsceneEventType.DialogueBalloon: 
                     return baseHeight + EditorGUI.GetPropertyHeight(property.FindPropertyRelative("dialogueBalloon"));
                 default: return baseHeight;
             }

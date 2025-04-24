@@ -26,7 +26,7 @@ namespace GGemCo.Scripts
         
         // 연출 컨트롤러
         private readonly List<ICutsceneController> controllers = new List<ICutsceneController>();
-        private readonly Dictionary<EventType, ICutsceneController> eventMap = new();
+        private readonly Dictionary<CutsceneEventType, ICutsceneController> eventMap = new();
         private CameraMoveController cameraMoveController;
         private CameraZoomController cameraZoomController;
         private CameraShakeController cameraShakeController;
@@ -56,12 +56,12 @@ namespace GGemCo.Scripts
             controllers.Add(new DialogueBalloonController(this, dialogueBalloonPool));
 
             // 이벤트 타입에 따라 대응되는 컨트롤러 등록
-            eventMap[EventType.CameraMove] = controllers.OfType<CameraMoveController>().FirstOrDefault();
-            eventMap[EventType.CameraZoom] = controllers.OfType<CameraZoomController>().FirstOrDefault();
-            eventMap[EventType.CameraShake] = controllers.OfType<CameraShakeController>().FirstOrDefault();
-            eventMap[EventType.CameraChangeTarget] = controllers.OfType<CameraChangeTargetController>().FirstOrDefault();
-            eventMap[EventType.CharacterMove] = controllers.OfType<CharacterMoveController>().FirstOrDefault();
-            eventMap[EventType.DialogueBalloon] = controllers.OfType<DialogueBalloonController>().FirstOrDefault();
+            eventMap[CutsceneEventType.CameraMove] = controllers.OfType<CameraMoveController>().FirstOrDefault();
+            eventMap[CutsceneEventType.CameraZoom] = controllers.OfType<CameraZoomController>().FirstOrDefault();
+            eventMap[CutsceneEventType.CameraShake] = controllers.OfType<CameraShakeController>().FirstOrDefault();
+            eventMap[CutsceneEventType.CameraChangeTarget] = controllers.OfType<CameraChangeTargetController>().FirstOrDefault();
+            eventMap[CutsceneEventType.CharacterMove] = controllers.OfType<CharacterMoveController>().FirstOrDefault();
+            eventMap[CutsceneEventType.DialogueBalloon] = controllers.OfType<DialogueBalloonController>().FirstOrDefault();
         }
         /// <summary>
         /// 초기화
@@ -75,16 +75,21 @@ namespace GGemCo.Scripts
         /// <summary>
         /// 연출 플레이
         /// </summary>
-        /// <param name="path"></param>
-        public void PlayCutscene(string path)
+        /// <param name="uid"></param>
+        public void PlayCutscene(int uid)
         {
+            var info = TableLoaderManager.Instance.TableCutscene.GetDataByUid(uid);
+            if (info == null)
+            {
+                return;
+            }
             Reset();
             currentState = State.Loading;
 
-            TextAsset asset = Resources.Load<TextAsset>(path);
+            TextAsset asset = Resources.Load<TextAsset>($"Cutscene/{info.FileName}");
             if (asset == null)
             {
-                GcLogger.LogError("연출 json 파일이 없습니다. " + path);
+                GcLogger.LogError("연출 json 파일이 없습니다. " + info.FileName);
                 return;
             }
             originalOrthographicSize = SceneGame.Instance.mainCamera.orthographicSize;

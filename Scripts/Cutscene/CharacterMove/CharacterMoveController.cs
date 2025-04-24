@@ -10,15 +10,15 @@ namespace GGemCo.Scripts
     {
         private Camera cam;
         private Vector2 startPosition, endPosition;
-        private float step;
-        private float speed;
+        private float characterMoveStep;
+        private float characterMoveSpeed;
         private float distance;
         private float timer;
         private bool isMoving;
         private bool isFollowTarget;
 
-        private Transform newTarget;
-        private CharacterBase newTargetCharacter;
+        private Transform target;
+        private CharacterBase targetCharacter;
 
         public CharacterMoveController(CutsceneManager manager)
         {
@@ -27,7 +27,7 @@ namespace GGemCo.Scripts
 
         public IEnumerator Ready(CutsceneEvent evt)
         {
-            if (evt.type != EventType.CharacterMove) yield break;
+            if (evt.type != CutsceneEventType.CharacterMove) yield break;
             var data = evt.characterMove;
             
             Transform character = GetTargetTransform(data.characterType, data.characterUid);
@@ -41,9 +41,9 @@ namespace GGemCo.Scripts
                         data.characterUid,
                         startPosition, SceneGame.Instance.mapManager.GetCurrentMap())?.transform;
                     if (character == null) yield break;
+                    character.GetComponent<CharacterBase>().uid = data.characterUid;
                     character.position = startPosition;
                     character.gameObject.SetActive(false);
-                    character.GetComponent<CharacterBase>()?.SetCurrentMoveSpeed(data.characterMoveSpeed);
                     CutsceneManager.AddCharacter(data.characterType, data.characterUid, character.gameObject);
                 }
             }
@@ -54,54 +54,59 @@ namespace GGemCo.Scripts
 
         public void Trigger(CutsceneEvent evt)
         {
-            if (evt.type != EventType.CharacterMove) return;
+            if (evt.type != CutsceneEventType.CharacterMove) return;
             var data = evt.characterMove;
             isFollowTarget = data.isFollowTarget;
-            newTarget = GetTargetTransform(data.characterType, data.characterUid);
-            if (newTarget == null)
+            target = GetTargetTransform(data.characterType, data.characterUid);
+            if (target == null)
             {
-                newTarget = CutsceneManager.GetCharacter(data.characterType, data.characterUid);
-                if (newTarget == null)
+                target = CutsceneManager.GetCharacter(data.characterType, data.characterUid);
+                if (target == null)
                 {
                     GcLogger.LogError("이동 시킬 캐릭터가 없습니다. type: " + data.characterType + "/ uid: " + data.characterUid);
                     return;
                 }
             }
-            if (newTarget.gameObject.activeSelf == false)
+            if (target.gameObject.activeSelf == false)
             {
-                newTarget.gameObject.SetActive(true);
+                target.gameObject.SetActive(true);
             }
 
             startPosition = data.startPosition.ToVector2();
             endPosition = data.endPosition.ToVector2();
             if (startPosition == Vector2.zero)
             {
-                startPosition = newTarget.position;
+                startPosition = target.position;
             }
-            speed = data.speed > 0f ? data.speed : 1f; // 데이터에서 속도 받기, 기본값 보정
             distance = Vector2.Distance(startPosition, endPosition);
             
-            if (newTarget != null)
+            if (target != null)
             {
-                newTargetCharacter = newTarget.GetComponent<CharacterBase>();
+                targetCharacter = target.GetComponent<CharacterBase>();
                 // step 적용
-                step = AddressableSettingsLoader.Instance.playerSettings.statMoveStep;
+                characterMoveStep = AddressableSettingsLoader.Instance.playerSettings.statMoveStep;
                 if (data.characterType != CharacterConstants.Type.Player)
                 {
-                    step = TableLoaderManager.Instance.GetCharacterMoveStep(data.characterType, data.characterUid);
+                    characterMoveStep = TableLoaderManager.Instance.GetCharacterMoveStep(data.characterType, data.characterUid);
+                }
+                // 이동 속도
+                if (data.characterMoveSpeed > 0)
+                {
+                    targetCharacter?.SetCurrentMoveSpeed(data.characterMoveSpeed);
+                    characterMoveSpeed = data.characterMoveSpeed;
                 }
                 // 크기 조정
                 if (data.characterScale > 0)
                 {
-                    newTarget.localScale = new Vector3(data.characterScale, data.characterScale, 0);
+                    targetCharacter?.SetScale(data.characterScale);
                 }
                 // 카메라가 따라가야하는 타겟 설정
                 if (isFollowTarget)
                 {
-                    SceneGame.Instance.cameraManager.SetFollowTarget(newTarget);
+                    SceneGame.Instance.cameraManager.SetFollowTarget(target);
                 }
-                newTargetCharacter.SetStatusMoveForce();
-                newTargetCharacter.CharacterAnimationController?.PlayRunAnimation();
+                targetCharacter?.SetStatusMoveForce();
+                targetCharacter?.CharacterAnimationController?.PlayRunAnimation();
             }
             timer = 0f;
             UpdateFacing();
@@ -109,14 +114,14 @@ namespace GGemCo.Scripts
         }
         public void Update()
         {
-            if (newTarget == null || !isMoving) return;
+            if (target == null || !isMoving) return;
 
             timer += Time.deltaTime;
-            float t = (speed > 0f) ? (timer * step * speed / distance) : 1f;
+            float t = timer * characterMoveStep * (characterMoveSpeed / 100f) / distance;
             t = Mathf.Clamp01(t);
 
             Vector2 interpolated = Vector2.Lerp(startPosition, endPosition, t);
-            newTarget.position = new Vector3(interpolated.x, interpolated.y, newTarget.position.z);
+            target.position = new Vector3(interpolated.x, interpolated.y, target.position.z);
 
             if (t >= 1f)
             {
@@ -125,7 +130,7 @@ namespace GGemCo.Scripts
         }
         private void UpdateFacing()
         {
-            if (newTarget == null) return;
+            if (target == null) return;
 
             Vector2 direction = endPosition - startPosition;
 
@@ -133,17 +138,17 @@ namespace GGemCo.Scripts
             if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
             {
                 bool movingRight = direction.x > 0f;
-                bool defaultIsRight = newTargetCharacter?.characterFacing == CharacterConstants.CharacterFacing.Right;
+                bool defaultIsRight = targetCharacter?.characterFacing == CharacterConstants.CharacterFacing.Right;
 
                 bool shouldFlip = (movingRight != defaultIsRight);
-                newTargetCharacter?.SetFlip(shouldFlip);
+                targetCharacter?.SetFlip(shouldFlip);
             }
 
             // 상하 전환도 필요하다면 추가 구현 가능
         }
         public void Stop()
         {
-            newTargetCharacter?.Stop();
+            targetCharacter?.Stop();
             isMoving = false;
         }
         public void End()

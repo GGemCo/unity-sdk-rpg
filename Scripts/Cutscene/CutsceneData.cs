@@ -12,7 +12,7 @@ namespace GGemCo.Scripts
         [Tooltip("클립 플레이 시간")]
         public float duration;
         [Tooltip("이벤트 타입")]
-        public EventType type;
+        public CutsceneEventType type;
 
         // 타입별 필드 (Union 구조처럼 사용)
         public CameraMoveData cameraMove;
@@ -22,12 +22,12 @@ namespace GGemCo.Scripts
         public CharacterMoveData characterMove;
         public DialogueBalloonData dialogueBalloon;
 
-        public bool ShouldSerializeCameraMove() => type == EventType.CameraMove && cameraMove != null;
-        public bool ShouldSerializeCameraZoom() => type == EventType.CameraZoom && cameraZoom != null;
-        public bool ShouldSerializeCameraShake() => type == EventType.CameraShake && cameraShake != null;
-        public bool ShouldSerializeCameraChangeTargetData() => type == EventType.CameraChangeTarget && cameraChangeTarget != null;
-        public bool ShouldSerializeCharacterMoveData() => type == EventType.CharacterMove && characterMove != null;
-        public bool ShouldSerializeDialogueBalloonData() => type == EventType.DialogueBalloon && dialogueBalloon != null;
+        public bool ShouldSerializeCameraMove() => type == CutsceneEventType.CameraMove && cameraMove != null;
+        public bool ShouldSerializeCameraZoom() => type == CutsceneEventType.CameraZoom && cameraZoom != null;
+        public bool ShouldSerializeCameraShake() => type == CutsceneEventType.CameraShake && cameraShake != null;
+        public bool ShouldSerializeCameraChangeTargetData() => type == CutsceneEventType.CameraChangeTarget && cameraChangeTarget != null;
+        public bool ShouldSerializeCharacterMoveData() => type == CutsceneEventType.CharacterMove && characterMove != null;
+        public bool ShouldSerializeDialogueBalloonData() => type == CutsceneEventType.DialogueBalloon && dialogueBalloon != null;
     }
     
     [Serializable]

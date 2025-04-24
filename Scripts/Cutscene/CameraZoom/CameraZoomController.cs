@@ -23,13 +23,13 @@ namespace GGemCo.Scripts
 
         public IEnumerator Ready(CutsceneEvent evt)
         {
-            if (evt.type != EventType.CameraZoom) yield break;
+            if (evt.type != CutsceneEventType.CameraZoom) yield break;
             var data = evt.cameraZoom;
             yield return null;
         }
         public void Trigger(CutsceneEvent evt)
         {
-            if (evt.type != EventType.CameraZoom) return;
+            if (evt.type != CutsceneEventType.CameraZoom) return;
             var data = evt.cameraZoom;
             duration = evt.duration;
             easing = data.easing;

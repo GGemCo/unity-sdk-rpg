@@ -21,6 +21,5 @@ namespace GGemCo.Scripts
         [Header("이동")] 
         public Vec2 startPosition;
         public Vec2 endPosition;
-        public float speed = 1f;
     }
 }

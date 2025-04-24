@@ -30,7 +30,7 @@ namespace GGemCo.Scripts
         }
         public void Trigger(CutsceneEvent evt)
         {
-            if (evt.type != EventType.CameraMove) return;
+            if (evt.type != CutsceneEventType.CameraMove) return;
             var data = evt.cameraMove;
 
             startPosition = data.startPosition.ToVector2();
