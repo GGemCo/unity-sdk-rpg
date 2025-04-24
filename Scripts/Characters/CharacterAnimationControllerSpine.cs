@@ -184,6 +184,11 @@ namespace GGemCo.Scripts
         {
             SetColor(color);
         }
+
+        public void PlayCharacterAnimation(string animationName, bool loop = false, float timeScale = 1f)
+        {
+            PlayAnimation(animationName, loop, timeScale);
+        }
     }
 #endif
 }

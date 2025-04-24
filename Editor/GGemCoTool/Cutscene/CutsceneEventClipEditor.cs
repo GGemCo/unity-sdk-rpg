@@ -139,6 +139,7 @@ namespace GGemCo.Editor
                                 cameraChangeTarget = e.type == CutsceneEventType.CameraChangeTarget ? e.cameraChangeTarget : null,
                                 
                                 characterMove = e.type == CutsceneEventType.CharacterMove ? e.characterMove : null,
+                                characterAnimation = e.type == CutsceneEventType.CharacterAnimation ? e.characterAnimation : null,
                                 
                                 dialogueBalloon = e.type == CutsceneEventType.DialogueBalloon ? e.dialogueBalloon : null,
                             };

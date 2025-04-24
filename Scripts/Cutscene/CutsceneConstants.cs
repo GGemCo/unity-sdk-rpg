@@ -11,6 +11,7 @@ namespace GGemCo.Scripts
         CameraShake,
         CameraChangeTarget,
         CharacterMove,
-        DialogueBalloon
+        DialogueBalloon,
+        CharacterAnimation
     }
 }

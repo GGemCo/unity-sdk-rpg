@@ -207,6 +207,15 @@ namespace GGemCo.Scripts
             zoomEasing = Easing.EaseType.EaseOutQuad;
             isZooming = true;
         }
+        /// <summary>
+        /// 연출 종료시 호출
+        /// </summary>
+        public void ReSetByCutscene()
+        {
+            // 카메라 player 따라가
+            SetFollowPlayer();
+            ReSetZoom();
+        }
         private void OnDrawGizmos()
         {
             // Gizmos.color = Color.red;

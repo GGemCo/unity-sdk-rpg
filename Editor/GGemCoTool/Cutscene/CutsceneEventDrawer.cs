@@ -21,6 +21,7 @@ namespace GGemCo.Editor
             var cameraChangeTargetProp = property.FindPropertyRelative("cameraChangeTarget");
             
             var characterMoveProp = property.FindPropertyRelative("characterMove");
+            var characterAnimationProp = property.FindPropertyRelative("characterAnimation");
             
             var dialogueBalloonProp = property.FindPropertyRelative("dialogueBalloon");
 
@@ -52,6 +53,9 @@ namespace GGemCo.Editor
                 case CutsceneEventType.CharacterMove:
                     EditorGUI.PropertyField(line, characterMoveProp, true);
                     break;
+                case CutsceneEventType.CharacterAnimation:
+                    EditorGUI.PropertyField(line, characterAnimationProp, true);
+                    break;
                 case CutsceneEventType.DialogueBalloon:
                     EditorGUI.PropertyField(line, dialogueBalloonProp, true);
                     break;
@@ -77,6 +81,8 @@ namespace GGemCo.Editor
                 
                 case CutsceneEventType.CharacterMove: 
                     return baseHeight + EditorGUI.GetPropertyHeight(property.FindPropertyRelative("characterMove"));
+                case CutsceneEventType.CharacterAnimation: 
+                    return baseHeight + EditorGUI.GetPropertyHeight(property.FindPropertyRelative("characterAnimation"));
                 
                 case CutsceneEventType.DialogueBalloon: 
                     return baseHeight + EditorGUI.GetPropertyHeight(property.FindPropertyRelative("dialogueBalloon"));

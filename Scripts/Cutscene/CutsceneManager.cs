@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -25,13 +24,16 @@ namespace GGemCo.Scripts
             new Dictionary<CharacterConstants.Type, Dictionary<int, GameObject>>();
         
         // 연출 컨트롤러
-        private readonly List<ICutsceneController> controllers = new List<ICutsceneController>();
-        private readonly Dictionary<CutsceneEventType, ICutsceneController> eventMap = new();
+        private readonly List<ICutsceneController> activeControllers = new();
+        
         private CameraMoveController cameraMoveController;
         private CameraZoomController cameraZoomController;
         private CameraShakeController cameraShakeController;
         private CameraChangeTargetController cameraChangeTargetController;
+        
         private CharacterMoveController characterMoveController;
+        private CharacterAnimationController characterAnimationController;
+        
         private DialogueBalloonController dialogueBalloonController;
 
         private void Awake()
@@ -46,23 +48,8 @@ namespace GGemCo.Scripts
         {
             // 기존 컨트롤러 초기화 이후
             dialogueBalloonPool = new DialogueBalloonPool(SceneGame.Instance.containerDialogueBalloon.transform); // 부모는 선택
-            
-            // 컨트롤러 수동 생성 + 등록
-            controllers.Add(new CameraMoveController(this));
-            controllers.Add(new CameraZoomController(this));
-            controllers.Add(new CameraShakeController(this));
-            controllers.Add(new CameraChangeTargetController(this));
-            controllers.Add(new CharacterMoveController(this));
-            controllers.Add(new DialogueBalloonController(this, dialogueBalloonPool));
-
-            // 이벤트 타입에 따라 대응되는 컨트롤러 등록
-            eventMap[CutsceneEventType.CameraMove] = controllers.OfType<CameraMoveController>().FirstOrDefault();
-            eventMap[CutsceneEventType.CameraZoom] = controllers.OfType<CameraZoomController>().FirstOrDefault();
-            eventMap[CutsceneEventType.CameraShake] = controllers.OfType<CameraShakeController>().FirstOrDefault();
-            eventMap[CutsceneEventType.CameraChangeTarget] = controllers.OfType<CameraChangeTargetController>().FirstOrDefault();
-            eventMap[CutsceneEventType.CharacterMove] = controllers.OfType<CharacterMoveController>().FirstOrDefault();
-            eventMap[CutsceneEventType.DialogueBalloon] = controllers.OfType<DialogueBalloonController>().FirstOrDefault();
         }
+        public bool IsPlaying() => currentState == State.Playing;
         /// <summary>
         /// 초기화
         /// </summary>
@@ -109,13 +96,14 @@ namespace GGemCo.Scripts
 
             foreach (var cutsceneEvent in currentCutscene.events)
             {
-                if (eventMap.TryGetValue(cutsceneEvent.type, out var controller))
-                {
-                    yield return StartCoroutine(controller.Ready(cutsceneEvent));
-                }
+                var controller = CreateController(cutsceneEvent.type);
+                if (controller == null) continue;
+                cutsceneEvent.Controller = controller; // 저장
+                activeControllers.Add(controller);
+                yield return StartCoroutine(controller.Ready(cutsceneEvent));
             }
 
-            GcLogger.Log("모든 컨트롤러 준비 완료 → 연출 시작");
+            // GcLogger.Log("모든 컨트롤러 준비 완료 → 연출 시작");
             currentState = State.Playing;
         }
 
@@ -129,15 +117,11 @@ namespace GGemCo.Scripts
                    currentCutscene.events[currentIndex].time <= playTimer)
             {
                 var evt = currentCutscene.events[currentIndex];
-                if (eventMap.TryGetValue(evt.type, out var controller))
-                {
-                    controller.Trigger(evt);
-                }
-
+                evt.Controller?.Trigger(evt); // 재사용
                 currentIndex++;
             }
 
-            foreach (var controller in controllers)
+            foreach (var controller in activeControllers)
             {
                 controller.Update();
             }
@@ -151,12 +135,15 @@ namespace GGemCo.Scripts
         /// </summary>
         private void OnCutsceneEnd()
         {
-            GcLogger.Log("연출 종료");
+            // GcLogger.Log("연출 종료");
             currentState = State.Finished;
-            foreach (var controller in controllers)
+            
+            foreach (var controller in activeControllers)
             {
                 controller.End();
             }
+            activeControllers.Clear(); // 메모리 정리
+            
             // 만들었던 캐릭터 지우기
             foreach (var dic1 in createCharacters)
             {
@@ -165,10 +152,9 @@ namespace GGemCo.Scripts
                     Destroy(dic2.Value);
                 }
             }
-            // 카메라 player 따라가
             
-            // 원래 카메라 size 로 되돌리기
-            SceneGame.Instance.cameraManager?.ReSetZoom();
+            // 원래 카메라로 되돌리기
+            SceneGame.Instance.cameraManager?.ReSetByCutscene();
         }
         /// <summary>
         /// 연출에 필요한 캐릭터 생성 후 추가
@@ -194,6 +180,22 @@ namespace GGemCo.Scripts
         {
             return createCharacters.GetValueOrDefault(type)?.GetValueOrDefault(characterUid)?.transform;
         }
-        public bool IsPlaying() => currentState == State.Playing;
+        private ICutsceneController CreateController(CutsceneEventType type)
+        {
+            return type switch
+            {
+                CutsceneEventType.CameraMove => new CameraMoveController(this),
+                CutsceneEventType.CameraZoom => new CameraZoomController(this),
+                CutsceneEventType.CameraShake => new CameraShakeController(this),
+                CutsceneEventType.CameraChangeTarget => new CameraChangeTargetController(this),
+
+                CutsceneEventType.CharacterMove => new CharacterMoveController(this),
+                CutsceneEventType.CharacterAnimation => new CharacterAnimationController(this),
+
+                CutsceneEventType.DialogueBalloon => new DialogueBalloonController(this, dialogueBalloonPool),
+
+                _ => null,
+            };
+        }
     }
 }
