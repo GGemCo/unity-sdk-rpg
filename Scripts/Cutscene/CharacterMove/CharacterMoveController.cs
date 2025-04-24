@@ -16,6 +16,8 @@ namespace GGemCo.Scripts
         private float timer;
         private bool isMoving;
         private bool isFollowTarget;
+        
+        private float duration;
 
         private Transform target;
         private CharacterBase targetCharacter;
@@ -37,12 +39,17 @@ namespace GGemCo.Scripts
                 character = CutsceneManager.GetCharacter(data.characterType, data.characterUid);
                 if (character == null)
                 {
-                    character = SceneGame.Instance.CharacterManager.CreateCharacter(data.characterType,
-                        data.characterUid,
-                        startPosition, SceneGame.Instance.mapManager.GetCurrentMap())?.transform;
+                    character = SceneGame.Instance.CharacterManager.CreateCharacter(data.characterType, data.characterUid)?.transform;
                     if (character == null) yield break;
-                    character.GetComponent<CharacterBase>().uid = data.characterUid;
+                    
+                    character.transform.position = startPosition;
+                    character.transform.SetParent(SceneGame.Instance.mapManager.GetCurrentMap()?.transform);
                     character.position = startPosition;
+                    
+                    CharacterBase characterBase = character.GetComponent<CharacterBase>();
+                    characterBase.uid = data.characterUid;
+                    // Awake, Start 함수가 호출되게 하기 위해 추가
+                    yield return null;
                     character.gameObject.SetActive(false);
                     CutsceneManager.AddCharacter(data.characterType, data.characterUid, character.gameObject);
                 }
@@ -55,6 +62,7 @@ namespace GGemCo.Scripts
         public void Trigger(CutsceneEvent evt)
         {
             if (evt.type != CutsceneEventType.CharacterMove) return;
+            duration = evt.duration;
             var data = evt.characterMove;
             isFollowTarget = data.isFollowTarget;
             target = GetTargetTransform(data.characterType, data.characterUid);
@@ -108,6 +116,10 @@ namespace GGemCo.Scripts
                 targetCharacter?.SetStatusMoveForce();
                 targetCharacter?.CharacterAnimationController?.PlayRunAnimation();
             }
+
+            duration = distance / (characterMoveStep * (characterMoveSpeed / 100f));
+            GcLogger.Log("duration: "+ duration );
+            
             timer = 0f;
             UpdateFacing();
             isMoving = true;
@@ -123,7 +135,7 @@ namespace GGemCo.Scripts
             Vector2 interpolated = Vector2.Lerp(startPosition, endPosition, t);
             target.position = new Vector3(interpolated.x, interpolated.y, target.position.z);
 
-            if (t >= 1f)
+            if (timer > duration)
             {
                 Stop();
             }
