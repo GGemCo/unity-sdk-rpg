@@ -48,7 +48,11 @@ namespace GGemCo.Scripts
         }
         public GameObject GetPrefab(int uid) {
             var info = GetDataByUid(uid);
-            if (info == null) return null;
+            if (info == null)
+            {
+                GcLogger.LogError("animation 테이블에 프리팹이 없습니다. uid: "+uid);
+                return null;
+            }
             return info.Prefab;
         }
     }

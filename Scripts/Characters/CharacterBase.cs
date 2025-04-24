@@ -53,6 +53,9 @@ namespace GGemCo.Scripts
         protected bool IsUseSkill = false;
         protected SkillController SkillController;
         
+        [Header("스폰 데이터")] 
+        [HideInInspector] public CharacterRegenData CharacterRegenData;
+        
         // 현재 상태
         private CharacterConstants.CharacterStatus currentStatus;
         // 몬스터 죽은 후 맵에서 지우기까지에 시간

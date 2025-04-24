@@ -95,7 +95,8 @@ namespace GGemCo.Scripts
             ItemManager = new ItemManager();
             ItemManager.Initialize(this);
             CharacterManager = new CharacterManager();
-            CharacterManager.Initialize();
+            CharacterManager.Initialize(TableLoaderManager.Instance.TableNpc, TableLoaderManager.Instance.TableMonster,
+                TableLoaderManager.Instance.TableAnimation);
             KeyboardManager = new KeyboardManager();
             KeyboardManager.Initialize(this);
             InteractionManager = new InteractionManager();

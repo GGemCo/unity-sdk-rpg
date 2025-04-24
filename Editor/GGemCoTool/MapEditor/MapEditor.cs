@@ -7,13 +7,14 @@ namespace GGemCo.Editor
 {
     public class MapExporter : EditorWindow
     {
-        private List<NpcData> npcList;
-        private List<MonsterData> monsterDatas;
+        private List<CharacterRegenData> npcList;
+        private List<CharacterRegenData> monsterDatas;
         private List<WarpData> warpDatas;
         private static MapTileCommon _defaultMap;
         private static GameObject _gridTileMap;
         private static GameObject _player;
 
+        private CharacterManager characterManager;
         private TableLoaderManager tableLoaderManager;
         private static TableMap _tableMap;
         private static TableNpc _tableNpc;
@@ -104,8 +105,11 @@ namespace GGemCo.Editor
             var tableMonster = tableLoaderManager.LoadMonsterTable();
             var tableSpine = tableLoaderManager.LoadSpineTable();
 
-            npcExporter.Initialize(tableNpc, tableSpine, defaultMap);
-            monsterExporter.Initialize(tableMonster, tableSpine, defaultMap);
+            characterManager = new CharacterManager();
+            characterManager.Initialize(tableNpc, tableMonster, tableSpine);
+            
+            npcExporter.Initialize(tableNpc, tableSpine, defaultMap, characterManager);
+            monsterExporter.Initialize(tableMonster, tableSpine, defaultMap, characterManager);
             warpExporter.Initialize(defaultMap);
             LoadNpcInfoData();
             LoadMonsterInfoData();

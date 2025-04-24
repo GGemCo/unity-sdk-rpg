@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using GGemCo.Scripts;
 using Newtonsoft.Json;
+using TMPro;
 using UnityEngine;
 
 namespace GGemCo.Editor
@@ -10,9 +11,9 @@ namespace GGemCo.Editor
     /// <summary>
     /// 맵 배치툴 > 몬스터 배치, 내보내기
     /// </summary>
-    public class MonsterExporter
+    public class MonsterExporter : DefaultExporter
     {
-        private List<MonsterData> monsterList;
+        private List<CharacterRegenData> monsterList;
         private TableMonster tableMonster;
         private TableAnimation tableAnimation;
         private DefaultMap defaultMap;
@@ -24,13 +25,12 @@ namespace GGemCo.Editor
         /// <param name="pTableMonster"></param>
         /// <param name="pTableAnimation"></param>
         /// <param name="pDefaultMap"></param>
-        public void Initialize(TableMonster pTableMonster, TableAnimation pTableAnimation, DefaultMap pDefaultMap)
+        public void Initialize(TableMonster pTableMonster, TableAnimation pTableAnimation, DefaultMap pDefaultMap, CharacterManager pcharacterManager)
         {
             tableMonster = pTableMonster;
             tableAnimation = pTableAnimation;
             defaultMap = pDefaultMap;
-            characterManager = new CharacterManager();
-            characterManager.Initialize();
+            characterManager = pcharacterManager;
         }
         /// <summary>
         /// 배치할 맵 셋팅
@@ -65,21 +65,16 @@ namespace GGemCo.Editor
                 }
                 index++;
             }
-
-            if (monsterData.Uid <= 0)
+            CharacterRegenData characterRegenData =
+                new CharacterRegenData(monsterData.Uid, Vector3.zero, false, defaultMap.GetChapterNumber(), true);
+            GameObject monster = characterManager.CreateMonster(monsterData.Uid, characterRegenData);
+            if (monster == null)
             {
                 Debug.LogError("몬스터 데이터가 없습니다.");
                 return;
             }
+            monster.transform.SetParent(defaultMap.gameObject.transform);
 
-            GameObject monsterPrefab = tableAnimation.GetPrefab(monsterData.SpineUid);
-            if (monsterPrefab == null)
-            {
-                Debug.LogError("몬스터 프리팹을 찾을 수 없습니다.");
-                return;
-            }
-
-            GameObject monster = characterManager.CreateMonster(monsterPrefab, Vector3.zero, defaultMap.gameObject.transform);
             var monsterScript = monster.GetComponent<Monster>();
             if (monsterScript != null)
             {
@@ -87,6 +82,10 @@ namespace GGemCo.Editor
                 monsterScript.SetScale(monsterData.Scale);
                 monsterScript.InitTagSortingLayer();
             }
+            
+            // npc 정보 보여줄 canvas 추가
+            TextMeshProUGUI text = CreateInfoCanvas(monsterScript);
+            text.text = $"Uid: {monsterData.Uid}\nPos: (0, 0)\nScale: {Math.Abs(monster.transform.localScale.x):F2}";
 
             Debug.Log($"{monsterData.Name} 몬스터가 맵에 추가되었습니다.");
         }
@@ -99,7 +98,7 @@ namespace GGemCo.Editor
         public void ExportMonsterDataToJson(string filePath, string fileName, int mapUid)
         {
             GameObject mapObject = GameObject.FindGameObjectWithTag(ConfigTags.GetValue(ConfigTags.Keys.Map));
-            MonsterDataList saveMonsterList = new MonsterDataList();
+            CharacterRegenDataList saveMonsterList = new CharacterRegenDataList();
 
             foreach (Transform child in mapObject.transform)
             {
@@ -107,7 +106,7 @@ namespace GGemCo.Editor
                 {
                     var monster = child.gameObject.GetComponent<Monster>();
                     if (monster == null) continue;
-                    saveMonsterList.monsterDataList.Add(new MonsterData(monster.uid, child.position, monster.isFlip, mapUid, true));
+                    saveMonsterList.CharacterRegenDatas.Add(new CharacterRegenData(monster.uid, child.position, monster.isFlip, mapUid, true));
                 }
             }
 
@@ -131,8 +130,8 @@ namespace GGemCo.Editor
                     string content = textFile.text;
                     if (!string.IsNullOrEmpty(content))
                     {
-                        MonsterDataList monsterDataList = JsonConvert.DeserializeObject<MonsterDataList>(content);
-                        monsterList = monsterDataList.monsterDataList;
+                        CharacterRegenDataList regenDataList = JsonConvert.DeserializeObject<CharacterRegenDataList>(content);
+                        monsterList = regenDataList.CharacterRegenDatas;
                         SpawnMonster();
                     }
                 }
@@ -153,32 +152,27 @@ namespace GGemCo.Editor
                 return;
             }
 
-            foreach (MonsterData monsterData in monsterList)
+            foreach (CharacterRegenData monsterData in monsterList)
             {
                 int uid = monsterData.Uid;
-                if (uid <= 0) continue;
-                var info = tableMonster.GetDataByUid(uid);
-                if (info.Uid <= 0 || info.SpineUid <= 0) continue;
-                GameObject monsterPrefab = tableAnimation.GetPrefab(info.SpineUid);
-                if (monsterPrefab == null)
-                {
-                    GcLogger.LogError("monster 프리팹이 없습니다. spine uid: " + info.SpineUid);
-                    continue;
-                }
-                GameObject monster = characterManager.CreateMonster(monsterPrefab, new Vector3(monsterData.x, monsterData.y, monsterData.z), defaultMap.gameObject.transform);
+                GameObject monster = characterManager.CreateMonster(uid, monsterData);
+                if (monster == null) continue;
+                monster.transform.SetParent(defaultMap.gameObject.transform);
+                
                 // 몬스터의 속성을 설정하는 스크립트가 있을 경우 적용
                 Monster myMonsterScript = monster.GetComponent<Monster>();
                 if (myMonsterScript != null)
                 {
                     // MapManager.cs:138 도 수정
                     myMonsterScript.uid = monsterData.Uid;
-                    myMonsterScript.MonsterData = monsterData;
-                    // 추가적인 속성 설정을 여기에서 수행할 수 있습니다.
-                    myMonsterScript.SetScale(info.Scale);
+                    myMonsterScript.CharacterRegenData = monsterData;
                     // SetScale 다음에 처리해야 함
                     myMonsterScript.SetFlip(monsterData.IsFlip);
                     myMonsterScript.InitTagSortingLayer();
                 }
+                // npc 정보 보여줄 canvas 추가
+                TextMeshProUGUI text = CreateInfoCanvas(myMonsterScript);
+                text.text = $"Uid: {monsterData.Uid}\nPos: ({monsterData.x}, {monsterData.y})\nScale: {Math.Abs(monster.transform.localScale.x):F2}";
             }
 
             Debug.Log("monster spawned successfully.");

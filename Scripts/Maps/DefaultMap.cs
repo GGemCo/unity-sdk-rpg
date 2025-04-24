@@ -103,26 +103,26 @@ namespace GGemCo.Scripts
         /// </summary>
         /// <param name="vid"></param>
         /// <returns></returns>
-        public NpcData GetNpcDataByVid(int vid)
+        public CharacterRegenData GetNpcDataByVid(int vid)
         {
             GameObject npc = Npcs.GetValueOrDefault(vid);
             if (npc == null) return null;
             Npc myNpc = npc.GetComponent<Npc>();
             if (myNpc == null) return null;
-            return myNpc.NpcData;
+            return myNpc.CharacterRegenData;
         }
         /// <summary>
         /// vid 값으로 몬스터 찾기  
         /// </summary>
         /// <param name="vid"></param>
         /// <returns></returns>
-        public MonsterData GetMonsterDataByVid(int vid)
+        public CharacterRegenData GetMonsterDataByVid(int vid)
         {
             GameObject monster = Monsters.GetValueOrDefault(vid);
             if (monster == null) return null;
             Monster myMonster = monster.GetComponent<Monster>();
             if (myMonster == null) return null;
-            return myMonster.MonsterData;
+            return myMonster.CharacterRegenData;
         }
         /// <summary>
         /// 맵에 배치된 npc 중에 uid 로 가져오기

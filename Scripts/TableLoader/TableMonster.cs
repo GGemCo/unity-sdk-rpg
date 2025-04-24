@@ -74,25 +74,5 @@ namespace GGemCo.Scripts
                 RewardGold = int.Parse(data["RewardGold"]),
             };
         }
-        
-        public GameObject GetPrefab(int uid) {
-            var info = GetDataByUid(uid);
-            if (info == null) return null;
-        
-            string prefabPath = TableLoaderManager.Instance.TableAnimation.GetPrefabPath(info.SpineUid);
-            if (prefabPath == "") {
-                GcLogger.LogError("prefab 경로가 없습니다. SpineUid: "+info.SpineUid);
-                return null;
-            }
-            GameObject prefab = Resources.Load<GameObject>(prefabPath);
-            if (prefab != null) return prefab;
-            GcLogger.LogError("prefab 오브젝트가 없습니다. prefabPath: "+prefabPath);
-            return null;
-        }
-        public string GetShapePath(int uid)
-        {
-            var info = GetDataByUid(uid);
-            return info == null || info.SpineUid <= 0 ? "" : TableLoaderManager.Instance.TableAnimation.GetPrefabPath(info.SpineUid);
-        }
     }
 }
