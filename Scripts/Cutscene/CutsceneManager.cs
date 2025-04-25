@@ -78,10 +78,12 @@ namespace GGemCo.Scripts
                 GcLogger.LogError("연출 json 파일이 없습니다. " + info.FileName);
                 return;
             }
+            // 카메라 원본 size 저장 
             originalOrthographicSize = SceneGame.Instance.mainCamera.orthographicSize;
-
-            currentCutscene = JsonConvert.DeserializeObject<CutsceneData>(asset.text);
-
+            // 모든 캐릭터 활성화, 컬링 적용되지 않음
+            sceneGame.mapManager.ActiveAllCharacters();
+            // json 파싱하기
+            currentCutscene = JsonConvert.DeserializeObject<CutsceneData>(asset.text);    
             // 리소스 생성, 프리팹 로딩, 사운드 등 선행 처리
             sceneGame.StartCoroutine(PrepareAndPlay());
         }

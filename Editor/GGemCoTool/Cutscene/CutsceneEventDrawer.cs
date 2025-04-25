@@ -12,7 +12,6 @@ namespace GGemCo.Editor
     {
         public override void OnGUI(Rect pos, SerializedProperty property, GUIContent label)
         {
-            var timeProp = property.FindPropertyRelative("time");
             var typeProp = property.FindPropertyRelative("type");
 
             var cameraMoveProp = property.FindPropertyRelative("cameraMove");
@@ -27,9 +26,6 @@ namespace GGemCo.Editor
 
             var line = pos;
             line.height = EditorGUIUtility.singleLineHeight;
-
-            EditorGUI.PropertyField(line, timeProp);
-            line.y += line.height + 2;
 
             EditorGUI.PropertyField(line, typeProp);
             line.y += line.height + 2;

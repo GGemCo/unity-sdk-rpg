@@ -8,10 +8,10 @@ namespace GGemCo.Scripts
     [Serializable]
     public class CutsceneEvent
     {
-        [Tooltip("시작 시간")]
-        public float time;
-        [Tooltip("클립 플레이 시간")]
-        public float duration;
+        // [Tooltip("시작 시간")]
+        [HideInInspector] public float time;
+        // [Tooltip("클립 플레이 시간")]
+        [HideInInspector] public float duration;
         [Tooltip("이벤트 타입")]
         public CutsceneEventType type;
         // 이 필드는 Prepare 단계에서 할당

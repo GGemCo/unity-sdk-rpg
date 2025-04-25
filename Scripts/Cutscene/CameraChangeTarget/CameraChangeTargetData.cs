@@ -10,7 +10,5 @@ namespace GGemCo.Scripts
         public CharacterConstants.Type characterType;
         [Header("캐릭터 고유번호")] 
         public int characterUid;
-
-        public Easing.EaseType easing = Easing.EaseType.Linear;
     }
 }

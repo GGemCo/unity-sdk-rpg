@@ -14,6 +14,7 @@ namespace GGemCo.Scripts
         [Tooltip("npc, monster 테이블의 고유번호")]
         public int characterUid;
         
+        [Header("메시지 텍스트")]
         [Tooltip("말풍선 내용")]
         public string message;
         [Tooltip("폰트 크기")]
