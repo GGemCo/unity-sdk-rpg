@@ -46,20 +46,16 @@ namespace GGemCo.Scripts
             }
             timer = 0f;
             isZooming = true;
+            SceneGame.Instance.cameraManager.StartZoom(endSize, duration, easing);
         }
 
         public void Update()
         {
             if (!isZooming) return;
-
             timer += Time.deltaTime;
             float t = Mathf.Clamp01(timer / duration);
-            float easedT = Easing.Apply(t, easing);
-
-            float zoom = Mathf.Lerp(startSize, endSize, easedT);
-            cam.orthographicSize = zoom;
-
-            if (t >= 1f)
+            
+            if (timer > duration)
             {
                 Stop();
             }
