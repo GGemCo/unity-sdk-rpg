@@ -6,18 +6,12 @@ namespace GGemCo.Scripts
     [Serializable]
     public class CameraMoveData
     {
-        [Header("타겟 따라가기")]
-        public bool followTarget;
-        public string targetName;
-
         [Header("이동")]
         public Vec2 startPosition;
         public Vec2 endPosition;
-        public float duration = 1f;
+        [Tooltip("종료 후 카메라 타겟을 player 로 해줄것인지")]
+        public bool endTargetPlayer;
         
-        public bool fadeIn;
-        public bool fadeOut;
-
         public Easing.EaseType easing = Easing.EaseType.Linear;
     }
 }

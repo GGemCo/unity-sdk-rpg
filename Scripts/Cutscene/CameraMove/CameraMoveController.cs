@@ -13,9 +13,8 @@ namespace GGemCo.Scripts
         private float duration;
         private float timer;
         private bool isMoving;
+        private bool endTargetPlayer;
         private Easing.EaseType easing;
-
-        private Transform followTarget;
 
         public CameraMoveController(CutsceneManager manager)
         {
@@ -31,15 +30,17 @@ namespace GGemCo.Scripts
         public void Trigger(CutsceneEvent evt)
         {
             if (evt.type != CutsceneEventType.CameraMove) return;
+            duration = evt.duration;
             var data = evt.cameraMove;
-
+            
             startPosition = data.startPosition.ToVector2();
             endPosition = data.endPosition.ToVector2();
-            duration = data.duration;
             easing = data.easing;
+            endTargetPlayer = data.endTargetPlayer;
 
             timer = 0f;
             isMoving = true;
+            SceneGame.Instance.cameraManager.RemoveFollowTarget();
         }
 
         public void Update()
@@ -50,7 +51,7 @@ namespace GGemCo.Scripts
             float t = Mathf.Clamp01(timer / duration);
             float easedT = Easing.Apply(t, easing);
 
-            Vector2 basePos = followTarget ? followTarget.position : Vector2.Lerp(startPosition, endPosition, easedT);
+            Vector2 basePos = Vector2.Lerp(startPosition, endPosition, easedT);
             cam.transform.position= new Vector3(basePos.x, basePos.y, cam.transform.position.z);
 
             if (t >= 1f)
@@ -62,6 +63,10 @@ namespace GGemCo.Scripts
         public void Stop()
         {
             isMoving = false;
+            if (endTargetPlayer)
+            {
+                SceneGame.Instance.cameraManager.SetFollowPlayer();
+            }
         }
         public void End()
         {
