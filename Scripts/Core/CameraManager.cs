@@ -49,11 +49,6 @@ namespace GGemCo.Scripts
             width = height * Screen.width / Screen.height;
             originalPos = transform.localPosition;
         }
-
-        private void Start()
-        {
-        }
-
         private void Update()
         {
             LimitCameraArea();
@@ -94,6 +89,9 @@ namespace GGemCo.Scripts
                 float easedT = Easing.Apply(t, zoomEasing);
                 float zoom = Mathf.Lerp(zoomStartSize, zoomEndSize, easedT);
                 currentCamera.orthographicSize = zoom;
+                
+                height = zoom;
+                width = height * Screen.width / Screen.height;
                 if (t >= 1f)
                 {
                     isZooming = false;
@@ -167,6 +165,13 @@ namespace GGemCo.Scripts
             cameraPosition.y = originCameraPosition.y;
         }
         /// <summary>
+        /// 카메라가 따라가는 캐릭터 지우기
+        /// </summary>
+        public void RemoveFollowTarget()
+        {
+            followTarget = null;
+        }
+        /// <summary>
         /// 따라가는 캐릭터 변경
         /// </summary>
         /// <param name="target"></param>
@@ -185,20 +190,22 @@ namespace GGemCo.Scripts
         /// <summary>
         /// orthographicSize 변경하기
         /// </summary>
-        /// <param name="size"></param>
-        public void StartZoom(float size)
+        /// <param name="endSize"></param>
+        /// <param name="duration"></param>
+        /// <param name="easeType"></param>
+        public void StartZoom(float endSize, float duration = 1f, Easing.EaseType easeType = Easing.EaseType.EaseOutQuad)
         {
             zoomTimer = 0;
             zoomStartSize = currentCamera.orthographicSize;
-            zoomEndSize = size;
-            zoomDuration = 1f;
-            zoomEasing = Easing.EaseType.EaseOutQuad;
+            zoomEndSize = endSize;
+            zoomDuration = duration;
+            zoomEasing = easeType;
             isZooming = true;
         }
         /// <summary>
         /// orthographicSize 초기화
         /// </summary>
-        public void ReSetZoom()
+        private void ReSetZoom()
         {
             zoomTimer = 0;
             zoomStartSize = currentCamera.orthographicSize;

@@ -9,6 +9,7 @@ namespace GGemCo.Scripts
         public Camera mainCamera;
         public float extraTileCount = 200f;
         private TilemapRenderer tilemapRenderer;
+        private CutsceneManager cutsceneManager;
 
         private Bounds cullingBounds; // 현재 컬링 범위를 저장할 변수
         private float mainCameraZ;
@@ -26,6 +27,8 @@ namespace GGemCo.Scripts
                 mainCamera = SceneGame.Instance.mainCamera;
                 mainCameraZ = mainCamera.transform.position.z;
             }
+
+            cutsceneManager = SceneGame.Instance.CutsceneManager;
             CalculateCullingBounds();
         }
 
@@ -40,6 +43,7 @@ namespace GGemCo.Scripts
         protected override void CalculateCullingBounds()
         {
             if (mainCamera == null || tilemapRenderer == null) return;
+            if (cutsceneManager.IsPlaying()) return;
 
             // 카메라 크기 계산
             float verticalSize = mainCamera.orthographicSize;
@@ -94,6 +98,23 @@ namespace GGemCo.Scripts
                         obj.GetComponent<Monster>()?.StartFadeOut();
                     }
                 }
+            }
+        }
+        /// <summary>
+        /// 모든 캐릭터 활성화
+        /// 연출 시작시 사용
+        /// </summary>
+        public void ActiveAllCharacters()
+        {
+            foreach (var data in Monsters)
+            {
+                if (data.Value == null) continue;
+                data.Value.GetComponent<Monster>()?.StartFadeIn();
+            }
+            foreach (var data in Npcs)
+            {
+                if (data.Value == null) continue;
+                data.Value.GetComponent<Npc>()?.StartFadeIn();
             }
         }
         /// <summary>

@@ -496,5 +496,14 @@ namespace GGemCo.Scripts
         {
             return mapTileCommon.transform;
         }
+        /// <summary>
+        /// 모든 캐릭터 활성화
+        /// 연출 시작시 사용
+        /// </summary>
+        public void ActiveAllCharacters()
+        {
+            if (mapTileCommon == null) return;
+            mapTileCommon.ActiveAllCharacters();
+        }
     }
 }
