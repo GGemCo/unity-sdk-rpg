@@ -15,9 +15,9 @@ namespace GGemCo.Editor
             canvasObject.transform.localPosition = Vector3.zero;
             Canvas canvas = canvasObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.WorldSpace;
-            canvas.worldCamera = GameObject.Find("MainCamera").GetComponent<Camera>();
+            canvas.worldCamera = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
             canvas.sortingLayerName = ConfigSortingLayer.GetValue(ConfigSortingLayer.Keys.UI);
-                
+
             GameObject infoObject = new GameObject("info");
             infoObject.transform.SetParent(canvas.transform);
             infoObject.transform.localPosition = Vector3.zero;
