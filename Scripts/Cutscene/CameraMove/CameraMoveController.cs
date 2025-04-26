@@ -32,8 +32,12 @@ namespace GGemCo.Scripts
             if (evt.type != CutsceneEventType.CameraMove) return;
             duration = evt.duration;
             var data = evt.cameraMove;
-            
+
             startPosition = data.startPosition.ToVector2();
+            if (startPosition == Vector2.zero)
+            {
+                startPosition = cam.transform.position;
+            }
             endPosition = data.endPosition.ToVector2();
             easing = data.easing;
             endTargetPlayer = data.endTargetPlayer;
