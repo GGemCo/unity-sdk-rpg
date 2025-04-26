@@ -1,11 +1,14 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace GGemCo.Scripts
 {
     [CreateAssetMenu(fileName = "GGemCoPlayerSettings", menuName = "GGemCo/Settings/GGemCoPlayerSettings", order = 2)]
     public class GGemCoPlayerSettings :ScriptableObject
     {
+        [FormerlySerializedAs("defaultFacing")]
         [Header("플레이어 디폴트 값 설정")] 
+        [Header("플레이어 디폴트 방향")] public CharacterConstants.CharacterFacing characterFacing;
         [Header("플레이어 최대 레벨")] public int maxLevel;
         [Header("시작 scale")] public float startScale;
         [Header("기본 공격력")] public int statAtk;
@@ -24,6 +27,7 @@ namespace GGemCo.Scripts
         /// </summary>
         private void Reset()
         {
+            characterFacing = CharacterConstants.CharacterFacing.Left;
             startScale = 1;
             statAtk = 100;
             statDef = 100;

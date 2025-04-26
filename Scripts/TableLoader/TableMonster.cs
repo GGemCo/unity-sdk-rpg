@@ -13,7 +13,7 @@ namespace GGemCo.Scripts
         public int SpineUid;
         public string DefaultSkin;
         public float Scale;
-        public CharacterBase.Grade Grade;
+        public CharacterConstants.Grade Grade;
         public int Level;
         public int StatHp;
         public int StatAtk;
@@ -31,18 +31,18 @@ namespace GGemCo.Scripts
     /// </summary>
     public class TableMonster : DefaultTable
     {
-        private static readonly Dictionary<string, CharacterBase.Grade> MapGrade;
+        private static readonly Dictionary<string, CharacterConstants.Grade> MapGrade;
 
         static TableMonster()
         {
-            MapGrade = new Dictionary<string, CharacterBase.Grade>
+            MapGrade = new Dictionary<string, CharacterConstants.Grade>
             {
-                { "Common", CharacterBase.Grade.Common },
-                { "Boss", CharacterBase.Grade.Boss },
+                { "Common", CharacterConstants.Grade.Common },
+                { "Boss", CharacterConstants.Grade.Boss },
             };
         }
 
-        private CharacterBase.Grade ConvertGrade(string grade) => MapGrade.GetValueOrDefault(grade, CharacterBase.Grade.None);
+        private CharacterConstants.Grade ConvertGrade(string grade) => MapGrade.GetValueOrDefault(grade, CharacterConstants.Grade.None);
 
         public StruckTableMonster GetDataByUid(int uid)
         {
@@ -73,26 +73,6 @@ namespace GGemCo.Scripts
                 RegistLightning = int.Parse(data["RegistLightning"]),
                 RewardGold = int.Parse(data["RewardGold"]),
             };
-        }
-        
-        public GameObject GetPrefab(int uid) {
-            var info = GetDataByUid(uid);
-            if (info == null) return null;
-        
-            string prefabPath = TableLoaderManager.Instance.TableAnimation.GetPrefabPath(info.SpineUid);
-            if (prefabPath == "") {
-                GcLogger.LogError("prefab 경로가 없습니다. SpineUid: "+info.SpineUid);
-                return null;
-            }
-            GameObject prefab = Resources.Load<GameObject>(prefabPath);
-            if (prefab != null) return prefab;
-            GcLogger.LogError("prefab 오브젝트가 없습니다. prefabPath: "+prefabPath);
-            return null;
-        }
-        public string GetShapePath(int uid)
-        {
-            var info = GetDataByUid(uid);
-            return info == null || info.SpineUid <= 0 ? "" : TableLoaderManager.Instance.TableAnimation.GetPrefabPath(info.SpineUid);
         }
     }
 }

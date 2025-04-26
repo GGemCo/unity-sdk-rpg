@@ -29,6 +29,8 @@ namespace GGemCo.Scripts
         public GameObject bgBlackForMapLoading;
         [Tooltip("몬스터 Hp Bar 오브젝트가 들어갈 오브젝트 입니다.")]
         public GameObject containerMonsterHpBar;
+        [Tooltip("연출 말풍선이 들어갈 오브젝트 입니다.")]
+        public GameObject containerDialogueBalloon;
         
         [Header("매니저")]
         [Tooltip("윈도우 매니저")]
@@ -39,6 +41,7 @@ namespace GGemCo.Scripts
         public CameraManager cameraManager;
         [Tooltip("팝업 매니저")]
         public PopupManager popupManager;
+
         [HideInInspector] public SaveDataManager saveDataManager;
         [HideInInspector] public CalculateManager calculateManager;
         [HideInInspector] public MapManager mapManager;
@@ -48,6 +51,7 @@ namespace GGemCo.Scripts
         public CharacterManager CharacterManager;
         public KeyboardManager KeyboardManager;
         public InteractionManager InteractionManager;
+        public CutsceneManager CutsceneManager;
         
         private UIWindowInventory uiWindowInventory;
 
@@ -85,17 +89,19 @@ namespace GGemCo.Scripts
             calculateManager = CreateManager<CalculateManager>(managerContainer);
             mapManager = CreateManager<MapManager>(managerContainer);
             saveDataManager = CreateManager<SaveDataManager>(managerContainer);
-            damageTextManager = CreateManager<DamageTextManager>(managerContainer);
             uIIconCoolTimeManager = CreateManager<UIIconCoolTimeManager>(managerContainer);
             
             ItemManager = new ItemManager();
             ItemManager.Initialize(this);
             CharacterManager = new CharacterManager();
-            CharacterManager.Initialize();
+            CharacterManager.Initialize(TableLoaderManager.Instance.TableNpc, TableLoaderManager.Instance.TableMonster,
+                TableLoaderManager.Instance.TableAnimation);
             KeyboardManager = new KeyboardManager();
             KeyboardManager.Initialize(this);
             InteractionManager = new InteractionManager();
             InteractionManager.Initialize(this);
+            CutsceneManager = new CutsceneManager();
+            CutsceneManager.Initialize(this);
         }
 
         private T CreateManager<T>(GameObject parent) where T : Component
@@ -182,6 +188,11 @@ namespace GGemCo.Scripts
             if (KeyboardManager != null)
             {
                 KeyboardManager.Update();
+            }
+
+            if (CutsceneManager != null)
+            {
+                CutsceneManager.Update();
             }
         }
         /// <summary>

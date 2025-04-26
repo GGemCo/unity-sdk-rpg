@@ -46,6 +46,8 @@ namespace GGemCo.Scripts
             uiWindowPlayerBuffInfo =
                 sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowPlayerBuffInfo>(UIWindowManager.WindowUid
                     .PlayerBuffInfo);
+            // 연출중 체크를 위해 추가
+            controllerPlayer.Initialize(sceneGame.CutsceneManager);
             
             // TotalHp, Mp 가 바뀌어도 현재 값이 바뀌면 안된다.
             TotalHp
@@ -408,6 +410,11 @@ namespace GGemCo.Scripts
         public override float GetHeightByScale()
         {
             return CharacterAnimationController.GetCharacterHeight() * Math.Abs(transform.localScale.x);
+        }
+
+        public void SetMapSize(Vector2 mapSize)
+        {
+            controllerPlayer?.ChangeMapSize(mapSize);
         }
     }
 }

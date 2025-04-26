@@ -130,7 +130,8 @@ namespace GGemCo.Scripts
             // 랜덤한 회전 방향 설정
             rotationDirection = Random.Range(-1f, 1f);
 
-            mapSizeHeight = SceneGame.Instance.mapManager.GetCurrentMapSize().height;
+            Vector2 size = SceneGame.Instance.mapManager.GetCurrentMapSize();
+            mapSizeHeight = size.y;
             
             isStart = true;
 

@@ -37,18 +37,13 @@ namespace GGemCo.Scripts
         /// </summary>
         /// <param name="playSpawnPosition"></param>
         /// <param name="currentMapTableData"></param>
+        /// <param name="mapTileCommon"></param>
         /// <returns></returns>
-        public IEnumerator LoadPlayer(Vector3 playSpawnPosition, StruckTableMap currentMapTableData)
+        public IEnumerator LoadPlayer(Vector3 playSpawnPosition, StruckTableMap currentMapTableData, DefaultMap mapTileCommon)
         {
             if (SceneGame.Instance.player == null)
             {
-                GameObject prefabPlayer = Resources.Load<GameObject>(ConfigCommon.PathPlayerPrefab);
-                if (prefabPlayer == null)
-                {
-                    GcLogger.LogError("플레이어 프리팹이 없습니다. path:"+ConfigCommon.PathPlayerPrefab);
-                    yield break;
-                }
-                GameObject player = SceneGame.Instance.CharacterManager.CreatePlayer(prefabPlayer, Vector3.zero);
+                GameObject player = SceneGame.Instance.CharacterManager.CreatePlayer();
                 SceneGame.Instance.player = player;
             }
             
@@ -58,8 +53,9 @@ namespace GGemCo.Scripts
             {
                 spawnPosition = playSpawnPosition;
             }
-            SceneGame.Instance.player.GetComponent<Player>().MoveForce(spawnPosition.x, spawnPosition.y);
-            // SceneGame.Instance.cameraManager.MoveCameraPosition(spawnPosition.x, spawnPosition.y);
+            SceneGame.Instance.player.GetComponent<Player>().MoveTeleport(spawnPosition.x, spawnPosition.y);
+            SceneGame.Instance.player.GetComponent<Player>().SetMapSize(mapTileCommon.GetMapSize());
+            SceneGame.Instance.cameraManager.SetFollowTarget(SceneGame.Instance.player.transform);
 
             // yield return new WaitForSeconds(ConfigCommon.CharacterFadeSec/2);
             yield return null;
@@ -80,8 +76,8 @@ namespace GGemCo.Scripts
                     string content = textFile.text;
                     if (!string.IsNullOrEmpty(content))
                     {
-                        MonsterDataList monsterDataList = JsonConvert.DeserializeObject<MonsterDataList>(content);
-                        SpawnMonsters(monsterDataList.monsterDataList, mapTileCommon);
+                        CharacterRegenDataList characterRegenDataList = JsonConvert.DeserializeObject<CharacterRegenDataList>(content);
+                        SpawnMonsters(characterRegenDataList.CharacterRegenDatas, mapTileCommon);
                     }
                 }
             }
@@ -98,9 +94,9 @@ namespace GGemCo.Scripts
         /// </summary>
         /// <param name="monsterList"></param>
         /// <param name="mapTileCommon"></param>
-        private void SpawnMonsters(List<MonsterData> monsterList, MapTileCommon mapTileCommon)
+        private void SpawnMonsters(List<CharacterRegenData> monsterList, MapTileCommon mapTileCommon)
         {
-            foreach (MonsterData monsterData in monsterList)
+            foreach (CharacterRegenData monsterData in monsterList)
             {
                 int uid = monsterData.Uid;
                 if (uid <= 0) continue;
@@ -115,32 +111,17 @@ namespace GGemCo.Scripts
         /// <param name="monsterUid"></param>
         /// <param name="monsterData"></param>
         /// <param name="mapTileCommon"></param>
-        private void SpawnMonster(int monsterUid, MonsterData monsterData, MapTileCommon mapTileCommon)
+        private void SpawnMonster(int monsterUid, CharacterRegenData monsterData, MapTileCommon mapTileCommon)
         {
-            if (monsterUid <= 0) return;
-            var info = tableMonster.GetDataByUid(monsterUid);
-            if (info.Uid <= 0 || info.SpineUid <= 0) return;
-            GameObject monsterPrefab = tableAnimation.GetPrefab(info.SpineUid);
-            if (monsterPrefab == null)
-            {
-                GcLogger.LogError("프리팹이 없습니다. spine uid: " + info.SpineUid);
-                return;
-            }
-            GameObject monster = SceneGame.Instance.CharacterManager.CreateMonster(monsterPrefab, new Vector3(monsterData.x, monsterData.y, monsterData.z), mapTileCommon.gameObject.transform);
+            GameObject monster = SceneGame.Instance.CharacterManager.CreateMonster(monsterUid, monsterData);
+            if (monster == null) return;
+            monster.transform.SetParent(mapTileCommon.gameObject.transform);
             
-            // 몬스터의 이름과 기타 속성 설정
             Monster myMonsterScript = monster.GetComponent<Monster>();
-            if (myMonsterScript != null)
-            {
-                // monsterExporter.cs:158 도 수정
-                myMonsterScript.vid = characterVid;
-                myMonsterScript.uid = monsterData.Uid;
-                myMonsterScript.MonsterData = monsterData;
-                myMonsterScript.CreateHpBar();
-
-                mapTileCommon.AddMonster(characterVid, monster);
-                characterVid++;
-            }
+            myMonsterScript.vid = characterVid;
+            myMonsterScript.CreateHpBar();
+            mapTileCommon.AddMonster(characterVid, monster);
+            characterVid++;
         }
         
         /// <summary>
@@ -159,8 +140,8 @@ namespace GGemCo.Scripts
                     string content = textFile.text;
                     if (!string.IsNullOrEmpty(content))
                     {
-                        NpcDataList npcDataList = JsonConvert.DeserializeObject<NpcDataList>(content);
-                        SpawnNpcs(npcDataList.npcDataList, mapTileCommon);
+                        CharacterRegenDataList regenDataList = JsonConvert.DeserializeObject<CharacterRegenDataList>(content);
+                        SpawnNpcs(regenDataList.CharacterRegenDatas, mapTileCommon);
                     }
                 }
             }
@@ -177,21 +158,14 @@ namespace GGemCo.Scripts
         /// </summary>
         /// <param name="npcList"></param>
         /// <param name="mapTileCommon"></param>
-        private void SpawnNpcs(List<NpcData> npcList, MapTileCommon mapTileCommon)
+        private void SpawnNpcs(List<CharacterRegenData> npcList, MapTileCommon mapTileCommon)
         {
-            foreach (NpcData npcData in npcList)
+            foreach (CharacterRegenData npcData in npcList)
             {
                 int uid = npcData.Uid;
-                if (uid <= 0) continue;
-                var info = tableNpc.GetDataByUid(uid);
-                if (info.Uid <= 0 || info.SpineUid <= 0) continue;
-                GameObject npcPrefab = tableAnimation.GetPrefab(info.SpineUid);
-                if (npcPrefab == null)
-                {
-                    GcLogger.LogError("프리팹이 없습니다. spine uid: " + info.SpineUid);
-                    continue;
-                }
-                GameObject npc = SceneGame.Instance.CharacterManager.CreateNpc(npcPrefab, new Vector3(npcData.x, npcData.y, npcData.z), mapTileCommon.gameObject.transform);
+                GameObject npc = SceneGame.Instance.CharacterManager.CreateNpc(uid, npcData);
+                if (npc == null) continue;
+                npc.transform.SetParent(mapTileCommon.gameObject.transform);
             
                 // NPC의 이름과 기타 속성 설정
                 Npc myNpcScript = npc.GetComponent<Npc>();
@@ -200,7 +174,7 @@ namespace GGemCo.Scripts
                     // npcExporter.cs:158 도 수정
                     myNpcScript.vid = characterVid;
                     myNpcScript.uid = npcData.Uid;
-                    myNpcScript.NpcData = npcData;
+                    myNpcScript.CharacterRegenData = npcData;
                     
                     mapTileCommon.AddNpc(characterVid, npc);
                     characterVid++;
@@ -215,7 +189,7 @@ namespace GGemCo.Scripts
         /// <param name="mapTileCommon"></param>
         public IEnumerator RegenMonster(int monsterVid, int currentMapUid, MapTileCommon mapTileCommon)
         {
-            MonsterData monsterData = mapTileCommon.GetMonsterDataByVid(monsterVid);
+            CharacterRegenData monsterData = mapTileCommon.GetMonsterDataByVid(monsterVid);
             if (monsterData == null) yield break;
 
             yield return new WaitForSeconds(defaultMonsterRegenTimeSec);

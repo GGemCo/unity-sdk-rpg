@@ -10,70 +10,9 @@ namespace GGemCo.Scripts
     /// </summary>
     public class CharacterBase : CharacterStat
     {
-        private const int SortingOrderTop = 32767;
-        private const int SortingOrderBottom = -32768;
-        /// <summary>
-        /// 캐릭터 상태
-        /// </summary>
-        public enum CharacterStatus
-        {
-            None,
-            /// <summary>
-            /// 기본 상태
-            /// </summary>
-            Idle,
-            /// <summary>
-            /// 움직이는 중
-            /// </summary>
-            Run,
-            /// <summary>
-            /// 공격 중
-            /// </summary>
-            Attack,
-            /// <summary>
-            /// 죽음
-            /// </summary>
-            Dead,
-            /// <summary>
-            /// 움직이지 못함
-            /// </summary>
-            DontMove,
-            /// <summary>
-            /// 움직이지 못함
-            /// </summary>
-            CastingSkill,
-            UseSkill,
-        }
-
-        /// <summary>
-        /// 캐릭터 등급
-        /// </summary>
-        public enum Grade
-        {
-            None,
-            Common,
-            Boss
-        }
-        /// <summary>
-        /// 캐릭터 정렬
-        /// </summary>
-        private enum CharacterSortingOrder
-        {
-            Normal,
-            AlwaysOnTop,
-            AlwaysOnBottom,
-            Fixed
-        }
-        public enum AttackType
-        {
-            None,
-            PassiveDefense, // 후공
-            AggroFirst // 선공
-        }
-
         [Header("캐릭터 정보")]
         // 캐릭터 타입
-        public CharacterManager.Type type;
+        public CharacterConstants.Type type;
         // 캐릭터 테이블 Uid
         public int uid;
         // 스폰될때 부여되는 가상번호 vid
@@ -81,7 +20,7 @@ namespace GGemCo.Scripts
         // 현재 이동 스텝
         public float currentMoveStep;
         // 어그로
-        private AttackType attackType;
+        private CharacterConstants.AttackType attackType;
         private bool isAggro;
         public float height;
         public string characterName;
@@ -89,6 +28,8 @@ namespace GGemCo.Scripts
         [Header("캐릭터 방향 관련")]
         // 좌우 flip 여부
         public bool isFlip;
+        // 기본 방향
+        public CharacterConstants.CharacterFacing characterFacing = CharacterConstants.CharacterFacing.Left;
         // 방향
         public Vector3 direction;
         // 좌우 방향 체크에 사용
@@ -102,7 +43,7 @@ namespace GGemCo.Scripts
         // 애니메이션 컨트롤러
         public ICharacterAnimationController CharacterAnimationController;
         private Renderer characterRenderer;
-        private CharacterSortingOrder sortingOrder;
+        private CharacterConstants.CharacterSortingOrder sortingOrder;
         
         [Header("상태 및 스탯")]
         protected readonly BehaviorSubject<long> CurrentHp = new(0);
@@ -112,8 +53,11 @@ namespace GGemCo.Scripts
         protected bool IsUseSkill = false;
         protected SkillController SkillController;
         
+        [Header("스폰 데이터")] 
+        [HideInInspector] public CharacterRegenData CharacterRegenData;
+        
         // 현재 상태
-        private CharacterStatus currentStatus;
+        private CharacterConstants.CharacterStatus currentStatus;
         // 몬스터 죽은 후 맵에서 지우기까지에 시간
         private float delayDestroyMonster;
         // fade in, out 효과 시작 여부. 맵에서 컬링 될때 사용
@@ -130,9 +74,10 @@ namespace GGemCo.Scripts
         
         protected override void Awake()
         {
+            if (AddressableSettingsLoader.Instance == null) return;
             base.Awake();
             AffectController = new AffectController(this);
-            SetAttackType(AttackType.None);
+            SetAttackType(CharacterConstants.AttackType.None);
             SetAggro(false);
             height = 0;
             SetStatusIdle();
@@ -145,6 +90,7 @@ namespace GGemCo.Scripts
                 SkillController = new SkillController();
                 SkillController.Initialize(this);
             }
+            characterFacing = AddressableSettingsLoader.Instance.playerSettings.characterFacing;
         }
         /// <summary>
         /// tag, sorting layer, layer 셋팅하기
@@ -177,7 +123,9 @@ namespace GGemCo.Scripts
                 .Subscribe(UpdateAnimationMoveTimeScale)
                 .AddTo(this);
 
-            mapSizeHeight = SceneGame.Instance.mapManager.GetCurrentMapSize().height;
+            Vector2 size = SceneGame.Instance.mapManager.GetCurrentMapSize();
+            mapSizeHeight = size.y;
+            Stop();
         }
         /// <summary>
         /// 테이블에서 가져온 몬스터 정보 셋팅
@@ -199,13 +147,13 @@ namespace GGemCo.Scripts
         {
             if (uid <= 0) return;
             int animationUid = 0;
-            if (type == CharacterManager.Type.Npc)
+            if (type == CharacterConstants.Type.Npc)
             {
                 var info = TableLoaderManager.Instance.TableNpc.GetDataByUid(uid);
                 if (info == null) return;
                 animationUid = info.SpineUid;
             }
-            else if (type == CharacterManager.Type.Monster)
+            else if (type == CharacterConstants.Type.Monster)
             {
                 var info = TableLoaderManager.Instance.TableMonster.GetDataByUid(uid);
                 if (info == null) return;
@@ -266,14 +214,14 @@ namespace GGemCo.Scripts
         /// </summary>
         private void UpdatePosition()
         {
-            if (sortingOrder == CharacterSortingOrder.Fixed) return;
+            if (sortingOrder == CharacterConstants.CharacterSortingOrder.Fixed) return;
 
             int baseSortingOrder = MathHelper.GetSortingOrder(mapSizeHeight, transform.position.y);
             
             baseSortingOrder = sortingOrder switch
             {
-                CharacterSortingOrder.AlwaysOnTop => SortingOrderTop,
-                CharacterSortingOrder.AlwaysOnBottom => SortingOrderBottom,
+                CharacterConstants.CharacterSortingOrder.AlwaysOnTop => CharacterConstants.SortingOrderTop,
+                CharacterConstants.CharacterSortingOrder.AlwaysOnBottom => CharacterConstants.SortingOrderBottom,
                 _ => baseSortingOrder
             };
 
@@ -289,25 +237,26 @@ namespace GGemCo.Scripts
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public void MoveForce(float x, float y)
+        public void MoveTeleport(float x, float y)
         {
             transform.position = new Vector3(x, y, transform.position.z);
         }
-        public bool IsStatusDead() => currentStatus == CharacterStatus.Dead;
-        public bool IsStatusAttack() => currentStatus == CharacterStatus.Attack;
-        public bool IsStatusDontMove() => currentStatus == CharacterStatus.DontMove;
-        public bool IsStatusRun() => currentStatus == CharacterStatus.Run;
-        public bool IsStatusIdle() => currentStatus == CharacterStatus.Idle;
-        public bool IsStatusNone() => currentStatus == CharacterStatus.None;
-
-        public CharacterStatus GetCurrentStatus() => currentStatus;
+        public bool IsStatusDead() => currentStatus == CharacterConstants.CharacterStatus.Dead;
+        public bool IsStatusAttack() => currentStatus == CharacterConstants.CharacterStatus.Attack;
+        public bool IsStatusDontMove() => currentStatus == CharacterConstants.CharacterStatus.DontMove;
+        public bool IsStatusRun() => currentStatus == CharacterConstants.CharacterStatus.Run;
+        public bool IsStatusIdle() => currentStatus == CharacterConstants.CharacterStatus.Idle;
+        public bool IsStatusNone() => currentStatus == CharacterConstants.CharacterStatus.None;
+        public bool IsStatusMoveForce() => currentStatus == CharacterConstants.CharacterStatus.MoveForce;
+        public CharacterConstants.CharacterStatus GetCurrentStatus() => currentStatus;
         
-        private void SetStatus(CharacterStatus value) => currentStatus = value;
-        public void SetStatusDead() => SetStatus(CharacterStatus.Dead);
-        public void SetStatusIdle() => SetStatus(CharacterStatus.Idle);
-        public void SetStatusRun() => SetStatus(CharacterStatus.Run);
-        public void SetStatusAttack() => SetStatus(CharacterStatus.Attack);
-        public void SetStatusDontMove() => SetStatus(CharacterStatus.DontMove);
+        private void SetStatus(CharacterConstants.CharacterStatus value) => currentStatus = value;
+        public void SetStatusDead() => SetStatus(CharacterConstants.CharacterStatus.Dead);
+        public void SetStatusIdle() => SetStatus(CharacterConstants.CharacterStatus.Idle);
+        public void SetStatusRun() => SetStatus(CharacterConstants.CharacterStatus.Run);
+        public void SetStatusAttack() => SetStatus(CharacterConstants.CharacterStatus.Attack);
+        public void SetStatusDontMove() => SetStatus(CharacterConstants.CharacterStatus.DontMove);
+        public void SetStatusMoveForce() => SetStatus(CharacterConstants.CharacterStatus.MoveForce);
 
         public void SetScale(float scale)
         {
@@ -412,6 +361,7 @@ namespace GGemCo.Scripts
         /// <param name="damageType">속성 데미지 타입</param>
         public bool TakeDamage(long damage, GameObject attacker, SkillConstants.DamageType damageType = SkillConstants.DamageType.None)
         {
+            if (SceneGame.Instance.CutsceneManager.IsPlaying()) return false;
             if (IsStatusDead())
             {
                 // GcLogger.Log("monster dead");
@@ -477,7 +427,7 @@ namespace GGemCo.Scripts
             
             if (remainHp <= 0)
             {
-                currentStatus = CharacterStatus.Dead;
+                currentStatus = CharacterConstants.CharacterStatus.Dead;
                 Destroy(gameObject, delayDestroyMonster);
 
                 OnDead();
@@ -518,12 +468,12 @@ namespace GGemCo.Scripts
         {
             return isAggro;
         }
-        public AttackType GetAttackType()
+        public CharacterConstants.AttackType GetAttackType()
         {
             return attackType;
         }
 
-        private void SetAttackType(AttackType pattackType)
+        private void SetAttackType(CharacterConstants.AttackType pattackType)
         {
             attackType = pattackType;
         }
@@ -597,6 +547,21 @@ namespace GGemCo.Scripts
         private void OnDisable()
         {
             AffectController?.RemoveAllAffects();
+        }
+        /// <summary>
+        /// 실제 보는 방향: 디폴트 방향이 오른쪽이면 localScale.x가 양수면 오른쪽, 음수면 왼쪽
+        /// </summary>
+        /// <returns></returns>
+        public float GetFacingDirection()
+        {
+            float sign = Mathf.Sign(transform.localScale.x);
+            return characterFacing == CharacterConstants.CharacterFacing.Right ? sign : -sign;
+        }
+
+        public void Stop()
+        {
+            SetStatusIdle();
+            CharacterAnimationController?.PlayWaitAnimation();
         }
     }
 }

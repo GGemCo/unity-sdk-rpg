@@ -20,6 +20,7 @@ namespace GGemCo.Scripts
         void PlayRunAnimation();
         void PlayAttackAnimation();
         void PlayDeadAnimation();
+        void PlayCharacterAnimation(string animationName, bool loop = false, float timeScale = 1f);
 
         float GetCharacterHeight();
 

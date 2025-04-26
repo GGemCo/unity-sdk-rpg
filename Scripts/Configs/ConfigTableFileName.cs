@@ -24,5 +24,6 @@
         public const string ItemUpgrade = "item_upgrade";
         public const string ItemSalvage = "item_salvage";
         public const string ItemCraft = "item_craft";
+        public const string Cutscene = "cutscene";
     }
 }

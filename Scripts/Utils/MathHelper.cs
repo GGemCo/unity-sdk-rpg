@@ -1,7 +1,36 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace GGemCo.Scripts
 {
+    
+    [Serializable]
+    public struct Vec3
+    {
+        public float x, y, z;
+
+        public Vec3(Vector3 v)
+        {
+            x = v.x;
+            y = v.y;
+            z = v.z;
+        }
+
+        public Vector3 ToVector3() => new Vector3(x, y, z);
+    }
+    [Serializable]
+    public struct Vec2
+    {
+        public float x, y;
+
+        public Vec2(Vector2 v)
+        {
+            x = v.x;
+            y = v.y;
+        }
+
+        public Vector2 ToVector2() => new Vector2(x, y);
+    }
     public static class MathHelper
     {
         public static string FormatNumber(long number)

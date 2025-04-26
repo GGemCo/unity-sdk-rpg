@@ -9,10 +9,8 @@ namespace GGemCo.Scripts
     /// </summary>
     public class Monster : CharacterBase
     {
-        // 몬스터 데이터
-        [HideInInspector] public MonsterData MonsterData;
         // 선공/후공
-        private AttackType attackType;
+        private CharacterConstants.AttackType attackType;
         public delegate void DelegateMonsterDead(int monsterVid, int monsterUid, GameObject monsterObject);
         public event DelegateMonsterDead OnMonsterDead;
         
@@ -27,8 +25,8 @@ namespace GGemCo.Scripts
         protected override void Awake()
         {
             base.Awake();
-            MonsterData = null;
-            attackType = AttackType.PassiveDefense;
+            CharacterRegenData = null;
+            attackType = CharacterConstants.AttackType.PassiveDefense;
             
             OnMonsterDead += SceneGame.Instance.ItemManager.OnMonsterDead;
             OnMonsterDead += SceneGame.Instance.saveDataManager.Player.AddExp;
@@ -80,11 +78,11 @@ namespace GGemCo.Scripts
         protected override void InitializeByRegenData()
         {
             // 맵 배치툴로 저장한 정보가 있을 경우 
-            if (MonsterData == null) return;
+            if (CharacterRegenData == null) return;
             // UpdateDirection() 에서 초기 방향 처리를 위해 추가
-            direction = new Vector3(MonsterData.IsFlip?1:-1, 0, 0);
-            directionPrev = new Vector3(MonsterData.IsFlip?1:-1, 0, 0);
-            SetFlip(MonsterData.IsFlip);
+            direction = new Vector3(CharacterRegenData.IsFlip?1:-1, 0, 0);
+            directionPrev = new Vector3(CharacterRegenData.IsFlip?1:-1, 0, 0);
+            SetFlip(CharacterRegenData.IsFlip);
         }
         /// <summary>
         /// 테이블에서 가져온 몬스터 정보 셋팅

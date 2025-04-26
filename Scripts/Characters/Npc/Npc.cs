@@ -10,16 +10,8 @@ namespace GGemCo.Scripts
     /// </summary>
     public class Npc : CharacterBase
     {
-        public NpcData NpcData;
         private GameObject containerNpcName;
         private TagNameNpc tagNameNpc;
-
-        // Start is called before the first frame update
-        protected override void Awake()
-        {
-            base.Awake();
-            NpcData = null;
-        }
 
         protected override void Start()
         {
@@ -109,11 +101,11 @@ namespace GGemCo.Scripts
         protected override void InitializeByRegenData()
         {
             // 맵 배치툴로 저장한 정보가 있을 경우 
-            if (NpcData == null) return;
+            if (CharacterRegenData == null) return;
             // UpdateDirection() 에서 초기 방향 처리를 위해 추가
-            direction = new Vector3(NpcData.Flip?1:-1, 0, 0);
-            directionPrev = new Vector3(NpcData.Flip?1:-1, 0, 0);
-            SetFlip(NpcData.Flip);
+            direction = new Vector3(CharacterRegenData.IsFlip?1:-1, 0, 0);
+            directionPrev = new Vector3(CharacterRegenData.IsFlip?1:-1, 0, 0);
+            SetFlip(CharacterRegenData.IsFlip);
         }
         
         protected void OnTriggerEnter2D(Collider2D collision)

@@ -72,5 +72,9 @@ namespace GGemCo.Scripts
         {
             
         }
+
+        public void PlayCharacterAnimation(string animationName, bool loop = false, float timeScale = 1f)
+        {
+        }
     }
 }

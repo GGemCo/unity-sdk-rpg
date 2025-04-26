@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using GGemCo.Scripts;
 using Newtonsoft.Json;
+using TMPro;
 using UnityEngine;
 
 namespace GGemCo.Editor
@@ -10,9 +11,9 @@ namespace GGemCo.Editor
     /// <summary>
     /// 맵 배치툴 > Npc 배치, 내보내기
     /// </summary>
-    public class NpcExporter
+    public class NpcExporter : DefaultExporter
     {
-        private List<NpcData> npcList;
+        private List<CharacterRegenData> npcList;
         private TableNpc tableNpc;
         private TableAnimation tableAnimation;
         private DefaultMap defaultMap;
@@ -24,13 +25,12 @@ namespace GGemCo.Editor
         /// <param name="pTableNpc"></param>
         /// <param name="pTableAnimation"></param>
         /// <param name="pDefaultMap"></param>
-        public void Initialize(TableNpc pTableNpc, TableAnimation pTableAnimation, DefaultMap pDefaultMap)
+        public void Initialize(TableNpc pTableNpc, TableAnimation pTableAnimation, DefaultMap pDefaultMap, CharacterManager pcharacterManager)
         {
             tableNpc = pTableNpc;
             tableAnimation = pTableAnimation;
             defaultMap = pDefaultMap;
-            characterManager = new CharacterManager();
-            characterManager.Initialize();
+            characterManager = pcharacterManager;
         }
         /// <summary>
         /// 배치할 맵 셋팅
@@ -66,20 +66,16 @@ namespace GGemCo.Editor
                 index++;
             }
 
-            if (npcData.Uid <= 0)
+            CharacterRegenData characterRegenData =
+                new CharacterRegenData(npcData.Uid, Vector3.zero, false, defaultMap.GetChapterNumber(), true);
+            GameObject npc = characterManager.CreateNpc(npcData.Uid, characterRegenData);
+            if (npc == null)
             {
                 Debug.LogError("NPC 데이터가 없습니다.");
                 return;
             }
-
-            GameObject npcPrefab = tableAnimation.GetPrefab(npcData.SpineUid);
-            if (npcPrefab == null)
-            {
-                Debug.LogError("NPC 프리팹을 찾을 수 없습니다.");
-                return;
-            }
-
-            GameObject npc = characterManager.CreateNpc(npcPrefab, Vector3.zero, defaultMap.gameObject.transform);
+            npc.transform.SetParent(defaultMap.gameObject.transform);
+            
             var npcScript = npc.GetComponent<Npc>();
             if (npcScript != null)
             {
@@ -87,6 +83,10 @@ namespace GGemCo.Editor
                 npcScript.SetScale(npcData.Scale);
                 npcScript.InitTagSortingLayer();
             }
+            
+            // npc 정보 보여줄 canvas 추가
+            TextMeshProUGUI text = CreateInfoCanvas(npcScript);
+            text.text = $"Uid: {npcData.Uid}\nPos: (0, 0)\nScale: {Math.Abs(npc.transform.localScale.x):F2}";
 
             Debug.Log($"{npcData.Name} NPC가 맵에 추가되었습니다.");
         }
@@ -99,7 +99,7 @@ namespace GGemCo.Editor
         public void ExportNpcDataToJson(string filePath, string fileName, int mapUid)
         {
             GameObject mapObject = GameObject.FindGameObjectWithTag(ConfigTags.GetValue(ConfigTags.Keys.Map));
-            NpcDataList saveNpcList = new NpcDataList();
+            CharacterRegenDataList saveNpcList = new CharacterRegenDataList();
 
             foreach (Transform child in mapObject.transform)
             {
@@ -107,7 +107,8 @@ namespace GGemCo.Editor
                 {
                     var npc = child.gameObject.GetComponent<Npc>();
                     if (npc == null) continue;
-                    saveNpcList.npcDataList.Add(new NpcData(npc.uid, child.position, npc.isFlip, mapUid, true));
+                    saveNpcList.CharacterRegenDatas.Add(new CharacterRegenData(npc.uid, child.position, npc.isFlip,
+                        mapUid, true));
                 }
             }
 
@@ -131,8 +132,8 @@ namespace GGemCo.Editor
                     string content = textFile.text;
                     if (!string.IsNullOrEmpty(content))
                     {
-                        NpcDataList npcDataList = JsonConvert.DeserializeObject<NpcDataList>(content);
-                        npcList = npcDataList.npcDataList;
+                        CharacterRegenDataList regenDataList = JsonConvert.DeserializeObject<CharacterRegenDataList>(content);
+                        npcList = regenDataList.CharacterRegenDatas;
                         SpawnNpc();
                     }
                 }
@@ -153,19 +154,12 @@ namespace GGemCo.Editor
                 return;
             }
 
-            foreach (NpcData npcData in npcList)
+            foreach (CharacterRegenData npcData in npcList)
             {
                 int uid = npcData.Uid;
-                if (uid <= 0) continue;
-                var info = tableNpc.GetDataByUid(uid);
-                if (info.Uid <= 0 || info.SpineUid <= 0) continue;
-                GameObject npcPrefab = tableAnimation.GetPrefab(info.SpineUid);
-                if (npcPrefab == null)
-                {
-                    GcLogger.LogError("npc 프리팹이 없습니다. spine uid: " + info.SpineUid);
-                    continue;
-                }
-                GameObject npc = characterManager.CreateNpc(npcPrefab, new Vector3(npcData.x, npcData.y, npcData.z), defaultMap.gameObject.transform);
+                GameObject npc = characterManager.CreateNpc(uid, npcData);
+                if (npc == null) continue;
+                npc.transform.SetParent(defaultMap.gameObject.transform);
                 
                 // NPC의 속성을 설정하는 스크립트가 있을 경우 적용
                 Npc myNpcScript = npc.GetComponent<Npc>();
@@ -173,14 +167,16 @@ namespace GGemCo.Editor
                 {
                     // MapManager.cs:138 도 수정
                     myNpcScript.uid = npcData.Uid;
-                    myNpcScript.NpcData = npcData;
-                    // 추가적인 속성 설정을 여기에서 수행할 수 있습니다.
-                    myNpcScript.SetScale(info.Scale);
+                    myNpcScript.CharacterRegenData = npcData;
                     // SetScale 다음에 처리해야 함
-                    myNpcScript.isFlip = npcData.Flip;
-                    myNpcScript.SetFlip(npcData.Flip);
+                    myNpcScript.isFlip = npcData.IsFlip;
+                    myNpcScript.SetFlip(npcData.IsFlip);
                     myNpcScript.InitTagSortingLayer();
                 }
+                
+                // npc 정보 보여줄 canvas 추가
+                TextMeshProUGUI text = CreateInfoCanvas(myNpcScript);
+                text.text = $"Uid: {npcData.Uid}\nPos: ({npcData.x}, {npcData.y})\nScale: {Math.Abs(npc.transform.localScale.x):F2}";
             }
 
             Debug.Log("NPCs spawned successfully.");

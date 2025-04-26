@@ -25,6 +25,8 @@ namespace GGemCo.Scripts
         public const string KeyPrefabTextDropItemNameTag = "GGemCo_PrefabTextDropItemNameTag";
         // npc 이름 태그
         public const string KeyPrefabTextNpcNameTag = "GGemCo_PrefabTextNpcNameTag";
+        // 말풍선
+        public const string KeyPrefabDialogueBalloon = "GGemCo_PrefabDialogueBalloon";
         
         public static readonly (string key, string path)[] AssetsToAdd =
         {
@@ -32,12 +34,15 @@ namespace GGemCo.Scripts
             (KeyPlayerSettings, "Assets/GGemCoSettings/GGemCoPlayerSettings.asset"),
             (KeyMapSettings, "Assets/GGemCoSettings/GGemCoMapSettings.asset"),
             (KeySaveSettings, "Assets/GGemCoSettings/GGemCoSaveSettings.asset"),
+            
             (KeyTextFloatingDamage, "Assets/Data/Prefabs/UI/TextDamage.prefab"),
             (KeyPrefabSlot, "Assets/Data/Prefabs/UI/Icon/Slot.prefab"),
             (KeyPrefabIconItem, "Assets/Data/Prefabs/UI/Icon/IconItem.prefab"),
             (KeyPrefabIconSkill, "Assets/Data/Prefabs/UI/Icon/IconSkill.prefab"),
-            (KeyPrefabDropItem, "Assets/Data/Prefabs/Item/DropItem.prefab"),
             (KeyPrefabSliderMonsterHp, "Assets/Data/Prefabs/UI/SliderMonsterHp.prefab"),
+            (KeyPrefabDialogueBalloon, "Assets/Data/Prefabs/UI/UIDialogueBalloon.prefab"),
+            
+            (KeyPrefabDropItem, "Assets/Data/Prefabs/Item/DropItem.prefab"),
             (KeyPrefabTextDropItemNameTag, "Assets/Data/Prefabs/Item/TextDropItemNameTag.prefab"),
             (KeyPrefabTextNpcNameTag, "Assets/Data/Prefabs/Item/TextNpcNameTag.prefab"),
         };
@@ -55,6 +60,7 @@ namespace GGemCo.Scripts
             { KeyPrefabSliderMonsterHp, LabelPreLoadGamePrefabs },
             { KeyPrefabTextDropItemNameTag, LabelPreLoadGamePrefabs },
             { KeyPrefabTextNpcNameTag, LabelPreLoadGamePrefabs },
+            { KeyPrefabDialogueBalloon, LabelPreLoadGamePrefabs },
         };
     }
 }

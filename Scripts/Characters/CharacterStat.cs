@@ -233,5 +233,12 @@ namespace GGemCo.Scripts
 
         public float GetCurrentMoveSpeed(bool isPercent = true) => isPercent ? TotalMoveSpeed.Value / 100f : TotalMoveSpeed.Value;
         public float GetCurrentAttackSpeed() => TotalAttackSpeed.Value / 100f;
+
+        public void SetCurrentMoveSpeed(int value)
+        {
+            if (value <= 0) return;
+            BaseMoveSpeed = value;
+            RecalculateStats();
+        }
     }
 }

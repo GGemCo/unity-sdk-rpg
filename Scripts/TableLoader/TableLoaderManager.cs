@@ -30,6 +30,7 @@ namespace GGemCo.Scripts
         public TableItemUpgrade TableItemUpgrade { get; private set; } = new TableItemUpgrade();
         public TableItemSalvage TableItemSalvage { get; private set; } = new TableItemSalvage();
         public TableItemCraft TableItemCraft { get; private set; } = new TableItemCraft();
+        public TableCutscene TableCutscene { get; private set; } = new TableCutscene();
 
         protected void Awake()
         {
@@ -50,7 +51,7 @@ namespace GGemCo.Scripts
                 ConfigTableFileName.MonsterDropRate, ConfigTableFileName.ItemDropGroup, ConfigTableFileName.Exp,
                 ConfigTableFileName.Window, ConfigTableFileName.Status, ConfigTableFileName.Skill, ConfigTableFileName.Affect,
                 ConfigTableFileName.Effect, ConfigTableFileName.Interaction, ConfigTableFileName.Shop, ConfigTableFileName.ItemUpgrade,
-                ConfigTableFileName.ItemSalvage, ConfigTableFileName.ItemCraft
+                ConfigTableFileName.ItemSalvage, ConfigTableFileName.ItemCraft, ConfigTableFileName.Cutscene
             };
         }
 
@@ -120,6 +121,9 @@ namespace GGemCo.Scripts
                             case ConfigTableFileName.ItemCraft:
                                 TableItemCraft.LoadData(content);
                                 break;
+                            case ConfigTableFileName.Cutscene:
+                                TableCutscene.LoadData(content);
+                                break;
                         }
                     }
                 }
@@ -133,6 +137,44 @@ namespace GGemCo.Scripts
         public string[] GetDataFiles()
         {
             return dataFiles;
+        }
+
+        private float GetNpcMoveStep(int npcUid)
+        {
+            var info = TableNpc.GetDataByUid(npcUid);
+            if (info == null) return 0;
+            var info2 = TableLoaderManager.Instance.TableAnimation.GetDataByUid(info.SpineUid);
+            if (info2 is { MoveStep: > 0 })
+            {
+                return info2.MoveStep;
+            }
+            return 0;
+        }
+
+        private float GetMonsterMoveStep(int monsterUid)
+        {
+            var info = TableMonster.GetDataByUid(monsterUid);
+            if (info == null) return 0;
+            var info2 = TableLoaderManager.Instance.TableAnimation.GetDataByUid(info.SpineUid);
+            if (info2 is { MoveStep: > 0 })
+            {
+                return info2.MoveStep;
+            }
+            return 0;
+        }
+
+        public float GetCharacterMoveStep(CharacterConstants.Type type, int characterUid)
+        {
+            if (type == CharacterConstants.Type.Npc)
+            {
+                return GetNpcMoveStep(characterUid);
+            }
+            else if (type == CharacterConstants.Type.Monster)
+            {
+                return GetMonsterMoveStep(characterUid);
+            }
+
+            return 0;
         }
     }
 }

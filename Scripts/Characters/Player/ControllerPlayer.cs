@@ -7,6 +7,12 @@ namespace GGemCo.Scripts
     /// </summary>
     public class ControllerPlayer : CharacterController
     {
+        CutsceneManager cutsceneManager;
+        
+        public void Initialize(CutsceneManager pcutsceneManager)
+        {
+            cutsceneManager = pcutsceneManager;
+        }
         /// <summary>
         /// 키보드 입력 처리 
         /// </summary>
@@ -37,8 +43,15 @@ namespace GGemCo.Scripts
                 ICharacterAnimationController?.PlayAttackAnimation();
             }
         }
-        void Update()
+        private void Update()
         {
+            // 연출 중이면 
+            if (cutsceneManager.IsPlaying())
+            {
+                return;
+            }
+            if (TargetCharacter.IsStatusMoveForce()) return;
+            
             HandleInput();
             HandleAttack();
             

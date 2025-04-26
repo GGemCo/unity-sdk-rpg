@@ -28,6 +28,12 @@ namespace GGemCo.Scripts
 
         public void Update()
         {
+            // 연출 중이면 
+            if (sceneGame.CutsceneManager.IsPlaying())
+            {
+                return;
+            }
+            
             bool isInput = false;
             // 우선순위에 따라 정렬 후 입력 처리
             foreach (var handler in inputHandlers.OrderByDescending(h => h.Priority))
@@ -57,10 +63,11 @@ namespace GGemCo.Scripts
             }
         }
 
-        protected virtual void OnTriggerEscapeKeyDown()
+        private void OnTriggerEscapeKeyDown()
         {
             // GcLogger.Log("OnTriggerEscapeKeyDown");
             if (sceneGame == null) return;
+            
             if (sceneGame.InteractionManager != null && sceneGame.InteractionManager.IsInteractioning())
             {
                 sceneGame.InteractionManager.EndInteraction();

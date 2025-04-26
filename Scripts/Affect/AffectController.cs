@@ -19,6 +19,7 @@ namespace GGemCo.Scripts
             
         public AffectController(CharacterBase characterBase)
         {
+            if (TableLoaderManager.Instance == null) return;
             character = characterBase;
             tableAffect = TableLoaderManager.Instance.TableAffect;
             tableEffect = TableLoaderManager.Instance.TableEffect;
@@ -109,14 +110,14 @@ namespace GGemCo.Scripts
         {
             if (removeCoroutine != null)
             {
-                character.StopCoroutine(removeCoroutine);
+                character?.StopCoroutine(removeCoroutine);
             }
             // 모든 버프, 디버프 지우고 stat 갱신
             foreach (var info in activeBuffs)
             {
-                character.RemoveStatModifiers(activeBuffs[info.Key]);
+                character?.RemoveStatModifiers(activeBuffs[info.Key]);
             }
-            character.RecalculateStats();
+            character?.RecalculateStats();
 
             // 생성된 이펙트 지우기
             foreach (var info in defaultEffects)
