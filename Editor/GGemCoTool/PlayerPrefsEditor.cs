@@ -13,7 +13,7 @@ namespace GGemCo.Editor
     {
         private const string Title = "PlayerPrefs 데이터 관리";
         
-        [MenuItem(ConfigEditor.NameToolPlayerPrefs)]
+        [MenuItem(ConfigEditor.NameToolPlayerPrefs, false, (int)ConfigEditor.ToolOrdering.PlayerPrefs)]
         public static void ShowWindow()
         {
             GetWindow<PlayerPrefsEditor>(Title);

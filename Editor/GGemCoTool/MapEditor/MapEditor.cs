@@ -53,7 +53,7 @@ namespace GGemCo.Editor
         private int selectedMonsterIndex;
         private Vector2 scrollPos = Vector2.zero;
 
-        [MenuItem(ConfigEditor.NameToolMapExporter)]
+        [MenuItem(ConfigEditor.NameToolMapExporter, false, (int)ConfigEditor.ToolOrdering.MapExporter)]
         public static void ShowWindow()
         {
             GetWindow<MapExporter>(Title);

@@ -22,7 +22,7 @@ namespace GGemCo.Editor
         private Dictionary<int, List<StruckTableItemDropGroup>> dropGroupDictionary = new Dictionary<int, List<StruckTableItemDropGroup>>();
         private Dictionary<int, List<StruckTableMonsterDropRate>> monsterDropDictionary = new Dictionary<int, List<StruckTableMonsterDropRate>>();
 
-        [MenuItem("GGemCoTool/테스트/"+Title)]
+        [MenuItem(ConfigEditor.NameToolDropItemRate, false, (int)ConfigEditor.ToolOrdering.DropItemRate)]
         public static void ShowWindow()
         {
             GetWindow<TestDropItemRate>(Title);

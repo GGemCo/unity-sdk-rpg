@@ -10,7 +10,7 @@ namespace GGemCo.Editor
     /// </summary>
     public class EtcEditor : EditorWindow
     {
-        [MenuItem(ConfigEditor.NameToolOpenSaveDataFolder)]
+        [MenuItem(ConfigEditor.NameToolOpenSaveDataFolder, false, (int)ConfigEditor.ToolOrdering.OpenSaveDataFolder)]
         private static void OpenGameDataFolder()
         {
             string path = Application.persistentDataPath;

@@ -17,7 +17,7 @@ namespace GGemCo.Editor
         private List<int> itemUids;
         private Dictionary<int, Dictionary<string, string>> itemDictionary;
         
-        [MenuItem(ConfigEditor.NameToolCreateItem)]
+        [MenuItem(ConfigEditor.NameToolCreateItem, false, (int)ConfigEditor.ToolOrdering.CreateItem)]
         public static void ShowWindow()
         {
             GetWindow<CreateItemTool>(Title);
