@@ -10,7 +10,7 @@ namespace GGemCo.Editor
         private readonly SettingLayers settingLayers = new SettingLayers();
         private readonly SettingAddressable settingAddressable = new SettingAddressable();
 
-        [MenuItem("GGemCoTool/기본 셋팅하기", false, 2)]
+        [MenuItem(ConfigEditor.NameToolDefaultSetting, false, 1)]
         public static void ShowWindow()
         {
             GetWindow<DefaultSettinsTool>("기본 셋팅하기");

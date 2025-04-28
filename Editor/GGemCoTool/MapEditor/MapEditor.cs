@@ -51,8 +51,9 @@ namespace GGemCo.Editor
         
         private int selectedNpcIndex;
         private int selectedMonsterIndex;
+        private Vector2 scrollPos = Vector2.zero;
 
-        [MenuItem("GGemCoTool/Map 배치툴", false, 3)]
+        [MenuItem(ConfigEditor.NameToolMapExporter)]
         public static void ShowWindow()
         {
             GetWindow<MapExporter>(Title);
@@ -136,6 +137,8 @@ namespace GGemCo.Editor
         {
             if (_npcNames == null) return;
             
+            scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+            
             GUILayout.Label("* 맵 배치 불러오기", EditorStyles.whiteLargeLabel);
             // 파일 경로 및 파일명 입력
             loadMapUid = EditorGUILayout.TextField("Map Uid", loadMapUid);
@@ -185,6 +188,8 @@ namespace GGemCo.Editor
             {
                 ExportDataToJson();
             }
+            
+            EditorGUILayout.EndScrollView();
         }
         private void ExportDataToJson()
         {

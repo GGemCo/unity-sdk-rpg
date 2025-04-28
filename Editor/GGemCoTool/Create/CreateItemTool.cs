@@ -17,7 +17,7 @@ namespace GGemCo.Editor
         private List<int> itemUids;
         private Dictionary<int, Dictionary<string, string>> itemDictionary;
         
-        [MenuItem("GGemCoTool/생성툴/"+Title, false, 3)]
+        [MenuItem(ConfigEditor.NameToolCreateItem)]
         public static void ShowWindow()
         {
             GetWindow<CreateItemTool>(Title);

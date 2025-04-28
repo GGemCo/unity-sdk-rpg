@@ -25,7 +25,7 @@ namespace GGemCo.Editor
         private List<string> cutsceneMemos = new List<string>();
         private Dictionary<int, StruckTableCutscene> cutsceneInfos = new Dictionary<int, StruckTableCutscene>(); 
         
-        [MenuItem("GGemCoTool/"+Title)]
+        [MenuItem(ConfigEditor.NameToolCutscene)]
         static void Open() => GetWindow<CutsceneEditorWindow>(Title);
 
         private void OnEnable()

@@ -10,7 +10,7 @@ namespace GGemCo.Editor
     /// </summary>
     public class EtcEditor : EditorWindow
     {
-        [MenuItem("GGemCoTool/게임 데이터 저장 폴더 열기")]
+        [MenuItem(ConfigEditor.NameToolOpenSaveDataFolder)]
         private static void OpenGameDataFolder()
         {
             string path = Application.persistentDataPath;
