@@ -4,9 +4,12 @@ using UnityEngine;
 
 namespace GGemCo.Editor
 {
+    /// <summary>
+    /// 대사 노드 연결 관리
+    /// </summary>
     public class ConnectionHandler
     {
-        private DialogueEditorWindow editorWindow;
+        private readonly DialogueEditorWindow editorWindow;
 
         public ConnectionHandler(DialogueEditorWindow window)
         {
@@ -30,15 +33,6 @@ namespace GGemCo.Editor
                                 new Vector2(targetNode.position.x, targetNode.position.y + 30) * editorWindow.zoom +
                                 editorWindow.panOffset;
 
-                            // 선택지별로 연결선 클릭 체크
-                            if (Handles.Button((startPos + endPos) * 0.5f, Quaternion.identity, 4, 8, Handles.RectangleHandleCap))
-                            {
-                                // 드래그 시작
-                                editorWindow.draggingFromNode = node;
-                                editorWindow.draggingFromOption = option;
-                                editorWindow.isDraggingConnection = true;
-                            }
-
                             Handles.DrawBezier(
                                 startPos,
                                 endPos,
@@ -54,20 +48,18 @@ namespace GGemCo.Editor
             }
 
             // 드래그 중이면 마우스 따라가게
-            if (editorWindow.isDraggingConnection && editorWindow.draggingFromOption != null)
-            {
-                Handles.DrawBezier(
-                    editorWindow.draggingFromOption.connectionPoint,
-                    Event.current.mousePosition,
-                    editorWindow.draggingFromOption.connectionPoint + Vector2.right * 50f,
-                    Event.current.mousePosition + Vector2.left * 50f,
-                    Color.yellow,
-                    null,
-                    3f
-                );
+            if (!editorWindow.isDraggingConnection || editorWindow.draggingFromOption == null) return;
+            Handles.DrawBezier(
+                editorWindow.draggingFromOption.connectionPoint,
+                Event.current.mousePosition,
+                editorWindow.draggingFromOption.connectionPoint + Vector2.right * 50f,
+                Event.current.mousePosition + Vector2.left * 50f,
+                Color.yellow,
+                null,
+                3f
+            );
 
-                editorWindow.Repaint();
-            }
+            editorWindow.Repaint();
         }
     }
 }

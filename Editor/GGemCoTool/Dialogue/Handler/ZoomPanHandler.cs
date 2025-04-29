@@ -2,9 +2,12 @@
 
 namespace GGemCo.Editor
 {
+    /// <summary>
+    /// Node 확대/축소, 이동
+    /// </summary>
     public class ZoomPanHandler
     {
-        private DialogueEditorWindow editorWindow;
+        private readonly DialogueEditorWindow editorWindow;
 
         public ZoomPanHandler(DialogueEditorWindow window)
         {

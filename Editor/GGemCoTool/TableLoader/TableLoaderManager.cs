@@ -72,5 +72,10 @@ namespace GGemCo.Editor
         {
             return LoadTable<TableCutscene>(ConfigTableFileName.Cutscene);
         }
+
+        public TableDialogue LoadDialogueTable()
+        {
+            return LoadTable<TableDialogue>(ConfigTableFileName.Dialogue);
+        }
     }
 }

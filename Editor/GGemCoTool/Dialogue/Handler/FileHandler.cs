@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 using System.IO;
 using GGemCo.Scripts;
 using UnityEditor;
@@ -6,9 +7,12 @@ using UnityEngine;
 
 namespace GGemCo.Editor
 {
+    /// <summary>
+    /// 대사 저장, 불러오기
+    /// </summary>
     public class FileHandler
     {
-        private DialogueEditorWindow editorWindow;
+        private readonly DialogueEditorWindow editorWindow;
 
         public FileHandler(DialogueEditorWindow window)
         {
@@ -49,27 +53,39 @@ namespace GGemCo.Editor
 
         }
 
-        public void LoadFromJson()
+        public void LoadFromJson(string fileName)
         {
-            string path = EditorUtility.OpenFilePanel("Load Dialogue JSON", Application.dataPath, "json");
-
-            if (!string.IsNullOrEmpty(path))
+            string jsonFilePath = $"Dialogue/{fileName}";
+            try
             {
-                string json = File.ReadAllText(path);
-                DialogueData data = JsonUtility.FromJson<DialogueData>(json);
-
-                editorWindow.nodes.Clear();
-
-                foreach (var nodeData in data.nodes)
+                TextAsset textFile = Resources.Load<TextAsset>($"{jsonFilePath}");
+                if (textFile != null)
                 {
-                    DialogueNode node = ScriptableObject.CreateInstance<DialogueNode>();
-                    node.guid = nodeData.guid;
-                    node.title = nodeData.title;
-                    node.dialogueText = nodeData.dialogueText;
-                    node.position = node.position;
-                    node.options = nodeData.options;
-                    editorWindow.nodes.Add(node);
+                    string content = textFile.text;
+                    if (string.IsNullOrEmpty(content)) return;
+                    DialogueData data = JsonConvert.DeserializeObject<DialogueData>(content);
+
+                    editorWindow.nodes.Clear();
+
+                    foreach (var nodeData in data.nodes)
+                    {
+                        DialogueNode node = ScriptableObject.CreateInstance<DialogueNode>();
+                        node.guid = nodeData.guid;
+                        node.title = nodeData.title;
+                        node.dialogueText = nodeData.dialogueText;
+                        node.position = nodeData.position.ToVector2();
+                        node.options = nodeData.options;
+                        editorWindow.nodes.Add(node);
+                    }
                 }
+                else
+                {
+                    GcLogger.LogError("파일이 없습니다. path: " + jsonFilePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                GcLogger.LogError($"json 파일을 읽어오는데 오류가 발생하였습니다. path: {jsonFilePath}, error message: {ex.Message}");
             }
         }
     }

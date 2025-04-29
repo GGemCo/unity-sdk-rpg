@@ -11,6 +11,9 @@ namespace GGemCo.Editor
         public List<DialogueNodeData> nodes = new List<DialogueNodeData>();
     }
 
+    /// <summary>
+    /// 대사 json에 저장되는 항목
+    /// </summary>
     [Serializable]
     public class DialogueNodeData
     {
@@ -43,6 +46,7 @@ namespace GGemCo.Editor
         public float fontSize;
         [Tooltip("썸네일 이미지")]
         public string thumbnailImage;
+        public Vector2 cachedSize = Vector2.zero;
 
         public List<DialogueOption> options = new List<DialogueOption>();
         

@@ -5,9 +5,13 @@ using UnityEngine;
 
 namespace GGemCo.Editor
 {
+    /// <summary>
+    /// 대사 Node 추가, 삭제, 이동
+    /// </summary>
     public class NodeHandler
     {
-        private DialogueEditorWindow editorWindow;
+        private readonly DialogueEditorWindow editorWindow;
+        private readonly Vector2 defaultNodeSize = new Vector2(250, 150);
 
         public NodeHandler(DialogueEditorWindow window)
         {
@@ -19,8 +23,8 @@ namespace GGemCo.Editor
             Matrix4x4 oldMatrix = GUI.matrix;
             GUIUtility.ScaleAroundPivot(Vector2.one * editorWindow.zoom, Vector2.zero);
             GUI.matrix = Matrix4x4.TRS(editorWindow.panOffset, Quaternion.identity, Vector3.one) * GUI.matrix;
-            
-            DialogueNode nodeToDelete = null; // 삭제할 노드 예약
+
+            DialogueNode nodeToDelete = null;
 
             foreach (DialogueNode node in editorWindow.nodes)
             {
@@ -31,46 +35,79 @@ namespace GGemCo.Editor
             {
                 DeleteNode(nodeToDelete);
             }
-            
+
             GUI.matrix = oldMatrix;
         }
-        
+
         private void DrawNode(DialogueNode node, ref DialogueNode nodeToDelete)
         {
             GUIStyle style = new GUIStyle(GUI.skin.window)
             {
                 padding = new RectOffset(10, 10, 10, 10)
             };
+
             if (node == editorWindow.selectedNode)
             {
-                style.normal.background =
-                    EditorGUIUtility.Load("builtin skins/darkskin/images/node1 on.png") as Texture2D;
+                style.normal.background = EditorGUIUtility.Load("builtin skins/darkskin/images/node1 on.png") as Texture2D;
                 style.border = new RectOffset(12, 12, 12, 12);
             }
 
-            GUILayout.BeginArea(new Rect(node.position, new Vector2(250, 150)), style);
+            // 임시 높이 계산을 위한 GUI 영역 시작 (나중에 바꿔줌)
+            Rect nodeRect = new Rect(node.position, defaultNodeSize)
+            {
+                height = Mathf.Max(node.cachedSize.y, defaultNodeSize.y)
+            };
+
+            GUILayout.BeginArea(nodeRect, style);
+
+            float totalHeight = 0f;
+
             EditorGUILayout.LabelField(node.title, EditorStyles.boldLabel);
-            EditorGUILayout.LabelField(node.dialogueText, EditorStyles.wordWrappedLabel);
+            totalHeight += EditorGUIUtility.singleLineHeight + 6;
+
+            GUIStyle wrappedLabel = new GUIStyle(EditorStyles.wordWrappedLabel)
+            {
+                wordWrap = true
+            };
+
+            EditorGUILayout.LabelField(node.dialogueText, wrappedLabel);
+            totalHeight += wrappedLabel.CalcHeight(new GUIContent(node.dialogueText), defaultNodeSize.x - 20) + 10;
 
             foreach (var option in node.options)
             {
-                Rect optionRect = GUILayoutUtility.GetRect(new GUIContent($"▶ {option.optionText}"), GUI.skin.label);
-                EditorGUI.LabelField(optionRect, $"▶ {option.optionText}");
+                GUILayout.BeginHorizontal();
 
-                // 선택지 연결 포인트 저장
-                option.connectionPoint = new Vector2(node.position.x + 250, node.position.y + optionRect.y + optionRect.height / 2); // 오른쪽 바깥쪽에서 출발
-            }
+                GUILayout.BeginVertical();
+                GUILayout.Label($"▶ {option.optionText}", wrappedLabel);
+                Rect optionRect = GUILayoutUtility.GetLastRect();
+                GUILayout.EndVertical();
 
-            if (GUILayout.Button("연결하기"))
-            {
-                if (editorWindow.selectedNode != null && editorWindow.selectedNode != node)
+                bool isConnecting = (editorWindow.draggingFromOption == option);
+                bool clicked = GUILayout.Toggle(isConnecting, GUIContent.none, GUILayout.Width(20));
+                if (clicked && !isConnecting)
                 {
-                    editorWindow.selectedNode.options.Add(new DialogueOption
+                    GenericMenu menu = new GenericMenu();
+                    menu.AddItem(new GUIContent("연결 하기"), false, () =>
                     {
-                        optionText = "새 선택지",
-                        nextNodeGuid = node.guid
+                        editorWindow.draggingFromOption = option;
+                        editorWindow.draggingFromNode = node;
+                        editorWindow.isDraggingConnection = true;
                     });
+                    menu.AddItem(new GUIContent("연결 삭제"), false, () =>
+                    {
+                        option.nextNodeGuid = null;
+                        editorWindow.Repaint();
+                    });
+                    menu.ShowAsContext();
                 }
+                Rect toggleRect = GUILayoutUtility.GetLastRect();
+
+                GUILayout.EndHorizontal();
+
+                totalHeight += optionRect.height + 5;
+
+                option.connectionPoint = new Vector2(node.position.x + defaultNodeSize.x,
+                    node.position.y + toggleRect.y + toggleRect.height / 2);
             }
 
             if (GUILayout.Button("삭제하기"))
@@ -78,15 +115,22 @@ namespace GGemCo.Editor
                 // Undo.RecordObject(this, "Delete Node");
                 nodeToDelete = node; // 바로 삭제하지 않고 예약
             }
+            Rect buttonRect = GUILayoutUtility.GetLastRect();
+            totalHeight += buttonRect.height;
 
             GUILayout.EndArea();
+
+            // 높이를 저장 (단, 최소는 defaultNodeSize.y)
+            node.cachedSize = new Vector2(defaultNodeSize.x, Mathf.Max(totalHeight, defaultNodeSize.y));
         }
+
         
         private void DeleteNode(DialogueNode node)
         {
             if (editorWindow.nodes.Contains(node))
             {
                 editorWindow.nodes.Remove(node);
+
                 foreach (DialogueNode n in editorWindow.nodes)
                 {
                     foreach (var option in n.options)
@@ -97,11 +141,11 @@ namespace GGemCo.Editor
                 }
             }
         }
+
         public void ProcessNodeEvents(Event e)
         {
             if (editorWindow.nodes == null) return;
 
-            // 마우스 좌표를 줌 및 패닝을 반영하여 변환
             Vector2 adjustedMousePosition = (e.mousePosition - editorWindow.panOffset) / editorWindow.zoom;
 
             if (e.type == EventType.MouseDown && e.button == 0)
@@ -136,38 +180,41 @@ namespace GGemCo.Editor
         {
             foreach (DialogueNode node in editorWindow.nodes)
             {
-                Rect rect = new Rect(node.position, new Vector2(250, 150));
+                Vector2 size = node.cachedSize != Vector2.zero ? node.cachedSize : defaultNodeSize;
+                Rect rect = new Rect(node.position, new Vector2(defaultNodeSize.x, Mathf.Max(size.y, defaultNodeSize.y)));
                 if (rect.Contains(point))
                     return node;
             }
             return null;
+        }
+        
+        private DialogueNode FindNodeAtPosition(Vector2 pos)
+        {
+            return editorWindow.nodes.FirstOrDefault(node =>
+            {
+                Vector2 size = node.cachedSize != Vector2.zero ? node.cachedSize : defaultNodeSize;
+                return new Rect(node.position, new Vector2(defaultNodeSize.x, Mathf.Max(size.y, defaultNodeSize.y))).Contains(pos);
+            });
         }
 
         public void HandleEvents()
         {
             if (editorWindow.isDraggingConnection && Event.current.type == EventType.MouseUp)
             {
-                // 드랍 위치에 있는 노드를 찾아서 연결
-                DialogueNode targetNode = FindNodeAtPosition(Event.current.mousePosition);
-                if (targetNode != null && editorWindow.draggingFromOption != null)
+                Vector2 adjustedMousePosition = (Event.current.mousePosition - editorWindow.panOffset) / editorWindow.zoom;
+
+                DialogueNode targetNode = FindNodeAtPosition(adjustedMousePosition);
+                if (targetNode != null && editorWindow.draggingFromOption != null && targetNode != editorWindow.draggingFromNode)
                 {
                     editorWindow.draggingFromOption.nextNodeGuid = targetNode.guid;
                 }
 
-                // 드래그 종료
                 editorWindow.draggingFromNode = null;
                 editorWindow.draggingFromOption = null;
                 editorWindow.isDraggingConnection = false;
+                Event.current.Use();
             }
         }
-
-        private DialogueNode FindNodeAtPosition(Vector2 pos)
-        {
-            return editorWindow.nodes.FirstOrDefault(node =>
-                new Rect(node.position, new Vector2(250, 150)).Contains(pos)
-            );
-        }
-        
         public void AddNode(Vector2 nodePosition)
         {
             DialogueNode node = ScriptableObject.CreateInstance<DialogueNode>();
@@ -175,13 +222,13 @@ namespace GGemCo.Editor
             node.position = nodePosition;
             editorWindow.nodes.Add(node);
         }
+
         public void AddNode()
         {
             DialogueNode node = ScriptableObject.CreateInstance<DialogueNode>();
             node.guid = Guid.NewGuid().ToString();
-            node.position = new Vector2(editorWindow.position.width/2, editorWindow.position.height/2);
+            node.position = new Vector2(editorWindow.position.width / 2, editorWindow.position.height / 2);
             editorWindow.nodes.Add(node);
         }
-
     }
 }

@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace GGemCo.Editor
 {
+    /// <summary>
+    /// 대사 생성툴
+    /// </summary>
     public class DialogueEditorWindow : EditorWindow
     {
         public List<DialogueNode> nodes = new List<DialogueNode>();
@@ -53,19 +56,27 @@ namespace GGemCo.Editor
         {
             // DrawGrid(20, 0.2f, Color.gray);
             // DrawGrid(100, 0.4f, Color.gray);
-            ZoomPanHandler.HandleZoom();
-            ZoomPanHandler.HandlePan();
+            ZoomPanHandler?.HandleZoom();
+            ZoomPanHandler?.HandlePan();
             
-            toolbarHandler.DrawToolbar();
+            GUILayout.BeginHorizontal();
+
+            toolbarHandler?.DrawToolbar();
+
+            // 오른쪽 메인 에디터 영역
+            GUILayout.BeginVertical();
             
-            NodeHandler.DrawNodes();
+            NodeHandler?.DrawNodes();
             
-            connectionHandler.DrawConnections();
-            NodeHandler.HandleEvents(); // 추가
+            connectionHandler?.DrawConnections();
+            NodeHandler?.HandleEvents(); // 추가
 
             ProcessEvents(Event.current);
-            NodeHandler.ProcessNodeEvents(Event.current);
+            NodeHandler?.ProcessNodeEvents(Event.current);
 
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+            
             if (GUI.changed) Repaint();
         }
         

@@ -58,7 +58,6 @@ namespace GGemCo.Editor
 
         private void OnGUI()
         {
-            // NPC 드롭다운
             selectedCutsceneIndex = EditorGUILayout.Popup("연출 선택", selectedCutsceneIndex, cutsceneMemos.ToArray());
             if (GUILayout.Button("연출 플레이"))
             {
