@@ -17,7 +17,7 @@ namespace GGemCo.Scripts
             tableNpc = TableLoaderManager.Instance.TableNpc;
             tableInteraction = TableLoaderManager.Instance.TableInteraction;
             uiWindowInteractionDialogue =
-                sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowInteractionDialogue>(UIWindowManager.WindowUid.Dialogue);
+                sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowInteractionDialogue>(UIWindowManager.WindowUid.InteractionDialogue);
                 sceneGame.uIWindowManager?.GetUIWindowByUid<UIWindowShopSale>(UIWindowManager.WindowUid.ShopSale);
         }
         /// <summary>
@@ -57,7 +57,7 @@ namespace GGemCo.Scripts
             {
                 // 다른 윈도우가 열려있으면 닫아주기
                 sceneGame.uIWindowManager.CloseAll(new List<UIWindowManager.WindowUid>
-                    { UIWindowManager.WindowUid.Dialogue });
+                    { UIWindowManager.WindowUid.InteractionDialogue });
                 ShowDialogue(infoNpc, infoInteraction);
             }
             // 메시지가 없으면 type별로 npc 머리 위로?
@@ -83,7 +83,7 @@ namespace GGemCo.Scripts
             if (currentNpc != null)
             {
                 sceneGame?.uIWindowManager?.CloseAll(new List<UIWindowManager.WindowUid>
-                    { UIWindowManager.WindowUid.Dialogue });
+                    { UIWindowManager.WindowUid.InteractionDialogue });
                 SetInfo(currentNpc);
                 return;
             }

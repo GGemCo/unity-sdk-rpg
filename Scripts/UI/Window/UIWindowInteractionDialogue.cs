@@ -26,7 +26,7 @@ namespace GGemCo.Scripts
         
         protected override void Awake()
         {
-            uid = UIWindowManager.WindowUid.Dialogue;
+            uid = UIWindowManager.WindowUid.InteractionDialogue;
             base.Awake();
             InitializeButtonChoice();
         }
