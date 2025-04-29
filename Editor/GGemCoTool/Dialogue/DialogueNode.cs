@@ -5,28 +5,6 @@ using UnityEngine;
 
 namespace GGemCo.Editor
 {
-    [Serializable]
-    public class DialogueData
-    {
-        public List<DialogueNodeData> nodes = new List<DialogueNodeData>();
-    }
-
-    /// <summary>
-    /// 대사 json에 저장되는 항목
-    /// </summary>
-    [Serializable]
-    public class DialogueNodeData
-    {
-        public string guid;
-        public string title;
-        public string dialogueText;
-        public Vec2 position;
-        public CharacterConstants.Type characterType;
-        public int characterUid;
-        public float fontSize;
-        public string thumbnailImage;
-        public List<DialogueOption> options;
-    }
     /// <summary>
     /// 대사 노드
     /// </summary>
@@ -47,7 +25,11 @@ namespace GGemCo.Editor
         [Tooltip("썸네일 이미지")]
         public string thumbnailImage;
         public Vector2 cachedSize = Vector2.zero;
-
+        
+        // 대사 텍스트의 연결 대상
+        public string nextNodeGuid;
+        public Vector2 nodeConnectionPoint;
+        
         public List<DialogueOption> options = new List<DialogueOption>();
         
         public DialogueNode()

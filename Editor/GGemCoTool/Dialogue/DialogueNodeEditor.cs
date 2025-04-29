@@ -48,6 +48,7 @@ namespace GGemCo.Editor
             EditorGUILayout.PropertyField(serializedObject.FindProperty("characterUid"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("fontSize"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("thumbnailImage"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("nextNodeGuid"));
 
             optionList.DoLayoutList();
 

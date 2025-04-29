@@ -74,6 +74,19 @@ namespace GGemCo.Editor
                     editorWindow.FileHandler?.LoadFromJson(info.FileName);
                 }
             }
+            if (GUILayout.Button("대사 미리보기", EditorStyles.toolbarButton))
+            {
+                if (SceneGame.Instance == null)
+                {
+                    EditorUtility.DisplayDialog("대사 생성툴", "게임을 실행해주세요.", "OK");
+                    return;
+                }
+                var info = dialogueInfos.GetValueOrDefault(selectedDialogueIndex);
+                UIWindowDialogue uiWindowDialogue =
+                    SceneGame.Instance.uIWindowManager.GetUIWindowByUid<UIWindowDialogue>(UIWindowManager.WindowUid
+                        .Dialogue);
+                uiWindowDialogue?.LoadDialogue(info.Uid);
+            }
             EditorGUILayout.Space();
             Common.GUILine(2);
             EditorGUILayout.Space();

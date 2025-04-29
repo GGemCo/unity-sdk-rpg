@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using GGemCo.Scripts;
 using UnityEditor;
 using UnityEngine;
 
@@ -18,6 +19,7 @@ namespace GGemCo.Editor
         public Vector2 draggingOffset;
         
         // 연결선 드래그
+        public DialogueNode draggingFromDialogue;
         public DialogueNode draggingFromNode;
         public DialogueOption draggingFromOption;
         private Vector2 draggingPosition;

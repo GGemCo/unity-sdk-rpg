@@ -70,44 +70,83 @@ namespace GGemCo.Editor
                 wordWrap = true
             };
 
+            // 연결 토글 (dialogueText 전용)
+            GUILayout.BeginHorizontal();
+
+            GUILayout.BeginVertical();
             EditorGUILayout.LabelField(node.dialogueText, wrappedLabel);
             totalHeight += wrappedLabel.CalcHeight(new GUIContent(node.dialogueText), defaultNodeSize.x - 20) + 10;
+            GUILayout.EndVertical();
+            
+            bool isDialogueConnecting = (editorWindow.draggingFromDialogue == node);
+            bool clickedDialogueToggle = GUILayout.Toggle(isDialogueConnecting, GUIContent.none, GUILayout.Width(20));
 
-            foreach (var option in node.options)
+            if (clickedDialogueToggle && !isDialogueConnecting)
             {
-                GUILayout.BeginHorizontal();
-
-                GUILayout.BeginVertical();
-                GUILayout.Label($"▶ {option.optionText}", wrappedLabel);
-                Rect optionRect = GUILayoutUtility.GetLastRect();
-                GUILayout.EndVertical();
-
-                bool isConnecting = (editorWindow.draggingFromOption == option);
-                bool clicked = GUILayout.Toggle(isConnecting, GUIContent.none, GUILayout.Width(20));
-                if (clicked && !isConnecting)
+                GenericMenu menu = new GenericMenu();
+                menu.AddItem(new GUIContent("연결 하기"), false, () =>
                 {
-                    GenericMenu menu = new GenericMenu();
-                    menu.AddItem(new GUIContent("연결 하기"), false, () =>
+                    editorWindow.draggingFromDialogue = node;
+                    editorWindow.isDraggingConnection = true;
+                });
+                menu.AddItem(new GUIContent("연결 삭제"), false, () =>
+                {
+                    node.nextNodeGuid = null;
+                    editorWindow.Repaint();
+                });
+                menu.ShowAsContext();
+            }
+
+            Rect dialogueToggleRect = GUILayoutUtility.GetLastRect();
+            GUILayout.EndHorizontal();
+
+            node.nodeConnectionPoint = new Vector2(
+                node.position.x + defaultNodeSize.x,
+                node.position.y + dialogueToggleRect.y + dialogueToggleRect.height / 2
+            );
+
+            totalHeight += dialogueToggleRect.height + 5;
+            
+            
+            if (node.options != null)
+            {
+                foreach (var option in node.options)
+                {
+                    GUILayout.BeginHorizontal();
+
+                    GUILayout.BeginVertical();
+                    GUILayout.Label($"▶ {option.optionText}", wrappedLabel);
+                    Rect optionRect = GUILayoutUtility.GetLastRect();
+                    GUILayout.EndVertical();
+
+                    bool isConnecting = (editorWindow.draggingFromOption == option);
+                    bool clicked = GUILayout.Toggle(isConnecting, GUIContent.none, GUILayout.Width(20));
+                    if (clicked && !isConnecting)
                     {
-                        editorWindow.draggingFromOption = option;
-                        editorWindow.draggingFromNode = node;
-                        editorWindow.isDraggingConnection = true;
-                    });
-                    menu.AddItem(new GUIContent("연결 삭제"), false, () =>
-                    {
-                        option.nextNodeGuid = null;
-                        editorWindow.Repaint();
-                    });
-                    menu.ShowAsContext();
+                        GenericMenu menu = new GenericMenu();
+                        menu.AddItem(new GUIContent("연결 하기"), false, () =>
+                        {
+                            editorWindow.draggingFromOption = option;
+                            editorWindow.draggingFromNode = node;
+                            editorWindow.isDraggingConnection = true;
+                        });
+                        menu.AddItem(new GUIContent("연결 삭제"), false, () =>
+                        {
+                            option.nextNodeGuid = null;
+                            editorWindow.Repaint();
+                        });
+                        menu.ShowAsContext();
+                    }
+
+                    Rect toggleRect = GUILayoutUtility.GetLastRect();
+
+                    GUILayout.EndHorizontal();
+
+                    totalHeight += optionRect.height + 5;
+
+                    option.connectionPoint = new Vector2(node.position.x + defaultNodeSize.x,
+                        node.position.y + toggleRect.y + toggleRect.height / 2);
                 }
-                Rect toggleRect = GUILayoutUtility.GetLastRect();
-
-                GUILayout.EndHorizontal();
-
-                totalHeight += optionRect.height + 5;
-
-                option.connectionPoint = new Vector2(node.position.x + defaultNodeSize.x,
-                    node.position.y + toggleRect.y + toggleRect.height / 2);
             }
 
             if (GUILayout.Button("삭제하기"))
@@ -208,9 +247,14 @@ namespace GGemCo.Editor
                 {
                     editorWindow.draggingFromOption.nextNodeGuid = targetNode.guid;
                 }
+                else if (editorWindow.draggingFromDialogue != null && editorWindow.draggingFromDialogue != targetNode)
+                {
+                    editorWindow.draggingFromDialogue.nextNodeGuid = targetNode.guid;
+                }
 
                 editorWindow.draggingFromNode = null;
                 editorWindow.draggingFromOption = null;
+                editorWindow.draggingFromDialogue = null;
                 editorWindow.isDraggingConnection = false;
                 Event.current.Use();
             }

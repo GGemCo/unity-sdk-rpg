@@ -35,6 +35,7 @@ namespace GGemCo.Editor
                     characterUid = node.characterUid,
                     fontSize = node.fontSize,
                     thumbnailImage = node.thumbnailImage,
+                    nextNodeGuid = node.nextNodeGuid,
                     options = node.options
                 };
                 data.nodes.Add(nodeData);
@@ -75,6 +76,7 @@ namespace GGemCo.Editor
                         node.dialogueText = nodeData.dialogueText;
                         node.position = nodeData.position.ToVector2();
                         node.options = nodeData.options;
+                        node.nextNodeGuid = nodeData.nextNodeGuid;
                         editorWindow.nodes.Add(node);
                     }
                 }
