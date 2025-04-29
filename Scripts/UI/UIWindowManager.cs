@@ -24,14 +24,15 @@ namespace GGemCo.Scripts
             QuickSlot,
             Skill,
             SkillInfo,
-            Dialogue,
+            InteractionDialogue,
             Shop,
             ItemBuy,
             Stash,
             ShopSale,
             ItemUpgrade,
             ItemSalvage,
-            ItemCraft
+            ItemCraft,
+            Dialogue
         }
         [Header("기본속성")]
         [Tooltip("윈도우 리스트")]
