@@ -25,6 +25,8 @@ namespace GGemCo.Scripts
         public string thumbnailImage;
         public List<DialogueOption> options;
         public string nextNodeGuid;
+        public int startQuestUid;
+        public int startQuestStep;
     }
 
 }

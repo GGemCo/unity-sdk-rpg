@@ -28,7 +28,6 @@ namespace GGemCo.Editor
                 DialogueNodeData nodeData = new DialogueNodeData
                 {
                     guid = node.guid,
-                    title = node.title,
                     dialogueText = node.dialogueText,
                     position = new Vec2(node.position),
                     characterType = node.characterType,
@@ -36,6 +35,8 @@ namespace GGemCo.Editor
                     fontSize = node.fontSize,
                     thumbnailImage = node.thumbnailImage,
                     nextNodeGuid = node.nextNodeGuid,
+                    startQuestUid = node.startQuestUid,
+                    startQuestStep = node.startQuestStep,
                     options = node.options
                 };
                 data.nodes.Add(nodeData);
@@ -72,11 +73,16 @@ namespace GGemCo.Editor
                     {
                         DialogueNode node = ScriptableObject.CreateInstance<DialogueNode>();
                         node.guid = nodeData.guid;
-                        node.title = nodeData.title;
                         node.dialogueText = nodeData.dialogueText;
+                        node.characterType = nodeData.characterType;
+                        node.characterUid = nodeData.characterUid;
+                        node.fontSize = nodeData.fontSize;
+                        node.thumbnailImage = nodeData.thumbnailImage;
                         node.position = nodeData.position.ToVector2();
                         node.options = nodeData.options;
                         node.nextNodeGuid = nodeData.nextNodeGuid;
+                        node.startQuestUid = nodeData.startQuestUid;
+                        node.startQuestStep = nodeData.startQuestStep;
                         editorWindow.nodes.Add(node);
                     }
                 }

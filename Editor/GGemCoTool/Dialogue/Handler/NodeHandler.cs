@@ -62,18 +62,14 @@ namespace GGemCo.Editor
 
             float totalHeight = 0f;
 
-            EditorGUILayout.LabelField(node.title, EditorStyles.boldLabel);
-            totalHeight += EditorGUIUtility.singleLineHeight + 6;
-
-            GUIStyle wrappedLabel = new GUIStyle(EditorStyles.wordWrappedLabel)
-            {
-                wordWrap = true
-            };
-
             // 연결 토글 (dialogueText 전용)
             GUILayout.BeginHorizontal();
 
             GUILayout.BeginVertical();
+            GUIStyle wrappedLabel = new GUIStyle(EditorStyles.wordWrappedLabel)
+            {
+                wordWrap = true
+            };
             EditorGUILayout.LabelField(node.dialogueText, wrappedLabel);
             totalHeight += wrappedLabel.CalcHeight(new GUIContent(node.dialogueText), defaultNodeSize.x - 20) + 10;
             GUILayout.EndVertical();
@@ -240,16 +236,21 @@ namespace GGemCo.Editor
         {
             if (editorWindow.isDraggingConnection && Event.current.type == EventType.MouseUp)
             {
-                Vector2 adjustedMousePosition = (Event.current.mousePosition - editorWindow.panOffset) / editorWindow.zoom;
+                Vector2 adjustedMousePosition =
+                    (Event.current.mousePosition - editorWindow.panOffset) / editorWindow.zoom;
 
                 DialogueNode targetNode = FindNodeAtPosition(adjustedMousePosition);
-                if (targetNode != null && editorWindow.draggingFromOption != null && targetNode != editorWindow.draggingFromNode)
+                if (targetNode != null)
                 {
-                    editorWindow.draggingFromOption.nextNodeGuid = targetNode.guid;
-                }
-                else if (editorWindow.draggingFromDialogue != null && editorWindow.draggingFromDialogue != targetNode)
-                {
-                    editorWindow.draggingFromDialogue.nextNodeGuid = targetNode.guid;
+                    if (editorWindow.draggingFromOption != null && targetNode != editorWindow.draggingFromNode)
+                    {
+                        editorWindow.draggingFromOption.nextNodeGuid = targetNode.guid;
+                    }
+                    else if (editorWindow.draggingFromDialogue != null &&
+                             editorWindow.draggingFromDialogue != targetNode)
+                    {
+                        editorWindow.draggingFromDialogue.nextNodeGuid = targetNode.guid;
+                    }
                 }
 
                 editorWindow.draggingFromNode = null;

@@ -31,9 +31,13 @@ namespace GGemCo.Editor
                 EditorGUI.PropertyField(
                     new Rect(rect.x, rect.y, rect.width * 0.5f, EditorGUIUtility.singleLineHeight),
                     element.FindPropertyRelative("optionText"), GUIContent.none);
+                
+                // nextNodeGuid 읽기 전용 처리
+                GUI.enabled = false;
                 EditorGUI.PropertyField(
                     new Rect(rect.x + rect.width * 0.55f, rect.y, rect.width * 0.45f, EditorGUIUtility.singleLineHeight),
                     element.FindPropertyRelative("nextNodeGuid"), GUIContent.none);
+                GUI.enabled = true;
             };
         }
 
@@ -41,15 +45,22 @@ namespace GGemCo.Editor
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("title"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("dialogueText"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("position"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("fontSize"));
+            // EditorGUILayout.PropertyField(serializedObject.FindProperty("position"));
+            // nextNodeGuid 읽기 전용 처리
+            GUI.enabled = false;
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("nextNodeGuid"));
+            GUI.enabled = true;
+            
             EditorGUILayout.PropertyField(serializedObject.FindProperty("characterType"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("characterUid"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("fontSize"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("thumbnailImage"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("nextNodeGuid"));
-
+            
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("startQuestUid"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("startQuestStep"));
+            
+            GUILayout.Space(20);
             optionList.DoLayoutList();
 
             serializedObject.ApplyModifiedProperties();
