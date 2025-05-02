@@ -159,6 +159,9 @@ namespace GGemCo.Scripts
 
             string filePath = saveFileController.GetSaveFilePath(currentSaveSlot);
             string thumbnailPath = thumbnailController.GetThumbnailPath(currentSaveSlot);
+
+            Inventory.ClearEmptyInfo();
+            Stash.ClearEmptyInfo();
             
             SaveDataContainer saveData = new SaveDataContainer
             {

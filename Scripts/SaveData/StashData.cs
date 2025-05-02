@@ -22,5 +22,21 @@ namespace GGemCo.Scripts
             return SceneGame.Instance.uIWindowManager
                 .GetUIWindowByUid<UIWindowStash>(UIWindowManager.WindowUid.Stash)?.maxCountIcon ?? 0;
         }
+
+        public void ClearEmptyInfo()
+        {
+            List<int> emptyKey = new List<int>();
+            foreach (var data in ItemCounts)
+            {
+                if (data.Value.Uid <= 0)
+                {
+                    emptyKey.Add(data.Key);
+                }
+            }
+            foreach (var key in emptyKey)
+            {
+                ItemCounts.Remove(key);
+            }
+        }
     }
 }

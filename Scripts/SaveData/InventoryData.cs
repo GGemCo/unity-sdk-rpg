@@ -166,5 +166,21 @@ namespace GGemCo.Scripts
             controls.Add(new SaveDataIcon(saveDataIcon.SlotIndex, resultItemUid, saveDataIcon.Count));
             return new ResultCommon(ResultCommon.Type.Success, "", controls); 
         }
+
+        public void ClearEmptyInfo()
+        {
+            List<int> emptyKey = new List<int>();
+            foreach (var data in ItemCounts)
+            {
+                if (data.Value.Uid <= 0)
+                {
+                    emptyKey.Add(data.Key);
+                }
+            }
+            foreach (var key in emptyKey)
+            {
+                ItemCounts.Remove(key);
+            }
+        }
     }
 }
