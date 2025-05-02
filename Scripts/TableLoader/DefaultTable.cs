@@ -34,6 +34,8 @@ namespace GGemCo.Scripts
 
         public virtual void LoadData(string content)
         {
+            PreLoad();
+            
             string[] lines = content.Split('\n');
             string[] headers = lines[0].Trim().Split('\t');
 
@@ -54,6 +56,12 @@ namespace GGemCo.Scripts
                 OnLoadedData(data);
             }
         }
+        
+        protected virtual void PreLoad()
+        {
+            
+        }
+
         /// <summary>
         /// xx,xx,xx 타입을 int 배열로 변환
         /// </summary>

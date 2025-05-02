@@ -26,5 +26,6 @@
         public const string ItemCraft = "item_craft";
         public const string Cutscene = "cutscene";
         public const string Dialogue = "dialogue";
+        public const string Quest = "quest";
     }
 }
