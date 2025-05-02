@@ -77,5 +77,9 @@ namespace GGemCo.Editor
         {
             return LoadTable<TableDialogue>(ConfigTableFileName.Dialogue);
         }
+        public TableQuest LoadQuestTable()
+        {
+            return LoadTable<TableQuest>(ConfigTableFileName.Quest);
+        }
     }
 }

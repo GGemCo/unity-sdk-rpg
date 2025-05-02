@@ -10,6 +10,7 @@
             MapExporter,
             CreateItem,
             Cutscene,
+            Quest,
             Test = 200,
             DropItemRate,
             Etc = 900,
@@ -26,6 +27,7 @@
         public const string NameToolMapExporter = NameToolDevelopment + "맵배치툴";
         public const string NameToolCreateItem = NameToolDevelopment + "아이템 생성툴";
         public const string NameToolCutscene = NameToolDevelopment + "연출툴";
+        public const string NameToolQuest = NameToolDevelopment + "퀘스트 생성툴";
         
         // 테스트
         private const string NameToolTest = NameToolGGemCo + "태스트툴/";
