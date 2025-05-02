@@ -6,6 +6,9 @@ using Object = UnityEngine.Object;
 
 namespace GGemCo.Scripts
 {
+    /// <summary>
+    /// 선택지 버튼 관리
+    /// </summary>
     public class ChoiceButtonHandler
     {
         private const int ButtonCount = 3;
@@ -50,6 +53,10 @@ namespace GGemCo.Scripts
                 button.gameObject.SetActive(false); // 초기 상태 비활성화
             }
         }
+        /// <summary>
+        /// 선택지 버튼 정보 업데이트
+        /// </summary>
+        /// <param name="options"></param>
         public void SetupButtons(List<DialogueOption> options)
         {
             if (options == null || options.Count == 0)
@@ -90,7 +97,9 @@ namespace GGemCo.Scripts
                 }
             }
         }
-
+        /// <summary>
+        /// 선택지 버튼 안보이게 처리
+        /// </summary>
         public void HideButtons()
         {
             container?.gameObject.SetActive(false);

@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace GGemCo.Scripts.UI
 {
+    /// <summary>
+    /// 말풍선
+    /// </summary>
     public class UIDialogueBalloon : MonoBehaviour
     {
         public TextMeshProUGUI textMessage;

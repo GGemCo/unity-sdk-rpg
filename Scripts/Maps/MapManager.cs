@@ -505,5 +505,6 @@ namespace GGemCo.Scripts
             if (mapTileCommon == null) return;
             mapTileCommon.ActiveAllCharacters();
         }
+        public int GetCurrentMapUid() => currentMapUid;
     }
 }

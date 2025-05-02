@@ -4,6 +4,11 @@ using UnityEngine;
 
 public static class DialogueLoader
 {
+    /// <summary>
+    /// 대사 json 불러오기
+    /// </summary>
+    /// <param name="dialogueUid"></param>
+    /// <returns></returns>
     public static DialogueData LoadDialogueData(int dialogueUid)
     {
         var info = TableLoaderManager.Instance.TableDialogue.GetDataByUid(dialogueUid);

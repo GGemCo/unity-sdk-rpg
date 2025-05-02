@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace GGemCo.Scripts
 {
+    /// <summary>
+    /// 선택지 버튼
+    /// </summary>
     public class UIButtonAnswer : MonoBehaviour
     {
         public TextMeshProUGUI buttonTitle;

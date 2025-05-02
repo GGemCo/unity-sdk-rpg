@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace GGemCo.Scripts
 {
+    /// <summary>
+    /// 메시지를 maxLineCount 씩 자르기 
+    /// </summary>
     public static class DialogueTextFormatter
     {
         public static List<string> SplitMessage(string message, int maxLineCount)
