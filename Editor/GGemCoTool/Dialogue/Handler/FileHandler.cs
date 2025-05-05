@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.IO;
 using GGemCo.Scripts;
@@ -19,7 +20,7 @@ namespace GGemCo.Editor
             editorWindow = window;
         }
 
-        public void SaveToJson()
+        public void SaveToJson(int selectedQuestIndex, Dictionary<int, StruckTableDialogue> dialogueInfos)
         {
             DialogueData data = new DialogueData();
 
@@ -42,17 +43,16 @@ namespace GGemCo.Editor
                 data.nodes.Add(nodeData);
             }
 
+            bool result = EditorUtility.DisplayDialog("저장하기", "현재 선택된 대화에 저장하시겠습니까?", "네", "아니요");
+            if (!result) return;
+            var info = dialogueInfos.GetValueOrDefault(selectedQuestIndex);
+            if (info == null) return;
+            string fileName = info.FileName;
+            string path = Path.Combine(DialogueConstants.GetJsonFolderPath(), fileName+".json");
             string json = JsonConvert.SerializeObject(data, Formatting.Indented);
-            string path = EditorUtility.SaveFilePanel("Save Dialogue JSON", Application.dataPath, "DialogueData", "json");
-
-            if (!string.IsNullOrEmpty(path))
-            {
-                File.WriteAllText(path, json);
-                AssetDatabase.Refresh();
-            }
+            File.WriteAllText(path, json);
             AssetDatabase.Refresh();
             EditorUtility.DisplayDialog("대사 생성툴", "Json 저장하기 완료", "OK");
-
         }
 
         public void LoadFromJson(string fileName)

@@ -18,6 +18,7 @@ namespace GGemCo.Editor
         private readonly List<string> dialogueMemos = new List<string>();
         private readonly Dictionary<int, StruckTableDialogue> dialogueInfos = new Dictionary<int, StruckTableDialogue>(); 
         
+        private int previousIndex;
         public ToolbarHandler(DialogueEditorWindow window)
         {
             editorWindow = window;
@@ -51,30 +52,37 @@ namespace GGemCo.Editor
             if (editorWindow == null) return;
             GUILayout.BeginVertical(EditorStyles.toolbar, GUILayout.Width(250));
 
-            // if (GUILayout.Button("자동 배치", EditorStyles.toolbarButton))
+            // if (GUILayout.Button("자동 배치"))
             // {
             //     AutoLayout();
             // }
             EditorGUILayout.Space(20);
+            
             selectedDialogueIndex = EditorGUILayout.Popup("", selectedDialogueIndex, dialogueMemos.ToArray());
-            if (GUILayout.Button("대사 불러오기", EditorStyles.toolbarButton))
+            if (previousIndex != selectedDialogueIndex)
             {
-                if (editorWindow.nodes?.Count > 0)
+                // 선택이 바뀌었을 때 실행할 코드
+                // Debug.Log($"선택이 변경되었습니다: {questTitle[selectedQuestIndex]}");
+                if (LoadDialogue())
                 {
-                    bool result = EditorUtility.DisplayDialog("불러오기", "현재 대사 Node 가 만들어진 상태입니다.\n저장 하셨나요?", "네", "아니요");
-                    if (result)
-                    {
-                        var info = dialogueInfos.GetValueOrDefault(selectedDialogueIndex);
-                        editorWindow.FileHandler?.LoadFromJson(info.FileName);
-                    }
+                    previousIndex = selectedDialogueIndex;
                 }
                 else
                 {
-                    var info = dialogueInfos.GetValueOrDefault(selectedDialogueIndex);
-                    editorWindow.FileHandler?.LoadFromJson(info.FileName);
+                    selectedDialogueIndex = previousIndex;
                 }
             }
-            if (GUILayout.Button("대사 미리보기", EditorStyles.toolbarButton))
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("저장"))
+            {
+                editorWindow.FileHandler?.SaveToJson(selectedDialogueIndex, dialogueInfos);
+            }
+            if (GUILayout.Button("불러오기"))
+            {
+                LoadDialogue();
+            }
+            
+            if (GUILayout.Button("미리보기"))
             {
                 if (SceneGame.Instance == null)
                 {
@@ -87,21 +95,18 @@ namespace GGemCo.Editor
                         .Dialogue);
                 uiWindowDialogue?.LoadDialogue(info.Uid);
             }
+            GUILayout.EndHorizontal();
+            
             EditorGUILayout.Space();
             Common.GUILine(2);
             EditorGUILayout.Space();
-            if (GUILayout.Button("노드 추가", EditorStyles.toolbarButton))
+            if (GUILayout.Button("노드 추가"))
             {
                 editorWindow.NodeHandler?.AddNode();
             }
 
-            if (GUILayout.Button("저장", EditorStyles.toolbarButton))
-            {
-                editorWindow.FileHandler?.SaveToJson();
-            }
-
             // 100% 보기 버튼
-            if (GUILayout.Button("100% 보기", EditorStyles.toolbarButton))
+            if (GUILayout.Button("100% 보기"))
             {
                 editorWindow.ZoomPanHandler?.SetZoom(1.0f);
                 editorWindow.panOffset = Vector2.zero; // 위치도 초기화
@@ -109,7 +114,7 @@ namespace GGemCo.Editor
             EditorGUILayout.Space();
             Common.GUILine(2);
             EditorGUILayout.Space();
-            if (GUILayout.Button("모두 지우기", EditorStyles.toolbarButton))
+            if (GUILayout.Button("모두 지우기"))
             {
                 bool result = EditorUtility.DisplayDialog("삭제", "정말로 삭제하시겠습니까?", "확인", "취소");
                 if (result)
@@ -119,12 +124,35 @@ namespace GGemCo.Editor
             }
 
             // // 화면 꽉차게 보기 버튼
-            // if (GUILayout.Button("화면 꽉차게 보기", EditorStyles.toolbarButton))
+            // if (GUILayout.Button("화면 꽉차게 보기"))
             // {
             //     editorWindow.ZoomPanHandler?.FitViewToNodes();
             // }
 
             GUILayout.EndVertical();
+        }
+
+        private bool LoadDialogue()
+        {
+            if (editorWindow.nodes?.Count > 0)
+            {
+                bool result = EditorUtility.DisplayDialog("불러오기", "현재 대사 Node 가 만들어진 상태입니다.\n저장 하셨나요?", "네", "아니요");
+                if (result)
+                {
+                    var info = dialogueInfos.GetValueOrDefault(selectedDialogueIndex);
+                    editorWindow.FileHandler?.LoadFromJson(info.FileName);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                var info = dialogueInfos.GetValueOrDefault(selectedDialogueIndex);
+                editorWindow.FileHandler?.LoadFromJson(info.FileName);
+            }
+            return true;
         }
     }
 }
