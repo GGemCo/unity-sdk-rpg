@@ -12,7 +12,9 @@ namespace GGemCo.Editor
             y += 20;
             step.targetUid = EditorGUI.IntField(new Rect(rect.x, y, rect.width, 18), "타겟 Uid", step.targetUid);
             y += 20;
+            step.dialogueUid = EditorGUI.IntField(new Rect(rect.x, y, rect.width, 18), "대화 Uid", step.dialogueUid);
+            y += 20;
         }
-        public float GetHeight() => 2 * 20; // 2줄
+        public float GetHeight() => 3 * 20;
     }
 }

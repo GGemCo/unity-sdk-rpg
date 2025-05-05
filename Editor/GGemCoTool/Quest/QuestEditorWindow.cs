@@ -26,6 +26,11 @@ namespace GGemCo.Editor
         private QuestStepListDrawer questStepListDrawer;
         private RewardItemListDrawer rewardItemListDrawer;
         
+        private AddressableSettingsLoader addressableSettingsLoader;
+        private int maxSlotCount;
+        private string saveDirectory;
+        private SaveDataContainer saveDataContainer;
+        
         [MenuItem(ConfigEditor.NameToolQuest, false, (int)ConfigEditor.ToolOrdering.Quest)]
         public static void ShowWindow()
         {
@@ -43,6 +48,17 @@ namespace GGemCo.Editor
             
             questStepListDrawer = new QuestStepListDrawer(quest.steps);
             rewardItemListDrawer = new RewardItemListDrawer(quest.reward);
+            
+            addressableSettingsLoader = new AddressableSettingsLoader();
+            _ = addressableSettingsLoader.InitializeAsync();
+            addressableSettingsLoader.OnLoadSettings += Initialize;
+        }
+
+        private void Initialize(GGemCoSettings settings, GGemCoPlayerSettings playerSettings,
+            GGemCoMapSettings mapSettings, GGemCoSaveSettings saveSettings)
+        {
+            maxSlotCount = saveSettings.saveDataMaxSlotCount;
+            saveDirectory = saveSettings.SaveDataFolderName;
         }
 
         private void LoadQuestInfoData()
@@ -92,12 +108,21 @@ namespace GGemCo.Editor
             GUILayout.EndHorizontal();
             
             Common.GUILineBlue(2);
+            // 퀘스트 정보 초기화
+            Common.OnGUITitle("퀘스트 진행 상황 초기화");
+            if (GUILayout.Button("초기화 하기"))
+            {
+                RemoveQuestSaveData();
+            }
+
+            Common.GUILineBlue(2);
             // 기본정보
             Common.OnGUITitle("퀘스트 기본 정보");
             // nextNodeGuid 읽기 전용 처리
             GUI.enabled = false;
-            quest.uid = EditorGUILayout.IntField("Uid", quest.uid);
-            quest.title = EditorGUILayout.TextField("제목", quest.title);
+            var info = questInfos.GetValueOrDefault(selectedQuestIndex);
+            quest.uid = EditorGUILayout.IntField("Uid", info.Uid);
+            quest.title = EditorGUILayout.TextField("제목", info.Title);
             GUI.enabled = true;
            
             // 단계별 정보
@@ -113,10 +138,35 @@ namespace GGemCo.Editor
             EditorGUILayout.EndScrollView();
         }
 
+        private void StartQuest()
+        {
+        }
+
+        private void RemoveQuestSaveData()
+        {
+            bool result = EditorUtility.DisplayDialog("초기화", "현재 플레이한 퀘스트 정보가 초기화 됩니다.\n계속 진행할가요?", "네", "아니요");
+            if (!result) return;
+            
+            int slotIndex = PlayerPrefsManager.LoadSaveDataSlotIndex();
+            SaveFileController saveFileController = new SaveFileController(saveDirectory, maxSlotCount);
+            string filePath = saveFileController.GetSaveFilePath(slotIndex);
+            string json = File.ReadAllText(filePath);
+            if (json != "")
+            {
+                saveDataContainer = JsonConvert.DeserializeObject<SaveDataContainer>(json);
+            }
+
+            saveDataContainer.QuestData = new QuestData();
+            json = JsonConvert.SerializeObject(saveDataContainer);
+            File.WriteAllText(filePath, json);
+            AssetDatabase.Refresh();
+            EditorUtility.DisplayDialog(ConfigEditor.NameToolQuest, "퀘스트 플레이 정보 초기화 완료", "OK");
+        }
+
         private void NewQuestJson()
         {
             bool result = EditorUtility.DisplayDialog("새로만들기", "현재 불러온 내용이 초기화 됩니다.\n계속 진행할가요?", "네", "아니요");
-            if (!result) return;
+            if (result) return;
             quest = new Quest();
             OnEnable();
         }
