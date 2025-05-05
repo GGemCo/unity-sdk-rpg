@@ -264,6 +264,7 @@ namespace GGemCo.Scripts
             if (uiWindowInventory != null)
             {
                 uiWindowInventory.SetIcons(result);
+                GameEventManager.ItemCollected(item.itemUid, item.itemCount);
             }
             
             item.Reset();
@@ -351,5 +352,8 @@ namespace GGemCo.Scripts
             return lastTestResult;
         }
 #endif
+        public void OnDestroy()
+        {
+        }
     }
 }

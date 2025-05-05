@@ -45,7 +45,7 @@ namespace GGemCo.Scripts
         
         // 서브 매니저
         // 아이콘 생성 관리
-        private IconPoolManager iconPoolManager;
+        protected IconPoolManager iconPoolManager;
         // 아이콘 드래그 관리
         protected IconDragDropHandler DragDropHandler;
 
@@ -95,6 +95,7 @@ namespace GGemCo.Scripts
                 UIWindowManager.WindowUid.Skill => new SlotIconBuildStrategySkill(),
                 UIWindowManager.WindowUid.ItemSalvage => new SlotIconBuildStrategyItemSalvage(),
                 UIWindowManager.WindowUid.ItemCraft => new SlotIconBuildStrategyItemCraft(),
+                // UIWindowManager.WindowUid.QuestReward => new SlotIconBuildStrategyQuestReward(),
                 _ => null,
             };
         }

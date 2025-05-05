@@ -14,7 +14,11 @@ namespace GGemCo.Scripts
         private SceneGame sceneGame;
         private TableQuest tableQuest;
         private UIWindowHudQuest uiWindowHudQuest;
+        private UIWindowQuestReward uiWindowQuestReward;
+        private UIWindowInventory uiWindowInventory;
         private QuestData questData;
+        private PlayerData playerData;
+        private InventoryData inventoryData;
         
         private readonly ObjectiveHandlerFactory handlerFactory = new ObjectiveHandlerFactory();
 
@@ -30,10 +34,18 @@ namespace GGemCo.Scripts
             activeHandlers.Clear();
             sceneGame = scene;
             
+            questData = sceneGame.saveDataManager.Quest;
+            playerData = sceneGame.saveDataManager.Player;
+            inventoryData = sceneGame.saveDataManager.Inventory;
+            
             tableQuest = TableLoaderManager.Instance.TableQuest;
+            
             uiWindowHudQuest =
                 sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowHudQuest>(UIWindowManager.WindowUid.HudQuest);
-            questData = sceneGame.saveDataManager.Quest;
+            uiWindowQuestReward =
+                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowQuestReward>(UIWindowManager.WindowUid.QuestReward);
+            uiWindowInventory =
+                sceneGame.uIWindowManager.GetUIWindowByUid<UIWindowInventory>(UIWindowManager.WindowUid.Inventory);
             
             LoadAllQuestJson();
             
@@ -194,6 +206,8 @@ namespace GGemCo.Scripts
             }
             else
             {
+                // count 초기화 먼저 해주기
+                questData.SaveCount(questUid, 0);
                 StartObjective(questUid, nextStepIndex, questStep.targetUid);
             }
         }
@@ -207,7 +221,9 @@ namespace GGemCo.Scripts
             QuestSaveData questSaveData = questData.GetQuestData(questUid);
             if (questSaveData == null) return;
             // 보상 주기
+            GiveReward(questUid);
             // 인벤토리 공간 부족할때
+            uiWindowQuestReward?.SetRewardInfoByQuestUid(questUid);
             
             // 저장하기
             questData.SaveStatus(questUid, questSaveData.QuestStepIndex, QuestConstants.Status.End);
@@ -215,6 +231,35 @@ namespace GGemCo.Scripts
             // UIWindowHudQuest 에 element 빼기
             uiWindowHudQuest?.RemoveQuestElement(questUid);
         }
+
+        private void GiveReward(int questUid)
+        {
+            if (questUid <= 0) return;
+            Quest quest = quests.GetValueOrDefault(questUid);
+            if (quest == null)
+            {
+                GcLogger.LogError("quest json 정보가 없습니다. uid: "+questUid);
+                return;
+            }
+
+            if (quest.reward == null)
+            {
+                GcLogger.LogError("quest 보상 정보가 없습니다. uid: "+questUid);
+                return;
+            }
+
+            playerData?.AddExp(quest.reward.experience);
+            playerData?.AddCurrency(CurrencyConstants.Type.Gold, quest.reward.gold);
+            playerData?.AddCurrency(CurrencyConstants.Type.Silver, quest.reward.silver);
+            if (quest.reward.items.Count <= 0) return;
+            foreach (var rewardItem in quest.reward.items)
+            {
+                if (rewardItem == null) continue;
+                ResultCommon result = inventoryData?.AddItem(rewardItem.itemUid, rewardItem.amount);
+                uiWindowInventory?.SetIcons(result);
+            }
+        }
+
         /// <summary>
         /// 목표 시작
         /// </summary>
@@ -241,6 +286,10 @@ namespace GGemCo.Scripts
             ChangeStatus(questUid, stepIndex, QuestConstants.Status.InProgress);
             
             // 목표 시작
+            if (npcUid <= 0 && questStep.targetUid > 0)
+            {
+                npcUid = questStep.targetUid;
+            }
             handler.StartObjective(questUid, questStep, stepIndex, npcUid);
 
             if (!activeHandlers.ContainsKey(questUid))
@@ -282,7 +331,7 @@ namespace GGemCo.Scripts
             activeHandlers[questUid].Remove(stepIndex);
         }
 
-        private void OnDestroy()
+        public void OnDestroy()
         {
             DisposeAllHandlers();
         }
@@ -303,6 +352,11 @@ namespace GGemCo.Scripts
             if (quest == null) return null;
             if (stepIndex < 0 || stepIndex >= quest.steps.Count) return null;
             return quest.steps[stepIndex];
+        }
+
+        public Quest GetQuestInfo(int questUid)
+        {
+            return quests.GetValueOrDefault(questUid);
         }
     }
 }

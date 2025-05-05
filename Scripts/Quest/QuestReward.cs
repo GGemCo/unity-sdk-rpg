@@ -14,7 +14,7 @@ namespace GGemCo.Scripts
     [System.Serializable]
     public class RewardItem
     {
-        public string itemUid;
+        public int itemUid;
         public int amount;
     }
 }

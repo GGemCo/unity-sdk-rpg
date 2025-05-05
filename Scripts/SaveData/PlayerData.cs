@@ -149,7 +149,12 @@ namespace GGemCo.Scripts
             var monsterData = tableMonster.GetDataByUid(monsterUid);
             if (monsterData == null) return;
 
-            long newExp = CurrentExp + monsterData.RewardExp;
+            AddExp(monsterData.RewardExp);
+        }
+
+        public void AddExp(long exp)
+        {
+            long newExp = CurrentExp + exp;
             int nextLevel = CurrentLevel;
             while (nextLevel < maxPlayerLevel && newExp >= tableExp.GetNeedExp(nextLevel + 1))
             {

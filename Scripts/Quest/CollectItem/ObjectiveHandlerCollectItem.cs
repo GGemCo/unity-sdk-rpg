@@ -6,13 +6,15 @@ namespace GGemCo.Scripts
     {
         private QuestStep currentStep;
         private int currentCount = 0;
-        private int currentStepIndex = 0;
+        private QuestData questData;
+        private int currentQuestUid;
 
         protected override void StartObjectiveTyped(int questUid, QuestStep step, int stepIndex, int npcUid)
         {
+            currentQuestUid = questUid;
             currentStep = step;
-            currentCount = 0;
-            currentStepIndex = stepIndex;
+            questData = SceneGame.Instance.saveDataManager.Quest;
+            currentCount = questData.GetCount(currentQuestUid);
             GameEventManager.OnItemCollected += OnItemCollected;
         }
 
@@ -25,7 +27,13 @@ namespace GGemCo.Scripts
             if (itemUid == currentStep.targetUid)
             {
                 currentCount += count;
-                Debug.Log($"[CollectObjective] {itemUid} 수집: {currentCount}/{currentStep.count}");
+                // GcLogger.Log($"[CollectObjective] {itemUid} 수집: {currentCount}/{currentStep.count}");
+                questData.SaveCount(currentQuestUid, currentCount);
+                if (currentCount >= currentStep.count)
+                {
+                    SceneGame.Instance.QuestManager.NextStep(currentQuestUid);
+                    GameEventManager.OnItemCollected -= OnItemCollected;
+                }
             }
         }
 
