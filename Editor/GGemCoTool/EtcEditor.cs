@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
-using UnityEditor;
-using UnityEngine;
+﻿using UnityEditor;
 
 namespace GGemCo.Editor
 {
@@ -10,28 +7,6 @@ namespace GGemCo.Editor
     /// </summary>
     public class EtcEditor : EditorWindow
     {
-        [MenuItem(ConfigEditor.NameToolOpenSaveDataFolder, false, (int)ConfigEditor.ToolOrdering.OpenSaveDataFolder)]
-        private static void OpenGameDataFolder()
-        {
-            string path = Application.persistentDataPath;
-
-            if (Directory.Exists(path))
-            {
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-                Process.Start(new ProcessStartInfo()
-                {
-                    FileName = path,
-                    UseShellExecute = true
-                });
-#elif UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
-                Process.Start("open", path);
-#endif
-            }
-            else
-            {
-                UnityEngine.Debug.LogError($"폴더를 찾을 수 없습니다: {path}");
-            }
-        }
 
     }
 }

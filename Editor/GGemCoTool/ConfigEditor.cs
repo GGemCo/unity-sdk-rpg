@@ -36,7 +36,7 @@
         // etc
         private const string NameToolEtc = NameToolGGemCo + "기타/";
         public const string NameToolPlayerPrefs = NameToolEtc + "PlayerPrefs 데이터 관리";
-        public const string NameToolOpenSaveDataFolder = NameToolEtc + "게임 데이터 저장 폴더 열기";
+        public const string NameToolOpenSaveDataFolder = NameToolEtc + "게임 데이터 관리";
         
     }
 }
