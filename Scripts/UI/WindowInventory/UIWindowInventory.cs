@@ -31,6 +31,7 @@ namespace GGemCo.Scripts
             uid = UIWindowManager.WindowUid.Inventory;
             if (TableLoaderManager.Instance == null) return;
             TableItem = TableLoaderManager.Instance.TableItem;
+            buttonMergeAllItems?.onClick.RemoveAllListeners();
             buttonMergeAllItems?.onClick.AddListener(OnClickMergeAllItems);
             base.Awake();
             

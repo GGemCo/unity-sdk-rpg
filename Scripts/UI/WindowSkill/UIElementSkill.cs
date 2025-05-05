@@ -40,11 +40,13 @@ namespace GGemCo.Scripts
             if (buttonLearn != null)
             {
                 buttonLearn.gameObject.SetActive(true);
+                buttonLearn.onClick.RemoveAllListeners();
                 buttonLearn.onClick.AddListener(OnClickLearn);
             }
             if (buttonLevelUp != null)
             {
                 buttonLevelUp.gameObject.SetActive(false);
+                buttonLevelUp.onClick.RemoveAllListeners();
                 buttonLevelUp.onClick.AddListener(OnClickLevelUp);
             }
 

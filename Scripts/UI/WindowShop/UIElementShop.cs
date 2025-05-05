@@ -54,6 +54,7 @@ namespace GGemCo.Scripts
             slotIndex = pslotIndex;
             if (buttonBuy != null)
             {
+                buttonBuy.onClick.RemoveAllListeners();
                 buttonBuy.onClick.AddListener(OnClickBuy);
             }
 

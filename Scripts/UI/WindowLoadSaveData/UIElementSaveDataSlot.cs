@@ -23,6 +23,7 @@ namespace GGemCo.Scripts
         private void Awake()
         {
             button = GetComponent<Button>();
+            button.onClick.RemoveAllListeners();
             button.onClick.AddListener(SetElement);
         }
         public void Initialize(SlotMetaInfo slotMetaInfo, bool isCheck, UIWindowLoadSaveData puiWindowLoadSaveData)

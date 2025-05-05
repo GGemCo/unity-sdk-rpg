@@ -33,6 +33,9 @@ namespace GGemCo.Scripts
         {
             uid = UIWindowManager.WindowUid.ItemSplit;
             base.Awake();
+            buttonConfirm.onClick.RemoveAllListeners();
+            buttonCancel.onClick.RemoveAllListeners();
+            sliderSplit.onValueChanged.RemoveAllListeners();
             buttonConfirm.onClick.AddListener(OnClickConfirm);
             buttonCancel.onClick.AddListener(OnClickCancel);
             sliderSplit.onValueChanged.AddListener(OnValueChanged);

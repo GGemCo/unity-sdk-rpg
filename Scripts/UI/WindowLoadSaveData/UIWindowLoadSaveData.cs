@@ -39,6 +39,9 @@ namespace GGemCo.Scripts
 
         private void InitButtons()
         {
+            buttonClose?.onClick.RemoveAllListeners();
+            buttonLoad?.onClick.RemoveAllListeners();
+            buttonDelete?.onClick.RemoveAllListeners();
             buttonClose?.onClick.AddListener(OnClickClose);
             buttonLoad?.onClick.AddListener(OnClickLoad);
             buttonDelete?.onClick.AddListener(OnClickDelete);

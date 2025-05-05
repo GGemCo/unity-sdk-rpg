@@ -80,6 +80,7 @@ namespace GGemCo.Scripts
 
             if (buttonUpgrade != null)
             {
+                buttonUpgrade.onClick.RemoveAllListeners();
                 buttonUpgrade.onClick.AddListener(OnClickUpgrade);
             }
             if (textResult != null)

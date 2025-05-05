@@ -67,6 +67,7 @@ namespace GGemCo.Scripts
 
             if (buttonClose != null)
             {
+                buttonClose.onClick.RemoveAllListeners();
                 buttonClose.onClick.AddListener(OnClickClose);
             }
 

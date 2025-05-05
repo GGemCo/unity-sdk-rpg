@@ -52,9 +52,11 @@ namespace GGemCo.Scripts
         private void OnDestroy()
         {
             addressableSettingsLoader.OnLoadSettings -= InitializeSlotMetaDataManager;
-            buttonGameContinue?.onClick.RemoveListener(OnClickGameContinue);
-            buttonNewGame?.onClick.RemoveListener(OnClickNewGame);
-            buttonOption?.onClick.RemoveListener(OnClickOption);
+            buttonGameContinue?.onClick.RemoveAllListeners();
+            buttonNewGame?.onClick.RemoveAllListeners();
+            buttonOption?.onClick.RemoveAllListeners();
+            buttonOpenSaveDataWindow?.onClick.RemoveAllListeners();
+            buttonGameExit?.onClick.RemoveAllListeners();
         }
         /// <summary>
         /// 세이븓 데이터 슬롯 정보를 읽어서 버튼 처리 

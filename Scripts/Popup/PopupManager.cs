@@ -128,10 +128,12 @@ namespace GGemCo.Scripts
 
             if (currentDefaultPopup.buttonConfirm != null)
             {
+                currentDefaultPopup.buttonConfirm.onClick.RemoveAllListeners();
                 currentDefaultPopup.buttonConfirm.onClick.AddListener(OnPopupClosed);
             }
             if (currentDefaultPopup.buttonCancel != null)
             {
+                currentDefaultPopup.buttonCancel.onClick.RemoveAllListeners();
                 currentDefaultPopup.buttonCancel.onClick.AddListener(OnPopupClosed);
             }
         }

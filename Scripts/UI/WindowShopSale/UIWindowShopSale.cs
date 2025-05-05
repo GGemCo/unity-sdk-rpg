@@ -28,6 +28,7 @@ namespace GGemCo.Scripts
             uid = UIWindowManager.WindowUid.ShopSale;
             if (TableLoaderManager.Instance == null) return;
             base.Awake();
+            buttonSale?.onClick.RemoveAllListeners();
             buttonSale?.onClick.AddListener(OnClickSale);
             
             totalPriceGold.DistinctUntilChanged()

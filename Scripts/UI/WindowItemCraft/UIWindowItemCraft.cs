@@ -63,6 +63,7 @@ namespace GGemCo.Scripts
             }
             if (buttonCraft != null)
             {
+                buttonCraft.onClick.RemoveAllListeners();
                 buttonCraft.onClick.AddListener(OnClickCraft);
             }
             if (textCraftResult != null)

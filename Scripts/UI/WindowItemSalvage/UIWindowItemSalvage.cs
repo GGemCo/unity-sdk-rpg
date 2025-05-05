@@ -40,6 +40,7 @@ namespace GGemCo.Scripts
             InitializeInfo();
             if (buttonSalvage != null)
             {
+                buttonSalvage.onClick.RemoveAllListeners();
                 buttonSalvage.onClick.AddListener(OnClickSalvage);
             }
         }
