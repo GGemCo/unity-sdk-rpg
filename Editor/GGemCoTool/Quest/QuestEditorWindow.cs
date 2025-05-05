@@ -182,6 +182,8 @@ namespace GGemCo.Editor
             if (info == null) return;
             string fileName = info.FileName;
             string path = Path.Combine(QuestConstants.GetJsonFolderPath(), fileName+".json");
+            // 저장 전에 Unity가 리스트를 최신 상태로 반영하게 강제한다.
+            EditorUtility.SetDirty(this);
             string json = JsonConvert.SerializeObject(quest, Formatting.Indented);
             File.WriteAllText(path, json);
             AssetDatabase.Refresh();

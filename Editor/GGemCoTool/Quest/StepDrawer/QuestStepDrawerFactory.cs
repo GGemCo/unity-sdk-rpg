@@ -10,6 +10,7 @@ public static class QuestStepDrawerFactory
             { QuestConstants.ObjectiveType.TalkToNpc, new StepDrawerTalkToNpc() },
             { QuestConstants.ObjectiveType.KillMonster, new StepDrawerKillMonster() },
             { QuestConstants.ObjectiveType.ReachPosition, new StepDrawerReachPosition() },
+            { QuestConstants.ObjectiveType.CollectItem, new StepDrawerCollectItem() },
             // 나머지 ObjectiveType들도 여기에 추가
         };
 

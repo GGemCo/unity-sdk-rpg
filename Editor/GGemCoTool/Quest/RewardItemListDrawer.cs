@@ -21,7 +21,7 @@ namespace GGemCo.Editor
             {
                 var item = reward.items[index];
                 float half = rect.width * 0.5f;
-                item.itemUid = EditorGUI.TextField(new Rect(rect.x, rect.y + 2, half - 5, 18), "아이템 ID", item.itemUid);
+                item.itemUid = EditorGUI.IntField(new Rect(rect.x, rect.y + 2, half - 5, 18), "아이템 ID", item.itemUid);
                 item.amount = EditorGUI.IntField(new Rect(rect.x + half + 5, rect.y + 2, half - 5, 18), "수량", item.amount);
             };
         }
