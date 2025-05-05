@@ -55,7 +55,7 @@ namespace GGemCo.Scripts
         public Color warningColor = Color.yellow;
         [Tooltip("에러 메시지")]
         public Color errorColor = Color.red;
-        private Dictionary<MessageType, Color> messageTypeColors;
+        private Dictionary<MessageType, Color> messageTypeColors = new Dictionary<MessageType, Color>();
         
         private TextMeshProUGUI textMessage;    // 메시지 텍스트 UI
         private CanvasGroup canvasGroup; // Fade In/Out을 위한 CanvasGroup
@@ -151,6 +151,10 @@ namespace GGemCo.Scripts
             {
                 ShowMessageWarning("실버가 부족합니다.");
             }
+        }
+        private void OnDestroy()
+        {
+            
         }
     }
 }

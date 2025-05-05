@@ -36,5 +36,9 @@ namespace GGemCo.Scripts
 
             return info.StatAtk;
         }
+        private void OnDestroy()
+        {
+            
+        }
     }
 }

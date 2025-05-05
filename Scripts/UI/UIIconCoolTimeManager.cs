@@ -102,5 +102,9 @@ namespace GGemCo.Scripts
             AddCoolTime(windowUid, icon, coolTime);
             return true;
         }
+        private void OnDestroy()
+        {
+            
+        }
     }
 }

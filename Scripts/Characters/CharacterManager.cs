@@ -136,5 +136,9 @@ namespace GGemCo.Scripts
             characters.Remove(character);
             Object.Destroy(character.gameObject);
         }
+
+        public void OnDestroy()
+        {
+        }
     }
 }

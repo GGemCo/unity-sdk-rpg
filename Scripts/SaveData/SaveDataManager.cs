@@ -200,5 +200,10 @@ namespace GGemCo.Scripts
             
             slotMetaDatController.DeleteSlot(slot);
         }
+
+        private void OnDestroy()
+        {
+            
+        }
     }
 }

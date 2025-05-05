@@ -198,5 +198,23 @@ namespace GGemCo.Scripts
                 _ => null,
             };
         }
+
+        public void OnDestroy()
+        {
+            foreach (var controller in activeControllers)
+            {
+                controller.End();
+            }
+            activeControllers.Clear(); // 메모리 정리
+            
+            // 만들었던 캐릭터 지우기
+            foreach (var dic1 in createCharacters)
+            {
+                foreach (var dic2 in dic1.Value)
+                {
+                    Object.Destroy(dic2.Value);
+                }
+            }
+        }
     }
 }

@@ -235,5 +235,15 @@ namespace GGemCo.Scripts
                 uiWindowInventory.SetIcons(addItem);
             }
         }
+
+        private void OnDestroy()
+        {
+            ItemManager?.OnDestroy();
+            CharacterManager?.OnDestroy();
+            KeyboardManager?.OnDestroy();
+            InteractionManager?.OnDestroy();
+            CutsceneManager?.OnDestroy();
+            GameEventManager.OnDestroy();
+        }
     }
 }

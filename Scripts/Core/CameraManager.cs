@@ -231,5 +231,9 @@ namespace GGemCo.Scripts
             // Gizmos.color = Color.blue;
             // Gizmos.DrawWireCube(center, monsterSpawnPositionBoxSize * 2);
         }
+        private void OnDestroy()
+        {
+            
+        }
     }
 }

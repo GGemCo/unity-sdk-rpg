@@ -75,5 +75,10 @@ namespace GGemCo.Scripts
             }
             sceneGame.uIWindowManager.CloseAll();
         }
+
+        public void OnDestroy()
+        {
+            inputHandlers.Clear();
+        }
     }
 }

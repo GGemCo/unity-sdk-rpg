@@ -506,5 +506,9 @@ namespace GGemCo.Scripts
             mapTileCommon.ActiveAllCharacters();
         }
         public int GetCurrentMapUid() => currentMapUid;
+        private void OnDestroy()
+        {
+            
+        }
     }
 }

@@ -39,13 +39,9 @@ namespace GGemCo.Scripts
         [Header("기본속성")]
         [Tooltip("윈도우 리스트")]
         [SerializeField] private UIWindow[] uiWindows;
-        // 아이템 아이콘용 프리팹
-        private GameObject prefabIconItem;
 
         private void Awake()
         {
-            if (AddressableSettingsLoader.Instance == null) return;
-            prefabIconItem = AddressablePrefabLoader.Instance.GetPreLoadGamePrefabByName(ConfigAddressables.KeyPrefabIconItem);
             InitializationTableInfo();
         }
         /// <summary>
@@ -53,6 +49,7 @@ namespace GGemCo.Scripts
         /// </summary>
         private void InitializationTableInfo()
         {
+            if (TableLoaderManager.Instance == null) return;
             TableWindow tableWindow = TableLoaderManager.Instance.TableWindow;
             var tables = tableWindow.GetDatas();
             if (tables == null) return;
@@ -314,6 +311,10 @@ namespace GGemCo.Scripts
                 // GcLogger.Log($"{className} already has component {className}");
             }
             return go.GetComponent<UIWindow>();
+        }
+        private void OnDestroy()
+        {
+            
         }
     }
 }

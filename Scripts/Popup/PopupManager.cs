@@ -178,5 +178,9 @@ namespace GGemCo.Scripts
             }
             return popupTypePrefabs[(int)popupType];
         }
+        private void OnDestroy()
+        {
+            
+        }
     }
 }

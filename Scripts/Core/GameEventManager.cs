@@ -26,5 +26,13 @@ namespace GGemCo.Scripts
         {
             OnDialogEnd?.Invoke(npcUid);
         }
+
+        public static void OnDestroy()
+        {
+            OnMonsterKilled = null;
+            OnItemCollected = null;
+            OnDialogStart = null;
+            OnDialogEnd = null;
+        }
     }
 }

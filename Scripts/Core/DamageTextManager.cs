@@ -134,5 +134,9 @@ namespace GGemCo.Scripts
             text.color = originalColor;
             textPool.Enqueue(text);
         }
+        private void OnDestroy()
+        {
+            
+        }
     }
 }

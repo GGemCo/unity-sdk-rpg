@@ -91,5 +91,9 @@ namespace GGemCo.Scripts
         {
             return currentNpc != null;
         }
+
+        public void OnDestroy()
+        {
+        }
     }
 }
