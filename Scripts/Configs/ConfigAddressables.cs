@@ -27,6 +27,10 @@ namespace GGemCo.Scripts
         public const string KeyPrefabTextNpcNameTag = "GGemCo_PrefabTextNpcNameTag";
         // 말풍선
         public const string KeyPrefabDialogueBalloon = "GGemCo_PrefabDialogueBalloon";
+        // 퀘스트 Ready 아이콘. 느낌표
+        public const string KeyPrefabIconQuestReady = "GGemCo_PrefabIconQuestReady";
+        // 퀘스트 InProgress 아이콘. 물음표
+        public const string KeyPrefabIconQuestInProgress = "GGemCo_PrefabIconQuestInProgress";
         
         public static readonly (string key, string path)[] AssetsToAdd =
         {
@@ -45,6 +49,9 @@ namespace GGemCo.Scripts
             (KeyPrefabDropItem, "Assets/Data/Prefabs/Item/DropItem.prefab"),
             (KeyPrefabTextDropItemNameTag, "Assets/Data/Prefabs/Item/TextDropItemNameTag.prefab"),
             (KeyPrefabTextNpcNameTag, "Assets/Data/Prefabs/Item/TextNpcNameTag.prefab"),
+            
+            (KeyPrefabIconQuestReady, "Assets/Data/Prefabs/UI/Icon/IconQuestReady.prefab"),
+            (KeyPrefabIconQuestInProgress, "Assets/Data/Prefabs/UI/Icon/IconQuestInProgress.prefab"),
         };
         
         // 게임 에서 사용하는 미리 로드해야하는 프리팹
@@ -61,6 +68,8 @@ namespace GGemCo.Scripts
             { KeyPrefabTextDropItemNameTag, LabelPreLoadGamePrefabs },
             { KeyPrefabTextNpcNameTag, LabelPreLoadGamePrefabs },
             { KeyPrefabDialogueBalloon, LabelPreLoadGamePrefabs },
+            { KeyPrefabIconQuestReady, LabelPreLoadGamePrefabs },
+            { KeyPrefabIconQuestInProgress, LabelPreLoadGamePrefabs },
         };
     }
 }

@@ -32,7 +32,9 @@ namespace GGemCo.Scripts
             ItemUpgrade,
             ItemSalvage,
             ItemCraft,
-            Dialogue
+            Dialogue,
+            HudQuest,
+            QuestReward
         }
         [Header("기본속성")]
         [Tooltip("윈도우 리스트")]

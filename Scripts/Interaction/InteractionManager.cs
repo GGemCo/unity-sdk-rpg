@@ -42,31 +42,28 @@ namespace GGemCo.Scripts
                 return;
             }
 
-            if (infoNpc.InteractionUid <= 0) return;
-            var infoInteraction = tableInteraction.GetDataByUid(infoNpc.InteractionUid);
-            if (infoInteraction == null)
-            {
-                GcLogger.LogError("interaction 테이블에 정보가 없습니다. interaction uid: "+infoNpc.InteractionUid);
-                return;
-            }
             currentNpc = characterBase;
-
-            // 메시지가 있으면 메시지 창에서 버튼으로 선택
-            var message = infoInteraction.Message;
-            if (message != "")
+            
+            // 퀘스트 정보
+            Npc npc = currentNpc as Npc;
+            List<NpcQuestData> npcQuestDatas = npc?.GetQuestInfos();
+            
+            // 인터렉션 정보
+            StruckTableInteraction infoInteraction = null;
+            if (infoNpc.InteractionUid > 0)
             {
-                // 다른 윈도우가 열려있으면 닫아주기
-                sceneGame.uIWindowManager.CloseAll(new List<UIWindowManager.WindowUid>
-                    { UIWindowManager.WindowUid.InteractionDialogue });
-                ShowDialogue(infoNpc, infoInteraction);
+                infoInteraction = tableInteraction.GetDataByUid(infoNpc.InteractionUid);
             }
-            // 메시지가 없으면 type별로 npc 머리 위로?
-            // type 이 1개면 바로 실행
+            // 다른 윈도우가 열려있으면 닫아주기
+            sceneGame.uIWindowManager.CloseAll(new List<UIWindowManager.WindowUid>
+                { UIWindowManager.WindowUid.InteractionDialogue });
+            // 인터렉션 대화창 보여주기
+            ShowDialogue(infoNpc, infoInteraction, npcQuestDatas);
         }
 
-        private void ShowDialogue(StruckTableNpc struckTableNpc, StruckTableInteraction struckTableInteraction)
+        private void ShowDialogue(StruckTableNpc struckTableNpc, StruckTableInteraction struckTableInteraction, List<NpcQuestData> questInfos)
         {
-            uiWindowInteractionDialogue?.SetInfos(struckTableNpc, struckTableInteraction);
+            uiWindowInteractionDialogue?.SetInfos(struckTableNpc, struckTableInteraction, questInfos);
             uiWindowInteractionDialogue?.Show(true);
         }
 

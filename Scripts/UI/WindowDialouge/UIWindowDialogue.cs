@@ -32,6 +32,7 @@ namespace GGemCo.Scripts
         private Dictionary<string, DialogueNodeData> dialogueNodeDatas;
         
         private int currentDialogueUid;
+        private int currentNpcUid;
         private DialogueNodeData currentDialogue;
         
         private SystemMessageManager systemMessageManager;
@@ -47,6 +48,7 @@ namespace GGemCo.Scripts
         private void Initialize()
         {
             originalFontSize = textMessage.fontSize;
+            buttonNextMessage.onClick.RemoveAllListeners();
             buttonNextMessage.onClick.AddListener(OnClickNext);
             messages = new List<string>();
             dialogueNodeDatas = new Dictionary<string, DialogueNodeData>();
@@ -71,18 +73,21 @@ namespace GGemCo.Scripts
             currentDialogueUid = 0;
             currentDialogue = null;
             indexMessage = 0;
+            currentNpcUid = 0;
             choiceButtonHandler.HideButtons();
         }
         /// <summary>
         /// 대사 json 불러오기
         /// </summary>
         /// <param name="dialogueUid"></param>
-        public void LoadDialogue(int dialogueUid)
+        /// <param name="npcUid"></param>
+        public void LoadDialogue(int dialogueUid, int npcUid = 0)
         {
             var data = DialogueLoader.LoadDialogueData(dialogueUid);
             if (data != null)
             {
                 SetDialogue(data);
+                currentNpcUid = npcUid;
             }
         }
         /// <summary>
@@ -199,6 +204,7 @@ namespace GGemCo.Scripts
         /// </summary>
         private void EndDialogue()
         {
+            GameEventManager.DialogEnd(currentNpcUid);
             ResetDialogue();
             gameObject.SetActive(false);
         }

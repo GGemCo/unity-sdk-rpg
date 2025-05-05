@@ -23,7 +23,7 @@ namespace GGemCo.Scripts
         public Camera mainCamera;
         [Tooltip("UI 에 사용되는 메인 Canvas")]
         public Canvas canvasUI;
-        [Tooltip("드랍 아이템의 이름 text 오브젝트가 들어갈 오브젝트 입니다.")]
+        [Tooltip("드랍 아이템의 이름 text, Npc 이름 text, Npc 퀘스트 마크 오브젝트가 들어갈 오브젝트 입니다.")]
         public GameObject containerDropItemName;
         [Tooltip("워프로 맵 이동시 화면을 가려줄 검정화면")]
         public GameObject bgBlackForMapLoading;
@@ -52,6 +52,7 @@ namespace GGemCo.Scripts
         public KeyboardManager KeyboardManager;
         public InteractionManager InteractionManager;
         public CutsceneManager CutsceneManager;
+        public QuestManager QuestManager;
         
         private UIWindowInventory uiWindowInventory;
 
@@ -89,6 +90,7 @@ namespace GGemCo.Scripts
             calculateManager = CreateManager<CalculateManager>(managerContainer);
             mapManager = CreateManager<MapManager>(managerContainer);
             saveDataManager = CreateManager<SaveDataManager>(managerContainer);
+            damageTextManager = CreateManager<DamageTextManager>(managerContainer);
             uIIconCoolTimeManager = CreateManager<UIIconCoolTimeManager>(managerContainer);
             
             ItemManager = new ItemManager();
@@ -102,6 +104,8 @@ namespace GGemCo.Scripts
             InteractionManager.Initialize(this);
             CutsceneManager = new CutsceneManager();
             CutsceneManager.Initialize(this);
+            QuestManager = new QuestManager();
+            QuestManager.Initialize(this);
         }
 
         private T CreateManager<T>(GameObject parent) where T : Component

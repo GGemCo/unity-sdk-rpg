@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace GGemCo.Scripts
@@ -12,7 +13,14 @@ namespace GGemCo.Scripts
     {
         private GameObject containerNpcName;
         private TagNameNpc tagNameNpc;
+        private NpcQuestController npcQuestController;
 
+        protected override void Awake()
+        {
+            base.Awake();
+            // 퀘스트 관리
+            npcQuestController = gameObject.AddComponent<NpcQuestController>();
+        }
         protected override void Start()
         {
             base.Start();
@@ -136,6 +144,17 @@ namespace GGemCo.Scripts
         {
             if (tagNameNpc == null) return;
             Destroy(tagNameNpc.gameObject);
+        }
+
+        public void UpdateQuestInfo()
+        {
+            npcQuestController?.LoadQuest();
+        }
+
+        public List<NpcQuestData> GetQuestInfos()
+        {
+            if (npcQuestController == null) return null;
+            return npcQuestController.GetQuestInfos();
         }
     }
 }

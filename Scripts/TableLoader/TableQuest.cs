@@ -20,10 +20,6 @@ namespace GGemCo.Scripts
         public int NpcUid;
         public int DirectionUid;
         public bool Repeat;
-        public int RewardItemUid1;
-        public int RewardItemCount1;
-        public int RewardItemUid2;
-        public int RewardItemCount2;
     }
 
     /// <summary>
@@ -98,10 +94,6 @@ namespace GGemCo.Scripts
                 NpcUid = int.Parse(data["NpcUid"]),
                 DirectionUid = int.Parse(data["DirectionUid"]),
                 Repeat = ConvertBoolean(data["Repeat"]),
-                RewardItemUid1 = int.Parse(data["RewardItemUid1"]),
-                RewardItemCount1 = int.Parse(data["RewardItemCount1"]),
-                RewardItemUid2 = int.Parse(data["RewardItemUid2"]),
-                RewardItemCount2 = int.Parse(data["RewardItemCount2"]),
             };
         }
         public List<int> GetQuestsByNpcUnum(int mapUid, int npcUid)

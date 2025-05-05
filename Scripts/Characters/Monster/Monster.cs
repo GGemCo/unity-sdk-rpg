@@ -145,6 +145,7 @@ namespace GGemCo.Scripts
                 Destroy(sliderHpBar);
             }
             controllerMonster.StopAttackCoroutine();
+            GameEventManager.MonsterKilled(uid);
             OnMonsterDead?.Invoke(vid, uid, gameObject);
         }
         protected void OnDestroy()
