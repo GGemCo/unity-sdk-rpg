@@ -1,19 +1,45 @@
 ﻿using GGemCo.Scripts;
-using UnityEditor;
 using UnityEngine;
 
 namespace GGemCo.Editor
 {
     public class StepDrawerTalkToNpc : IQuestStepDrawer
     {
-        public void Draw(ref float y, Rect rect, QuestStep step)
+        private int selectedIndexNpc = 0;
+        private int selectedIndexMap = 0;
+        private int selectedIndexDialogue = 0;
+        
+        public void Draw(ref float y, Rect rect, QuestStep step, MetadataQuestStepListDrawer metadataQuestStepListDrawer)
         {
-            step.mapUid = EditorGUI.IntField(new Rect(rect.x, y, rect.width, 18), "맵 Uid", step.mapUid);
-            y += 20;
-            step.targetUid = EditorGUI.IntField(new Rect(rect.x, y, rect.width, 18), "타겟 Uid", step.targetUid);
-            y += 20;
-            step.dialogueUid = EditorGUI.IntField(new Rect(rect.x, y, rect.width, 18), "대화 Uid", step.dialogueUid);
-            y += 20;
+            EditorPopupUtils.DrawUidPopup(
+                "맵",
+                ref selectedIndexMap,
+                metadataQuestStepListDrawer.NameMap,
+                metadataQuestStepListDrawer.StruckTableMaps,
+                ref step.mapUid,
+                rect,
+                ref y
+            );
+            
+            EditorPopupUtils.DrawUidPopup(
+                "NPC",
+                ref selectedIndexNpc,
+                metadataQuestStepListDrawer.NameNpc,
+                metadataQuestStepListDrawer.StruckTableNpcs,
+                ref step.targetUid,
+                rect,
+                ref y
+            );
+            
+            EditorPopupUtils.DrawUidPopup(
+                "대화",
+                ref selectedIndexDialogue,
+                metadataQuestStepListDrawer.NameDialogue,
+                metadataQuestStepListDrawer.StruckTableDialogues,
+                ref step.dialogueUid,
+                rect,
+                ref y
+            );
         }
         public float GetHeight() => 3 * 20;
     }

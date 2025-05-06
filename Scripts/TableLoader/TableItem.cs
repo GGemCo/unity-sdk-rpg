@@ -6,10 +6,10 @@ namespace GGemCo.Scripts
     /// <summary>
     /// 아이템 테이블 Structure
     /// </summary>
-    public class StruckTableItem
+    public class StruckTableItem : IUidName
     {
-        public int Uid;
-        public string Name;
+        public int Uid { get; set; }
+        public string Name { get; set; }
         public ItemConstants.Type Type;
         public ItemConstants.Category Category;
         public ItemConstants.SubCategory SubCategory;
@@ -267,6 +267,11 @@ namespace GGemCo.Scripts
                 OptionSuffix5 = ConvertSuffixType(data["OptionSuffix5"]),
                 OptionValue5 = int.Parse(data["OptionValue5"]),
             };
+        }
+        public override bool TryGetDataByUid(int uid, out object info)
+        {
+            info = GetDataByUid(uid);
+            return info != null && ((StruckTableItem)info).Uid > 0;
         }
     }
 }

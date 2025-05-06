@@ -6,7 +6,7 @@ namespace GGemCo.Editor
 {
     public class StepDrawerReachPosition : IQuestStepDrawer
     {
-        public void Draw(ref float y, Rect rect, QuestStep step)
+        public void Draw(ref float y, Rect rect, QuestStep step, MetadataQuestStepListDrawer metadataQuestStepListDrawer)
         {
             step.mapUid = EditorGUI.IntField(new Rect(rect.x, y, rect.width, 18), "맵 UID", step.mapUid);
             y += 20;

@@ -9,6 +9,41 @@ using UnityEngine;
 
 namespace GGemCo.Editor
 {
+    public class MetadataQuestStepListDrawer
+    {
+        public List<string> NameQuest;
+        public List<string> NameNpc;
+        public List<string> NameMonster;
+        public List<string> NameMap;
+        public List<string> NameDialogue;
+        public List<string> NameItem;
+        public Dictionary<int, StruckTableQuest> StruckTableQuests;
+        public Dictionary<int, StruckTableNpc> StruckTableNpcs;
+        public Dictionary<int, StruckTableMonster> StruckTableMonsters;
+        public Dictionary<int, StruckTableMap> StruckTableMaps;
+        public Dictionary<int, StruckTableDialogue> StruckTableDialogues;
+        public Dictionary<int, StruckTableItem> StruckTableItems;
+
+        public MetadataQuestStepListDrawer(List<string> nameQuest, List<string> nameNpc, List<string> nameMonster,
+            List<string> nameMap, List<string> nameDialogue, List<string> nameItem,
+            Dictionary<int, StruckTableQuest> struckTableQuests, Dictionary<int, StruckTableNpc> struckTableNpcs,
+            Dictionary<int, StruckTableMonster> struckTableMonsters, Dictionary<int, StruckTableMap> struckTableMaps,
+            Dictionary<int, StruckTableDialogue> struckTableDialogues, Dictionary<int, StruckTableItem> struckTableItems)
+        {
+            NameQuest = nameQuest;
+            NameNpc = nameNpc;
+            NameMonster = nameMonster;
+            NameMap = nameMap;
+            NameDialogue = nameDialogue;
+            NameItem = nameItem;
+            StruckTableQuests = struckTableQuests;
+            StruckTableNpcs = struckTableNpcs;
+            StruckTableMonsters = struckTableMonsters;
+            StruckTableMaps = struckTableMaps;
+            StruckTableDialogues = struckTableDialogues;
+            StruckTableItems = struckTableItems;
+        }
+    }
     public class QuestEditorWindow : EditorWindow
     {
         private Quest quest = new Quest();
@@ -19,9 +54,25 @@ namespace GGemCo.Editor
         
         private TableLoaderManager tableLoaderManager;
         private TableQuest tableQuest;
+        private TableNpc tableNpc;
+        private TableMonster tableMonster;
+        private TableMap tableMap;
+        private TableDialogue tableDialogue;
+        private TableItem tableItem;
+        
         private int selectedQuestIndex;
-        private List<string> questTitle = new List<string>();
-        private Dictionary<int, StruckTableQuest> questInfos = new Dictionary<int, StruckTableQuest>(); 
+        private List<string> nameQuest = new List<string>();
+        private List<string> nameNpc = new List<string>();
+        private List<string> nameMonster = new List<string>();
+        private List<string> nameMap = new List<string>();
+        private List<string> nameDialogue = new List<string>();
+        private List<string> nameItem = new List<string>();
+        private Dictionary<int, StruckTableQuest> struckTableQuests = new Dictionary<int, StruckTableQuest>(); 
+        private Dictionary<int, StruckTableNpc> struckTableNpcs = new Dictionary<int, StruckTableNpc>(); 
+        private Dictionary<int, StruckTableMonster> struckTableMonsters = new Dictionary<int, StruckTableMonster>(); 
+        private Dictionary<int, StruckTableMap> struckTableMaps = new Dictionary<int, StruckTableMap>(); 
+        private Dictionary<int, StruckTableDialogue> struckTableDialogues = new Dictionary<int, StruckTableDialogue>(); 
+        private Dictionary<int, StruckTableItem> struckTableItems = new Dictionary<int, StruckTableItem>(); 
 
         private QuestStepListDrawer questStepListDrawer;
         private RewardItemListDrawer rewardItemListDrawer;
@@ -39,46 +90,76 @@ namespace GGemCo.Editor
         private void OnEnable()
         {
             tableLoaderManager = new TableLoaderManager();
-            tableQuest = tableLoaderManager.LoadQuestTable();
-            LoadQuestInfoData();
+            tableLoaderManager.LoadTableData<TableQuest, StruckTableQuest>(
+                ConfigTableFileName.Quest,
+                out tableQuest,
+                out nameQuest,
+                out struckTableQuests,
+                info => $"{info.Uid} - {info.Title}"
+            );
+            
+            tableLoaderManager.LoadTableData<TableNpc, StruckTableNpc>(
+                ConfigTableFileName.Npc,
+                out tableNpc,
+                out nameNpc,
+                out struckTableNpcs,
+                info => $"{info.Uid} - {info.Name}"
+            );
+            tableLoaderManager.LoadTableData<TableMonster, StruckTableMonster>(
+                ConfigTableFileName.Monster,
+                out tableMonster,
+                out nameMonster,
+                out struckTableMonsters,
+                info => $"{info.Uid} - {info.Name}"
+            );
+            tableLoaderManager.LoadTableData<TableMap, StruckTableMap>(
+                ConfigTableFileName.Map,
+                out tableMap,
+                out nameMap,
+                out struckTableMaps,
+                info => $"{info.Uid} - {info.Name}"
+            );
+            tableLoaderManager.LoadTableData<TableDialogue, StruckTableDialogue>(
+                ConfigTableFileName.Dialogue,
+                out tableDialogue,
+                out nameDialogue,
+                out struckTableDialogues,
+                info => $"{info.Uid} - {info.Memo}"
+            );
+            tableLoaderManager.LoadTableData<TableItem, StruckTableItem>(
+                ConfigTableFileName.Item,
+                out tableItem,
+                out nameItem,
+                out struckTableItems,
+                info => $"{info.Uid} - {info.Name}"
+            );
             
             quest.steps ??= new List<QuestStep>();
             quest.reward ??= new QuestReward();
             quest.reward.items ??= new List<RewardItem>();
-            
-            questStepListDrawer = new QuestStepListDrawer(quest.steps);
-            rewardItemListDrawer = new RewardItemListDrawer(quest.reward);
+
+            MetadataQuestStepListDrawer metadataQuestStepListDrawer = new MetadataQuestStepListDrawer(
+                nameQuest, nameNpc, nameMonster, nameMap, nameDialogue, nameItem, 
+                struckTableQuests, 
+                struckTableNpcs,
+                struckTableMonsters,
+                struckTableMaps, 
+                struckTableDialogues, 
+                struckTableItems
+                );
+            questStepListDrawer = new QuestStepListDrawer(quest.steps, metadataQuestStepListDrawer);
+            rewardItemListDrawer = new RewardItemListDrawer(quest.reward, metadataQuestStepListDrawer);
             
             addressableSettingsLoader = new AddressableSettingsLoader();
             _ = addressableSettingsLoader.InitializeAsync();
             addressableSettingsLoader.OnLoadSettings += Initialize;
         }
-
         private void Initialize(GGemCoSettings settings, GGemCoPlayerSettings playerSettings,
             GGemCoMapSettings mapSettings, GGemCoSaveSettings saveSettings)
         {
             maxSlotCount = saveSettings.saveDataMaxSlotCount;
             saveDirectory = saveSettings.SaveDataFolderName;
         }
-
-        private void LoadQuestInfoData()
-        {
-            Dictionary<int, Dictionary<string, string>> npcDictionary = tableQuest.GetDatas();
-             
-            questTitle.Clear();
-            questInfos.Clear();
-            int index = 0;
-            // foreach 문을 사용하여 딕셔너리 내용을 출력
-            foreach (KeyValuePair<int, Dictionary<string, string>> outerPair in npcDictionary)
-            {
-                var info = tableQuest.GetDataByUid(outerPair.Key);
-                if (info.Uid <= 0) continue;
-                questTitle.Add($"{info.Uid} - {info.Title}");
-                questInfos.TryAdd(index, info);
-                index++;
-            }
-        }
-
         private int previousIndex;
         private void OnGUI()
         {
@@ -86,7 +167,7 @@ namespace GGemCo.Editor
             scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
 
             Common.OnGUITitle("저장/불러오기");
-            selectedQuestIndex = EditorGUILayout.Popup("연출 선택", selectedQuestIndex, questTitle.ToArray());
+            selectedQuestIndex = EditorGUILayout.Popup("연출 선택", selectedQuestIndex, nameQuest.ToArray());
             if (previousIndex != selectedQuestIndex)
             {
                 // 선택이 바뀌었을 때 실행할 코드
@@ -120,7 +201,7 @@ namespace GGemCo.Editor
             Common.OnGUITitle("퀘스트 기본 정보");
             // nextNodeGuid 읽기 전용 처리
             GUI.enabled = false;
-            var info = questInfos.GetValueOrDefault(selectedQuestIndex);
+            var info = struckTableQuests.GetValueOrDefault(selectedQuestIndex);
             quest.uid = EditorGUILayout.IntField("Uid", info.Uid);
             quest.title = EditorGUILayout.TextField("제목", info.Title);
             GUI.enabled = true;
@@ -178,7 +259,7 @@ namespace GGemCo.Editor
         {
             bool result = EditorUtility.DisplayDialog("저장하기", "현재 선택된 퀘스트에 저장하시겠습니까?", "네", "아니요");
             if (!result) return;
-            var info = questInfos.GetValueOrDefault(selectedQuestIndex);
+            var info = struckTableQuests.GetValueOrDefault(selectedQuestIndex);
             if (info == null) return;
             string fileName = info.FileName;
             string path = Path.Combine(QuestConstants.GetJsonFolderPath(), fileName+".json");
@@ -197,7 +278,7 @@ namespace GGemCo.Editor
             bool result = EditorUtility.DisplayDialog("불러오기", "현재 불러온 내용이 초기화 됩니다.\n계속 진행할가요?", "네", "아니요");
             if (!result) return false;
             
-            var info = questInfos.GetValueOrDefault(selectedQuestIndex);
+            var info = struckTableQuests.GetValueOrDefault(selectedQuestIndex);
             if (info == null) return false;
             string path = Path.Combine(QuestConstants.JsonFolderName, info.FileName);
             

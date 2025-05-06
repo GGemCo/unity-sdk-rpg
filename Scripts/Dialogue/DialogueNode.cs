@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using GGemCo.Scripts;
 using UnityEngine;
 
-namespace GGemCo.Editor
+namespace GGemCo.Scripts
 {
     /// <summary>
     /// 대사 노드

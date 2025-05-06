@@ -1,4 +1,5 @@
-﻿using GGemCo.Scripts;
+﻿using System.Collections.Generic;
+using GGemCo.Scripts;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -9,8 +10,9 @@ namespace GGemCo.Editor
     {
         private QuestReward reward;
         private ReorderableList list;
-
-        public RewardItemListDrawer(QuestReward reward)
+        private int selectedIndexItem = 0;
+        
+        public RewardItemListDrawer(QuestReward reward, MetadataQuestStepListDrawer metadataQuestStepListDrawer)
         {
             this.reward = reward;
 
@@ -21,7 +23,17 @@ namespace GGemCo.Editor
             {
                 var item = reward.items[index];
                 float half = rect.width * 0.5f;
-                item.itemUid = EditorGUI.IntField(new Rect(rect.x, rect.y + 2, half - 5, 18), "아이템 ID", item.itemUid);
+
+                if (item.itemUid > 0)
+                {
+                    selectedIndexItem = item.itemUid > 0
+                        ? metadataQuestStepListDrawer.NameItem.FindIndex(x => x.Contains(item.itemUid.ToString()))
+                        : 0;
+                }
+                selectedIndexItem = EditorGUI.Popup(new Rect(rect.x, rect.y + 2, half - 5, 18), "아이템",
+                    selectedIndexItem, metadataQuestStepListDrawer.NameItem.ToArray());
+                item.itemUid = metadataQuestStepListDrawer.StruckTableItems.GetValueOrDefault(selectedIndexItem)?.Uid ?? 0;
+                
                 item.amount = EditorGUI.IntField(new Rect(rect.x + half + 5, rect.y + 2, half - 5, 18), "수량", item.amount);
             };
         }

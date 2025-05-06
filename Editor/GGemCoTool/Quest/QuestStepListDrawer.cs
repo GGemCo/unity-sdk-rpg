@@ -10,7 +10,7 @@ namespace GGemCo.Editor
     {
         public ReorderableList List { get; private set; }
 
-        public QuestStepListDrawer(List<QuestStep> steps)
+        public QuestStepListDrawer(List<QuestStep> steps, MetadataQuestStepListDrawer metadataQuestStepListDrawer)
         {
             List = new ReorderableList(steps, typeof(QuestStep), true, true, true, true);
 
@@ -33,7 +33,7 @@ namespace GGemCo.Editor
                 y += 20;
 
                 var drawer = QuestStepDrawerFactory.GetDrawer(step.objectiveType);
-                drawer?.Draw(ref y, rect, step);
+                drawer?.Draw(ref y, rect, step, metadataQuestStepListDrawer);
             };
         }
 

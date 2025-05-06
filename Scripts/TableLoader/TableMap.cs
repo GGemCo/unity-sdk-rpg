@@ -6,10 +6,10 @@ namespace GGemCo.Scripts
     /// <summary>
     /// 맵 테이블 Structure
     /// </summary>
-    public class StruckTableMap
+    public class StruckTableMap : IUidName
     {
-        public int Uid;
-        public string Name;
+        public int Uid { get; set; }
+        public string Name { get; set; }
         public MapConstants.Type Type;
         public MapConstants.SubType Subtype;
         public string FolderName;
@@ -71,6 +71,11 @@ namespace GGemCo.Scripts
                 playerSpawnPosition.y = float.Parse(result2[1]);
             }
             return playerSpawnPosition;
+        }
+        public override bool TryGetDataByUid(int uid, out object info)
+        {
+            info = GetDataByUid(uid);
+            return info != null && ((StruckTableMap)info).Uid > 0;
         }
     }
 }

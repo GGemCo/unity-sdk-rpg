@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
 namespace GGemCo.Scripts
 {
     /// <summary>
     /// Npc 테이블 Structure
     /// </summary>
-    public class StruckTableNpc
+    public class StruckTableNpc : IUidName
     {
-        public int Uid;
-        public string Name;
+        public int Uid { get; set; }
+        public string Name { get; set; }
         public int SpineUid;
         public string DefaultSkin;
         public float Scale;
@@ -57,6 +56,11 @@ namespace GGemCo.Scripts
                 InteractionUid = int.Parse(data["InteractionUid"]),
                 ImageThumbnailPath = data["ImageThumbnailPath"],
             };
+        }
+        public override bool TryGetDataByUid(int uid, out object info)
+        {
+            info = GetDataByUid(uid);
+            return info != null && ((StruckTableNpc)info).Uid > 0;
         }
     }
 }

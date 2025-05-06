@@ -7,9 +7,10 @@ namespace GGemCo.Scripts
     /// <summary>
     /// Window 테이블 Structure
     /// </summary>
-    public class StruckTableQuest
+    public class StruckTableQuest : IUidName
     {
-        public int Uid;
+        public int Uid { get; set; }
+        public string Name { get; set; }
         public QuestConstants.Type Type;
         public string Title;
         public string FileName;
@@ -102,6 +103,11 @@ namespace GGemCo.Scripts
             if (QuestUids.TryGetValue(mapUid, out var npcUids) != true || npcUids.ContainsKey(npcUid) != true)
                 return empty;
             return QuestUids[mapUid][npcUid];
+        }
+        public override bool TryGetDataByUid(int uid, out object info)
+        {
+            info = GetDataByUid(uid);
+            return info != null && ((StruckTableQuest)info).Uid > 0;
         }
     }
 }

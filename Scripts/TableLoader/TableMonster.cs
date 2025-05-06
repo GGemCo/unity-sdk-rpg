@@ -6,10 +6,10 @@ namespace GGemCo.Scripts
     /// <summary>
     /// 몬스터 테이블 Structure
     /// </summary>
-    public class StruckTableMonster
+    public class StruckTableMonster : IUidName
     {
-        public int Uid;
-        public string Name;
+        public int Uid { get; set; }
+        public string Name { get; set; }
         public int SpineUid;
         public string DefaultSkin;
         public float Scale;
@@ -73,6 +73,11 @@ namespace GGemCo.Scripts
                 RegistLightning = int.Parse(data["RegistLightning"]),
                 RewardGold = int.Parse(data["RewardGold"]),
             };
+        }
+        public override bool TryGetDataByUid(int uid, out object info)
+        {
+            info = GetDataByUid(uid);
+            return info != null && ((StruckTableMonster)info).Uid > 0;
         }
     }
 }

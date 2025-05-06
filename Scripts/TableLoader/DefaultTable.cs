@@ -4,12 +4,22 @@ using UnityEngine;
 
 namespace GGemCo.Scripts
 {
+    public interface IUidName
+    {
+        int Uid { get; }
+        string Name { get; }
+    }
     public class DefaultTable
     {
         private readonly Dictionary<int, Dictionary<string, string>> table = new Dictionary<int, Dictionary<string, string>>();
         private static readonly Dictionary<string, ConfigCommon.SuffixType> MapSuffix;
         private static readonly Dictionary<string, CurrencyConstants.Type> MapCurrencyType;
 
+        public virtual bool TryGetDataByUid(int uid, out object info)
+        {
+            info = null;
+            return false;
+        }
         static DefaultTable()
         {
             MapSuffix = new Dictionary<string, ConfigCommon.SuffixType>
