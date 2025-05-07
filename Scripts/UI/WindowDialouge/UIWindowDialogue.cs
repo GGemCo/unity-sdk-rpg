@@ -47,9 +47,12 @@ namespace GGemCo.Scripts
         }
         private void Initialize()
         {
-            originalFontSize = textMessage.fontSize;
-            buttonNextMessage.onClick.RemoveAllListeners();
-            buttonNextMessage.onClick.AddListener(OnClickNext);
+            if (textMessage != null)
+            {
+                originalFontSize = textMessage.fontSize;
+            }
+            buttonNextMessage?.onClick.RemoveAllListeners();
+            buttonNextMessage?.onClick.AddListener(OnClickNext);
             messages = new List<string>();
             dialogueNodeDatas = new Dictionary<string, DialogueNodeData>();
 
