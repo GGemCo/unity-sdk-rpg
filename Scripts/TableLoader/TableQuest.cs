@@ -12,15 +12,9 @@ namespace GGemCo.Scripts
         public int Uid { get; set; }
         public string Name { get; set; }
         public QuestConstants.Type Type;
-        public string Title;
         public string FileName;
-        public int NeedQuestUid;
-        public int NextQuestUid;
-        public int DialogueUid;
         public int MapUid;
         public int NpcUid;
-        public int DirectionUid;
-        public bool Repeat;
     }
 
     /// <summary>
@@ -86,15 +80,10 @@ namespace GGemCo.Scripts
             {
                 Uid = int.Parse(data["Uid"]),
                 Type = ConvertType(data["Type"]),
-                Title = data["Title"],
+                Name = data["Name"],
                 FileName = data["FileName"],
-                NeedQuestUid = int.Parse(data["NeedQuestUid"]),
-                NextQuestUid = int.Parse(data["NextQuestUid"]),
-                DialogueUid = int.Parse(data["DialogueUid"]),
                 MapUid = int.Parse(data["MapUid"]),
                 NpcUid = int.Parse(data["NpcUid"]),
-                DirectionUid = int.Parse(data["DirectionUid"]),
-                Repeat = ConvertBoolean(data["Repeat"]),
             };
         }
         public List<int> GetQuestsByNpcUnum(int mapUid, int npcUid)

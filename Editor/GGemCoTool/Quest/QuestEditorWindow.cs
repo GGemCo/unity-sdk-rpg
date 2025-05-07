@@ -95,7 +95,7 @@ namespace GGemCo.Editor
                 out tableQuest,
                 out nameQuest,
                 out struckTableQuests,
-                info => $"{info.Uid} - {info.Title}"
+                info => $"{info.Uid} - {info.Name}"
             );
             
             tableLoaderManager.LoadTableData<TableNpc, StruckTableNpc>(
@@ -203,7 +203,7 @@ namespace GGemCo.Editor
             GUI.enabled = false;
             var info = struckTableQuests.GetValueOrDefault(selectedQuestIndex);
             quest.uid = EditorGUILayout.IntField("Uid", info.Uid);
-            quest.title = EditorGUILayout.TextField("제목", info.Title);
+            quest.title = EditorGUILayout.TextField("제목", info.Name);
             GUI.enabled = true;
            
             // 단계별 정보

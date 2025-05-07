@@ -43,7 +43,7 @@ namespace GGemCo.Scripts
             if (uid <= 0) return;
             var info = tableQuest.GetDataByUid(uid);
             if (info == null) return;
-            textQuestTitle.text = info.Title;
+            textQuestTitle.text = info.Name;
             
             // objective 별 처리
             QuestStep questStep = questManager.GetQuestStep(uid, stepIndex);

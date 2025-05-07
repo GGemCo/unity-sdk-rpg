@@ -89,7 +89,7 @@ namespace GGemCo.Editor
             {
                 var info = tableQuest.GetDataByUid(outerPair.Key);
                 if (info.Uid <= 0) continue;
-                nameQuest.Add($"{info.Uid} - {info.Title}");
+                nameQuest.Add($"{info.Uid} - {info.Name}");
                 struckTableQuest.TryAdd(index, info);
                 index++;
             }

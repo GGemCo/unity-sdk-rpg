@@ -24,6 +24,7 @@ namespace GGemCo.Scripts
         [Header("버튼")]
         [Tooltip("다음 대사 보기")]
         public Button buttonNextMessage;
+        [Tooltip("선택지 왼쪽, 오른쪽 여백 사이즈ㅂ")]
         public int paddingWidth = 20;
 
         private float originalFontSize;

@@ -156,7 +156,7 @@ namespace GGemCo.Scripts
             if (textComponent != null)
             {
                 var info = tableQuest.GetDataByUid(npcQuestData.QuestUid);
-                textComponent.text = $"{info.Title}";
+                textComponent.text = $"{info.Name}";
             }
         }
         /// <summary>
