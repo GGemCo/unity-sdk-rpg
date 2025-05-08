@@ -4,14 +4,14 @@ namespace GGemCo.Scripts
 {
     public static class GameEventManager
     {
-        public static event Action<int> OnMonsterKilled = null;
+        public static event Action<int, int> OnMonsterKilled = null;
         public static event Action<int, int> OnItemCollected = null;
         public static event Action<int> OnDialogStart = null;
         public static event Action<int> OnDialogEnd = null;
 
-        public static void MonsterKilled(int monsterUid)
+        public static void MonsterKilled(int mapUid, int monsterUid)
         {
-            OnMonsterKilled?.Invoke(monsterUid);
+            OnMonsterKilled?.Invoke(mapUid, monsterUid);
         }
 
         public static void ItemCollected(int itemUid, int count)

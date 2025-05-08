@@ -185,7 +185,6 @@ namespace GGemCo.Editor
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("JSON 저장")) SaveQuestToJson();
             if (GUILayout.Button("JSON 불러오기")) LoadQuestFromJson();
-            if (GUILayout.Button("새로 만들기")) NewQuestJson();
             GUILayout.EndHorizontal();
             
             Common.GUILineBlue(2);
@@ -243,15 +242,6 @@ namespace GGemCo.Editor
             AssetDatabase.Refresh();
             EditorUtility.DisplayDialog(ConfigEditor.NameToolQuest, "퀘스트 플레이 정보 초기화 완료", "OK");
         }
-
-        private void NewQuestJson()
-        {
-            bool result = EditorUtility.DisplayDialog("새로만들기", "현재 불러온 내용이 초기화 됩니다.\n계속 진행할가요?", "네", "아니요");
-            if (result) return;
-            quest = new Quest();
-            OnEnable();
-        }
-
         /// <summary>
         /// json 으로 저장하기
         /// </summary>

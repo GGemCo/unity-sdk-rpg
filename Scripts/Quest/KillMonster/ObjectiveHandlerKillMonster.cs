@@ -21,8 +21,9 @@ namespace GGemCo.Scripts
         {
             return currentCount >= step.count;
         }
-        private void OnMonsterKilled(int monsterUid)
+        private void OnMonsterKilled(int mapUid, int monsterUid)
         {
+            if (mapUid != currentStep.mapUid) return;
             if (monsterUid != currentStep.targetUid) return;
             currentCount++;
             // GcLogger.Log($"[KillObjective] {monsterUid} 처치: {currentCount}/{currentStep.count}");
