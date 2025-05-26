@@ -25,7 +25,6 @@ namespace GGemCo.Scripts
         protected override void Awake()
         {
             base.Awake();
-            CharacterRegenData = null;
             attackType = CharacterConstants.AttackType.PassiveDefense;
             
             OnMonsterDead += SceneGame.Instance.ItemManager.OnMonsterDead;

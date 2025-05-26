@@ -76,6 +76,7 @@ namespace GGemCo.Scripts
         {
             if (AddressableSettingsLoader.Instance == null) return;
             base.Awake();
+            CharacterRegenData = null;
             AffectController = new AffectController(this);
             SetAttackType(CharacterConstants.AttackType.None);
             SetAggro(false);

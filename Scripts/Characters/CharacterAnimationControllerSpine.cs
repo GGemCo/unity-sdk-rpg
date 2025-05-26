@@ -11,7 +11,7 @@ namespace GGemCo.Scripts
     /// <summary>
     /// 캐릭터 스파인 애니메이션 처리
     /// </summary>
-    public class CharacterCharacterAnimationControllerSpine : Spine2dController, ICharacterAnimationController
+    public class CharacterAnimationControllerSpine : Spine2dController, ICharacterAnimationController
     {
         private CharacterBase characterBase;
         protected override void Awake()

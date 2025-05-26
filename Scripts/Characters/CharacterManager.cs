@@ -48,10 +48,10 @@ namespace GGemCo.Scripts
                     break;
             }
 #if GGEMCO_USE_SPINE
-            CharacterCharacterAnimationControllerSpine characterCharacterAnimationControllerSpine =
-                characterObj.AddComponent<CharacterCharacterAnimationControllerSpine>();
+            CharacterAnimationControllerSpine characterAnimationControllerSpine =
+                characterObj.AddComponent<CharacterAnimationControllerSpine>();
             ICharacterAnimationController iCharacterAnimationController =
-                characterCharacterAnimationControllerSpine.GetComponent<ICharacterAnimationController>();
+                characterAnimationControllerSpine.GetComponent<ICharacterAnimationController>();
 #else
             CharacterAnimationControllerSprite characterAnimationControllerSprite =
              characterObj.AddComponent<CharacterAnimationControllerSprite>();

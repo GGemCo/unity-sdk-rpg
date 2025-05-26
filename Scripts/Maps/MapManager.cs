@@ -112,11 +112,7 @@ namespace GGemCo.Scripts
         }
         protected void Reset()
         {
-            if (coroutineRegenMonster != null)
-            {
-                StopCoroutine(coroutineRegenMonster);
-            }
-
+            StopAllCoroutines();
             mapLoadCharacters.Reset();
         }
         /// <summary>
@@ -353,10 +349,6 @@ namespace GGemCo.Scripts
             {
             }
 
-            if (mapTileCommon != null)
-            {
-                Destroy(mapTileCommon.gameObject);
-            }
             GameObject currentMap = Instantiate(prefab, gridTileMap.transform);
             mapTileCommon = currentMap.GetComponent<MapTileCommon>();
             mapTileCommon.Initialize(currentMapTableData.Uid, currentMapTableData.Name, currentMapTableData.Type, currentMapTableData.Subtype);

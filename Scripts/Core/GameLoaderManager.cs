@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -17,7 +16,6 @@ namespace GGemCo.Scripts
         }
 
         public TextMeshProUGUI textLoadingPercent; // 진행률 표시
-        private Dictionary<string, GameObject> gamePrefabs;
         private TableLoaderManager tableLoader;
         private AddressablePrefabLoader prefabLoader;
         private SaveDataLoader saveDataLoader;

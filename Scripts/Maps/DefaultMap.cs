@@ -112,19 +112,6 @@ namespace GGemCo.Scripts
             return myNpc.CharacterRegenData;
         }
         /// <summary>
-        /// vid 값으로 몬스터 찾기  
-        /// </summary>
-        /// <param name="vid"></param>
-        /// <returns></returns>
-        public CharacterRegenData GetMonsterDataByVid(int vid)
-        {
-            GameObject monster = Monsters.GetValueOrDefault(vid);
-            if (monster == null) return null;
-            Monster myMonster = monster.GetComponent<Monster>();
-            if (myMonster == null) return null;
-            return myMonster.CharacterRegenData;
-        }
-        /// <summary>
         /// 맵에 배치된 npc 중에 uid 로 가져오기
         /// </summary>
         /// <param name="npcUid"></param>
@@ -183,6 +170,19 @@ namespace GGemCo.Scripts
         {
             if (monster == null) return;
             Monsters.Add(vid, monster);
+        }
+        /// <summary>
+        /// vid 값으로 몬스터 찾기  
+        /// </summary>
+        /// <param name="vid"></param>
+        /// <returns></returns>
+        public CharacterRegenData GetMonsterDataByVid(int vid)
+        {
+            GameObject monster = Monsters.GetValueOrDefault(vid);
+            if (monster == null) return null;
+            Monster myMonster = monster.GetComponent<Monster>();
+            if (myMonster == null) return null;
+            return myMonster.CharacterRegenData;
         }
         /// <summary>
         /// 플레이어 기준 range 안에서 가장 가까운 몬스터 찾기

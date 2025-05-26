@@ -48,12 +48,15 @@ namespace GGemCo.Scripts
 
             dataFiles = new[]
             {
-                ConfigTableFileName.Config, ConfigTableFileName.Map, ConfigTableFileName.Monster,
-                ConfigTableFileName.Npc, ConfigTableFileName.Animation, ConfigTableFileName.Item,
+                ConfigTableFileName.Map, ConfigTableFileName.Monster, ConfigTableFileName.Npc,
+                ConfigTableFileName.Animation, ConfigTableFileName.Item,
                 ConfigTableFileName.MonsterDropRate, ConfigTableFileName.ItemDropGroup, ConfigTableFileName.Exp,
-                ConfigTableFileName.Window, ConfigTableFileName.Status, ConfigTableFileName.Skill, ConfigTableFileName.Affect,
-                ConfigTableFileName.Effect, ConfigTableFileName.Interaction, ConfigTableFileName.Shop, ConfigTableFileName.ItemUpgrade,
-                ConfigTableFileName.ItemSalvage, ConfigTableFileName.ItemCraft, ConfigTableFileName.Cutscene, ConfigTableFileName.Dialogue,
+                ConfigTableFileName.Window, ConfigTableFileName.Status, ConfigTableFileName.Skill,
+                ConfigTableFileName.Affect,
+                ConfigTableFileName.Effect, ConfigTableFileName.Interaction, ConfigTableFileName.Shop,
+                ConfigTableFileName.ItemUpgrade,
+                ConfigTableFileName.ItemSalvage, ConfigTableFileName.ItemCraft, ConfigTableFileName.Cutscene,
+                ConfigTableFileName.Dialogue,
                 ConfigTableFileName.Quest
             };
         }
