@@ -16,6 +16,7 @@ namespace GGemCo.Scripts
         public float Height;
         public int AttackRange;
         public Vector2 HitAreaSize;
+        public CharacterConstants.CharacterFacing DefaultFacing;
     }
     /// <summary>
     /// 애니메이션 테이블
@@ -44,8 +45,10 @@ namespace GGemCo.Scripts
                 Width = float.Parse(data["Width"]),
                 Height = float.Parse(data["Height"]),
                 HitAreaSize = ConvertVector2(data["HitAreaSize"]),
+                DefaultFacing = ConvertFacing(data["DefaultFacing"]),
             };
         }
+
         public GameObject GetPrefab(int uid) {
             var info = GetDataByUid(uid);
             if (info == null)

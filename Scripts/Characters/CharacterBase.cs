@@ -174,6 +174,7 @@ namespace GGemCo.Scripts
                 colliderCheckHitArea.size = struckTableAnimation.HitAreaSize;
             }
             height = struckTableAnimation.Height;
+            characterFacing = struckTableAnimation.DefaultFacing;
         }
         /// <summary>
         /// 캐릭터가 flip 되었는지 체크

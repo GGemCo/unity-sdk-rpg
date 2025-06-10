@@ -97,7 +97,10 @@ namespace GGemCo.Scripts
         /// </summary>
         private int GetScaleByDirection(Vector2 direction)
         {
-            return direction.x >= 0 ? -1 : 1;
+            if (TargetCharacter.characterFacing == CharacterConstants.CharacterFacing.Left)
+                return direction.x >= 0 ? -1 : 1;
+            else
+                return direction.x >= 0 ? 1 : -1;
         }
         /// <summary>
         /// 공격 실행

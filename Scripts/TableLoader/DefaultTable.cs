@@ -14,6 +14,7 @@ namespace GGemCo.Scripts
         private readonly Dictionary<int, Dictionary<string, string>> table = new Dictionary<int, Dictionary<string, string>>();
         private static readonly Dictionary<string, ConfigCommon.SuffixType> MapSuffix;
         private static readonly Dictionary<string, CurrencyConstants.Type> MapCurrencyType;
+        private static readonly Dictionary<string, CharacterConstants.CharacterFacing> MapCharacterFacing;
 
         public virtual bool TryGetDataByUid(int uid, out object info)
         {
@@ -34,6 +35,11 @@ namespace GGemCo.Scripts
                 { "Gold", CurrencyConstants.Type.Gold },
                 { "Silver", CurrencyConstants.Type.Silver },
             };
+            MapCharacterFacing = new Dictionary<string, CharacterConstants.CharacterFacing>
+            {
+                { "Left", CharacterConstants.CharacterFacing.Left },
+                { "Right", CharacterConstants.CharacterFacing.Right },
+            };
         }
 
         protected static ConfigCommon.SuffixType ConvertSuffixType(string type) =>
@@ -42,6 +48,8 @@ namespace GGemCo.Scripts
         protected static CurrencyConstants.Type ConvertCurrencyType(string type) =>
             MapCurrencyType.GetValueOrDefault(type, CurrencyConstants.Type.None);
 
+        protected static CharacterConstants.CharacterFacing ConvertFacing(string type) =>
+            MapCharacterFacing.GetValueOrDefault(type, CharacterConstants.CharacterFacing.Left);
         public virtual void LoadData(string content)
         {
             PreLoad();
