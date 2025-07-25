@@ -1,3 +1,7 @@
+# GGemCo 2D Core 패키지
+- Unity Package 방식으로 버전 2를 만들었습니다.
+- 바로가기: https://github.com/GGemCo/unity-package-2d-core
+
 # Unity SDK RPG
 유니티에서 2D RPG 게임을 만들기 위한 라이브러리 입니다.
 
